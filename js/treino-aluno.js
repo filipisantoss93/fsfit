@@ -10,11 +10,12 @@ const params = new URLSearchParams(location.search);
 const alunoId = params.get('id');
 const message = document.querySelector('#workout-message');
 const workoutForm = document.querySelector('#workout-form');
-const exerciseLibraryForm = document.querySelector('#exercise-library-form');
 const workoutExerciseForm = document.querySelector('#workout-exercise-form');
 const exerciseSelect = document.querySelector('#exercise-select');
 const workoutDaySelect = workoutExerciseForm.querySelector('[name="dia_semana"]');
 const workoutDays = document.querySelector('#workout-days');
+const exerciseModal = document.querySelector('#exercise-modal');
+const openExerciseModalButton = document.querySelector('#open-exercise-modal');
 const dayNames = { 0: 'Domingo', 1: 'Segunda-feira', 2: 'Terça-feira', 3: 'Quarta-feira', 4: 'Quinta-feira', 5: 'Sexta-feira', 6: 'Sábado' };
 let treinoId = null;
 
@@ -37,14 +38,26 @@ function updateWorkoutDayOptions(days = selectedDays()) {
     .map(day => `<option value="${day}">${dayNames[day]}</option>`)
     .join('');
 
-  if (orderedDays.includes(Number(currentValue))) {
-    workoutDaySelect.value = currentValue;
-  }
+  if (orderedDays.includes(Number(currentValue))) workoutDaySelect.value = currentValue;
 
   workoutDaySelect.disabled = orderedDays.length === 0;
   if (orderedDays.length === 0) {
     workoutDaySelect.innerHTML = '<option value="">Selecione os dias na configuração do treino</option>';
   }
+}
+
+function openExerciseModal() {
+  updateWorkoutDayOptions();
+  exerciseModal.classList.remove('hidden');
+  exerciseModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+  setTimeout(() => workoutDaySelect.focus(), 0);
+}
+
+function closeExerciseModal() {
+  exerciseModal.classList.add('hidden');
+  exerciseModal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
 }
 
 async function loadStudent() {
@@ -154,6 +167,12 @@ document.querySelectorAll('#weekday-options input').forEach(input => {
   input.addEventListener('change', () => updateWorkoutDayOptions());
 });
 
+openExerciseModalButton.addEventListener('click', openExerciseModal);
+document.querySelectorAll('[data-close-exercise-modal]').forEach(element => element.addEventListener('click', closeExerciseModal));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !exerciseModal.classList.contains('hidden')) closeExerciseModal();
+});
+
 workoutForm.addEventListener('submit', async event => {
   event.preventDefault();
   const days = selectedDays();
@@ -169,24 +188,6 @@ workoutForm.addEventListener('submit', async event => {
   if (error) return showMessage(message, error.message, 'error');
   updateWorkoutDayOptions(days);
   showMessage(message, 'Configuração do treino salva com sucesso.');
-});
-
-exerciseLibraryForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  const payload = {
-    personal_id: session.user.id,
-    nome: exerciseLibraryForm.nome.value.trim(),
-    grupo_muscular: exerciseLibraryForm.grupo_muscular.value.trim() || null,
-    equipamento: exerciseLibraryForm.equipamento.value.trim() || null,
-    instrucoes: exerciseLibraryForm.instrucoes.value.trim() || null,
-    video_url: exerciseLibraryForm.video_url.value.trim() || null,
-    global: false
-  };
-  const { error } = await supabase.from('exercicios').insert(payload);
-  if (error) return showMessage(message, error.message, 'error');
-  exerciseLibraryForm.reset();
-  await loadExerciseLibrary();
-  showMessage(message, 'Exercício adicionado à biblioteca.');
 });
 
 workoutExerciseForm.addEventListener('submit', async event => {
@@ -214,6 +215,7 @@ workoutExerciseForm.addEventListener('submit', async event => {
   workoutExerciseForm.reset();
   workoutExerciseForm.ordem.value = '1';
   updateWorkoutDayOptions(allowedDays);
+  closeExerciseModal();
   await loadWorkoutExercises();
   showMessage(message, 'Exercício adicionado ao treino.');
 });
