@@ -1,0 +1,150 @@
+/* Página de alunos */
+.students-page { max-width: 1080px; }
+.students-page-header { align-items: center; }
+.student-form-card { margin-bottom: 20px; }
+.student-list-card { margin-top: 20px; }
+
+.student-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.student-section-heading small {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+.student-section-heading h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 4vw, 2rem);
+  letter-spacing: -.025em;
+}
+
+.student-fieldset {
+  margin: 0 0 22px;
+  padding: 0 0 20px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+.student-fieldset-last { margin-bottom: 18px; }
+.student-fieldset legend {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 0;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+.student-form-grid,
+.student-physical-grid,
+.student-notes-grid { gap: 14px; }
+.student-form-grid .form-group,
+.student-physical-grid .form-group,
+.student-notes-grid .form-group { margin-bottom: 0; }
+.student-textarea { min-height: 110px; }
+.student-form-actions { justify-content: flex-start; }
+.student-form-actions .btn { min-width: 180px; }
+
+.student-list-heading { margin-bottom: 14px; }
+.responsive-students .actions { gap: 8px; }
+.responsive-students .btn { min-height: 40px; padding-inline: 13px; font-size: .86rem; }
+
+@media (max-width: 860px) {
+  .student-physical-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .students-page-header {
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .students-page-header h1 { font-size: 2.15rem; }
+  .students-page-header p { max-width: 330px; font-size: .95rem; line-height: 1.5; }
+
+  .student-form-card,
+  .student-list-card { padding: 17px; }
+  .student-section-heading { margin-bottom: 18px; }
+  .student-section-heading h2 { font-size: 1.6rem; }
+
+  .student-fieldset { margin-bottom: 18px; padding-bottom: 16px; }
+  .student-fieldset legend { margin-bottom: 13px; }
+  .student-form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .student-physical-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .student-notes-grid { grid-template-columns: 1fr; gap: 12px; }
+  .student-textarea { min-height: 96px; }
+
+  .student-form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .student-form-actions .btn { width: 100%; min-width: 0; }
+
+  .responsive-students { overflow: visible; }
+  .responsive-students table,
+  .responsive-students tbody,
+  .responsive-students tr,
+  .responsive-students td { display: block; width: 100%; }
+  .responsive-students thead { display: none; }
+  .responsive-students tbody { display: grid; gap: 12px; }
+  .responsive-students tr {
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-light);
+  }
+  .responsive-students td {
+    display: grid;
+    grid-template-columns: 102px minmax(0, 1fr);
+    gap: 12px;
+    padding: 7px 0;
+    border: 0;
+    line-height: 1.4;
+  }
+  .responsive-students td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .responsive-students td:first-child strong { font-size: 1.05rem; }
+  .responsive-students td:first-child small { display: block; margin-top: 3px; }
+  .responsive-students td.student-actions-cell {
+    display: block;
+    padding-top: 12px;
+  }
+  .responsive-students td.student-actions-cell::before { display: none; }
+  .responsive-students .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .responsive-students .actions .btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 10px;
+    font-size: .82rem;
+  }
+  .responsive-students .actions .btn-primary { grid-column: 1 / -1; }
+  .responsive-students td[colspan] {
+    display: block;
+    padding: 24px 10px;
+    text-align: center;
+  }
+  .responsive-students td[colspan]::before { display: none; }
+}
+
+@media (max-width: 390px) {
+  .student-physical-grid { grid-template-columns: 1fr; }
+  .responsive-students td { grid-template-columns: 88px minmax(0, 1fr); gap: 9px; }
+  .responsive-students .actions { grid-template-columns: 1fr; }
+  .responsive-students .actions .btn-primary { grid-column: auto; }
+}
