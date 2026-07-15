@@ -63,6 +63,7 @@ export function renderHeader(active = '') {
           <li><a data-page="exercicios" href="biblioteca-exercicios.html">Exercícios</a></li>
           <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
           <li><a data-page="contato" href="contato.html">Contato</a></li>
+          <li id="admin-support-nav" class="hidden"><a data-page="admin-suporte" href="admin-contatos.html">Suporte</a></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
           <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
         </ul>
@@ -81,9 +82,13 @@ export function renderHeader(active = '') {
 export async function setGreeting(session) {
   const target = document.querySelector('#user-greeting');
   if (!target || !session) return;
-  const { data } = await supabase.from('perfis').select('nome').eq('id', session.user.id).maybeSingle();
-  const name = data?.nome?.trim() || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Personal';
+  const [{ data: profile }, { data: admin }] = await Promise.all([
+    supabase.from('perfis').select('nome').eq('id', session.user.id).maybeSingle(),
+    supabase.from('platform_admins').select('user_id').eq('user_id', session.user.id).maybeSingle()
+  ]);
+  const name = profile?.nome?.trim() || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Personal';
   target.textContent = `Olá, ${name}`;
+  if (admin) document.querySelector('#admin-support-nav')?.classList.remove('hidden');
 }
 
 export function showMessage(element, text, type = 'success') {
