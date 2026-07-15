@@ -6,86 +6,54 @@
   <meta name="theme-color" content="#0f1115">
   <title>Meu perfil — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .profile-card{max-width:860px}.upload-row{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center;margin-bottom:22px}.upload-preview{width:120px;height:120px;border-radius:18px;object-fit:cover;border:1px solid var(--border);background:var(--surface-light)}.upload-preview.avatar{border-radius:50%}.upload-placeholder{display:grid;place-items:center;color:var(--muted);font-size:.8rem;text-align:center;padding:12px}.public-link-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.gallery-admin{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:14px}.gallery-admin-item{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--surface-light)}.gallery-admin-item img{width:100%;height:100%;object-fit:cover}.gallery-remove{position:absolute;top:7px;right:7px;width:32px;height:32px;border:0;border-radius:50%;background:rgba(0,0,0,.72);color:#fff;cursor:pointer;font-weight:900}.gallery-count{color:var(--muted);font-size:.85rem}.file-help{display:block;margin-top:7px;color:var(--muted)}@media(max-width:700px){.upload-row{grid-template-columns:1fr}.gallery-admin{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:430px){.gallery-admin{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
 </head>
 <body>
   <div id="header-container"></div>
   <main class="container">
-    <section class="page-header">
-      <div>
-        <h1>Meu Perfil</h1>
-        <p>Configure seus dados profissionais e a página pública que você poderá compartilhar nas redes sociais.</p>
-      </div>
-    </section>
+    <section class="page-header"><div><h1>Meu Perfil</h1><p>Configure seus dados profissionais e a página pública que você poderá compartilhar nas redes sociais.</p></div></section>
 
-    <section class="card" style="max-width:760px">
+    <section class="card profile-card">
       <div id="profile-message" class="message"></div>
       <form id="profile-form">
-        <div class="form-group">
-          <label>Nome do personal *</label>
-          <input name="full_name" required>
-        </div>
-
-        <div class="form-group">
-          <label>WhatsApp profissional</label>
-          <input name="whatsapp" inputmode="numeric" maxlength="15">
-        </div>
-
-        <div class="form-group">
-          <label>E-mail da conta</label>
-          <input name="email" disabled>
-        </div>
+        <div class="form-group"><label>Nome do personal *</label><input name="full_name" required></div>
+        <div class="form-group"><label>WhatsApp profissional</label><input name="whatsapp" inputmode="numeric" maxlength="15"></div>
+        <div class="form-group"><label>E-mail da conta</label><input name="email" disabled></div>
 
         <hr style="margin:28px 0;border:0;border-top:1px solid rgba(255,255,255,.08)">
-
         <h2>Página pública</h2>
         <p style="margin-top:0;opacity:.75">Este é o único link que você precisa divulgar. Seus alunos usarão o próprio telefone para acessar a área privada.</p>
 
-        <div class="form-group">
-          <label>Endereço público *</label>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <span style="opacity:.7">personal.html?u=</span>
-            <input name="slug" maxlength="60" placeholder="joao-silva" required style="flex:1;min-width:180px">
-          </div>
-          <small>Use letras minúsculas, números e hífen.</small>
-        </div>
-
-        <div class="form-group">
-          <label>Foto de perfil (URL)</label>
-          <input name="foto_url" type="url" placeholder="https://...">
-        </div>
-
-        <div class="grid grid-2">
-          <div class="form-group">
-            <label>Local de trabalho</label>
-            <input name="local_trabalho" maxlength="120" placeholder="Ex.: Academia FS Center">
-          </div>
-          <div class="form-group">
-            <label>Cidade</label>
-            <input name="cidade" maxlength="100" placeholder="Ex.: São Paulo - SP">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Especialidades</label>
-          <input name="especialidades" maxlength="240" placeholder="Ex.: Hipertrofia, emagrecimento e condicionamento">
-        </div>
-
-        <div class="form-group">
-          <label>Sobre você</label>
-          <textarea name="bio" maxlength="800" rows="5" placeholder="Conte brevemente sobre sua experiência e forma de trabalho."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Instagram</label>
-          <input name="instagram" maxlength="120" placeholder="@seuusuario">
-        </div>
-
-        <label style="display:flex;gap:10px;align-items:center;margin:18px 0 24px">
-          <input name="publicado" type="checkbox" style="width:auto">
-          <span>Deixar minha página pública ativa</span>
-        </label>
-
+        <div class="form-group"><label>Endereço público *</label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="opacity:.7">/p/</span><input name="slug" maxlength="60" placeholder="joao-silva" required style="flex:1;min-width:180px"></div><small>Use letras minúsculas, números e hífen.</small></div>
         <div id="public-link-box" class="message" style="margin-bottom:18px"></div>
+
+        <h3>Foto de perfil</h3>
+        <div class="upload-row">
+          <div id="avatar-preview" class="upload-preview avatar upload-placeholder">Sem foto</div>
+          <div><input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp"><small class="file-help">JPEG, PNG ou WebP. Máximo 5 MB.</small></div>
+        </div>
+
+        <div class="grid grid-2"><div class="form-group"><label>Local de trabalho</label><input name="local_trabalho" maxlength="120" placeholder="Ex.: Academia FS Center"></div><div class="form-group"><label>Cidade</label><input name="cidade" maxlength="100" placeholder="Ex.: São Paulo - SP"></div></div>
+
+        <h3>Foto do local de trabalho</h3>
+        <div class="upload-row">
+          <div id="workplace-preview" class="upload-preview upload-placeholder">Sem foto</div>
+          <div><input id="workplace-file" type="file" accept="image/jpeg,image/png,image/webp"><small class="file-help">Exiba a academia, estúdio ou espaço onde você atende.</small></div>
+        </div>
+
+        <div class="form-group"><label>Especialidades</label><input name="especialidades" maxlength="240" placeholder="Ex.: Hipertrofia, emagrecimento e condicionamento"></div>
+        <div class="form-group"><label>Sobre você</label><textarea name="bio" maxlength="800" rows="5" placeholder="Conte brevemente sobre sua experiência e forma de trabalho."></textarea></div>
+        <div class="form-group"><label>Instagram</label><input name="instagram" maxlength="120" placeholder="@seuusuario"></div>
+
+        <hr style="margin:28px 0;border:0;border-top:1px solid rgba(255,255,255,.08)">
+        <h2>Fotos do dia a dia</h2>
+        <p style="margin-top:0;opacity:.75">Adicione até 10 fotos para mostrar treinos, rotina e ambiente profissional.</p>
+        <div class="form-group"><input id="gallery-files" type="file" accept="image/jpeg,image/png,image/webp" multiple><small id="gallery-count" class="gallery-count">0 de 10 fotos</small></div>
+        <div id="gallery-admin" class="gallery-admin"></div>
+
+        <label style="display:flex;gap:10px;align-items:center;margin:24px 0"><input name="publicado" type="checkbox" style="width:auto"><span>Deixar minha página pública ativa</span></label>
         <button class="btn btn-primary" type="submit">Salvar perfil</button>
       </form>
     </section>
