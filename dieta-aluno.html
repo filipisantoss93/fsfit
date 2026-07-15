@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Dieta do aluno — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container">
+    <section class="page-header">
+      <div>
+        <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar</a>
+        <h1 id="student-name">Plano alimentar</h1>
+        <p>Organize refeições por dias da semana e horários.</p>
+      </div>
+      <span class="hero-badge">DIETA</span>
+    </section>
+
+    <div id="diet-message" class="message"></div>
+
+    <section class="grid grid-2" style="align-items:start">
+      <article class="card">
+        <h2>Dados do plano</h2>
+        <form id="diet-form">
+          <div class="form-group"><label>Título *</label><input name="titulo" maxlength="120" placeholder="Ex.: Plano alimentar - Hipertrofia" required></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Data de início</label><input name="data_inicio" type="date"></div>
+            <div class="form-group"><label>Data de término</label><input name="data_fim" type="date"></div>
+          </div>
+          <div class="form-group"><label>Meta de água (ml/dia)</label><input name="agua_ml" type="number" min="0" max="15000" step="100" placeholder="Ex.: 3000"></div>
+          <div class="form-group"><label>Orientações gerais</label><textarea name="orientacoes" placeholder="Ex.: Preferir alimentos in natura, ajustar porções conforme orientação profissional..."></textarea></div>
+          <div class="actions"><button class="btn btn-primary" type="submit">Salvar plano alimentar</button></div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Nova refeição</h2>
+        <form id="meal-form">
+          <div class="form-group"><label>Nome da refeição *</label><input name="nome" maxlength="100" placeholder="Ex.: Café da manhã" required></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Horário</label><input name="horario" type="time"></div>
+            <div class="form-group"><label>Ordem</label><input name="ordem" type="number" min="1" max="50" value="1"></div>
+          </div>
+          <div class="form-group">
+            <label>Dias da semana *</label>
+            <div class="actions" id="meal-days">
+              <label><input type="checkbox" value="1"> Seg</label>
+              <label><input type="checkbox" value="2"> Ter</label>
+              <label><input type="checkbox" value="3"> Qua</label>
+              <label><input type="checkbox" value="4"> Qui</label>
+              <label><input type="checkbox" value="5"> Sex</label>
+              <label><input type="checkbox" value="6"> Sáb</label>
+              <label><input type="checkbox" value="7"> Dom</label>
+            </div>
+          </div>
+          <div class="form-group"><label>Descrição *</label><textarea name="descricao" placeholder="Ex.: 2 ovos, 1 fatia de pão integral, 1 banana..." required></textarea></div>
+          <div class="form-group"><label>Substituições</label><textarea name="substituicoes" placeholder="Ex.: Trocar banana por maçã; pão por tapioca..."></textarea></div>
+          <div class="actions"><button class="btn btn-primary" type="submit">Adicionar refeição</button></div>
+        </form>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <div class="section-heading compact"><div><small>Plano ativo</small><strong>Refeições por dia</strong></div></div>
+      <div id="meal-list"><p>Carregando...</p></div>
+    </section>
+  </main>
+  <script type="module" src="js/dieta-aluno.js"></script>
+</body>
+</html>
