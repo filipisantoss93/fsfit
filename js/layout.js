@@ -60,6 +60,7 @@ export function renderHeader(active = '') {
         <ul id="nav-menu" class="nav-menu">
           <li><a data-page="painel" href="painel.html">Início</a></li>
           <li><a data-page="alunos" href="alunos.html">Alunos</a></li>
+          <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
           <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
         </ul>
