@@ -1,7 +1,8 @@
 import { supabase } from './supabase.js';
 
 const params = new URLSearchParams(window.location.search);
-const slug = String(params.get('u') || '').trim().toLowerCase();
+const pathMatch = window.location.pathname.match(/^\/p\/([^/]+)\/?$/i);
+const slug = String(pathMatch?.[1] || params.get('u') || '').trim().toLowerCase();
 const profileHost = document.querySelector('#public-profile');
 const accessSection = document.querySelector('#student-access');
 const message = document.querySelector('#access-message');
@@ -43,8 +44,8 @@ function resetAccess() {
 
 function saveSession(result) {
   localStorage.setItem('fsfit_aluno_token', result.token);
-  localStorage.setItem('fsfit_aluno_expira_em', result.expira_em || '');
-  window.location.href = 'aluno.html';
+  localStorage.setItem('fsfit_aluno_token_expira_em', result.expira_em || '');
+  window.location.href = '/aluno.html';
 }
 
 async function invoke(body) {
@@ -82,7 +83,18 @@ async function loadProfile() {
     return;
   }
 
+  localStorage.setItem('fsfit_personal_slug', data.slug);
   document.title = `${data.nome_publico} — FS Fit`;
+
+  const canonicalUrl = `${window.location.origin}/p/${encodeURIComponent(data.slug)}`;
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    document.head.appendChild(canonical);
+  }
+  canonical.href = canonicalUrl;
+
   const avatar = data.foto_url
     ? `<img class="public-profile-avatar" src="${esc(data.foto_url)}" alt="Foto de ${esc(data.nome_publico)}">`
     : `<div class="public-profile-avatar public-profile-avatar-placeholder">${esc(data.nome_publico.charAt(0).toUpperCase())}</div>`;
