@@ -76,6 +76,7 @@ async function loadStudents() {
       <td data-label="Ações" class="student-actions-cell"><div class="actions">
         <a class="btn btn-primary" href="ficha-aluno.html?id=${student.id}">Abrir ficha</a>
         <button class="btn btn-outline" data-edit="${student.id}">Editar cadastro</button>
+        <button class="btn btn-outline" data-reset-pin="${student.id}" data-name="${esc(student.nome)}">Alterar PIN</button>
         <button class="btn btn-danger" data-delete="${student.id}" data-name="${esc(student.nome)}">Excluir</button>
       </div></td>
     </tr>`;
@@ -122,6 +123,34 @@ document.querySelector('#cancel-edit').addEventListener('click', resetForm);
 document.addEventListener('click', async event => {
   const edit = event.target.closest('[data-edit]');
   if (edit) return editStudent(edit.dataset.edit);
+
+  const resetPin = event.target.closest('[data-reset-pin]');
+  if (resetPin) {
+    const first = prompt(`Digite o novo PIN de 4 números para ${resetPin.dataset.name}:`);
+    if (first == null) return;
+    const pin = String(first).replace(/\D/g, '').slice(0, 4);
+    if (pin.length !== 4) return showMessage(message, 'O PIN deve ter exatamente 4 números.', 'error');
+    const confirmation = prompt('Confirme o novo PIN de 4 números:');
+    if (confirmation == null) return;
+    const pinConfirm = String(confirmation).replace(/\D/g, '').slice(0, 4);
+    if (pin !== pinConfirm) return showMessage(message, 'Os PINs informados não coincidem.', 'error');
+
+    resetPin.disabled = true;
+    try {
+      const { data, error } = await supabase.functions.invoke('aluno-auth', {
+        body: { action: 'personal_reset_pin', aluno_id: resetPin.dataset.resetPin, pin }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      showMessage(message, `PIN de ${resetPin.dataset.name} alterado com sucesso. As sessões anteriores foram encerradas.`);
+    } catch (error) {
+      console.error(error);
+      showMessage(message, error.message || 'Não foi possível alterar o PIN.', 'error');
+    } finally {
+      resetPin.disabled = false;
+    }
+    return;
+  }
 
   const remove = event.target.closest('[data-delete]');
   if (remove && confirm(`Excluir ${remove.dataset.name}? Todos os dados vinculados também serão removidos.`)) {
