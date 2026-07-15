@@ -1,0 +1,89 @@
+.student-media-section { margin-top: 20px; }
+.media-create-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.media-form { padding: 18px; }
+.media-form h3 { margin: 0 0 16px; }
+.field-help {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.4;
+}
+.media-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 14px;
+}
+.media-list-header h3 { margin: 0; }
+.media-count {
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
+}
+.student-media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.student-media-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-light);
+}
+.student-media-preview {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #090b0e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.student-media-preview img,
+.student-media-preview video,
+.student-media-preview iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+.student-media-preview-link {
+  padding: 24px;
+  color: inherit;
+  text-decoration: none;
+  text-align: center;
+}
+.student-media-preview-link strong { display: block; margin-bottom: 6px; }
+.student-media-body { padding: 14px; }
+.student-media-type {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.student-media-title { margin: 0 0 12px; font-size: 1rem; }
+.student-media-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.student-media-actions a { font-size: .84rem; }
+.student-media-actions .btn { min-height: 38px; padding: 0 12px; font-size: .8rem; }
+
+@media (max-width: 700px) {
+  .media-create-grid,
+  .student-media-grid { grid-template-columns: 1fr; }
+  .media-form { padding: 15px; }
+}
