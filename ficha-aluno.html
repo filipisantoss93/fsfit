@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Ficha do aluno — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container">
+    <section class="page-header">
+      <div><a class="btn btn-outline" href="alunos.html">← Voltar</a><h1 id="student-name">Ficha do aluno</h1><p id="student-summary">Carregando dados...</p></div>
+      <span id="student-status" class="hero-badge">ATIVO</span>
+    </section>
+
+    <div id="record-message" class="message"></div>
+
+    <section class="grid grid-2">
+      <article class="card">
+        <h2>Dados cadastrais</h2>
+        <div id="profile-data"><p>Carregando...</p></div>
+        <div class="actions"><a id="edit-registration" class="btn btn-secondary" href="alunos.html">Editar cadastro</a></div>
+      </article>
+      <article class="card">
+        <h2>Resumo físico</h2>
+        <div class="metric-grid">
+          <div class="metric-card"><span>Peso atual</span><strong id="current-weight">—</strong><small id="weight-date">Sem registros</small></div>
+          <div class="metric-card"><span>Gordura corporal</span><strong id="current-fat">—</strong><small>Última avaliação</small></div>
+          <div class="metric-card"><span>Altura</span><strong id="student-height">—</strong><small>Cadastro</small></div>
+          <div class="metric-card"><span>IMC</span><strong id="student-bmi">—</strong><small>Estimativa</small></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid grid-2" style="margin-top:20px">
+      <article class="card">
+        <h2>Registrar peso</h2>
+        <form id="weight-form">
+          <div class="grid grid-2">
+            <div class="form-group"><label>Peso (kg) *</label><input name="peso_kg" type="number" min="20" max="400" step="0.1" required></div>
+            <div class="form-group"><label>Data *</label><input name="data_registro" type="date" required></div>
+          </div>
+          <div class="form-group"><label>Observações</label><input name="observacoes" maxlength="240" placeholder="Ex.: medição em jejum"></div>
+          <button class="btn btn-primary" type="submit">Adicionar peso</button>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Nova avaliação física</h2>
+        <form id="assessment-form">
+          <div class="grid grid-2">
+            <div class="form-group"><label>Data *</label><input name="data_avaliacao" type="date" required></div>
+            <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura" type="number" min="1" max="75" step="0.1"></div>
+            <div class="form-group"><label>Cintura (cm)</label><input name="cintura_cm" type="number" min="30" max="250" step="0.1"></div>
+            <div class="form-group"><label>Quadril (cm)</label><input name="quadril_cm" type="number" min="30" max="250" step="0.1"></div>
+            <div class="form-group"><label>Braço (cm)</label><input name="braco_cm" type="number" min="10" max="100" step="0.1"></div>
+            <div class="form-group"><label>Coxa (cm)</label><input name="coxa_cm" type="number" min="20" max="150" step="0.1"></div>
+          </div>
+          <div class="form-group"><label>Observações</label><textarea name="observacoes"></textarea></div>
+          <button class="btn btn-primary" type="submit">Salvar avaliação</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <div class="section-heading compact"><div><small>Evolução</small><strong>Histórico de peso</strong></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Data</th><th>Peso</th><th>Variação</th><th>Observações</th></tr></thead><tbody id="weight-history"><tr><td colspan="4">Carregando...</td></tr></tbody></table></div>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Próximos módulos</h2>
+      <div class="actions">
+        <button class="btn btn-secondary" type="button" disabled>Treinos estruturados</button>
+        <button class="btn btn-secondary" type="button" disabled>Dieta por horários</button>
+        <button class="btn btn-secondary" type="button" disabled>Lembretes</button>
+        <button class="btn btn-secondary" type="button" disabled>Acesso e PIN</button>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/ficha-aluno.js"></script>
+</body>
+</html>
