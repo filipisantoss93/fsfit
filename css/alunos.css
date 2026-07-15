@@ -1,7 +1,7 @@
 /* Página de alunos */
 .students-page { max-width: 1080px; }
 .students-page-header { align-items: center; }
-.student-form-card { margin-bottom: 20px; }
+.student-form-card { margin-top: 20px; margin-bottom: 20px; }
 .student-list-card { margin-top: 20px; }
 
 .student-section-heading {
@@ -24,6 +24,9 @@
   font-size: clamp(1.55rem, 4vw, 2rem);
   letter-spacing: -.025em;
 }
+
+.student-search-wrap { margin-bottom: 16px; }
+.student-search-wrap input { width: 100%; min-height: 52px; }
 
 .student-fieldset {
   margin: 0 0 22px;
@@ -51,6 +54,62 @@
 .student-form-actions { justify-content: flex-start; }
 .student-form-actions .btn { min-width: 180px; }
 
+.student-form-card input:not([type="checkbox"]),
+.student-form-card select {
+  min-height: 56px;
+  height: 56px;
+}
+.student-form-card input[type="date"],
+.student-form-card input[type="time"] {
+  min-height: 56px;
+  height: 56px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.student-age-input {
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+  opacity: .9;
+}
+
+.student-weekdays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.student-weekdays label {
+  position: relative;
+  cursor: pointer;
+}
+.student-weekdays input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.student-weekdays span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-light);
+  color: var(--text);
+  font-weight: 800;
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+.student-weekdays input:checked + span {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #08110b;
+}
+.student-weekdays input:focus-visible + span {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .student-list-heading { margin-bottom: 14px; }
 .responsive-students .actions { gap: 8px; }
 .responsive-students .btn { min-height: 40px; padding-inline: 13px; font-size: .86rem; }
@@ -69,7 +128,12 @@
 
   .student-form-card,
   .student-list-card { padding: 17px; }
-  .student-section-heading { margin-bottom: 18px; }
+  .student-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+    margin-bottom: 18px;
+  }
+  .student-section-heading .btn { width: 100%; }
   .student-section-heading h2 { font-size: 1.6rem; }
 
   .student-fieldset { margin-bottom: 18px; padding-bottom: 16px; }
@@ -78,6 +142,10 @@
   .student-physical-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .student-notes-grid { grid-template-columns: 1fr; gap: 12px; }
   .student-textarea { min-height: 96px; }
+
+  .student-weekdays { gap: 8px; }
+  .student-weekdays label { flex: 1 1 calc(25% - 8px); }
+  .student-weekdays span { width: 100%; min-width: 0; padding-inline: 10px; }
 
   .student-form-actions {
     display: grid;
@@ -134,6 +202,7 @@
     font-size: .82rem;
   }
   .responsive-students .actions .btn-primary { grid-column: 1 / -1; }
+  .responsive-students .actions .btn-danger { grid-column: 1 / -1; }
   .responsive-students td[colspan] {
     display: block;
     padding: 24px 10px;
@@ -144,7 +213,9 @@
 
 @media (max-width: 390px) {
   .student-physical-grid { grid-template-columns: 1fr; }
+  .student-weekdays label { flex-basis: calc(33.333% - 8px); }
   .responsive-students td { grid-template-columns: 88px minmax(0, 1fr); gap: 9px; }
   .responsive-students .actions { grid-template-columns: 1fr; }
-  .responsive-students .actions .btn-primary { grid-column: auto; }
+  .responsive-students .actions .btn-primary,
+  .responsive-students .actions .btn-danger { grid-column: auto; }
 }
