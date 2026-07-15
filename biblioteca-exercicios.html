@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Biblioteca de exercícios — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/biblioteca-exercicios.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container exercise-library-page">
+    <section class="page-header">
+      <div>
+        <a class="btn btn-outline" href="alunos.html">← Voltar</a>
+        <h1>Biblioteca de exercícios</h1>
+        <p>Cadastre, edite e organize os exercícios usados nos treinos dos seus alunos.</p>
+      </div>
+      <span class="hero-badge">BIBLIOTECA</span>
+    </section>
+
+    <div id="library-message" class="message"></div>
+
+    <section class="card library-form-card">
+      <div class="section-heading">
+        <div><small>CADASTRO</small><h2 id="library-form-title">Novo exercício</h2></div>
+      </div>
+      <form id="exercise-library-form">
+        <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Supino reto" required></div>
+        <div class="grid grid-2">
+          <div class="form-group"><label>Grupo muscular</label><input name="grupo_muscular" maxlength="80" placeholder="Peitoral"></div>
+          <div class="form-group"><label>Aparelho / equipamento</label><input name="equipamento" maxlength="120" placeholder="Banco e barra"></div>
+        </div>
+        <div class="form-group"><label>Instruções</label><textarea name="instrucoes" placeholder="Orientações de execução e segurança."></textarea></div>
+        <div class="form-group"><label>Vídeo (URL)</label><input name="video_url" type="url" placeholder="https://..."></div>
+        <div class="actions">
+          <button id="library-submit" class="btn btn-primary" type="submit">Adicionar exercício</button>
+          <button id="cancel-library-edit" class="btn btn-outline hidden" type="button">Cancelar edição</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card library-list-card">
+      <div class="library-list-heading">
+        <div><small>GESTÃO</small><h2>Meus exercícios</h2></div>
+        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar por nome, grupo ou equipamento"></div>
+      </div>
+      <div id="exercise-library-list" class="exercise-library-list"><p>Carregando...</p></div>
+    </section>
+  </main>
+  <script type="module" src="js/biblioteca-exercicios.js"></script>
+</body>
+</html>
