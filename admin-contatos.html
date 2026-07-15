@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Suporte interno — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin-contatos.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container admin-support-page">
+    <section class="page-header">
+      <div>
+        <h1>Suporte interno</h1>
+        <p>Acompanhe, responda e finalize os contatos enviados pelos usuários da plataforma.</p>
+      </div>
+      <span class="hero-badge">ADMIN</span>
+    </section>
+
+    <div id="admin-support-message" class="message"></div>
+
+    <section class="admin-stats" id="support-stats">
+      <div class="card stat-card"><small>NOVOS</small><strong id="stat-new">0</strong></div>
+      <div class="card stat-card"><small>EM ATENDIMENTO</small><strong id="stat-progress">0</strong></div>
+      <div class="card stat-card"><small>RESPONDIDOS</small><strong id="stat-answered">0</strong></div>
+      <div class="card stat-card"><small>RESOLVIDOS</small><strong id="stat-resolved">0</strong></div>
+    </section>
+
+    <section class="card admin-support-toolbar">
+      <div class="grid grid-2">
+        <div class="form-group"><label>Buscar</label><input id="admin-support-search" placeholder="Nome, assunto ou mensagem"></div>
+        <div class="form-group"><label>Status</label><select id="admin-support-filter"><option value="">Todos</option><option value="novo">Novos</option><option value="em_atendimento">Em atendimento</option><option value="respondido">Respondidos</option><option value="resolvido">Resolvidos</option></select></div>
+      </div>
+    </section>
+
+    <section class="admin-support-layout">
+      <article class="card admin-ticket-list-card">
+        <div class="section-heading"><div><small>CAIXA DE ENTRADA</small><h2>Contatos</h2></div></div>
+        <div id="admin-ticket-list"><p>Carregando...</p></div>
+      </article>
+
+      <article class="card admin-ticket-detail-card">
+        <div id="admin-ticket-detail" class="admin-empty-detail">
+          <p>Selecione um contato para abrir o atendimento.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script type="module" src="js/admin-contatos.js"></script>
+</body>
+</html>
