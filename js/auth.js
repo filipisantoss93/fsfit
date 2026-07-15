@@ -8,6 +8,7 @@ const switchButton = document.querySelector('#auth-switch');
 const nameGroup = document.querySelector('#name-group');
 const confirmGroup = document.querySelector('#confirm-group');
 const forgotWrap = document.querySelector('#forgot-password-wrap');
+const trialNote = document.querySelector('#auth-trial-note');
 const message = document.querySelector('#auth-message');
 let mode = 'login';
 
@@ -19,9 +20,14 @@ function show(text, type = 'error') {
 function setMode(nextMode, { preserveMessage = false } = {}) {
   mode = nextMode;
   const signup = mode === 'signup';
-  title.textContent = signup ? 'Crie sua conta' : 'Acesse sua conta';
-  submit.textContent = signup ? 'Cadastrar' : 'Entrar';
-  switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Criar conta';
+  title.textContent = signup ? 'Comece seus 7 dias grátis' : 'Acesse sua conta';
+  submit.textContent = signup ? 'Começar meus 7 dias grátis' : 'Entrar';
+  switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Começar 7 dias grátis';
+  if (trialNote) {
+    trialNote.innerHTML = signup
+      ? '<strong>7 dias grátis.</strong> Crie sua conta agora. Depois do período gratuito, continue por R$ 29,90.'
+      : '<strong>Novo por aqui?</strong> Crie sua conta e ganhe 7 dias grátis.';
+  }
   nameGroup.classList.toggle('hidden', !signup);
   confirmGroup.classList.toggle('hidden', !signup);
   forgotWrap?.classList.toggle('hidden', signup);
@@ -82,8 +88,8 @@ form?.addEventListener('submit', async event => {
     form.email.value = email;
     show(
       data.session
-        ? 'Conta criada com sucesso. Faça login para continuar.'
-        : 'Conta criada. Verifique seu e-mail para confirmar o cadastro e depois faça login.',
+        ? 'Conta criada com sucesso. Seus 7 dias grátis já estão disponíveis. Faça login para continuar.'
+        : 'Conta criada. Confirme seu e-mail para ativar o cadastro e iniciar seus 7 dias grátis.',
       'success'
     );
   } catch (error) {
@@ -91,7 +97,7 @@ form?.addEventListener('submit', async event => {
     show(error.message || 'Não foi possível concluir a autenticação.');
   } finally {
     submit.disabled = false;
-    submit.textContent = mode === 'signup' ? 'Cadastrar' : 'Entrar';
+    submit.textContent = mode === 'signup' ? 'Começar meus 7 dias grátis' : 'Entrar';
   }
 });
 
