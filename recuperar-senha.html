@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Recuperar senha — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="main-header"><nav class="nav-container"><a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a></nav></header>
+  <main class="container">
+    <section class="hero" style="grid-template-columns:1fr;min-height:calc(100vh - 140px)">
+      <div class="card auth-card" style="justify-self:center;width:min(470px,100%)">
+        <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
+        <h2>Recuperar senha</h2>
+        <p>Informe o e-mail da sua conta. Você receberá um link para criar uma nova senha.</p>
+        <div id="recovery-message" class="message"></div>
+        <form id="recovery-form">
+          <div class="form-group">
+            <label for="recovery-email">E-mail</label>
+            <input id="recovery-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%">Enviar link de recuperação</button>
+        </form>
+        <div class="auth-switch"><a href="index.html">Voltar para o login</a></div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/recuperar-senha.js"></script>
+</body>
+</html>
