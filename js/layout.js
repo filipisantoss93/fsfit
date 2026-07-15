@@ -1,11 +1,51 @@
 import { supabase } from './supabase.js';
 
+export async function ensurePersonalProfile(session) {
+  if (!session?.user?.id) throw new Error('Sessão inválida.');
+
+  const { data: existing, error: selectError } = await supabase
+    .from('perfis')
+    .select('id,nome,tipo,ativo')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (selectError) throw selectError;
+  if (existing) return existing;
+
+  const fallbackName = session.user.user_metadata?.full_name?.trim()
+    || session.user.email?.split('@')[0]
+    || 'Personal';
+
+  const { data, error } = await supabase
+    .from('perfis')
+    .insert({
+      id: session.user.id,
+      tipo: 'personal',
+      nome: fallbackName,
+      plano: 'gratis',
+      ativo: true
+    })
+    .select('id,nome,tipo,ativo')
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function requireSession() {
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error || !session) {
     window.location.replace('index.html?login=1');
     return null;
   }
+
+  try {
+    await ensurePersonalProfile(session);
+  } catch (profileError) {
+    console.error('Não foi possível preparar o perfil do personal:', profileError);
+    throw new Error('Não foi possível preparar seu perfil. Atualize a página e tente novamente.');
+  }
+
   return session;
 }
 
