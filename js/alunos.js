@@ -63,12 +63,17 @@ async function loadStudents() {
 
   list.innerHTML = data?.length ? data.map(student => {
     const years = age(student.data_nascimento);
-    const physical = [student.peso_inicial_kg ? `${student.peso_inicial_kg} kg` : null, student.altura_cm ? `${student.altura_cm} cm` : null, student.percentual_gordura_inicial ? `${student.percentual_gordura_inicial}% gordura` : null].filter(Boolean).join(' · ') || 'Não informado';
+    const physical = [
+      student.peso_inicial_kg ? `${student.peso_inicial_kg} kg` : null,
+      student.altura_cm ? `${student.altura_cm} cm` : null,
+      student.percentual_gordura_inicial ? `${student.percentual_gordura_inicial}% gordura` : null
+    ].filter(Boolean).join(' · ') || 'Não informado';
+
     return `<tr>
-      <td><strong>${esc(student.nome)}</strong><br><small>${esc(student.telefone || '')}</small></td>
-      <td>${years == null ? '—' : `${years} anos`}</td>
-      <td>${esc(physical)}</td>
-      <td><div class="actions">
+      <td data-label="Aluno"><strong>${esc(student.nome)}</strong><br><small>${esc(student.telefone || '')}</small></td>
+      <td data-label="Idade">${years == null ? '—' : `${years} anos`}</td>
+      <td data-label="Dados físicos">${esc(physical)}</td>
+      <td data-label="Ações" class="student-actions-cell"><div class="actions">
         <a class="btn btn-primary" href="ficha-aluno.html?id=${student.id}">Abrir ficha</a>
         <button class="btn btn-outline" data-edit="${student.id}">Editar cadastro</button>
         <button class="btn btn-danger" data-delete="${student.id}" data-name="${esc(student.nome)}">Excluir</button>
@@ -99,7 +104,7 @@ async function editStudent(id) {
   form.observacoes.value = data.observacoes || '';
   updateAge();
   document.querySelector('#cancel-edit').classList.remove('hidden');
-  form.scrollIntoView({ behavior: 'smooth' });
+  form.closest('.student-form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function resetForm() {
@@ -128,6 +133,7 @@ document.addEventListener('click', async event => {
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
+  const wasEditing = Boolean(editingId);
   const payload = {
     personal_id: session.user.id,
     nome: form.nome.value.trim(),
@@ -153,10 +159,10 @@ form.addEventListener('submit', async event => {
       : supabase.from('alunos').insert(payload);
     const { data, error } = await query.select('id').single();
     if (error) throw error;
-    showMessage(message, editingId ? 'Cadastro atualizado com sucesso.' : 'Aluno cadastrado com sucesso.');
+    showMessage(message, wasEditing ? 'Cadastro atualizado com sucesso.' : 'Aluno cadastrado com sucesso.');
     resetForm();
     await loadStudents();
-    if (!editingId && data?.id) window.location.href = `ficha-aluno.html?id=${data.id}`;
+    if (!wasEditing && data?.id) window.location.href = `ficha-aluno.html?id=${data.id}`;
   } catch (error) {
     console.error(error);
     showMessage(message, error.message || 'Não foi possível salvar.', 'error');
