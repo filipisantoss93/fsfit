@@ -18,7 +18,7 @@
     <section id="student-access" class="student-access-card card hidden">
       <span class="hero-badge">ÁREA DO ALUNO</span>
       <h2>Já é aluno?</h2>
-      <p>Informe seu WhatsApp cadastrado com este personal. Depois, confirme seu PIN para acessar sua área privada.</p>
+      <p>Informe seu WhatsApp cadastrado com este personal. Depois, use seu PIN de 4 números para acessar sua área privada.</p>
 
       <div id="access-message" class="message"></div>
 
@@ -40,16 +40,16 @@
       </form>
 
       <form id="activation-form" class="hidden">
-        <p>Este é seu primeiro acesso. Use o código de ativação fornecido pelo seu personal e crie um PIN.</p>
-        <div class="form-group">
-          <label for="activation-code">Código de ativação</label>
-          <input id="activation-code" name="codigo" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required>
-        </div>
+        <p>Este é seu primeiro acesso. Crie um PIN de 4 números que será usado nos próximos acessos.</p>
         <div class="form-group">
           <label for="activation-pin">Crie um PIN de 4 números</label>
-          <input id="activation-pin" name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required>
+          <input id="activation-pin" name="pin" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" required>
         </div>
-        <button class="btn btn-primary" type="submit" style="width:100%">Ativar e entrar</button>
+        <div class="form-group">
+          <label for="activation-pin-confirm">Confirme o PIN</label>
+          <input id="activation-pin-confirm" name="pin_confirm" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Criar PIN e entrar</button>
         <button id="change-phone-activation" class="btn btn-outline" type="button" style="width:100%;margin-top:10px">Usar outro telefone</button>
       </form>
     </section>
