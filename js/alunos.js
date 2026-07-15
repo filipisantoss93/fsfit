@@ -20,7 +20,7 @@ function esc(value = '') {
 }
 
 function phone(value = '') {
-  return String(value).replace(/\D/g, '').slice(0, 15);
+  return String(value).replace(/\D/g, '').slice(0, 11);
 }
 
 function dbSexo(value) {
@@ -164,8 +164,12 @@ form.addEventListener('submit', async event => {
     telefone: phone(form.whatsapp.value)
   };
 
-  if (payload.nome.length < 2 || payload.telefone.length < 10) {
-    return showMessage(message, 'Revise nome e WhatsApp.', 'error');
+  if (payload.nome.length < 2) {
+    return showMessage(message, 'Informe o nome do aluno.', 'error');
+  }
+
+  if (payload.telefone.length !== 11) {
+    return showMessage(message, 'O WhatsApp deve ter exatamente 11 números: DDD + número.', 'error');
   }
 
   const button = form.querySelector('[type=submit]');
