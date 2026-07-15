@@ -38,6 +38,7 @@ async function loadStudent() {
   document.querySelector('#edit-registration').href = `alunos.html?editar=${data.id}`;
   document.querySelector('#workout-editor-link').href = `treino-aluno.html?id=${data.id}`;
   document.querySelector('#diet-editor-link').href = `dieta-aluno.html?id=${data.id}`;
+  document.querySelector('#reminders-link').href = `lembretes-aluno.html?id=${data.id}`;
   document.querySelector('#student-height').textContent = data.altura_cm ? `${data.altura_cm} cm` : '—';
   document.querySelector('#profile-data').innerHTML = `<p><strong>WhatsApp:</strong> ${esc(data.telefone || 'Não informado')}</p><p><strong>Nascimento:</strong> ${formatDate(data.data_nascimento)}${age != null ? ` (${age} anos)` : ''}</p><p><strong>Objetivo:</strong> ${esc(data.objetivo || 'Não informado')}</p><p><strong>Restrições:</strong> ${esc(data.restricoes || 'Nenhuma informada')}</p><p><strong>Observações:</strong> ${esc(data.observacoes || 'Nenhuma')}</p>`;
 }
