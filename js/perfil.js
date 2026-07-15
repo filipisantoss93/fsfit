@@ -10,16 +10,16 @@ const form = document.querySelector('#profile-form');
 const message = document.querySelector('#profile-message');
 
 const { data, error } = await supabase
-  .from('profiles')
-  .select('full_name,whatsapp')
+  .from('perfis')
+  .select('nome,telefone')
   .eq('id', session.user.id)
   .maybeSingle();
 
 if (error) {
   showMessage(message, error.message, 'error');
 } else {
-  form.full_name.value = data?.full_name || '';
-  form.whatsapp.value = data?.whatsapp || '';
+  form.full_name.value = data?.nome || session.user.user_metadata?.full_name || '';
+  form.whatsapp.value = data?.telefone || '';
   form.email.value = session.user.email || '';
 }
 
@@ -30,15 +30,17 @@ form.whatsapp.addEventListener('input', () => {
 form.addEventListener('submit', async event => {
   event.preventDefault();
   const payload = {
-    full_name: form.full_name.value.trim(),
-    whatsapp: form.whatsapp.value.replace(/\D/g, '')
+    id: session.user.id,
+    nome: form.full_name.value.trim(),
+    telefone: form.whatsapp.value.replace(/\D/g, ''),
+    tipo: 'personal'
   };
 
-  if (payload.full_name.length < 2) {
+  if (payload.nome.length < 2) {
     return showMessage(message, 'Informe seu nome.', 'error');
   }
 
-  const { error } = await supabase.from('profiles').update(payload).eq('id', session.user.id);
+  const { error } = await supabase.from('perfis').upsert(payload, { onConflict: 'id' });
   if (error) showMessage(message, error.message, 'error');
   else {
     showMessage(message, 'Perfil atualizado com sucesso.');
