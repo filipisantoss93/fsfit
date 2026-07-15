@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Contato — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/contato.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container support-page">
+    <section class="page-header">
+      <div>
+        <h1>Contato</h1>
+        <p>Fale diretamente com a equipe FS Fit e acompanhe suas solicitações por aqui.</p>
+      </div>
+      <span class="hero-badge">SUPORTE</span>
+    </section>
+
+    <div id="support-message" class="message"></div>
+
+    <section class="grid grid-2 support-grid">
+      <article class="card support-form-card">
+        <div class="section-heading"><div><small>NOVA MENSAGEM</small><h2>Como podemos ajudar?</h2></div></div>
+        <form id="support-form">
+          <div class="form-group">
+            <label>Categoria *</label>
+            <select name="categoria" required>
+              <option value="duvida">Dúvida</option>
+              <option value="problema_tecnico">Problema técnico</option>
+              <option value="sugestao">Sugestão</option>
+              <option value="financeiro">Financeiro</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Assunto *</label><input name="assunto" maxlength="160" placeholder="Resuma sua solicitação" required></div>
+          <div class="form-group"><label>Mensagem *</label><textarea name="mensagem" maxlength="5000" placeholder="Descreva sua dúvida, problema ou sugestão com detalhes." required></textarea></div>
+          <button class="btn btn-primary" type="submit">Enviar mensagem</button>
+        </form>
+      </article>
+
+      <article class="card support-history-card">
+        <div class="section-heading"><div><small>ACOMPANHAMENTO</small><h2>Minhas mensagens</h2></div></div>
+        <div id="support-list"><p>Carregando...</p></div>
+      </article>
+    </section>
+  </main>
+  <script type="module" src="js/contato.js"></script>
+</body>
+</html>
