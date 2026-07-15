@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Lembretes do aluno — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container">
+    <section class="page-header">
+      <div>
+        <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar para ficha</a>
+        <h1 id="student-name">Lembretes do aluno</h1>
+        <p>Programe avisos de treino, hidratação, refeições, avaliações e acompanhamento.</p>
+      </div>
+      <span class="hero-badge">LEMBRETES</span>
+    </section>
+
+    <div id="reminder-message" class="message"></div>
+
+    <section class="grid grid-2" style="align-items:start">
+      <article class="card">
+        <h2 id="form-title">Novo lembrete</h2>
+        <form id="reminder-form">
+          <div class="form-group">
+            <label>Título *</label>
+            <input name="titulo" maxlength="120" placeholder="Ex.: Hora do treino" required>
+          </div>
+
+          <div class="form-group">
+            <label>Mensagem *</label>
+            <textarea name="mensagem" maxlength="500" placeholder="Ex.: Seu treino de pernas está programado para hoje." required></textarea>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Data e horário *</label>
+              <input name="agendado_para" type="datetime-local" required>
+            </div>
+            <div class="form-group">
+              <label>Canal *</label>
+              <select name="canal" required>
+                <option value="push">Notificação no celular</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="ambos">Notificação + WhatsApp</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Recorrência</label>
+              <select name="recorrencia">
+                <option value="">Não repetir</option>
+                <option value="daily">Todos os dias</option>
+                <option value="weekly">Toda semana</option>
+                <option value="weekdays">Segunda a sexta</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select name="status">
+                <option value="agendado">Agendado</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Salvar lembrete</button>
+            <button id="cancel-edit" class="btn btn-secondary hidden" type="button">Cancelar edição</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Como funciona</h2>
+        <p>O lembrete fica vinculado exclusivamente a este aluno e ao personal autenticado.</p>
+        <p><strong>Notificação no celular:</strong> o agendamento já fica pronto no banco. A entrega em segundo plano depende do aluno autorizar notificações no dispositivo e da infraestrutura Web Push/PWA estar ativa.</p>
+        <p><strong>WhatsApp:</strong> o canal fica registrado para futura automação de envio. O sistema não dispara mensagens pelo WhatsApp sem integração oficial configurada.</p>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <div class="section-heading compact">
+        <div><small>Agenda</small><strong>Lembretes programados</strong></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Quando</th><th>Lembrete</th><th>Canal</th><th>Recorrência</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="reminders-list"><tr><td colspan="6">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/lembretes-aluno.js"></script>
+</body>
+</html>
