@@ -6,43 +6,74 @@
   <meta name="theme-color" content="#0f1115">
   <title>Alunos — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/alunos.css">
 </head>
 <body>
   <div id="header-container"></div>
-  <main class="container">
-    <section class="page-header">
-      <div><h1>Meus Alunos</h1><p>Cadastre dados físicos e acompanhe a evolução individual.</p></div>
+  <main class="container students-page">
+    <section class="page-header students-page-header">
+      <div>
+        <h1>Meus Alunos</h1>
+        <p>Cadastre dados físicos e acompanhe a evolução individual.</p>
+      </div>
       <span class="hero-badge"><span id="student-count">0</span>&nbsp; ALUNOS</span>
     </section>
 
     <div id="student-message" class="message"></div>
 
-    <section class="card">
-      <h2 id="form-title">Cadastrar novo aluno</h2>
-      <form id="student-form">
-        <div class="grid grid-2">
-          <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" required></div>
-          <div class="form-group"><label>WhatsApp *</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
-          <div class="form-group"><label>Sexo *</label><select name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
-          <div class="form-group"><label>Data de nascimento</label><input name="data_nascimento" type="date"></div>
-          <div class="form-group"><label>Idade calculada</label><input name="idade" readonly placeholder="Calculada automaticamente"></div>
-          <div class="form-group"><label>Altura (cm)</label><input name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
-          <div class="form-group"><label>Peso inicial (kg)</label><input name="peso_inicial_kg" type="number" min="20" max="400" step="0.1" placeholder="Ex.: 82,5"></div>
-          <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura_inicial" type="number" min="1" max="75" step="0.1" placeholder="Ex.: 18,5"></div>
+    <section class="card student-form-card">
+      <div class="student-section-heading">
+        <div>
+          <small>CADASTRO</small>
+          <h2 id="form-title">Cadastrar novo aluno</h2>
         </div>
-        <div class="form-group"><label>Objetivo</label><input name="objetivo" maxlength="240" placeholder="Ex.: hipertrofia, emagrecimento, condicionamento"></div>
-        <div class="form-group"><label>Restrições</label><textarea name="restricoes" placeholder="Lesões, limitações, alergias ou cuidados importantes"></textarea></div>
-        <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Informações gerais para o acompanhamento"></textarea></div>
-        <div class="actions">
+      </div>
+
+      <form id="student-form">
+        <fieldset class="student-fieldset">
+          <legend>Informações pessoais</legend>
+          <div class="grid grid-2 student-form-grid">
+            <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" autocomplete="name" required></div>
+            <div class="form-group"><label>WhatsApp *</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
+            <div class="form-group"><label>Sexo *</label><select name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
+            <div class="form-group"><label>Data de nascimento</label><input name="data_nascimento" type="date"></div>
+            <div class="form-group"><label>Idade calculada</label><input name="idade" readonly placeholder="Calculada automaticamente"></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="student-fieldset">
+          <legend>Dados físicos iniciais</legend>
+          <div class="grid grid-3 student-physical-grid">
+            <div class="form-group"><label>Altura (cm)</label><input name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
+            <div class="form-group"><label>Peso inicial (kg)</label><input name="peso_inicial_kg" type="number" min="20" max="400" step="0.1" placeholder="Ex.: 82,5"></div>
+            <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura_inicial" type="number" min="1" max="75" step="0.1" placeholder="Ex.: 18,5"></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="student-fieldset student-fieldset-last">
+          <legend>Acompanhamento</legend>
+          <div class="form-group"><label>Objetivo</label><input name="objetivo" maxlength="240" placeholder="Ex.: hipertrofia, emagrecimento, condicionamento"></div>
+          <div class="grid grid-2 student-notes-grid">
+            <div class="form-group"><label>Restrições</label><textarea class="student-textarea" name="restricoes" placeholder="Lesões, limitações, alergias ou cuidados importantes"></textarea></div>
+            <div class="form-group"><label>Observações</label><textarea class="student-textarea" name="observacoes" placeholder="Informações gerais para o acompanhamento"></textarea></div>
+          </div>
+        </fieldset>
+
+        <div class="actions student-form-actions">
           <button class="btn btn-primary" type="submit">Salvar aluno</button>
-          <button id="cancel-edit" class="btn btn-secondary hidden" type="button">Cancelar edição</button>
+          <button id="cancel-edit" class="btn btn-outline hidden" type="button">Cancelar edição</button>
         </div>
       </form>
     </section>
 
-    <section class="card" style="margin-top:20px">
-      <h2>Lista de alunos</h2>
-      <div class="table-wrap">
+    <section class="card student-list-card">
+      <div class="student-section-heading student-list-heading">
+        <div>
+          <small>GESTÃO</small>
+          <h2>Lista de alunos</h2>
+        </div>
+      </div>
+      <div class="table-wrap responsive-students">
         <table>
           <thead><tr><th>Aluno</th><th>Idade</th><th>Dados físicos</th><th>Ações</th></tr></thead>
           <tbody id="students-list"><tr><td colspan="4">Carregando...</td></tr></tbody>
