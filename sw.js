@@ -1,0 +1,74 @@
+const CACHE_NAME = 'fsfit-shell-v1';
+const APP_SHELL = [
+  '/',
+  '/acesso-aluno.html',
+  '/aluno.html',
+  '/css/style.css',
+  '/js/supabase.js',
+  '/js/acesso-aluno.js',
+  '/js/aluno.js',
+  '/manifest.webmanifest',
+  '/assets/fsfit-icon.svg'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).catch(() => undefined));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)).catch(() => undefined);
+        return response;
+      })
+      .catch(() => caches.match(event.request).then(cached => cached || caches.match('/acesso-aluno.html')))
+  );
+});
+
+self.addEventListener('push', event => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { body: event.data?.text() || 'Você recebeu um novo lembrete do seu personal.' };
+  }
+
+  const title = payload.title || 'FS Fit';
+  const options = {
+    body: payload.body || payload.message || 'Você recebeu um novo lembrete do seu personal.',
+    icon: '/assets/fsfit-icon.svg',
+    badge: '/assets/fsfit-icon.svg',
+    data: { url: payload.url || '/aluno.html' },
+    tag: payload.tag || 'fsfit-lembrete',
+    renotify: true
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || '/aluno.html';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      for (const client of clients) {
+        if ('focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(targetUrl);
+    })
+  );
+});
