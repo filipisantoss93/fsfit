@@ -64,17 +64,12 @@
     <div class="record-tab-panel" data-record-panel="access">
       <section class="card record-section-card">
         <div class="section-heading"><div><small>Portal do aluno</small><h2>Acesso do aluno</h2></div></div>
-        <p class="section-intro">O aluno entra pelo WhatsApp cadastrado e um PIN de 4 números. No primeiro acesso, utilize um código de ativação temporário.</p>
+        <p class="section-intro">O aluno entra pelo WhatsApp cadastrado e um PIN de 4 números.</p>
         <div class="access-grid">
-          <article class="sub-card">
-            <h3>Primeiro acesso</h3>
-            <p>Gere um código temporário para ativar o acesso do aluno.</p>
-            <button id="generate-activation" class="btn btn-primary" type="button">Gerar código de ativação</button>
-            <div id="activation-result" class="message"></div>
-          </article>
           <article class="sub-card">
             <form id="pin-form">
               <h3>Segurança</h3>
+              <p>Defina ou altere o PIN de acesso do aluno.</p>
               <div class="form-group"><label>Novo PIN de 4 números</label><input name="pin" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></div>
               <button class="btn btn-secondary" type="submit">Salvar novo PIN</button>
             </form>
