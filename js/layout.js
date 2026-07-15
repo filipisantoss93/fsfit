@@ -1,11 +1,22 @@
 import { supabase } from './supabase.js';
 
+const FREE_ALLOWED_PAGES = new Set([
+  'painel.html',
+  'perfil.html',
+  'contato.html'
+]);
+
+function currentPage() {
+  const page = window.location.pathname.split('/').pop();
+  return page || 'index.html';
+}
+
 export async function ensurePersonalProfile(session) {
   if (!session?.user?.id) throw new Error('Sessão inválida.');
 
   const { data: existing, error: selectError } = await supabase
     .from('perfis')
-    .select('id,nome,tipo,ativo')
+    .select('id,nome,tipo,ativo,plano,trial_inicio,trial_fim')
     .eq('id', session.user.id)
     .maybeSingle();
 
@@ -16,18 +27,29 @@ export async function ensurePersonalProfile(session) {
     || session.user.email?.split('@')[0]
     || 'Personal';
 
+  const trialInicio = new Date();
+  const trialFim = new Date(trialInicio.getTime() + 7 * 24 * 60 * 60 * 1000);
+
   const { data, error } = await supabase
     .from('perfis')
     .insert({
       id: session.user.id,
       tipo: 'personal',
       nome: fallbackName,
-      plano: 'gratis',
-      ativo: true
+      plano: 'trial',
+      ativo: true,
+      trial_inicio: trialInicio.toISOString(),
+      trial_fim: trialFim.toISOString()
     })
-    .select('id,nome,tipo,ativo')
+    .select('id,nome,tipo,ativo,plano,trial_inicio,trial_fim')
     .single();
 
+  if (error) throw error;
+  return data;
+}
+
+export async function getAccessStatus() {
+  const { data, error } = await supabase.rpc('fsfit_sincronizar_meu_acesso');
   if (error) throw error;
   return data;
 }
@@ -41,9 +63,17 @@ export async function requireSession() {
 
   try {
     await ensurePersonalProfile(session);
+    const access = await getAccessStatus();
+
+    if (!access?.acesso_premium && !FREE_ALLOWED_PAGES.has(currentPage())) {
+      window.location.replace('painel.html?acesso=free');
+      return null;
+    }
+
+    session.fsfitAccess = access;
   } catch (profileError) {
-    console.error('Não foi possível preparar o perfil do personal:', profileError);
-    throw new Error('Não foi possível preparar seu perfil. Atualize a página e tente novamente.');
+    console.error('Não foi possível preparar/verificar o perfil do personal:', profileError);
+    throw new Error('Não foi possível verificar seu acesso. Atualize a página e tente novamente.');
   }
 
   return session;
