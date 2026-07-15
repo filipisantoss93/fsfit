@@ -39,6 +39,12 @@ function numberOrNull(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function isHalfHourSlot(value) {
+  if (!value) return true;
+  const [hour, minute] = String(value).slice(0, 5).split(':').map(Number);
+  return Number.isInteger(hour) && Number.isInteger(minute) && hour >= 0 && hour <= 23 && (minute === 0 || minute === 30);
+}
+
 function dbSexo(value) {
   return { Masculino: 'masculino', Feminino: 'feminino', Outro: 'outro', 'Prefiro não informar': 'nao_informado' }[value] || 'nao_informado';
 }
@@ -61,17 +67,6 @@ function age(date) {
 function updateAge() {
   const years = age(form.data_nascimento.value);
   form.idade.value = years == null ? '' : `${years} anos`;
-}
-
-function selectedWeekdays() {
-  return [...form.querySelectorAll('input[name="dias_semana"]:checked')].map(input => input.value);
-}
-
-function fillWeekdays(values = []) {
-  const selected = new Set(values || []);
-  form.querySelectorAll('input[name="dias_semana"]').forEach(input => {
-    input.checked = selected.has(input.value);
-  });
 }
 
 function openForm() {
@@ -141,7 +136,7 @@ async function loadStudents() {
 
 async function editStudent(id) {
   const { data, error } = await supabase.from('alunos')
-    .select('id,nome,sexo,telefone,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,objetivo,restricoes,observacoes,dias_semana,periodo_aula,horario_aula,local_aula')
+    .select('id,nome,sexo,telefone,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,objetivo,restricoes,observacoes,periodo_aula,horario_aula,local_aula,status')
     .eq('id', id).eq('personal_id', session.user.id).single();
 
   if (error) return showMessage(message, 'Não foi possível abrir o cadastro.', 'error');
@@ -160,7 +155,6 @@ async function editStudent(id) {
   form.periodo_aula.value = data.periodo_aula || '';
   form.horario_aula.value = data.horario_aula ? String(data.horario_aula).slice(0, 5) : '';
   form.local_aula.value = data.local_aula || '';
-  fillWeekdays(data.dias_semana || []);
   updateAge();
   document.querySelector('#cancel-edit').classList.remove('hidden');
   openForm();
@@ -176,6 +170,13 @@ function resetForm() {
 
 form.data_nascimento.addEventListener('change', updateAge);
 form.whatsapp.addEventListener('input', () => { form.whatsapp.value = phone(form.whatsapp.value); });
+form.horario_aula.addEventListener('change', () => {
+  if (form.horario_aula.value && !isHalfHourSlot(form.horario_aula.value)) {
+    showMessage(message, 'Escolha um horário em intervalos de 30 minutos, como 08:00, 08:30, 09:00 ou 09:30.', 'error');
+    form.horario_aula.value = '';
+    form.horario_aula.focus();
+  }
+});
 document.querySelector('#cancel-edit').addEventListener('click', resetForm);
 toggleStudentForm?.addEventListener('click', () => {
   resetForm();
@@ -233,7 +234,6 @@ form.addEventListener('submit', async event => {
     telefone: phone(form.whatsapp.value),
     sexo: dbSexo(form.sexo.value),
     data_nascimento: form.data_nascimento.value || null,
-    dias_semana: selectedWeekdays().length ? selectedWeekdays() : null,
     periodo_aula: form.periodo_aula.value || null,
     horario_aula: form.horario_aula.value || null,
     local_aula: form.local_aula.value.trim() || null,
@@ -242,13 +242,15 @@ form.addEventListener('submit', async event => {
     percentual_gordura_inicial: numberOrNull(form.percentual_gordura_inicial.value),
     objetivo: form.objetivo.value.trim() || null,
     restricoes: form.restricoes.value.trim() || null,
-    observacoes: form.observacoes.value.trim() || null
+    observacoes: form.observacoes.value.trim() || null,
+    status: 'ativo'
   };
 
   if (payload.nome.length < 2) return showMessage(message, 'Informe o nome do aluno.', 'error');
   if (payload.telefone.length !== 11) return showMessage(message, 'O WhatsApp deve ter 11 números: DDD + número.', 'error');
-  if ((payload.dias_semana || payload.periodo_aula || payload.horario_aula || payload.local_aula) && !(payload.dias_semana?.length && payload.periodo_aula && payload.horario_aula && payload.local_aula)) {
-    return showMessage(message, 'Para cadastrar a agenda, informe dias da semana, período, horário e local da aula.', 'error');
+  if (!isHalfHourSlot(payload.horario_aula)) return showMessage(message, 'O horário deve estar em intervalos de 30 minutos.', 'error');
+  if ((payload.periodo_aula || payload.horario_aula || payload.local_aula) && !(payload.periodo_aula && payload.horario_aula && payload.local_aula)) {
+    return showMessage(message, 'Para programar a agenda, informe período, horário e local. Os dias são definidos pelo treino ativo.', 'error');
   }
 
   const button = form.querySelector('[type=submit]');
