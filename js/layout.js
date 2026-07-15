@@ -62,6 +62,7 @@ export function renderHeader(active = '') {
           <li><a data-page="alunos" href="alunos.html">Alunos</a></li>
           <li><a data-page="exercicios" href="biblioteca-exercicios.html">Exercícios</a></li>
           <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
+          <li><a data-page="contato" href="contato.html">Contato</a></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
           <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
         </ul>
