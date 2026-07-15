@@ -1,1 +1,95 @@
-<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f1115"><title>Meu perfil — FS Fit</title><link rel="stylesheet" href="css/style.css"></head><body><div id="header-container"></div><main class="container"><section class="page-header"><div><h1>Meu Perfil</h1><p>Esses dados aparecem no portal dos seus alunos.</p></div></section><section class="card" style="max-width:680px"><div id="profile-message" class="message"></div><form id="profile-form"><div class="form-group"><label>Nome do personal *</label><input name="full_name" required></div><div class="form-group"><label>WhatsApp profissional</label><input name="whatsapp" inputmode="numeric" maxlength="15"></div><div class="form-group"><label>E-mail da conta</label><input name="email" disabled></div><button class="btn btn-primary" type="submit">Salvar perfil</button></form></section></main><script type="module" src="js/perfil.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Meu perfil — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container">
+    <section class="page-header">
+      <div>
+        <h1>Meu Perfil</h1>
+        <p>Configure seus dados profissionais e a página pública que você poderá compartilhar nas redes sociais.</p>
+      </div>
+    </section>
+
+    <section class="card" style="max-width:760px">
+      <div id="profile-message" class="message"></div>
+      <form id="profile-form">
+        <div class="form-group">
+          <label>Nome do personal *</label>
+          <input name="full_name" required>
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp profissional</label>
+          <input name="whatsapp" inputmode="numeric" maxlength="15">
+        </div>
+
+        <div class="form-group">
+          <label>E-mail da conta</label>
+          <input name="email" disabled>
+        </div>
+
+        <hr style="margin:28px 0;border:0;border-top:1px solid rgba(255,255,255,.08)">
+
+        <h2>Página pública</h2>
+        <p style="margin-top:0;opacity:.75">Este é o único link que você precisa divulgar. Seus alunos usarão o próprio telefone para acessar a área privada.</p>
+
+        <div class="form-group">
+          <label>Endereço público *</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span style="opacity:.7">personal.html?u=</span>
+            <input name="slug" maxlength="60" placeholder="joao-silva" required style="flex:1;min-width:180px">
+          </div>
+          <small>Use letras minúsculas, números e hífen.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Foto de perfil (URL)</label>
+          <input name="foto_url" type="url" placeholder="https://...">
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>Local de trabalho</label>
+            <input name="local_trabalho" maxlength="120" placeholder="Ex.: Academia FS Center">
+          </div>
+          <div class="form-group">
+            <label>Cidade</label>
+            <input name="cidade" maxlength="100" placeholder="Ex.: São Paulo - SP">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Especialidades</label>
+          <input name="especialidades" maxlength="240" placeholder="Ex.: Hipertrofia, emagrecimento e condicionamento">
+        </div>
+
+        <div class="form-group">
+          <label>Sobre você</label>
+          <textarea name="bio" maxlength="800" rows="5" placeholder="Conte brevemente sobre sua experiência e forma de trabalho."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Instagram</label>
+          <input name="instagram" maxlength="120" placeholder="@seuusuario">
+        </div>
+
+        <label style="display:flex;gap:10px;align-items:center;margin:18px 0 24px">
+          <input name="publicado" type="checkbox" style="width:auto">
+          <span>Deixar minha página pública ativa</span>
+        </label>
+
+        <div id="public-link-box" class="message" style="margin-bottom:18px"></div>
+        <button class="btn btn-primary" type="submit">Salvar perfil</button>
+      </form>
+    </section>
+  </main>
+  <script type="module" src="js/perfil.js"></script>
+</body>
+</html>
