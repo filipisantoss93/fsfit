@@ -42,6 +42,27 @@
         </fieldset>
 
         <fieldset class="student-fieldset">
+          <legend>Agenda de aulas</legend>
+          <div class="form-group">
+            <label>Dias da semana</label>
+            <div class="student-weekdays">
+              <label><input type="checkbox" name="dias_semana" value="segunda"> Segunda</label>
+              <label><input type="checkbox" name="dias_semana" value="terca"> Terça</label>
+              <label><input type="checkbox" name="dias_semana" value="quarta"> Quarta</label>
+              <label><input type="checkbox" name="dias_semana" value="quinta"> Quinta</label>
+              <label><input type="checkbox" name="dias_semana" value="sexta"> Sexta</label>
+              <label><input type="checkbox" name="dias_semana" value="sabado"> Sábado</label>
+              <label><input type="checkbox" name="dias_semana" value="domingo"> Domingo</label>
+            </div>
+          </div>
+          <div class="grid grid-3 student-form-grid">
+            <div class="form-group"><label>Período</label><select name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
+            <div class="form-group"><label>Horário</label><input name="horario_aula" type="time"></div>
+            <div class="form-group"><label>Local da aula</label><input name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="student-fieldset">
           <legend>Dados físicos iniciais</legend>
           <div class="grid grid-3 student-physical-grid">
             <div class="form-group"><label>Altura (cm)</label><input name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
