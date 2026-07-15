@@ -11,7 +11,6 @@ const message = document.querySelector('#record-message');
 const weightForm = document.querySelector('#weight-form');
 const assessmentForm = document.querySelector('#assessment-form');
 const pinForm = document.querySelector('#pin-form');
-const activationResult = document.querySelector('#activation-result');
 let student = null;
 
 if (!alunoId) {
@@ -170,13 +169,6 @@ assessmentForm.addEventListener('submit', async event => {
   assessmentForm.reset();
   assessmentForm.data_avaliacao.value = new Date().toISOString().slice(0, 10);
   await loadEvolution();
-});
-
-document.querySelector('#generate-activation').addEventListener('click', async () => {
-  activationResult.className = 'message';
-  const { data, error } = await supabase.functions.invoke('personal-aluno-pin', { body: { action: 'generate_activation', aluno_id: alunoId } });
-  if (error || !data?.success) return showMessage(activationResult, data?.error || 'Não foi possível gerar o código.', 'error');
-  showMessage(activationResult, `Código: ${data.codigo_ativacao} — válido por 7 dias. Envie este código ao aluno com segurança.`);
 });
 
 pinForm.pin.addEventListener('input', () => {
