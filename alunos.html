@@ -63,22 +63,11 @@
         </fieldset>
 
         <fieldset class="student-fieldset">
-          <legend>Agenda de aulas</legend>
-          <div class="form-group">
-            <label>Dias da semana</label>
-            <div class="student-weekdays">
-              <label><input type="checkbox" name="dias_semana" value="segunda"><span>Seg</span></label>
-              <label><input type="checkbox" name="dias_semana" value="terca"><span>Ter</span></label>
-              <label><input type="checkbox" name="dias_semana" value="quarta"><span>Qua</span></label>
-              <label><input type="checkbox" name="dias_semana" value="quinta"><span>Qui</span></label>
-              <label><input type="checkbox" name="dias_semana" value="sexta"><span>Sex</span></label>
-              <label><input type="checkbox" name="dias_semana" value="sabado"><span>Sáb</span></label>
-              <label><input type="checkbox" name="dias_semana" value="domingo"><span>Dom</span></label>
-            </div>
-          </div>
+          <legend>Programação da agenda</legend>
+          <p class="form-hint">Os dias da semana são definidos automaticamente pelo treino ativo do aluno. Aqui você programa apenas o horário e o local de atendimento.</p>
           <div class="grid grid-3 student-form-grid">
             <div class="form-group"><label>Período</label><select name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
-            <div class="form-group"><label>Horário</label><input name="horario_aula" type="time"></div>
+            <div class="form-group"><label>Horário</label><input name="horario_aula" type="time" step="1800"><small>Horários disponíveis de 30 em 30 minutos.</small></div>
             <div class="form-group"><label>Local da aula</label><input name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
           </div>
         </fieldset>
