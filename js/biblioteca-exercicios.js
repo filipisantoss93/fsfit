@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import { renderHeader, requireSession, setGreeting, showMessage } from './layout.js';
 
-renderHeader('alunos');
+renderHeader('exercicios');
 const session = await requireSession();
 if (!session) throw new Error('Sessão inválida');
 await setGreeting(session);
