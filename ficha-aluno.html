@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Ficha do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ficha-aluno.css">
 </head>
 <body class="student-record-page">
   <div id="header-container"></div>
@@ -57,6 +58,57 @@
           <a id="workout-editor-link" class="btn btn-secondary" href="treino-aluno.html">Editar treino estruturado</a>
           <a id="diet-editor-link" class="btn btn-secondary" href="dieta-aluno.html">Editar dieta por horários</a>
           <a id="reminders-link" class="btn btn-secondary" href="lembretes-aluno.html">Programar lembretes</a>
+        </div>
+      </section>
+
+      <section class="card record-section-card student-media-section">
+        <div class="section-heading">
+          <div><small>Conteúdo para o aluno</small><h2>Fotos e vídeos</h2></div>
+        </div>
+        <p class="section-intro">Envie fotos ou vídeos próprios e compartilhe conteúdos do YouTube e Instagram.</p>
+
+        <div class="media-create-grid">
+          <form id="media-upload-form" class="sub-card media-form">
+            <h3>Enviar arquivo</h3>
+            <div class="form-group">
+              <label>Título opcional</label>
+              <input name="titulo" maxlength="120" placeholder="Ex.: Execução correta do exercício">
+            </div>
+            <div class="form-group">
+              <label>Foto ou vídeo</label>
+              <input name="arquivo" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" required>
+              <small class="field-help">Formatos: JPG, PNG, WebP, MP4, WebM ou MOV. Máximo 50 MB.</small>
+            </div>
+            <button class="btn btn-primary" type="submit">Enviar mídia</button>
+          </form>
+
+          <form id="media-link-form" class="sub-card media-form">
+            <h3>Adicionar link</h3>
+            <div class="form-group">
+              <label>Plataforma</label>
+              <select name="tipo" required>
+                <option value="youtube">YouTube</option>
+                <option value="instagram">Instagram</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Título opcional</label>
+              <input name="titulo" maxlength="120" placeholder="Ex.: Mobilidade para antes do treino">
+            </div>
+            <div class="form-group">
+              <label>Link da publicação ou vídeo</label>
+              <input name="url" type="url" inputmode="url" placeholder="https://..." required>
+            </div>
+            <button class="btn btn-secondary" type="submit">Adicionar link</button>
+          </form>
+        </div>
+
+        <div class="media-list-header">
+          <h3>Mídias adicionadas</h3>
+          <span id="media-count" class="media-count">0 itens</span>
+        </div>
+        <div id="media-list" class="student-media-grid">
+          <p class="empty">Carregando mídias...</p>
         </div>
       </section>
     </div>
