@@ -13,6 +13,7 @@ const workoutForm = document.querySelector('#workout-form');
 const exerciseLibraryForm = document.querySelector('#exercise-library-form');
 const workoutExerciseForm = document.querySelector('#workout-exercise-form');
 const exerciseSelect = document.querySelector('#exercise-select');
+const workoutDaySelect = workoutExerciseForm.querySelector('[name="dia_semana"]');
 const workoutDays = document.querySelector('#workout-days');
 const dayNames = { 0: 'Domingo', 1: 'Segunda-feira', 2: 'Terça-feira', 3: 'Quarta-feira', 4: 'Quinta-feira', 5: 'Sexta-feira', 6: 'Sábado' };
 let treinoId = null;
@@ -25,6 +26,25 @@ function esc(value = '') {
 
 function selectedDays() {
   return [...document.querySelectorAll('#weekday-options input:checked')].map(input => Number(input.value));
+}
+
+function updateWorkoutDayOptions(days = selectedDays()) {
+  const currentValue = workoutDaySelect.value;
+  const uniqueDays = [...new Set((days || []).map(Number))];
+  const orderedDays = [1, 2, 3, 4, 5, 6, 0].filter(day => uniqueDays.includes(day));
+
+  workoutDaySelect.innerHTML = '<option value="">Selecione</option>' + orderedDays
+    .map(day => `<option value="${day}">${dayNames[day]}</option>`)
+    .join('');
+
+  if (orderedDays.includes(Number(currentValue))) {
+    workoutDaySelect.value = currentValue;
+  }
+
+  workoutDaySelect.disabled = orderedDays.length === 0;
+  if (orderedDays.length === 0) {
+    workoutDaySelect.innerHTML = '<option value="">Selecione os dias na configuração do treino</option>';
+  }
 }
 
 async function loadStudent() {
@@ -52,9 +72,11 @@ async function loadOrCreateWorkout() {
     workoutForm.descricao.value = existing.descricao || '';
     workoutForm.data_inicio.value = existing.data_inicio || '';
     workoutForm.data_fim.value = existing.data_fim || '';
+    const configuredDays = (existing.dias_semana || []).map(Number);
     document.querySelectorAll('#weekday-options input').forEach(input => {
-      input.checked = (existing.dias_semana || []).includes(Number(input.value));
+      input.checked = configuredDays.includes(Number(input.value));
     });
+    updateWorkoutDayOptions(configuredDays);
     return;
   }
 
@@ -70,6 +92,7 @@ async function loadOrCreateWorkout() {
   if (insertError) throw insertError;
   treinoId = data.id;
   workoutForm.nome.value = 'Plano de treino';
+  updateWorkoutDayOptions([]);
 }
 
 async function loadExerciseLibrary() {
@@ -127,18 +150,24 @@ async function loadWorkoutExercises() {
       </section>`).join('');
 }
 
+document.querySelectorAll('#weekday-options input').forEach(input => {
+  input.addEventListener('change', () => updateWorkoutDayOptions());
+});
+
 workoutForm.addEventListener('submit', async event => {
   event.preventDefault();
+  const days = selectedDays();
   const payload = {
     nome: workoutForm.nome.value.trim(),
     descricao: workoutForm.descricao.value.trim(),
-    dias_semana: selectedDays(),
+    dias_semana: days,
     data_inicio: workoutForm.data_inicio.value || null,
     data_fim: workoutForm.data_fim.value || null,
     status: 'ativo'
   };
   const { error } = await supabase.from('treinos').update(payload).eq('id', treinoId).eq('personal_id', session.user.id);
   if (error) return showMessage(message, error.message, 'error');
+  updateWorkoutDayOptions(days);
   showMessage(message, 'Configuração do treino salva com sucesso.');
 });
 
@@ -162,10 +191,17 @@ exerciseLibraryForm.addEventListener('submit', async event => {
 
 workoutExerciseForm.addEventListener('submit', async event => {
   event.preventDefault();
+  const day = Number(workoutExerciseForm.dia_semana.value);
+  const allowedDays = selectedDays();
+
+  if (!workoutExerciseForm.dia_semana.value || !allowedDays.includes(day)) {
+    return showMessage(message, 'Selecione um dia habilitado na configuração do treino.', 'error');
+  }
+
   const payload = {
     treino_id: treinoId,
     exercicio_id: workoutExerciseForm.exercicio_id.value,
-    dia_semana: Number(workoutExerciseForm.dia_semana.value),
+    dia_semana: day,
     ordem: Number(workoutExerciseForm.ordem.value || 1),
     series: workoutExerciseForm.series.value ? Number(workoutExerciseForm.series.value) : null,
     repeticoes: workoutExerciseForm.repeticoes.value.trim() || null,
@@ -177,6 +213,7 @@ workoutExerciseForm.addEventListener('submit', async event => {
   if (error) return showMessage(message, error.message, 'error');
   workoutExerciseForm.reset();
   workoutExerciseForm.ordem.value = '1';
+  updateWorkoutDayOptions(allowedDays);
   await loadWorkoutExercises();
   showMessage(message, 'Exercício adicionado ao treino.');
 });
