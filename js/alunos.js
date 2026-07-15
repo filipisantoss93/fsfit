@@ -7,10 +7,15 @@ if (!session) throw new Error('Sessão inválida');
 await setGreeting(session);
 
 const form = document.querySelector('#student-form');
+const formCard = document.querySelector('#student-form-card');
 const message = document.querySelector('#student-message');
 const list = document.querySelector('#students-list');
 const formTitle = document.querySelector('#form-title');
+const studentSearch = document.querySelector('#student-search');
+const toggleStudentForm = document.querySelector('#toggle-student-form');
+const closeStudentForm = document.querySelector('#close-student-form');
 let editingId = null;
+let students = [];
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -20,6 +25,12 @@ function esc(value = '') {
 
 function phone(value = '') {
   return String(value).replace(/\D/g, '').slice(0, 11);
+}
+
+function formatPhone(value = '') {
+  const digits = phone(value);
+  if (digits.length !== 11) return digits;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
 function numberOrNull(value) {
@@ -63,6 +74,57 @@ function fillWeekdays(values = []) {
   });
 }
 
+function openForm() {
+  formCard.classList.remove('hidden');
+  requestAnimationFrame(() => formCard.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+}
+
+function closeForm() {
+  if (editingId) resetForm();
+  formCard.classList.add('hidden');
+}
+
+function updateStudentCount(total) {
+  document.querySelector('#student-count').textContent = total;
+  document.querySelector('#student-count-label').textContent = total === 1 ? 'ALUNO' : 'ALUNOS';
+}
+
+function renderStudents(data) {
+  list.innerHTML = data.length ? data.map(student => {
+    const years = age(student.data_nascimento);
+    const physical = [
+      student.peso_inicial_kg ? `${student.peso_inicial_kg} kg` : null,
+      student.altura_cm ? `${student.altura_cm} cm` : null,
+      student.percentual_gordura_inicial ? `${student.percentual_gordura_inicial}% gordura` : null
+    ].filter(Boolean).join(' · ') || 'Não informado';
+
+    return `<tr>
+      <td data-label="Aluno"><strong>${esc(student.nome)}</strong><br><small>${esc(formatPhone(student.telefone || ''))}</small></td>
+      <td data-label="Idade">${years == null ? '—' : `${years} anos`}</td>
+      <td data-label="Dados físicos">${esc(physical)}</td>
+      <td data-label="Ações" class="student-actions-cell"><div class="actions">
+        <a class="btn btn-primary" href="ficha-aluno.html?id=${student.id}">Abrir ficha</a>
+        <button class="btn btn-outline" data-edit="${student.id}">Editar cadastro</button>
+        <button class="btn btn-outline" data-reset-pin="${student.id}" data-name="${esc(student.nome)}">Alterar PIN</button>
+        <button class="btn btn-danger" data-delete="${student.id}" data-name="${esc(student.nome)}">Excluir aluno</button>
+      </div></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="4" class="empty">Nenhum aluno encontrado.</td></tr>';
+}
+
+function filterStudents() {
+  const query = String(studentSearch?.value || '').trim().toLowerCase().replace(/\D/g, match => match);
+  if (!query) return renderStudents(students);
+
+  const normalizedQuery = query.replace(/\D/g, '');
+  const filtered = students.filter(student => {
+    const nameMatch = String(student.nome || '').toLowerCase().includes(query);
+    const phoneMatch = normalizedQuery && phone(student.telefone || '').includes(normalizedQuery);
+    return nameMatch || phoneMatch;
+  });
+  renderStudents(filtered);
+}
+
 async function loadStudents() {
   const { data, error } = await supabase
     .from('alunos')
@@ -72,28 +134,9 @@ async function loadStudents() {
 
   if (error) return showMessage(message, 'Não foi possível carregar os alunos.', 'error');
 
-  list.innerHTML = data?.length ? data.map(student => {
-    const years = age(student.data_nascimento);
-    const physical = [
-      student.peso_inicial_kg ? `${student.peso_inicial_kg} kg` : null,
-      student.altura_cm ? `${student.altura_cm} cm` : null,
-      student.percentual_gordura_inicial ? `${student.percentual_gordura_inicial}% gordura` : null
-    ].filter(Boolean).join(' · ') || 'Não informado';
-
-    return `<tr>
-      <td data-label="Aluno"><strong>${esc(student.nome)}</strong><br><small>${esc(student.telefone || '')}</small></td>
-      <td data-label="Idade">${years == null ? '—' : `${years} anos`}</td>
-      <td data-label="Dados físicos">${esc(physical)}</td>
-      <td data-label="Ações" class="student-actions-cell"><div class="actions">
-        <a class="btn btn-primary" href="ficha-aluno.html?id=${student.id}">Abrir ficha</a>
-        <button class="btn btn-outline" data-edit="${student.id}">Editar cadastro</button>
-        <button class="btn btn-outline" data-reset-pin="${student.id}" data-name="${esc(student.nome)}">Alterar PIN</button>
-        <button class="btn btn-danger" data-delete="${student.id}" data-name="${esc(student.nome)}">Excluir</button>
-      </div></td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="4" class="empty">Nenhum aluno cadastrado.</td></tr>';
-
-  document.querySelector('#student-count').textContent = data?.length || 0;
+  students = data || [];
+  updateStudentCount(students.length);
+  filterStudents();
 }
 
 async function editStudent(id) {
@@ -120,7 +163,7 @@ async function editStudent(id) {
   fillWeekdays(data.dias_semana || []);
   updateAge();
   document.querySelector('#cancel-edit').classList.remove('hidden');
-  form.closest('.student-form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  openForm();
 }
 
 function resetForm() {
@@ -134,6 +177,12 @@ function resetForm() {
 form.data_nascimento.addEventListener('change', updateAge);
 form.whatsapp.addEventListener('input', () => { form.whatsapp.value = phone(form.whatsapp.value); });
 document.querySelector('#cancel-edit').addEventListener('click', resetForm);
+toggleStudentForm?.addEventListener('click', () => {
+  resetForm();
+  openForm();
+});
+closeStudentForm?.addEventListener('click', closeForm);
+studentSearch?.addEventListener('input', filterStudents);
 
 document.addEventListener('click', async event => {
   const edit = event.target.closest('[data-edit]');
@@ -214,6 +263,7 @@ form.addEventListener('submit', async event => {
     resetForm();
     await loadStudents();
     if (!wasEditing && data?.id) window.location.href = `ficha-aluno.html?id=${data.id}`;
+    else closeForm();
   } catch (error) {
     console.error(error);
     showMessage(message, error.message || 'Não foi possível salvar.', 'error');
