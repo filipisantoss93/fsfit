@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Treino do aluno — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container">
+    <section class="page-header">
+      <div>
+        <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar à ficha</a>
+        <h1 id="student-name">Treino do aluno</h1>
+        <p>Monte o treino por dias, exercícios, aparelhos, séries, repetições, carga e descanso.</p>
+      </div>
+      <span class="hero-badge">TREINO</span>
+    </section>
+
+    <div id="workout-message" class="message"></div>
+
+    <section class="grid grid-2" style="align-items:start">
+      <article class="card">
+        <h2>Configuração do treino</h2>
+        <form id="workout-form">
+          <div class="form-group"><label>Nome do treino *</label><input name="nome" maxlength="120" placeholder="Ex.: Hipertrofia A/B" required></div>
+          <div class="form-group"><label>Descrição</label><textarea name="descricao" placeholder="Objetivo, orientações gerais e observações do ciclo."></textarea></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Data de início</label><input name="data_inicio" type="date"></div>
+            <div class="form-group"><label>Data de término</label><input name="data_fim" type="date"></div>
+          </div>
+          <div class="form-group">
+            <label>Dias da semana</label>
+            <div class="actions" id="weekday-options">
+              <label><input type="checkbox" value="1"> Segunda</label>
+              <label><input type="checkbox" value="2"> Terça</label>
+              <label><input type="checkbox" value="3"> Quarta</label>
+              <label><input type="checkbox" value="4"> Quinta</label>
+              <label><input type="checkbox" value="5"> Sexta</label>
+              <label><input type="checkbox" value="6"> Sábado</label>
+              <label><input type="checkbox" value="0"> Domingo</label>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Salvar configuração</button>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Novo exercício na biblioteca</h2>
+        <form id="exercise-library-form">
+          <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Supino reto" required></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Grupo muscular</label><input name="grupo_muscular" maxlength="80" placeholder="Peitoral"></div>
+            <div class="form-group"><label>Aparelho / equipamento</label><input name="equipamento" maxlength="120" placeholder="Banco e barra"></div>
+          </div>
+          <div class="form-group"><label>Instruções</label><textarea name="instrucoes" placeholder="Orientações de execução e segurança."></textarea></div>
+          <div class="form-group"><label>Vídeo (URL)</label><input name="video_url" type="url" placeholder="https://..."></div>
+          <button class="btn btn-secondary" type="submit">Adicionar à biblioteca</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h2>Adicionar exercício ao treino</h2>
+      <form id="workout-exercise-form">
+        <div class="grid grid-2">
+          <div class="form-group"><label>Dia da semana *</label><select name="dia_semana" required><option value="">Selecione</option><option value="1">Segunda-feira</option><option value="2">Terça-feira</option><option value="3">Quarta-feira</option><option value="4">Quinta-feira</option><option value="5">Sexta-feira</option><option value="6">Sábado</option><option value="0">Domingo</option></select></div>
+          <div class="form-group"><label>Exercício *</label><select name="exercicio_id" id="exercise-select" required><option value="">Carregando...</option></select></div>
+          <div class="form-group"><label>Séries</label><input name="series" type="number" min="1" max="20" step="1" placeholder="4"></div>
+          <div class="form-group"><label>Repetições</label><input name="repeticoes" maxlength="40" placeholder="8-12"></div>
+          <div class="form-group"><label>Carga</label><input name="carga" maxlength="40" placeholder="30 kg ou ajustar"></div>
+          <div class="form-group"><label>Descanso (segundos)</label><input name="descanso_segundos" type="number" min="0" max="1800" step="5" placeholder="60"></div>
+          <div class="form-group"><label>Ordem</label><input name="ordem" type="number" min="1" max="100" step="1" value="1"></div>
+        </div>
+        <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Cadência, técnica, progressão, intensidade..."></textarea></div>
+        <button class="btn btn-primary" type="submit">Adicionar exercício</button>
+      </form>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <div class="section-heading compact"><div><small>Planejamento</small><strong>Treino estruturado</strong></div></div>
+      <div id="workout-days"><p>Carregando treino...</p></div>
+    </section>
+  </main>
+  <script type="module" src="js/treino-aluno.js"></script>
+</body>
+</html>
