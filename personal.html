@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Personal Trainer — FS Fit</title>
+  <meta name="description" content="Perfil profissional e acesso do aluno no FS Fit.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/personal-publico.css">
+</head>
+<body>
+  <main class="public-profile-shell">
+    <section id="public-profile" class="public-profile-card card" aria-live="polite">
+      <div class="public-profile-loading">Carregando perfil...</div>
+    </section>
+
+    <section id="student-access" class="student-access-card card hidden">
+      <span class="hero-badge">ÁREA DO ALUNO</span>
+      <h2>Já é aluno?</h2>
+      <p>Informe seu WhatsApp cadastrado com este personal. Depois, confirme seu PIN para acessar sua área privada.</p>
+
+      <div id="access-message" class="message"></div>
+
+      <form id="phone-form">
+        <div class="form-group">
+          <label for="student-phone">Seu WhatsApp</label>
+          <input id="student-phone" name="telefone" inputmode="numeric" autocomplete="tel" maxlength="11" placeholder="DDD + número" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Continuar</button>
+      </form>
+
+      <form id="pin-form" class="hidden">
+        <div class="form-group">
+          <label for="student-pin">PIN de 4 números</label>
+          <input id="student-pin" name="pin" inputmode="numeric" autocomplete="current-password" maxlength="4" pattern="[0-9]{4}" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Abrir minha área</button>
+        <button id="change-phone" class="btn btn-outline" type="button" style="width:100%;margin-top:10px">Usar outro telefone</button>
+      </form>
+
+      <form id="activation-form" class="hidden">
+        <p>Este é seu primeiro acesso. Use o código de ativação fornecido pelo seu personal e crie um PIN.</p>
+        <div class="form-group">
+          <label for="activation-code">Código de ativação</label>
+          <input id="activation-code" name="codigo" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required>
+        </div>
+        <div class="form-group">
+          <label for="activation-pin">Crie um PIN de 4 números</label>
+          <input id="activation-pin" name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Ativar e entrar</button>
+        <button id="change-phone-activation" class="btn btn-outline" type="button" style="width:100%;margin-top:10px">Usar outro telefone</button>
+      </form>
+    </section>
+
+    <footer class="public-profile-footer"><strong>FS</strong> Fit</footer>
+  </main>
+  <script type="module" src="js/personal-publico.js"></script>
+</body>
+</html>
