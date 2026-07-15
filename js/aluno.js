@@ -170,6 +170,13 @@ async function load() {
   renderText(document.querySelector('#workout-content'), portal.treino, 'Nenhum treino publicado ainda.');
   renderText(document.querySelector('#diet-content'), portal.dieta, 'Nenhuma orientação publicada ainda.');
 
+  const personalSlug = String(portal.personal_slug || localStorage.getItem('fsfit_personal_slug') || '').trim().toLowerCase();
+  if (personalSlug) {
+    const personalPageButton = document.querySelector('#personal-page-button');
+    personalPageButton.href = `/p/${encodeURIComponent(personalSlug)}`;
+    personalPageButton.classList.remove('hidden');
+  }
+
   if (portal.plano_atualizado_em) {
     document.querySelector('#updated-at').textContent = `Atualizado em ${new Date(portal.plano_atualizado_em).toLocaleString('pt-BR')}`;
   }
