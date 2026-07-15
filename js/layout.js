@@ -38,8 +38,8 @@ export function renderHeader(active = '') {
 export async function setGreeting(session) {
   const target = document.querySelector('#user-greeting');
   if (!target || !session) return;
-  const { data } = await supabase.from('profiles').select('full_name').eq('id', session.user.id).maybeSingle();
-  const name = data?.full_name?.trim() || session.user.email?.split('@')[0] || 'Personal';
+  const { data } = await supabase.from('perfis').select('nome').eq('id', session.user.id).maybeSingle();
+  const name = data?.nome?.trim() || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Personal';
   target.textContent = `Olá, ${name}`;
 }
 
