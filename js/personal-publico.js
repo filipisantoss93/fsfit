@@ -18,6 +18,26 @@ function clearMessage() { message.className = 'message'; message.textContent = '
 function resetAccess() { phone = ''; phoneForm.classList.remove('hidden'); pinForm.classList.add('hidden'); activationForm.classList.add('hidden'); phoneForm.reset(); pinForm.reset(); activationForm.reset(); clearMessage(); }
 function saveSession(result) { localStorage.setItem('fsfit_aluno_token', result.token); localStorage.setItem('fsfit_aluno_token_expira_em', result.expira_em || ''); localStorage.setItem('fsfit_personal_slug', slug); window.location.href = '/aluno.html'; }
 
+async function renderOwnerReturnButton(personalId) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id || session.user.id !== personalId) return;
+
+  const { data: profile } = await supabase
+    .from('perfis')
+    .select('tipo')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (profile?.tipo !== 'personal') return;
+
+  const actions = document.createElement('div');
+  actions.className = 'actions';
+  actions.style.justifyContent = 'center';
+  actions.style.marginBottom = '18px';
+  actions.innerHTML = '<a class="btn btn-secondary" href="/painel.html">Voltar ao painel</a>';
+  profileHost.parentNode.insertBefore(actions, profileHost);
+}
+
 async function invoke(body) {
   const { data, error } = await supabase.functions.invoke('aluno-auth', { body });
   if (error) {
@@ -50,6 +70,8 @@ async function loadProfile() {
 
   const { data, error } = await supabase.from('perfis_publicos').select('personal_id,slug,nome_publico,foto_url,foto_local_url,local_trabalho,cidade,bio,especialidades,instagram').eq('slug', slug).eq('publicado', true).maybeSingle();
   if (error || !data) { profileHost.innerHTML = '<div class="public-profile-error"><h1>Página indisponível</h1><p>Este perfil não existe ou não está publicado.</p></div>'; return; }
+
+  await renderOwnerReturnButton(data.personal_id);
 
   const { data: photos, error: photosError } = await supabase.from('perfil_fotos').select('id,foto_url,ordem').eq('personal_id', data.personal_id).order('ordem').limit(10);
   if (photosError) console.error(photosError);
