@@ -11,6 +11,10 @@ const message = document.querySelector('#record-message');
 const weightForm = document.querySelector('#weight-form');
 const assessmentForm = document.querySelector('#assessment-form');
 const pinForm = document.querySelector('#pin-form');
+const mediaUploadForm = document.querySelector('#media-upload-form');
+const mediaLinkForm = document.querySelector('#media-link-form');
+const mediaList = document.querySelector('#media-list');
+const mediaCount = document.querySelector('#media-count');
 let student = null;
 
 if (!alunoId) {
@@ -63,6 +67,82 @@ function setupTabs() {
 
   const requested = location.hash.replace('#', '');
   if (tabs.some(tab => tab.dataset.recordTab === requested)) activate(requested);
+}
+
+function mediaTypeLabel(type) {
+  return { foto: 'Foto', video: 'Vídeo', youtube: 'YouTube', instagram: 'Instagram' }[type] || 'Mídia';
+}
+
+function youtubeEmbedUrl(url) {
+  try {
+    const parsed = new URL(url);
+    let id = '';
+    if (parsed.hostname.includes('youtu.be')) id = parsed.pathname.split('/').filter(Boolean)[0] || '';
+    if (parsed.hostname.includes('youtube.com')) {
+      id = parsed.searchParams.get('v') || '';
+      if (!id && parsed.pathname.startsWith('/shorts/')) id = parsed.pathname.split('/')[2] || '';
+      if (!id && parsed.pathname.startsWith('/embed/')) id = parsed.pathname.split('/')[2] || '';
+    }
+    return id ? `https://www.youtube.com/embed/${encodeURIComponent(id)}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function isValidSocialUrl(type, url) {
+  try {
+    const host = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+    if (type === 'youtube') return host === 'youtube.com' || host.endsWith('.youtube.com') || host === 'youtu.be';
+    if (type === 'instagram') return host === 'instagram.com' || host.endsWith('.instagram.com');
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function mediaPreview(item) {
+  if (item.tipo === 'foto') {
+    return `<div class="student-media-preview"><img src="${esc(item.url)}" alt="${esc(item.titulo || 'Foto do aluno')}" loading="lazy"></div>`;
+  }
+  if (item.tipo === 'video') {
+    return `<div class="student-media-preview"><video src="${esc(item.url)}" controls preload="metadata"></video></div>`;
+  }
+  if (item.tipo === 'youtube') {
+    const embed = youtubeEmbedUrl(item.url);
+    if (embed) return `<div class="student-media-preview"><iframe src="${esc(embed)}" title="${esc(item.titulo || 'Vídeo do YouTube')}" loading="lazy" allowfullscreen></iframe></div>`;
+  }
+  const network = item.tipo === 'instagram' ? 'Instagram' : 'conteúdo';
+  return `<a class="student-media-preview student-media-preview-link" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer"><div><strong>Abrir no ${network}</strong><span>Ver publicação externa →</span></div></a>`;
+}
+
+async function loadMedia() {
+  if (!mediaList) return;
+  const { data, error } = await supabase
+    .from('aluno_midias')
+    .select('id,tipo,titulo,url,storage_path,created_at')
+    .eq('aluno_id', alunoId)
+    .eq('personal_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    mediaList.innerHTML = '<p class="empty">Não foi possível carregar as mídias.</p>';
+    return;
+  }
+
+  const items = data || [];
+  mediaCount.textContent = `${items.length} ${items.length === 1 ? 'item' : 'itens'}`;
+  mediaList.innerHTML = items.length ? items.map(item => `
+    <article class="student-media-card">
+      ${mediaPreview(item)}
+      <div class="student-media-body">
+        <span class="student-media-type">${mediaTypeLabel(item.tipo)}</span>
+        <h4 class="student-media-title">${esc(item.titulo || mediaTypeLabel(item.tipo))}</h4>
+        <div class="student-media-actions">
+          <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">Abrir conteúdo</a>
+          <button class="btn btn-danger" type="button" data-delete-media="${item.id}" data-storage-path="${esc(item.storage_path || '')}">Excluir</button>
+        </div>
+      </div>
+    </article>`).join('') : '<p class="empty">Nenhuma mídia adicionada para este aluno.</p>';
 }
 
 async function loadStudent() {
@@ -132,6 +212,97 @@ setupTabs();
 weightForm.data_registro.value = new Date().toISOString().slice(0, 10);
 assessmentForm.data_avaliacao.value = new Date().toISOString().slice(0, 10);
 
+mediaUploadForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const file = mediaUploadForm.arquivo.files?.[0];
+  if (!file) return;
+
+  const allowed = ['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];
+  if (!allowed.includes(file.type)) return showMessage(message, 'Formato de arquivo não permitido.', 'error');
+  if (file.size > 50 * 1024 * 1024) return showMessage(message, 'O arquivo deve ter no máximo 50 MB.', 'error');
+
+  const button = mediaUploadForm.querySelector('[type=submit]');
+  button.disabled = true;
+  let storagePath = null;
+  try {
+    const ext = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '') || (file.type.startsWith('image/') ? 'jpg' : 'mp4');
+    storagePath = `${session.user.id}/${alunoId}/${crypto.randomUUID()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from('aluno-midias').upload(storagePath, file, { contentType: file.type, upsert: false });
+    if (uploadError) throw uploadError;
+
+    const { data: publicData } = supabase.storage.from('aluno-midias').getPublicUrl(storagePath);
+    const tipo = file.type.startsWith('image/') ? 'foto' : 'video';
+    const { error: insertError } = await supabase.from('aluno_midias').insert({
+      personal_id: session.user.id,
+      aluno_id: alunoId,
+      tipo,
+      titulo: mediaUploadForm.titulo.value.trim() || null,
+      url: publicData.publicUrl,
+      storage_path: storagePath
+    });
+    if (insertError) throw insertError;
+
+    mediaUploadForm.reset();
+    showMessage(message, 'Mídia enviada com sucesso.');
+    await loadMedia();
+  } catch (error) {
+    if (storagePath) await supabase.storage.from('aluno-midias').remove([storagePath]);
+    showMessage(message, error.message || 'Não foi possível enviar a mídia.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+mediaLinkForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const tipo = mediaLinkForm.tipo.value;
+  const url = mediaLinkForm.url.value.trim();
+  if (!isValidSocialUrl(tipo, url)) {
+    return showMessage(message, tipo === 'youtube' ? 'Informe um link válido do YouTube.' : 'Informe um link válido do Instagram.', 'error');
+  }
+
+  const button = mediaLinkForm.querySelector('[type=submit]');
+  button.disabled = true;
+  try {
+    const { error } = await supabase.from('aluno_midias').insert({
+      personal_id: session.user.id,
+      aluno_id: alunoId,
+      tipo,
+      titulo: mediaLinkForm.titulo.value.trim() || null,
+      url
+    });
+    if (error) throw error;
+    mediaLinkForm.reset();
+    mediaLinkForm.tipo.value = 'youtube';
+    showMessage(message, 'Link adicionado com sucesso.');
+    await loadMedia();
+  } catch (error) {
+    showMessage(message, error.message || 'Não foi possível adicionar o link.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.addEventListener('click', async event => {
+  const button = event.target.closest('[data-delete-media]');
+  if (!button) return;
+  if (!confirm('Excluir esta mídia do aluno?')) return;
+
+  button.disabled = true;
+  try {
+    const id = button.dataset.deleteMedia;
+    const storagePath = button.dataset.storagePath;
+    const { error } = await supabase.from('aluno_midias').delete().eq('id', id).eq('personal_id', session.user.id);
+    if (error) throw error;
+    if (storagePath) await supabase.storage.from('aluno-midias').remove([storagePath]);
+    showMessage(message, 'Mídia excluída.');
+    await loadMedia();
+  } catch (error) {
+    showMessage(message, error.message || 'Não foi possível excluir a mídia.', 'error');
+    button.disabled = false;
+  }
+});
+
 weightForm.addEventListener('submit', async event => {
   event.preventDefault();
   const payload = {
@@ -186,4 +357,4 @@ pinForm.addEventListener('submit', async event => {
 });
 
 await loadStudent();
-await loadEvolution();
+await Promise.all([loadEvolution(), loadMedia()]);
