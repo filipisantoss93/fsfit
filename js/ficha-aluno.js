@@ -64,6 +64,7 @@ async function loadStudent() {
   document.querySelector('#student-summary').textContent = [age != null ? `${age} anos` : null, data.telefone, data.objetivo].filter(Boolean).join(' · ') || 'Cadastro individual';
   document.querySelector('#student-status').textContent = String(data.status || 'ativo').toUpperCase();
   document.querySelector('#edit-registration').href = `alunos.html?editar=${data.id}`;
+  document.querySelector('#workout-editor-link').href = `treino-aluno.html?id=${data.id}`;
   document.querySelector('#student-height').textContent = data.altura_cm ? `${data.altura_cm} cm` : '—';
 
   document.querySelector('#profile-data').innerHTML = `
