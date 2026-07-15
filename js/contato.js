@@ -1,0 +1,138 @@
+import { supabase } from './supabase.js';
+import { renderHeader, requireSession, setGreeting, showMessage } from './layout.js';
+
+renderHeader('contato');
+const session = await requireSession();
+if (!session) throw new Error('Sessão inválida');
+await setGreeting(session);
+
+const form = document.querySelector('#support-form');
+const message = document.querySelector('#support-message');
+const list = document.querySelector('#support-list');
+
+const categoryLabels = {
+  duvida: 'Dúvida',
+  problema_tecnico: 'Problema técnico',
+  sugestao: 'Sugestão',
+  financeiro: 'Financeiro',
+  outro: 'Outro'
+};
+const statusLabels = {
+  novo: 'Novo',
+  em_atendimento: 'Em atendimento',
+  respondido: 'Respondido',
+  resolvido: 'Resolvido'
+};
+
+function esc(value = '') {
+  const div = document.createElement('div');
+  div.textContent = value ?? '';
+  return div.innerHTML;
+}
+
+function formatDate(value) {
+  return new Date(value).toLocaleString('pt-BR');
+}
+
+async function loadTickets() {
+  const { data: tickets, error } = await supabase
+    .from('contatos_suporte')
+    .select('id,assunto,categoria,mensagem,status,prioridade,created_at,updated_at')
+    .eq('user_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    list.innerHTML = '<p class="support-empty">Não foi possível carregar suas mensagens.</p>';
+    return;
+  }
+
+  if (!tickets?.length) {
+    list.innerHTML = '<p class="support-empty">Você ainda não enviou nenhuma mensagem para o suporte.</p>';
+    return;
+  }
+
+  const ids = tickets.map(ticket => ticket.id);
+  const { data: replies } = await supabase
+    .from('contatos_suporte_respostas')
+    .select('id,contato_id,autor_tipo,mensagem,created_at')
+    .in('contato_id', ids)
+    .order('created_at');
+
+  const grouped = (replies || []).reduce((acc, reply) => {
+    (acc[reply.contato_id] ||= []).push(reply);
+    return acc;
+  }, {});
+
+  list.innerHTML = tickets.map(ticket => {
+    const thread = grouped[ticket.id] || [];
+    const canReply = ticket.status !== 'resolvido';
+    return `<article class="support-ticket">
+      <div class="support-ticket-head">
+        <div>
+          <h3>${esc(ticket.assunto)}</h3>
+          <div class="support-ticket-meta">${esc(categoryLabels[ticket.categoria] || ticket.categoria)} · ${formatDate(ticket.created_at)}</div>
+        </div>
+        <span class="support-status ${ticket.status}">${esc(statusLabels[ticket.status] || ticket.status)}</span>
+      </div>
+      <div class="support-thread">
+        <div class="support-reply"><small>Você · ${formatDate(ticket.created_at)}</small>${esc(ticket.mensagem)}</div>
+        ${thread.map(reply => `<div class="support-reply ${reply.autor_tipo === 'admin' ? 'admin' : ''}"><small>${reply.autor_tipo === 'admin' ? 'Equipe FS Fit' : 'Você'} · ${formatDate(reply.created_at)}</small>${esc(reply.mensagem)}</div>`).join('')}
+      </div>
+      ${canReply ? `<form class="support-followup" data-followup="${ticket.id}">
+        <div class="form-group"><textarea name="mensagem" maxlength="5000" placeholder="Adicionar uma nova mensagem ao atendimento" required></textarea></div>
+        <button class="btn btn-outline" type="submit">Enviar complemento</button>
+      </form>` : ''}
+    </article>`;
+  }).join('');
+}
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = form.querySelector('[type=submit]');
+  button.disabled = true;
+  try {
+    const payload = {
+      user_id: session.user.id,
+      categoria: form.categoria.value,
+      assunto: form.assunto.value.trim(),
+      mensagem: form.mensagem.value.trim()
+    };
+    const { error } = await supabase.from('contatos_suporte').insert(payload);
+    if (error) throw error;
+    form.reset();
+    showMessage(message, 'Mensagem enviada. Você pode acompanhar a resposta nesta página.');
+    await loadTickets();
+  } catch (error) {
+    console.error(error);
+    showMessage(message, error.message || 'Não foi possível enviar sua mensagem.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.addEventListener('submit', async event => {
+  const followup = event.target.closest('[data-followup]');
+  if (!followup) return;
+  event.preventDefault();
+  const button = followup.querySelector('[type=submit]');
+  button.disabled = true;
+  try {
+    const { error } = await supabase.from('contatos_suporte_respostas').insert({
+      contato_id: followup.dataset.followup,
+      autor_id: session.user.id,
+      autor_tipo: 'usuario',
+      mensagem: followup.mensagem.value.trim()
+    });
+    if (error) throw error;
+    followup.reset();
+    showMessage(message, 'Mensagem adicionada ao atendimento.');
+    await loadTickets();
+  } catch (error) {
+    console.error(error);
+    showMessage(message, error.message || 'Não foi possível enviar a mensagem.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+await loadTickets();
