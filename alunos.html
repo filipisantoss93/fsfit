@@ -16,12 +16,33 @@
         <h1>Meus Alunos</h1>
         <p>Cadastre dados físicos e acompanhe a evolução individual.</p>
       </div>
-      <span class="hero-badge"><span id="student-count">0</span>&nbsp; ALUNOS</span>
+      <span class="hero-badge"><span id="student-count">0</span>&nbsp;<span id="student-count-label">ALUNOS</span></span>
     </section>
 
     <div id="student-message" class="message"></div>
 
-    <section class="card student-form-card">
+    <section class="card student-list-card">
+      <div class="student-section-heading student-list-heading">
+        <div>
+          <small>GESTÃO</small>
+          <h2>Lista de alunos</h2>
+        </div>
+        <button id="toggle-student-form" class="btn btn-primary" type="button">+ Cadastrar novo aluno</button>
+      </div>
+
+      <div class="student-search-wrap">
+        <input id="student-search" type="search" placeholder="Buscar por nome ou WhatsApp" autocomplete="off" aria-label="Buscar aluno">
+      </div>
+
+      <div class="table-wrap responsive-students">
+        <table>
+          <thead><tr><th>Aluno</th><th>Idade</th><th>Dados físicos</th><th>Ações</th></tr></thead>
+          <tbody id="students-list"><tr><td colspan="4">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="student-form-card" class="card student-form-card hidden">
       <div class="student-section-heading">
         <div>
           <small>CADASTRO</small>
@@ -37,7 +58,7 @@
             <div class="form-group"><label>WhatsApp *</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
             <div class="form-group"><label>Sexo *</label><select name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
             <div class="form-group"><label>Data de nascimento</label><input name="data_nascimento" type="date"></div>
-            <div class="form-group"><label>Idade calculada</label><input name="idade" readonly placeholder="Calculada automaticamente"></div>
+            <div class="form-group"><label>Idade calculada</label><input class="student-age-input" name="idade" readonly placeholder="Calculada automaticamente"></div>
           </div>
         </fieldset>
 
@@ -46,13 +67,13 @@
           <div class="form-group">
             <label>Dias da semana</label>
             <div class="student-weekdays">
-              <label><input type="checkbox" name="dias_semana" value="segunda"> Segunda</label>
-              <label><input type="checkbox" name="dias_semana" value="terca"> Terça</label>
-              <label><input type="checkbox" name="dias_semana" value="quarta"> Quarta</label>
-              <label><input type="checkbox" name="dias_semana" value="quinta"> Quinta</label>
-              <label><input type="checkbox" name="dias_semana" value="sexta"> Sexta</label>
-              <label><input type="checkbox" name="dias_semana" value="sabado"> Sábado</label>
-              <label><input type="checkbox" name="dias_semana" value="domingo"> Domingo</label>
+              <label><input type="checkbox" name="dias_semana" value="segunda"><span>Seg</span></label>
+              <label><input type="checkbox" name="dias_semana" value="terca"><span>Ter</span></label>
+              <label><input type="checkbox" name="dias_semana" value="quarta"><span>Qua</span></label>
+              <label><input type="checkbox" name="dias_semana" value="quinta"><span>Qui</span></label>
+              <label><input type="checkbox" name="dias_semana" value="sexta"><span>Sex</span></label>
+              <label><input type="checkbox" name="dias_semana" value="sabado"><span>Sáb</span></label>
+              <label><input type="checkbox" name="dias_semana" value="domingo"><span>Dom</span></label>
             </div>
           </div>
           <div class="grid grid-3 student-form-grid">
@@ -83,23 +104,9 @@
         <div class="actions student-form-actions">
           <button class="btn btn-primary" type="submit">Salvar aluno</button>
           <button id="cancel-edit" class="btn btn-outline hidden" type="button">Cancelar edição</button>
+          <button id="close-student-form" class="btn btn-outline" type="button">Fechar</button>
         </div>
       </form>
-    </section>
-
-    <section class="card student-list-card">
-      <div class="student-section-heading student-list-heading">
-        <div>
-          <small>GESTÃO</small>
-          <h2>Lista de alunos</h2>
-        </div>
-      </div>
-      <div class="table-wrap responsive-students">
-        <table>
-          <thead><tr><th>Aluno</th><th>Idade</th><th>Dados físicos</th><th>Ações</th></tr></thead>
-          <tbody id="students-list"><tr><td colspan="4">Carregando...</td></tr></tbody>
-        </table>
-      </div>
     </section>
   </main>
   <script type="module" src="js/alunos.js"></script>
