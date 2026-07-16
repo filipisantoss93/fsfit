@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Administração — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container admin-page">
+    <section class="page-header">
+      <div>
+        <h1>Painel administrativo</h1>
+        <p>Visão geral da plataforma, assinaturas, faturamento e administração de contas.</p>
+      </div>
+      <span class="hero-badge">ADMIN</span>
+    </section>
+
+    <div id="admin-message" class="message"></div>
+
+    <section class="admin-stats">
+      <div class="card stat-card"><small>CONTAS</small><strong id="stat-accounts">—</strong></div>
+      <div class="card stat-card"><small>ASSINANTES</small><strong id="stat-subscribers">—</strong></div>
+      <div class="card stat-card"><small>EM TRIAL</small><strong id="stat-trial">—</strong></div>
+      <div class="card stat-card"><small>INATIVAS</small><strong id="stat-inactive">—</strong></div>
+      <div class="card stat-card"><small>FATURAMENTO MÊS</small><strong id="stat-revenue-month">R$ 0,00</strong></div>
+      <div class="card stat-card"><small>FATURAMENTO TOTAL</small><strong id="stat-revenue-total">R$ 0,00</strong></div>
+    </section>
+
+    <section class="admin-grid">
+      <article class="card admin-section-card">
+        <div class="section-heading">
+          <div><small>FINANCEIRO</small><h2>Resumo financeiro</h2></div>
+        </div>
+        <div class="admin-financial-grid">
+          <div><span>Pagamentos aprovados</span><strong id="finance-approved">0</strong></div>
+          <div><span>Pendentes</span><strong id="finance-pending">0</strong></div>
+          <div><span>Cancelados/estornados</span><strong id="finance-cancelled">0</strong></div>
+          <div><span>Ticket médio</span><strong id="finance-ticket">R$ 0,00</strong></div>
+        </div>
+        <p id="finance-source-note" class="admin-note">Os dados financeiros serão exibidos quando existirem registros na tabela de pagamentos integrada ao provedor.</p>
+      </article>
+
+      <article class="card admin-section-card">
+        <div class="section-heading">
+          <div><small>ATALHOS</small><h2>Administração</h2></div>
+        </div>
+        <div class="admin-shortcuts">
+          <a class="btn btn-secondary" href="admin-contatos.html">Suporte interno</a>
+          <button id="export-finance" class="btn btn-outline" type="button">Exportar financeiro CSV</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="card admin-section-card">
+      <div class="section-heading">
+        <div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div>
+      </div>
+      <div class="admin-toolbar">
+        <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome ou e-mail"></div>
+        <div class="form-group"><label for="admin-plan-filter">Plano</label><select id="admin-plan-filter"><option value="">Todos</option><option value="trial">Trial</option><option value="gratis">Grátis</option><option value="free">Free</option><option value="premium">Premium</option><option value="pago">Pago</option></select></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Usuário</th><th>Plano</th><th>Status</th><th>Trial</th><th>Ações</th></tr></thead>
+          <tbody id="admin-users-list"><tr><td colspan="5">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card admin-section-card">
+      <div class="section-heading"><div><small>HISTÓRICO</small><h2>Movimentações financeiras</h2></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
+          <tbody id="admin-finance-list"><tr><td colspan="5">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
