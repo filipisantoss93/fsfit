@@ -9,6 +9,62 @@
   <link rel="stylesheet" href="css/alunos.css">
   <style>
     .student-actions-cell .actions > button { display: none; }
+
+    #student-form-card:not(.hidden) {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      width: 100%;
+      max-width: none;
+      height: 100dvh;
+      margin: 0;
+      padding: 24px;
+      overflow-y: auto;
+      border: 0;
+      border-radius: 0;
+      background: rgba(10, 14, 18, .97);
+      box-sizing: border-box;
+    }
+
+    #student-form-card:not(.hidden) > * {
+      width: min(760px, 100%);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    body.student-modal-open { overflow: hidden; }
+
+    body.embed-edit {
+      background: #0f1115;
+      overflow: auto;
+    }
+
+    body.embed-edit #header-container,
+    body.embed-edit .students-page-header,
+    body.embed-edit #student-message,
+    body.embed-edit .student-list-card {
+      display: none !important;
+    }
+
+    body.embed-edit .students-page {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body.embed-edit #student-form-card:not(.hidden) {
+      position: static;
+      width: 100%;
+      min-height: 100dvh;
+      height: auto;
+      padding: 22px 18px 36px;
+      background: #151a1f;
+    }
+
+    @media (max-width: 640px) {
+      #student-form-card:not(.hidden) { padding: 18px 14px 32px; }
+    }
   </style>
 </head>
 <body>
@@ -102,5 +158,41 @@
     </section>
   </main>
   <script type="module" src="js/alunos.js"></script>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const embed = params.get('embed') === '1';
+      const formCard = document.querySelector('#student-form-card');
+      const toggle = document.querySelector('#toggle-student-form');
+      const close = document.querySelector('#close-student-form');
+      const message = document.querySelector('#student-message');
+
+      if (embed) document.body.classList.add('embed-edit');
+
+      const syncModalState = () => {
+        if (!formCard || embed) return;
+        document.body.classList.toggle('student-modal-open', !formCard.classList.contains('hidden'));
+      };
+
+      toggle?.addEventListener('click', () => setTimeout(syncModalState, 0));
+      close?.addEventListener('click', () => {
+        if (embed) {
+          window.parent.postMessage({ type: 'fsfit-close-student-modal' }, location.origin);
+          return;
+        }
+        setTimeout(syncModalState, 0);
+      });
+
+      if (formCard) new MutationObserver(syncModalState).observe(formCard, { attributes: true, attributeFilter: ['class'] });
+
+      if (embed && message) {
+        new MutationObserver(() => {
+          if (message.textContent.includes('Cadastro atualizado com sucesso')) {
+            window.parent.postMessage({ type: 'fsfit-student-updated' }, location.origin);
+          }
+        }).observe(message, { childList: true, subtree: true, characterData: true });
+      }
+    })();
+  </script>
 </body>
 </html>
