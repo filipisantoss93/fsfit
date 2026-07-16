@@ -31,6 +31,7 @@ let activeCategoryId = null;
 function esc(value = '') { const div = document.createElement('div'); div.textContent = value ?? ''; return div.innerHTML; }
 function normalize(value = '') { return String(value || '').trim().toLocaleLowerCase('pt-BR'); }
 function categoryById(id) { return categories.find(item => item.id === id); }
+function prescriptionLabel(type) { return { repeticoes: 'Repetições', tempo: 'Tempo', distancia: 'Distância' }[type] || 'Repetições'; }
 function getVisibleExercises() {
   const customizedGlobalIds = new Set(exercises.filter(item => !item.global && item.personal_id === session.user.id && item.origem_global_id).map(item => item.origem_global_id));
   return exercises.filter(item => !(item.global && customizedGlobalIds.has(item.id)));
@@ -39,7 +40,7 @@ function populateCategorySelect(selectedId = '') {
   form.categoria_id.innerHTML = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${category.id}">${esc(category.nome)}${category.global ? ' · FS Fit' : ''}</option>`).join('');
   form.categoria_id.value = selectedId || '';
 }
-function resetExerciseForm() { editingId = null; editingGlobalId = null; form.reset(); populateCategorySelect(activeCategoryId || ''); formTitle.textContent = 'Novo exercício'; submitButton.textContent = 'Adicionar exercício'; }
+function resetExerciseForm() { editingId = null; editingGlobalId = null; form.reset(); populateCategorySelect(activeCategoryId || ''); form.tipo_prescricao.value = 'repeticoes'; formTitle.textContent = 'Novo exercício'; submitButton.textContent = 'Adicionar exercício'; }
 function resetCategoryForm() { editingCategoryId = null; categoryForm.reset(); categoryFormTitle.textContent = 'Nova categoria'; categorySubmit.textContent = 'Criar categoria'; }
 function openModal(target) { target.classList.add('open'); target.setAttribute('aria-hidden', 'false'); document.body.classList.add('library-modal-open'); }
 function closeModal(target, reset) { target.classList.remove('open'); target.setAttribute('aria-hidden', 'true'); if (!document.querySelector('.library-modal.open')) document.body.classList.remove('library-modal-open'); reset(); }
@@ -72,7 +73,7 @@ function renderExercises() {
     const isGlobal = Boolean(item.global);
     const isCustomized = Boolean(item.origem_global_id);
     const badge = isGlobal ? 'PADRÃO FS FIT' : isCustomized ? 'PERSONALIZADO' : 'MEU EXERCÍCIO';
-    return `<article class="exercise-library-item"><div class="exercise-library-item-content"><div class="exercise-library-item-title"><h3>${esc(item.nome)}</h3><span class="library-badge${isGlobal ? '' : ' personal'}">${badge}</span></div><p>${esc(item.equipamento || 'Sem equipamento informado')}</p>${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}</div><div class="actions library-item-actions${isGlobal ? ' single-action' : ''}"><button class="btn btn-outline library-edit-exercise" type="button" data-edit-exercise="${item.id}">Editar</button>${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}</div></article>`;
+    return `<article class="exercise-library-item"><div class="exercise-library-item-content"><div class="exercise-library-item-title"><h3>${esc(item.nome)}</h3><span class="library-badge${isGlobal ? '' : ' personal'}">${badge}</span><span class="library-badge">${prescriptionLabel(item.tipo_prescricao)}</span></div><p>${esc(item.equipamento || 'Sem equipamento informado')}</p>${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}</div><div class="actions library-item-actions${isGlobal ? ' single-action' : ''}"><button class="btn btn-outline library-edit-exercise" type="button" data-edit-exercise="${item.id}">Editar</button>${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}</div></article>`;
   }).join('');
 }
 
@@ -90,11 +91,11 @@ async function loadData() {
   const previousCategoryId = activeCategoryId;
   const [{ data: categoryData, error: categoryError }, { data: exerciseData, error: exerciseError }] = await Promise.all([
     supabase.from('categorias_exercicios').select('id,nome,global,personal_id').or(`global.eq.true,personal_id.eq.${session.user.id}`),
-    supabase.from('exercicios').select('id,nome,grupo_muscular,equipamento,instrucoes,video_url,global,personal_id,origem_global_id,categoria_id').or(`global.eq.true,personal_id.eq.${session.user.id}`).order('global', { ascending: false }).order('nome')
+    supabase.from('exercicios').select('id,nome,grupo_muscular,equipamento,instrucoes,video_url,tipo_prescricao,global,personal_id,origem_global_id,categoria_id').or(`global.eq.true,personal_id.eq.${session.user.id}`).order('global', { ascending: false }).order('nome')
   ]);
   if (categoryError || exerciseError) throw categoryError || exerciseError;
   categories = (categoryData || []).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
-  exercises = exerciseData || [];
+  exercises = (exerciseData || []).map(item => ({ ...item, tipo_prescricao: item.tipo_prescricao || 'repeticoes' }));
   populateCategorySelect();
   activeCategoryId = previousCategoryId && categoryById(previousCategoryId) ? previousCategoryId : (categories[0]?.id || null);
   renderCategoryNav();
@@ -108,6 +109,7 @@ function editExercise(id) {
   editingGlobalId = item.global ? item.id : null;
   form.nome.value = item.nome || '';
   populateCategorySelect(item.categoria_id);
+  form.tipo_prescricao.value = item.tipo_prescricao || 'repeticoes';
   form.equipamento.value = item.equipamento || '';
   form.instrucoes.value = item.instrucoes || '';
   form.video_url.value = item.video_url || '';
@@ -120,7 +122,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   const category = categoryById(form.categoria_id.value);
   if (!category) return showMessage(message, 'Selecione uma categoria para o exercício.', 'error');
-  const payload = { personal_id: session.user.id, nome: form.nome.value.trim(), categoria_id: category.id, grupo_muscular: category.nome, equipamento: form.equipamento.value.trim() || null, instrucoes: form.instrucoes.value.trim() || null, video_url: form.video_url.value.trim() || null, global: false };
+  const payload = { personal_id: session.user.id, nome: form.nome.value.trim(), categoria_id: category.id, grupo_muscular: category.nome, tipo_prescricao: form.tipo_prescricao.value || 'repeticoes', equipamento: form.equipamento.value.trim() || null, instrucoes: form.instrucoes.value.trim() || null, video_url: form.video_url.value.trim() || null, global: false };
   if (payload.nome.length < 2) return showMessage(message, 'Informe o nome do exercício.', 'error');
   const wasEditing = Boolean(editingId || editingGlobalId);
   submitButton.disabled = true;
