@@ -103,6 +103,11 @@
   color: var(--text);
 }
 
+.diet-plan-empty .btn {
+  justify-self: center;
+  margin-top: 8px;
+}
+
 .diet-workspace {
   margin-top: 24px;
 }
@@ -152,6 +157,46 @@
   min-height: 130px;
 }
 
+.diet-library-meal-list {
+  display: grid;
+  gap: 12px;
+  max-height: min(58vh, 560px);
+  overflow: auto;
+  padding-right: 3px;
+}
+
+.diet-library-meal-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-light);
+}
+
+.diet-library-meal-card small {
+  color: var(--primary);
+  font-weight: 900;
+  letter-spacing: .05em;
+}
+
+.diet-library-meal-card h3 {
+  margin: 5px 0 6px;
+}
+
+.diet-library-meal-card p {
+  margin: 0 0 7px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.diet-library-meal-card span {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
 @media (max-width: 640px) {
   .diet-plans-heading {
     align-items: stretch;
@@ -176,5 +221,13 @@
 
   .diet-plan-summary > div.wide {
     grid-column: auto;
+  }
+
+  .diet-library-meal-card {
+    grid-template-columns: 1fr;
+  }
+
+  .diet-library-meal-card .btn {
+    width: 100%;
   }
 }
