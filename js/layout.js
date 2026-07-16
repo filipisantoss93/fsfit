@@ -3,7 +3,9 @@ import { supabase } from './supabase.js';
 const FREE_ALLOWED_PAGES = new Set([
   'painel.html',
   'perfil.html',
-  'contato.html'
+  'contato.html',
+  'admin.html',
+  'admin-contatos.html'
 ]);
 
 const messageTimers = new WeakMap();
@@ -96,7 +98,7 @@ export function renderHeader(active = '') {
           <li><a data-page="alimentacao" href="biblioteca-alimentar.html">Alimentação</a></li>
           <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
           <li><a data-page="contato" href="contato.html">Contato</a></li>
-          <li id="admin-support-nav" class="hidden"><a data-page="admin-suporte" href="admin-contatos.html">Suporte</a></li>
+          <li id="admin-nav" class="hidden"><a data-page="admin" href="admin.html">Administração</a></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
           <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
         </ul>
@@ -121,7 +123,7 @@ export async function setGreeting(session) {
   ]);
   const name = profile?.nome?.trim() || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Personal';
   target.textContent = `Olá, ${name}`;
-  if (admin) document.querySelector('#admin-support-nav')?.classList.remove('hidden');
+  if (admin) document.querySelector('#admin-nav')?.classList.remove('hidden');
 }
 
 export function showMessage(element, text, type = 'success') {
