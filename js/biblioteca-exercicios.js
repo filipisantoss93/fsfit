@@ -18,6 +18,7 @@ const openModalButton = document.querySelector('#open-library-modal');
 const addCategoryShortcut = document.querySelector('#add-category-shortcut');
 const categoryButtons = [...document.querySelectorAll('[data-library-category]')];
 let editingId = null;
+let editingGlobalId = null;
 let exercises = [];
 let activeCategory = 'Todos';
 
@@ -33,6 +34,7 @@ function normalize(value = '') {
 
 function resetForm() {
   editingId = null;
+  editingGlobalId = null;
   form.reset();
   formTitle.textContent = 'Novo exercício';
   submitButton.textContent = 'Adicionar exercício';
@@ -62,10 +64,20 @@ function setActiveCategory(category) {
   renderExercises();
 }
 
+function getVisibleExercises() {
+  const customizedGlobalIds = new Set(
+    exercises
+      .filter(item => !item.global && item.personal_id === session.user.id && item.origem_global_id)
+      .map(item => item.origem_global_id)
+  );
+
+  return exercises.filter(item => !(item.global && customizedGlobalIds.has(item.id)));
+}
+
 function renderExercises() {
   const term = normalize(search.value);
   const category = normalize(activeCategory);
-  const filtered = exercises.filter(item => {
+  const filtered = getVisibleExercises().filter(item => {
     const matchesSearch = !term || [item.nome, item.grupo_muscular, item.equipamento]
       .filter(Boolean)
       .some(value => normalize(value).includes(term));
@@ -80,21 +92,28 @@ function renderExercises() {
 
   list.innerHTML = filtered.map(item => {
     const isGlobal = Boolean(item.global);
+    const isCustomized = Boolean(item.origem_global_id);
+    const badge = isGlobal
+      ? '<span class="library-badge">PADRÃO FS FIT</span>'
+      : isCustomized
+        ? '<span class="library-badge personal">PERSONALIZADO</span>'
+        : '<span class="library-badge personal">MEU EXERCÍCIO</span>';
+
     return `<article class="exercise-library-item">
       <div class="exercise-library-item-content">
         <div class="exercise-library-item-title">
           <h3>${esc(item.nome)}</h3>
           ${item.grupo_muscular ? `<span class="library-category-badge">${esc(item.grupo_muscular)}</span>` : ''}
-          ${isGlobal ? '<span class="library-badge">PADRÃO FS FIT</span>' : '<span class="library-badge personal">MEU EXERCÍCIO</span>'}
+          ${badge}
         </div>
         <p>${esc(item.equipamento || 'Sem equipamento informado')}</p>
         ${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}
-        ${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo →</a>` : ''}
+        ${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}
       </div>
-      ${isGlobal ? '' : `<div class="actions library-item-actions">
-        <button class="btn btn-outline" type="button" data-edit-exercise="${item.id}">Editar</button>
-        <button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>
-      </div>`}
+      <div class="actions library-item-actions">
+        <button class="btn btn-outline" type="button" data-edit-exercise="${item.id}">${isGlobal ? 'Personalizar' : 'Editar'}</button>
+        ${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}
+      </div>
     </article>`;
   }).join('');
 }
@@ -102,7 +121,7 @@ function renderExercises() {
 async function loadExercises() {
   const { data, error } = await supabase
     .from('exercicios')
-    .select('id,nome,grupo_muscular,equipamento,instrucoes,video_url,global,personal_id')
+    .select('id,nome,grupo_muscular,equipamento,instrucoes,video_url,global,personal_id,origem_global_id')
     .or(`global.eq.true,personal_id.eq.${session.user.id}`)
     .order('global', { ascending: false })
     .order('nome');
@@ -117,17 +136,21 @@ async function loadExercises() {
 }
 
 function editExercise(id) {
-  const item = exercises.find(exercise => exercise.id === id && !exercise.global && exercise.personal_id === session.user.id);
+  const item = exercises.find(exercise => exercise.id === id);
   if (!item) return;
 
-  editingId = id;
+  const canEdit = item.global || item.personal_id === session.user.id;
+  if (!canEdit) return;
+
+  editingId = item.global ? null : item.id;
+  editingGlobalId = item.global ? item.id : null;
   form.nome.value = item.nome || '';
   form.grupo_muscular.value = item.grupo_muscular || '';
   form.equipamento.value = item.equipamento || '';
   form.instrucoes.value = item.instrucoes || '';
   form.video_url.value = item.video_url || '';
-  formTitle.textContent = `Editar ${item.nome}`;
-  submitButton.textContent = 'Salvar alterações';
+  formTitle.textContent = item.global ? `Personalizar ${item.nome}` : `Editar ${item.nome}`;
+  submitButton.textContent = item.global ? 'Salvar minha versão' : 'Salvar alterações';
   openModal();
 }
 
@@ -147,17 +170,42 @@ form.addEventListener('submit', async event => {
 
   submitButton.disabled = true;
   try {
-    const query = editingId
-      ? supabase.from('exercicios').update(payload).eq('id', editingId).eq('personal_id', session.user.id).eq('global', false)
-      : supabase.from('exercicios').insert(payload);
+    let query;
+    let successText;
+
+    if (editingGlobalId) {
+      query = supabase.from('exercicios').insert({
+        ...payload,
+        origem_global_id: editingGlobalId
+      });
+      successText = 'Sua versão personalizada foi criada com sucesso.';
+    } else if (editingId) {
+      query = supabase.from('exercicios')
+        .update(payload)
+        .eq('id', editingId)
+        .eq('personal_id', session.user.id)
+        .eq('global', false);
+      successText = 'Exercício atualizado com sucesso.';
+    } else {
+      query = supabase.from('exercicios').insert(payload);
+      successText = 'Exercício adicionado à biblioteca.';
+    }
+
     const { error } = await query;
     if (error) throw error;
-    showMessage(message, editingId ? 'Exercício atualizado com sucesso.' : 'Exercício adicionado à biblioteca.');
+    showMessage(message, successText);
     closeModal();
     await loadExercises();
   } catch (error) {
     console.error(error);
-    showMessage(message, error.message || 'Não foi possível salvar o exercício.', 'error');
+    const duplicateCustomization = error?.code === '23505' && editingGlobalId;
+    showMessage(
+      message,
+      duplicateCustomization
+        ? 'Você já possui uma versão personalizada deste exercício. Atualize a página e edite sua versão.'
+        : error.message || 'Não foi possível salvar o exercício.',
+      'error'
+    );
   } finally {
     submitButton.disabled = false;
   }
@@ -199,7 +247,7 @@ document.addEventListener('click', async event => {
       .eq('global', false);
     if (error) throw error;
     if (editingId === deleteButton.dataset.deleteExercise) closeModal();
-    showMessage(message, 'Exercício excluído da biblioteca.');
+    showMessage(message, 'Exercício excluído da biblioteca. Se era uma personalização, o exercício padrão voltará a aparecer.');
     await loadExercises();
   } catch (error) {
     console.error(error);
