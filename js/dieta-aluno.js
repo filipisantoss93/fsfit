@@ -11,8 +11,15 @@ const message = document.querySelector('#diet-message');
 const dietForm = document.querySelector('#diet-form');
 const mealForm = document.querySelector('#meal-form');
 const mealList = document.querySelector('#meal-list');
+const mealModal = document.querySelector('#meal-modal');
+const mealModalTitle = document.querySelector('#meal-modal-title');
+const mealModalBody = document.querySelector('#meal-modal-body');
+const mealModalEdit = document.querySelector('#meal-modal-edit');
+const mealModalDelete = document.querySelector('#meal-modal-delete');
 let planId = null;
 let editingMealId = null;
+let selectedMealId = null;
+let mealsCache = [];
 
 const dayNames = { 1: 'Segunda-feira', 2: 'Terça-feira', 3: 'Quarta-feira', 4: 'Quinta-feira', 5: 'Sexta-feira', 6: 'Sábado', 7: 'Domingo' };
 
@@ -43,6 +50,71 @@ function resetMealForm() {
   mealForm.ordem.value = '1';
   setSelectedDays([]);
   mealForm.querySelector('[type="submit"]').textContent = 'Adicionar refeição';
+}
+
+function closeMealModal() {
+  mealModal.classList.remove('open');
+  mealModal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('diet-modal-open');
+  selectedMealId = null;
+}
+
+function openMealModal(mealId) {
+  const meal = mealsCache.find(item => item.id === mealId);
+  if (!meal) return;
+
+  selectedMealId = meal.id;
+  const days = (meal.dias_semana || []).map(day => dayNames[day]).filter(Boolean).join(', ') || 'Não informado';
+  const time = meal.horario ? meal.horario.slice(0, 5) : 'Não informado';
+
+  mealModalTitle.textContent = meal.nome || 'Refeição';
+  mealModalBody.innerHTML = `
+    <div class="diet-detail"><small>Horário</small><strong>${esc(time)}</strong></div>
+    <div class="diet-detail"><small>Dias da semana</small><p>${esc(days)}</p></div>
+    <div class="diet-detail"><small>Descrição</small><p>${esc(meal.descricao || 'Não informado')}</p></div>
+    <div class="diet-detail"><small>Substituições</small><p>${esc(meal.substituicoes || 'Nenhuma substituição informada')}</p></div>
+    <div class="diet-detail"><small>Ordem no plano</small><strong>${esc(String(meal.ordem || '—'))}</strong></div>
+  `;
+
+  mealModal.classList.add('open');
+  mealModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('diet-modal-open');
+  mealModalEdit.focus();
+}
+
+function startEditingMeal(mealId) {
+  const data = mealsCache.find(item => item.id === mealId);
+  if (!data) return showMessage(message, 'Não foi possível abrir a refeição.', 'error');
+
+  editingMealId = data.id;
+  mealForm.nome.value = data.nome || '';
+  mealForm.horario.value = data.horario ? data.horario.slice(0, 5) : '';
+  mealForm.descricao.value = data.descricao || '';
+  mealForm.substituicoes.value = data.substituicoes || '';
+  mealForm.ordem.value = data.ordem || 1;
+  setSelectedDays(data.dias_semana || []);
+  mealForm.querySelector('[type="submit"]').textContent = 'Salvar alteração';
+  closeMealModal();
+  mealForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function deleteMeal(mealId) {
+  const meal = mealsCache.find(item => item.id === mealId);
+  if (!meal) return;
+  if (!confirm(`Excluir a refeição “${meal.nome}” do plano?`)) return;
+
+  const { error } = await supabase
+    .from('refeicoes')
+    .delete()
+    .eq('id', mealId)
+    .eq('plano_alimentar_id', planId);
+
+  if (error) return showMessage(message, 'Não foi possível excluir a refeição.', 'error');
+
+  closeMealModal();
+  showMessage(message, 'Refeição excluída com sucesso.');
+  if (editingMealId === mealId) resetMealForm();
+  await loadMeals();
 }
 
 async function loadStudent() {
@@ -116,32 +188,34 @@ async function loadMeals() {
     return;
   }
 
-  if (!data?.length) {
+  mealsCache = data || [];
+
+  if (!mealsCache.length) {
     mealList.innerHTML = '<p class="empty">Nenhuma refeição cadastrada.</p>';
     return;
   }
 
   mealList.innerHTML = Object.entries(dayNames).map(([day, label]) => {
-    const meals = data.filter(meal => (meal.dias_semana || []).includes(Number(day)));
+    const meals = mealsCache.filter(meal => (meal.dias_semana || []).includes(Number(day)));
     if (!meals.length) return '';
+
     return `
-      <section style="margin-top:20px">
-        <div class="section-heading compact"><div><small>DIA ${day}</small><strong>${label}</strong></div></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Horário</th><th>Refeição</th><th>Descrição</th><th>Substituições</th><th>Ações</th></tr></thead>
-            <tbody>${meals.map(meal => `
-              <tr>
-                <td>${esc(meal.horario ? meal.horario.slice(0, 5) : '—')}</td>
-                <td><strong>${esc(meal.nome)}</strong></td>
-                <td>${esc(meal.descricao || '—')}</td>
-                <td>${esc(meal.substituicoes || '—')}</td>
-                <td><div class="actions">
-                  <button class="btn btn-outline" data-edit-meal="${meal.id}" type="button">Editar</button>
-                  <button class="btn btn-danger" data-delete-meal="${meal.id}" type="button">Excluir</button>
-                </div></td>
-              </tr>`).join('')}</tbody>
-          </table>
+      <section class="diet-day-section">
+        <div class="diet-day-header">
+          <div><small>DIA ${day}</small><strong>${label}</strong></div>
+          <span class="diet-day-count">${meals.length} ${meals.length === 1 ? 'refeição' : 'refeições'}</span>
+        </div>
+        <div class="diet-meal-list">
+          ${meals.map(meal => `
+            <button class="diet-meal-row" type="button" data-open-meal="${meal.id}" aria-label="Abrir detalhes de ${esc(meal.nome)}">
+              <span class="diet-meal-time">${esc(meal.horario ? meal.horario.slice(0, 5) : '—')}</span>
+              <span class="diet-meal-main">
+                <strong>${esc(meal.nome)}</strong>
+                <span>${esc(meal.descricao || 'Sem descrição')}</span>
+              </span>
+              <span class="diet-meal-arrow" aria-hidden="true">›</span>
+            </button>
+          `).join('')}
         </div>
       </section>`;
   }).join('') || '<p class="empty">As refeições cadastradas ainda não possuem dias da semana definidos.</p>';
@@ -171,7 +245,7 @@ dietForm.addEventListener('submit', async event => {
     .eq('id', planId)
     .eq('personal_id', session.user.id);
 
-  if (error) return showMessage(message, error.message, 'error');
+  if (error) return showMessage(message, 'Não foi possível salvar o plano alimentar.', 'error');
   showMessage(message, 'Plano alimentar atualizado com sucesso.');
 });
 
@@ -200,48 +274,31 @@ mealForm.addEventListener('submit', async event => {
     ? await supabase.from('refeicoes').update(payload).eq('id', editingMealId).eq('plano_alimentar_id', planId)
     : await supabase.from('refeicoes').insert(payload);
 
-  if (result.error) return showMessage(message, result.error.message, 'error');
+  if (result.error) return showMessage(message, 'Não foi possível salvar a refeição. Verifique os dados e tente novamente.', 'error');
 
   showMessage(message, editingMealId ? 'Refeição atualizada com sucesso.' : 'Refeição adicionada com sucesso.');
   resetMealForm();
   await loadMeals();
 });
 
-document.addEventListener('click', async event => {
-  const edit = event.target.closest('[data-edit-meal]');
-  if (edit) {
-    const { data, error } = await supabase
-      .from('refeicoes')
-      .select('id,nome,horario,descricao,substituicoes,ordem,dias_semana')
-      .eq('id', edit.dataset.editMeal)
-      .eq('plano_alimentar_id', planId)
-      .single();
+document.addEventListener('click', event => {
+  const open = event.target.closest('[data-open-meal]');
+  if (open) return openMealModal(open.dataset.openMeal);
 
-    if (error) return showMessage(message, 'Não foi possível abrir a refeição.', 'error');
-    editingMealId = data.id;
-    mealForm.nome.value = data.nome || '';
-    mealForm.horario.value = data.horario ? data.horario.slice(0, 5) : '';
-    mealForm.descricao.value = data.descricao || '';
-    mealForm.substituicoes.value = data.substituicoes || '';
-    mealForm.ordem.value = data.ordem || 1;
-    setSelectedDays(data.dias_semana || []);
-    mealForm.querySelector('[type="submit"]').textContent = 'Salvar alteração';
-    mealForm.scrollIntoView({ behavior: 'smooth' });
-    return;
-  }
+  const close = event.target.closest('[data-close-meal-modal]');
+  if (close) return closeMealModal();
+});
 
-  const remove = event.target.closest('[data-delete-meal]');
-  if (remove && confirm('Excluir esta refeição do plano?')) {
-    const { error } = await supabase
-      .from('refeicoes')
-      .delete()
-      .eq('id', remove.dataset.deleteMeal)
-      .eq('plano_alimentar_id', planId);
-    if (error) return showMessage(message, error.message, 'error');
-    showMessage(message, 'Refeição excluída.');
-    if (editingMealId === remove.dataset.deleteMeal) resetMealForm();
-    await loadMeals();
-  }
+mealModalEdit.addEventListener('click', () => {
+  if (selectedMealId) startEditingMeal(selectedMealId);
+});
+
+mealModalDelete.addEventListener('click', () => {
+  if (selectedMealId) deleteMeal(selectedMealId);
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && mealModal.classList.contains('open')) closeMealModal();
 });
 
 await loadStudent();
