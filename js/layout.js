@@ -15,6 +15,15 @@ function currentPage() {
   return page || 'index.html';
 }
 
+function ensureHeaderStyles() {
+  if (document.querySelector('link[data-fsfit-header-styles]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'css/header-menu.css?v=20260716-0113';
+  link.dataset.fsfitHeaderStyles = 'true';
+  document.head.appendChild(link);
+}
+
 export async function ensurePersonalProfile(session) {
   if (!session?.user?.id) throw new Error('Sessão inválida.');
 
@@ -84,34 +93,190 @@ export async function requireSession() {
 }
 
 export function renderHeader(active = '') {
+  ensureHeaderStyles();
   const host = document.querySelector('#header-container');
   if (!host) return;
+
   host.innerHTML = `
     <header class="main-header">
-      <nav class="nav-container">
-        <a class="logo-nav" href="painel.html"><strong>FS</strong><span>Fit</span></a>
+      <nav class="nav-container" aria-label="Navegação principal">
+        <a class="logo-nav" href="painel.html" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
         <span id="user-greeting" class="user-greeting"></span>
-        <ul id="nav-menu" class="nav-menu">
+
+        <ul id="nav-menu" class="nav-menu" aria-label="Menu principal">
           <li><a data-page="painel" href="painel.html">Início</a></li>
           <li><a data-page="alunos" href="alunos.html">Alunos</a></li>
           <li><a data-page="exercicios" href="biblioteca-exercicios.html">Exercícios</a></li>
           <li><a data-page="alimentacao" href="biblioteca-alimentar.html">Alimentação</a></li>
           <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
-          <li><a data-page="contato" href="contato.html">Contato</a></li>
-          <li id="admin-nav" class="hidden"><a data-page="admin" href="admin.html">Administração</a></li>
+          <li class="nav-divider" aria-hidden="true"></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
+          <li><a data-page="contato" href="contato.html">Contato</a></li>
+          <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html"><span aria-hidden="true">⚙</span> Administração</a></li>
+          <li class="nav-divider" aria-hidden="true"></li>
           <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
         </ul>
-        <button id="menu-button" class="menu-mobile-btn" type="button" aria-label="Abrir menu">☰</button>
+
+        <div class="nav-header-actions">
+          <div class="notification-shell">
+            <button id="notification-button" class="notification-button" type="button" aria-label="Abrir notificações" aria-expanded="false" aria-controls="notification-panel">
+              <span class="notification-bell" aria-hidden="true">🔔</span>
+              <span id="notification-badge" class="notification-badge hidden">0</span>
+            </button>
+            <section id="notification-panel" class="notification-panel" aria-label="Notificações" hidden>
+              <div class="notification-panel-header">
+                <div><small>CENTRAL</small><strong>Notificações</strong></div>
+                <button id="notification-mark-all" type="button" class="notification-mark-all hidden">Marcar todas como lidas</button>
+              </div>
+              <div id="notification-list" class="notification-list">
+                <p class="notification-empty">Nenhuma notificação nova.</p>
+              </div>
+            </section>
+          </div>
+          <button id="menu-button" class="menu-mobile-btn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">☰</button>
+        </div>
       </nav>
     </header>`;
+
+  const menu = host.querySelector('#nav-menu');
+  const menuButton = host.querySelector('#menu-button');
+  const notificationButton = host.querySelector('#notification-button');
+  const notificationPanel = host.querySelector('#notification-panel');
+
   host.querySelector(`[data-page="${active}"]`)?.classList.add('active');
-  host.querySelector('#menu-button')?.addEventListener('click', () => host.querySelector('#nav-menu')?.classList.toggle('active'));
+
+  const setMenuOpen = open => {
+    menu?.classList.toggle('active', open);
+    menuButton?.setAttribute('aria-expanded', String(open));
+    if (menuButton) menuButton.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+    document.body.classList.toggle('nav-menu-open', open && window.matchMedia('(max-width: 860px)').matches);
+  };
+
+  const setNotificationsOpen = open => {
+    if (!notificationPanel || !notificationButton) return;
+    notificationPanel.hidden = !open;
+    notificationButton.setAttribute('aria-expanded', String(open));
+  };
+
+  menuButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    setNotificationsOpen(false);
+    setMenuOpen(!menu?.classList.contains('active'));
+  });
+
+  notificationButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    setMenuOpen(false);
+    setNotificationsOpen(notificationPanel?.hidden ?? true);
+  });
+
+  menu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => setMenuOpen(false));
+  });
+
+  document.addEventListener('click', event => {
+    if (!host.contains(event.target)) {
+      setMenuOpen(false);
+      setNotificationsOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    setMenuOpen(false);
+    setNotificationsOpen(false);
+  });
+
+  window.addEventListener('resize', () => {
+    if (!window.matchMedia('(max-width: 860px)').matches) {
+      setMenuOpen(false);
+      document.body.classList.remove('nav-menu-open');
+    }
+  });
+
   host.querySelector('#logout-button')?.addEventListener('click', async () => {
     await supabase.auth.signOut();
     localStorage.clear();
     window.location.replace('index.html');
   });
+}
+
+function escapeNotificationHtml(value = '') {
+  const div = document.createElement('div');
+  div.textContent = value ?? '';
+  return div.innerHTML;
+}
+
+function formatNotificationDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+async function loadNotifications(session) {
+  const badge = document.querySelector('#notification-badge');
+  const list = document.querySelector('#notification-list');
+  const markAll = document.querySelector('#notification-mark-all');
+  if (!badge || !list || !session?.user?.id) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('notificacoes')
+      .select('id,titulo,mensagem,link,lida,created_at')
+      .eq('destinatario_id', session.user.id)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+
+    const notifications = data || [];
+    const unread = notifications.filter(item => !item.lida);
+
+    badge.textContent = unread.length > 99 ? '99+' : String(unread.length);
+    badge.classList.toggle('hidden', unread.length === 0);
+    markAll?.classList.toggle('hidden', unread.length === 0);
+
+    list.innerHTML = notifications.length
+      ? notifications.map(item => `
+          <${item.link ? `a href="${escapeNotificationHtml(item.link)}"` : 'div'} class="notification-item ${item.lida ? '' : 'unread'}" data-notification-id="${item.id}">
+            <span class="notification-dot" aria-hidden="true"></span>
+            <span class="notification-copy">
+              <strong>${escapeNotificationHtml(item.titulo || 'Notificação')}</strong>
+              <span>${escapeNotificationHtml(item.mensagem || '')}</span>
+              <small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small>
+            </span>
+          </${item.link ? 'a' : 'div'}>`).join('')
+      : '<p class="notification-empty">Nenhuma notificação nova.</p>';
+
+    list.querySelectorAll('[data-notification-id]').forEach(item => {
+      item.addEventListener('click', async () => {
+        if (!item.classList.contains('unread')) return;
+        await supabase.from('notificacoes').update({ lida: true }).eq('id', item.dataset.notificationId).eq('destinatario_id', session.user.id);
+      });
+    });
+
+    markAll?.addEventListener('click', async () => {
+      markAll.disabled = true;
+      try {
+        const { error: updateError } = await supabase
+          .from('notificacoes')
+          .update({ lida: true })
+          .eq('destinatario_id', session.user.id)
+          .eq('lida', false);
+        if (updateError) throw updateError;
+        await loadNotifications(session);
+      } catch (updateError) {
+        console.error('Não foi possível marcar as notificações como lidas:', updateError);
+      } finally {
+        markAll.disabled = false;
+      }
+    }, { once: true });
+  } catch (error) {
+    console.info('Central de notificações ainda não disponível:', error?.message || error);
+    badge.classList.add('hidden');
+    if (markAll) markAll.classList.add('hidden');
+    list.innerHTML = '<p class="notification-empty">Nenhuma notificação nova.</p>';
+  }
 }
 
 export async function setGreeting(session) {
@@ -124,6 +289,7 @@ export async function setGreeting(session) {
   const name = profile?.nome?.trim() || session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Personal';
   target.textContent = `Olá, ${name}`;
   if (admin) document.querySelector('#admin-nav')?.classList.remove('hidden');
+  await loadNotifications(session);
 }
 
 export function showMessage(element, text, type = 'success') {
