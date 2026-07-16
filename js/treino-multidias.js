@@ -10,36 +10,67 @@ const modal = document.querySelector('#exercise-modal');
 const message = document.querySelector('#workout-message');
 const originalDaySelect = form?.querySelector('[name="dia_semana"]');
 const weekdayOptions = document.querySelector('#exercise-weekday-options');
-const categorySelect = document.querySelector('#exercise-category');
+const batchCategorySelect = document.querySelector('#exercise-category');
+const singleCategorySelect = document.querySelector('#single-exercise-category');
 const exerciseSelect = document.querySelector('#exercise-select');
-const repetitionsField = form?.repeticoes?.closest('.form-group');
+const checkboxList = document.querySelector('#exercise-checkbox-list');
+const selectedSection = document.querySelector('#selected-exercises-section');
+const selectedBuilder = document.querySelector('#selected-exercises-builder');
+const selectedCount = document.querySelector('#selected-exercises-count');
+const batchSelector = document.querySelector('#batch-exercise-selector');
+const singleEditor = document.querySelector('#single-exercise-editor');
+const saveButton = document.querySelector('#save-exercise-batch');
+const modalTitle = document.querySelector('#exercise-modal-title');
 
 let activeWorkoutId = null;
 let allowedDays = [];
 let editingExerciseId = null;
 let exerciseLibrary = [];
+let selectedExerciseIds = [];
+const selectedConfigs = new Map();
 
 if (originalDaySelect) {
   originalDaySelect.style.display = 'none';
   originalDaySelect.required = false;
 }
 
+const repetitionsField = form?.repeticoes?.closest('.form-group');
 const prescriptionTypeField = document.createElement('div');
 prescriptionTypeField.className = 'form-group';
 prescriptionTypeField.innerHTML = '<label>Tipo de prescrição</label><input id="exercise-prescription-type" type="text" value="Repetições" readonly>';
 repetitionsField?.parentElement?.insertBefore(prescriptionTypeField, repetitionsField);
 
+const durationInput = form?.duracao_minutos;
+const distanceInput = form?.distancia_km;
 const durationField = document.createElement('div');
 durationField.className = 'form-group hidden';
-durationField.id = 'exercise-duration-field';
-durationField.innerHTML = '<label>Duração (minutos)</label><input name="duracao_minutos" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Ex.: 30">';
+durationField.innerHTML = '<label>Duração (minutos)</label>';
+if (durationInput) {
+  durationInput.type = 'number';
+  durationInput.min = '0';
+  durationInput.step = '0.5';
+  durationInput.placeholder = 'Ex.: 30';
+  durationField.appendChild(durationInput);
+}
 repetitionsField?.parentElement?.insertBefore(durationField, repetitionsField?.nextSibling || null);
 
 const distanceField = document.createElement('div');
 distanceField.className = 'form-group hidden';
-distanceField.id = 'exercise-distance-field';
-distanceField.innerHTML = '<label>Distância (km)</label><input name="distancia_km" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Ex.: 5">';
+distanceField.innerHTML = '<label>Distância (km)</label>';
+if (distanceInput) {
+  distanceInput.type = 'number';
+  distanceInput.min = '0';
+  distanceInput.step = '0.1';
+  distanceInput.placeholder = 'Ex.: 5';
+  distanceField.appendChild(distanceInput);
+}
 durationField.parentElement?.insertBefore(distanceField, durationField.nextSibling);
+
+function esc(value = '') {
+  const div = document.createElement('div');
+  div.textContent = value ?? '';
+  return div.innerHTML;
+}
 
 function checkedDays() {
   return [...(weekdayOptions?.querySelectorAll('input:checked') || [])].map(input => Number(input.value));
@@ -62,54 +93,116 @@ function prescriptionLabel(type) {
   return { repeticoes: 'Repetições', tempo: 'Tempo', distancia: 'Distância' }[type] || 'Repetições';
 }
 
-function selectedExercise() {
-  return exerciseLibrary.find(item => item.id === exerciseSelect?.value) || null;
+function exerciseById(id) {
+  return exerciseLibrary.find(item => item.id === id) || null;
 }
 
-function syncPrescriptionUI(type = 'repeticoes') {
-  const normalized = ['repeticoes', 'tempo', 'distancia'].includes(type) ? type : 'repeticoes';
-  const typeInput = document.querySelector('#exercise-prescription-type');
-  if (typeInput) typeInput.value = prescriptionLabel(normalized);
-
-  repetitionsField?.classList.toggle('hidden', normalized !== 'repeticoes');
-  durationField.classList.toggle('hidden', normalized !== 'tempo');
-  distanceField.classList.toggle('hidden', normalized !== 'distancia');
-
-  if (normalized !== 'repeticoes' && form?.repeticoes) form.repeticoes.value = '';
-  if (normalized !== 'tempo' && form?.duracao_minutos) form.duracao_minutos.value = '';
-  if (normalized !== 'distancia' && form?.distancia_km) form.distancia_km.value = '';
+function defaultConfig(item) {
+  return {
+    series: '',
+    repeticoes: '',
+    duracao_minutos: '',
+    distancia_km: '',
+    carga: '',
+    descanso_segundos: '',
+    observacoes: '',
+    tipo_prescricao: item?.tipo_prescricao || 'repeticoes'
+  };
 }
 
-function populateExerciseOptions(category, selectedExerciseId = '') {
+function seriesOptions(selected = '') {
+  return '<option value="">—</option>' + Array.from({ length: 10 }, (_, index) => index + 1)
+    .map(value => `<option value="${value}"${String(value) === String(selected) ? ' selected' : ''}>${value}</option>`).join('');
+}
+
+function prescriptionInput(item, config) {
+  const type = item.tipo_prescricao || 'repeticoes';
+  if (type === 'tempo') {
+    return `<div class="form-group"><label>Duração (min)</label><input data-config-field="duracao_minutos" type="number" min="0" step="0.5" inputmode="decimal" value="${esc(config.duracao_minutos)}" placeholder="30"></div>`;
+  }
+  if (type === 'distancia') {
+    return `<div class="form-group"><label>Distância (km)</label><input data-config-field="distancia_km" type="number" min="0" step="0.1" inputmode="decimal" value="${esc(config.distancia_km)}" placeholder="5"></div>`;
+  }
+  return `<div class="form-group"><label>Repetições</label><input data-config-field="repeticoes" inputmode="numeric" value="${esc(config.repeticoes)}" placeholder="12"></div>`;
+}
+
+function renderSelectedBuilder() {
+  const items = selectedExerciseIds.map(exerciseById).filter(Boolean);
+  selectedSection?.classList.toggle('hidden', items.length === 0);
+  if (selectedCount) selectedCount.textContent = String(items.length);
+  if (saveButton && !editingExerciseId) saveButton.textContent = items.length ? `Adicionar ${items.length} ${items.length === 1 ? 'exercício' : 'exercícios'}` : 'Adicionar exercícios';
+  if (!selectedBuilder) return;
+
+  selectedBuilder.innerHTML = items.map((item, index) => {
+    const config = selectedConfigs.get(item.id) || defaultConfig(item);
+    selectedConfigs.set(item.id, config);
+    return `<article class="selected-exercise-card" data-selected-exercise="${item.id}">
+      <div class="selected-exercise-card-head">
+        <span class="selected-exercise-order">${index + 1}</span>
+        <div><strong>${esc(item.nome)}</strong><small>${esc(categoryName(item))} · ${esc(prescriptionLabel(item.tipo_prescricao))}</small></div>
+        <button class="selected-exercise-remove" type="button" data-remove-selected="${item.id}" aria-label="Remover ${esc(item.nome)}">×</button>
+      </div>
+      <div class="selected-exercise-config-grid">
+        <div class="form-group"><label>Séries</label><select data-config-field="series">${seriesOptions(config.series)}</select></div>
+        ${prescriptionInput(item, config)}
+        <div class="form-group"><label>Carga</label><input data-config-field="carga" value="${esc(config.carga)}" placeholder="Opcional"></div>
+        <div class="form-group"><label>Descanso (s)</label><input data-config-field="descanso_segundos" type="number" min="0" step="5" value="${esc(config.descanso_segundos)}" placeholder="60"></div>
+      </div>
+      <div class="form-group selected-exercise-notes"><label>Observações</label><textarea data-config-field="observacoes" placeholder="Técnica, intensidade, cadência...">${esc(config.observacoes)}</textarea></div>
+    </article>`;
+  }).join('');
+}
+
+function renderExerciseCheckboxes(category) {
+  if (!checkboxList) return;
+  if (!category) {
+    checkboxList.innerHTML = '<p class="empty">Selecione uma categoria para ver os exercícios.</p>';
+    return;
+  }
+  const filtered = exerciseLibrary.filter(item => categoryName(item) === category);
+  if (!filtered.length) {
+    checkboxList.innerHTML = '<p class="empty">Nenhum exercício nesta categoria.</p>';
+    return;
+  }
+  checkboxList.innerHTML = filtered.map(item => {
+    const checked = selectedExerciseIds.includes(item.id);
+    const detail = [item.equipamento, prescriptionLabel(item.tipo_prescricao)].filter(Boolean).join(' · ');
+    return `<label class="exercise-checkbox-option${checked ? ' selected' : ''}">
+      <input type="checkbox" value="${item.id}"${checked ? ' checked' : ''}>
+      <span><strong>${esc(item.nome)}</strong><small>${esc(detail)}</small></span>
+    </label>`;
+  }).join('');
+}
+
+function populateSingleExerciseOptions(category, selectedExerciseId = '') {
   if (!exerciseSelect) return;
   if (!category) {
     exerciseSelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
     exerciseSelect.disabled = true;
-    syncPrescriptionUI('repeticoes');
     return;
   }
-
   const filtered = exerciseLibrary.filter(item => categoryName(item) === category);
-  exerciseSelect.innerHTML = '<option value="">Selecione</option>' + filtered.map(item => {
-    const detail = item.equipamento ? ` — ${item.equipamento}` : '';
-    return `<option value="${item.id}">${item.nome}${detail}</option>`;
-  }).join('');
+  exerciseSelect.innerHTML = '<option value="">Selecione</option>' + filtered.map(item => `<option value="${item.id}">${esc(item.nome)}${item.equipamento ? ` — ${esc(item.equipamento)}` : ''}</option>`).join('');
   exerciseSelect.disabled = false;
   if (selectedExerciseId) exerciseSelect.value = selectedExerciseId;
-  syncPrescriptionUI(selectedExercise()?.tipo_prescricao || 'repeticoes');
 }
 
-function syncCategoryForExercise(exerciseId) {
-  const item = exerciseLibrary.find(exercise => exercise.id === exerciseId);
-  if (!item || !categorySelect) {
-    if (categorySelect) categorySelect.value = '';
-    populateExerciseOptions('');
-    return;
-  }
+function syncSinglePrescriptionUI(type = 'repeticoes') {
+  const normalized = ['repeticoes', 'tempo', 'distancia'].includes(type) ? type : 'repeticoes';
+  const typeInput = document.querySelector('#exercise-prescription-type');
+  if (typeInput) typeInput.value = prescriptionLabel(normalized);
+  repetitionsField?.classList.toggle('hidden', normalized !== 'repeticoes');
+  durationField.classList.toggle('hidden', normalized !== 'tempo');
+  distanceField.classList.toggle('hidden', normalized !== 'distancia');
+}
+
+function syncSingleCategoryForExercise(exerciseId) {
+  const item = exerciseById(exerciseId);
+  if (!item || !singleCategorySelect) return;
   const category = categoryName(item);
-  categorySelect.value = category;
-  populateExerciseOptions(category, exerciseId);
-  syncPrescriptionUI(item.tipo_prescricao || 'repeticoes');
+  singleCategorySelect.value = category;
+  populateSingleExerciseOptions(category, item.id);
+  syncSinglePrescriptionUI(item.tipo_prescricao || 'repeticoes');
 }
 
 async function loadExerciseLibrary() {
@@ -118,27 +211,18 @@ async function loadExerciseLibrary() {
     .select('id,nome,grupo_muscular,equipamento,tipo_prescricao')
     .or(`global.eq.true,personal_id.eq.${session.user.id}`)
     .order('nome');
-
   if (error) throw error;
   exerciseLibrary = (data || []).map(item => ({ ...item, tipo_prescricao: item.tipo_prescricao || 'repeticoes' }));
-
   const categories = [...new Set(exerciseLibrary.map(categoryName))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  if (categorySelect) {
-    categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${category}">${category}</option>`).join('');
-  }
-  populateExerciseOptions('');
+  const options = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${esc(category)}">${esc(category)}</option>`).join('');
+  if (batchCategorySelect) batchCategorySelect.innerHTML = options;
+  if (singleCategorySelect) singleCategorySelect.innerHTML = options;
+  renderExerciseCheckboxes('');
 }
 
 async function refreshActiveWorkoutDays() {
   if (!alunoId) return;
-  const { data } = await supabase
-    .from('treinos')
-    .select('id,dias_semana')
-    .eq('aluno_id', alunoId)
-    .eq('personal_id', session.user.id)
-    .eq('status', 'ativo')
-    .maybeSingle();
-
+  const { data } = await supabase.from('treinos').select('id,dias_semana').eq('aluno_id', alunoId).eq('personal_id', session.user.id).eq('status', 'ativo').maybeSingle();
   activeWorkoutId = data?.id || null;
   allowedDays = (data?.dias_semana || []).map(Number);
   setCheckedDays([]);
@@ -146,29 +230,31 @@ async function refreshActiveWorkoutDays() {
 
 async function prepareNewExercise() {
   editingExerciseId = null;
+  selectedExerciseIds = [];
+  selectedConfigs.clear();
   await refreshActiveWorkoutDays();
-  if (categorySelect) categorySelect.value = '';
-  populateExerciseOptions('');
-  if (form?.duracao_minutos) form.duracao_minutos.value = '';
-  if (form?.distancia_km) form.distancia_km.value = '';
+  if (batchCategorySelect) batchCategorySelect.value = '';
+  batchSelector?.classList.remove('hidden');
+  singleEditor?.classList.add('hidden');
+  if (modalTitle) modalTitle.textContent = 'Montar sequência';
+  renderExerciseCheckboxes('');
+  renderSelectedBuilder();
 }
 
 async function prepareExerciseEdit(id) {
   editingExerciseId = id;
+  batchSelector?.classList.add('hidden');
+  singleEditor?.classList.remove('hidden');
+  if (modalTitle) modalTitle.textContent = 'Editar exercício';
+  if (saveButton) saveButton.textContent = 'Salvar alteração';
   const selectedDay = Number(originalDaySelect?.value);
   setCheckedDays(selectedDay ? [selectedDay] : []);
-  syncCategoryForExercise(form?.exercicio_id?.value || '');
 
-  if (!id) return;
-  const { data } = await supabase
-    .from('treino_exercicios')
-    .select('duracao_minutos,distancia_km,exercicio_id')
-    .eq('id', id)
-    .maybeSingle();
-  if (!data) return;
-  syncCategoryForExercise(data.exercicio_id || form?.exercicio_id?.value || '');
-  if (form?.duracao_minutos) form.duracao_minutos.value = data.duracao_minutos ?? '';
-  if (form?.distancia_km) form.distancia_km.value = data.distancia_km ?? '';
+  const { data } = await supabase.from('treino_exercicios').select('duracao_minutos,distancia_km,exercicio_id').eq('id', id).maybeSingle();
+  const exerciseId = data?.exercicio_id || form?.exercicio_id?.value || '';
+  syncSingleCategoryForExercise(exerciseId);
+  if (form?.duracao_minutos) form.duracao_minutos.value = data?.duracao_minutos ?? '';
+  if (form?.distancia_km) form.distancia_km.value = data?.distancia_km ?? '';
 }
 
 async function getNextOrders(days) {
@@ -183,10 +269,56 @@ async function getNextOrders(days) {
   return nextOrders;
 }
 
-categorySelect?.addEventListener('change', () => populateExerciseOptions(categorySelect.value));
-exerciseSelect?.addEventListener('change', () => syncPrescriptionUI(selectedExercise()?.tipo_prescricao || 'repeticoes'));
+batchCategorySelect?.addEventListener('change', () => renderExerciseCheckboxes(batchCategorySelect.value));
+singleCategorySelect?.addEventListener('change', () => populateSingleExerciseOptions(singleCategorySelect.value));
+exerciseSelect?.addEventListener('change', () => syncSinglePrescriptionUI(exerciseById(exerciseSelect.value)?.tipo_prescricao || 'repeticoes'));
 
-document.querySelector('#open-exercise-modal')?.addEventListener('click', () => { setTimeout(() => prepareNewExercise(), 0); });
+checkboxList?.addEventListener('change', event => {
+  const input = event.target.closest('input[type="checkbox"]');
+  if (!input) return;
+  const id = input.value;
+  if (input.checked) {
+    if (!selectedExerciseIds.includes(id)) selectedExerciseIds.push(id);
+    if (!selectedConfigs.has(id)) selectedConfigs.set(id, defaultConfig(exerciseById(id)));
+  } else {
+    selectedExerciseIds = selectedExerciseIds.filter(item => item !== id);
+    selectedConfigs.delete(id);
+  }
+  renderExerciseCheckboxes(batchCategorySelect?.value || '');
+  renderSelectedBuilder();
+});
+
+selectedBuilder?.addEventListener('input', event => {
+  const card = event.target.closest('[data-selected-exercise]');
+  const field = event.target.dataset.configField;
+  if (!card || !field) return;
+  const id = card.dataset.selectedExercise;
+  const config = selectedConfigs.get(id) || defaultConfig(exerciseById(id));
+  config[field] = event.target.value;
+  selectedConfigs.set(id, config);
+});
+
+selectedBuilder?.addEventListener('change', event => {
+  const card = event.target.closest('[data-selected-exercise]');
+  const field = event.target.dataset.configField;
+  if (!card || !field) return;
+  const id = card.dataset.selectedExercise;
+  const config = selectedConfigs.get(id) || defaultConfig(exerciseById(id));
+  config[field] = event.target.value;
+  selectedConfigs.set(id, config);
+});
+
+selectedBuilder?.addEventListener('click', event => {
+  const remove = event.target.closest('[data-remove-selected]');
+  if (!remove) return;
+  const id = remove.dataset.removeSelected;
+  selectedExerciseIds = selectedExerciseIds.filter(item => item !== id);
+  selectedConfigs.delete(id);
+  renderExerciseCheckboxes(batchCategorySelect?.value || '');
+  renderSelectedBuilder();
+});
+
+document.querySelector('#open-exercise-modal')?.addEventListener('click', () => setTimeout(() => prepareNewExercise(), 0));
 document.addEventListener('click', event => {
   const detailRow = event.target.closest('[data-open-exercise-detail]');
   if (detailRow) editingExerciseId = detailRow.dataset.openExerciseDetail;
@@ -202,62 +334,78 @@ form?.addEventListener('submit', async event => {
   if (!activeWorkoutId) await refreshActiveWorkoutDays();
   if (!activeWorkoutId) return showMessage(message, 'Ative um plano de treino antes de adicionar exercícios.', 'error');
 
-  const exerciseId = form.exercicio_id.value;
-  if (!exerciseId) return showMessage(message, 'Selecione uma categoria e um exercício.', 'error');
-
-  const exercise = exerciseLibrary.find(item => item.id === exerciseId);
-  const type = exercise?.tipo_prescricao || 'repeticoes';
-  const duration = form.duracao_minutos?.value ? Number(form.duracao_minutos.value) : null;
-  const distance = form.distancia_km?.value ? Number(form.distancia_km.value) : null;
-
-  if (type === 'tempo' && !duration) return showMessage(message, 'Informe a duração do exercício em minutos.', 'error');
-  if (type === 'distancia' && !distance) return showMessage(message, 'Informe a distância do exercício em quilômetros.', 'error');
-
-  const commonPayload = {
-    treino_id: activeWorkoutId,
-    exercicio_id: exerciseId,
-    series: form.series.value ? Number(form.series.value) : null,
-    repeticoes: type === 'repeticoes' ? (form.repeticoes.value || null) : null,
-    duracao_minutos: type === 'tempo' ? duration : null,
-    distancia_km: type === 'distancia' ? distance : null,
-    carga: form.carga.value.trim() || null,
-    descanso_segundos: form.descanso_segundos.value ? Number(form.descanso_segundos.value) : null,
-    observacoes: form.observacoes.value.trim() || null
-  };
-
-  let error = null;
+  saveButton.disabled = true;
   try {
     if (editingExerciseId) {
-      const [firstDay, ...extraDays] = days;
-      const preservedOrder = Number(form.ordem.value || 1);
-      const updateResult = await supabase.from('treino_exercicios').update({ ...commonPayload, dia_semana: firstDay, ordem: preservedOrder }).eq('id', editingExerciseId).eq('treino_id', activeWorkoutId);
-      error = updateResult.error;
-      if (!error && extraDays.length) {
-        const nextOrders = await getNextOrders(extraDays);
-        const insertResult = await supabase.from('treino_exercicios').insert(extraDays.map(day => ({ ...commonPayload, dia_semana: day, ordem: nextOrders[day] })));
-        error = insertResult.error;
-      }
+      const exerciseId = form.exercicio_id.value;
+      const exercise = exerciseById(exerciseId);
+      if (!exercise) return showMessage(message, 'Selecione um exercício.', 'error');
+      const type = exercise.tipo_prescricao || 'repeticoes';
+      const duration = form.duracao_minutos?.value ? Number(form.duracao_minutos.value) : null;
+      const distance = form.distancia_km?.value ? Number(form.distancia_km.value) : null;
+      if (type === 'tempo' && !duration) return showMessage(message, 'Informe a duração do exercício em minutos.', 'error');
+      if (type === 'distancia' && !distance) return showMessage(message, 'Informe a distância do exercício em quilômetros.', 'error');
+      const [firstDay] = days;
+      const payload = {
+        treino_id: activeWorkoutId,
+        exercicio_id: exerciseId,
+        dia_semana: firstDay,
+        ordem: Number(form.ordem.value || 1),
+        series: form.series.value ? Number(form.series.value) : null,
+        repeticoes: type === 'repeticoes' ? (form.repeticoes.value || null) : null,
+        duracao_minutos: type === 'tempo' ? duration : null,
+        distancia_km: type === 'distancia' ? distance : null,
+        carga: form.carga.value.trim() || null,
+        descanso_segundos: form.descanso_segundos.value ? Number(form.descanso_segundos.value) : null,
+        observacoes: form.observacoes.value.trim() || null
+      };
+      const { error } = await supabase.from('treino_exercicios').update(payload).eq('id', editingExerciseId).eq('treino_id', activeWorkoutId);
+      if (error) throw error;
     } else {
+      if (!selectedExerciseIds.length) return showMessage(message, 'Selecione pelo menos um exercício.', 'error');
       const nextOrders = await getNextOrders(days);
-      const insertResult = await supabase.from('treino_exercicios').insert(days.map(day => ({ ...commonPayload, dia_semana: day, ordem: nextOrders[day] })));
-      error = insertResult.error;
+      const rows = [];
+
+      for (const day of days) {
+        selectedExerciseIds.forEach((exerciseId, index) => {
+          const exercise = exerciseById(exerciseId);
+          const config = selectedConfigs.get(exerciseId) || defaultConfig(exercise);
+          const type = exercise?.tipo_prescricao || 'repeticoes';
+          const duration = config.duracao_minutos ? Number(config.duracao_minutos) : null;
+          const distance = config.distancia_km ? Number(config.distancia_km) : null;
+          if (type === 'tempo' && !duration) throw new Error(`Informe a duração de “${exercise.nome}”.`);
+          if (type === 'distancia' && !distance) throw new Error(`Informe a distância de “${exercise.nome}”.`);
+          rows.push({
+            treino_id: activeWorkoutId,
+            exercicio_id: exerciseId,
+            dia_semana: day,
+            ordem: nextOrders[day] + index,
+            series: config.series ? Number(config.series) : null,
+            repeticoes: type === 'repeticoes' ? (config.repeticoes || null) : null,
+            duracao_minutos: type === 'tempo' ? duration : null,
+            distancia_km: type === 'distancia' ? distance : null,
+            carga: config.carga?.trim() || null,
+            descanso_segundos: config.descanso_segundos ? Number(config.descanso_segundos) : null,
+            observacoes: config.observacoes?.trim() || null
+          });
+        });
+      }
+
+      const { error } = await supabase.from('treino_exercicios').insert(rows);
+      if (error) throw error;
     }
-  } catch (saveError) {
-    console.error('Erro ao salvar exercício:', saveError);
-    error = saveError;
-  }
 
-  if (error) {
-    console.error('Erro ao salvar exercício em múltiplos dias:', error);
-    showMessage(message, 'Não foi possível salvar o exercício. Verifique se a migração de tipo de prescrição já foi aplicada no Supabase.', 'error');
-    return;
+    modal?.classList.remove('open');
+    modal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('workout-modal-open');
+    showMessage(message, editingExerciseId ? 'Exercício atualizado com sucesso.' : `${selectedExerciseIds.length} ${selectedExerciseIds.length === 1 ? 'exercício adicionado' : 'exercícios adicionados'} ao treino.`);
+    setTimeout(() => location.reload(), 450);
+  } catch (error) {
+    console.error('Erro ao salvar exercícios:', error);
+    showMessage(message, error.message || 'Não foi possível salvar os exercícios.', 'error');
+  } finally {
+    saveButton.disabled = false;
   }
-
-  modal?.classList.remove('open');
-  modal?.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('workout-modal-open');
-  showMessage(message, editingExerciseId ? 'Exercício atualizado com sucesso.' : 'Exercício adicionado aos dias selecionados com sucesso.');
-  setTimeout(() => location.reload(), 450);
 }, true);
 
 try {
@@ -265,5 +413,5 @@ try {
   await refreshActiveWorkoutDays();
 } catch (error) {
   console.error(error);
-  showMessage(message, 'Não foi possível carregar as categorias de exercícios. A migração de tipo de prescrição pode ainda não ter sido aplicada no Supabase.', 'error');
+  showMessage(message, 'Não foi possível carregar a biblioteca de exercícios.', 'error');
 }
