@@ -65,15 +65,29 @@ function renderCategoryNav() {
 function renderExercises() {
   const active = categoryById(activeCategoryId);
   if (selectedCategoryTitle) selectedCategoryTitle.textContent = active ? active.nome : 'Exercícios';
-  if (!activeCategoryId) { list.innerHTML = '<p class="empty">Nenhuma categoria selecionada.</p>'; return; }
   const term = normalize(search.value);
-  const filtered = getVisibleExercises().filter(item => item.categoria_id === activeCategoryId && (!term || [item.nome, item.equipamento, item.instrucoes].filter(Boolean).some(value => normalize(value).includes(term))));
-  if (!filtered.length) { list.innerHTML = '<p class="empty">Nenhum exercício nesta categoria.</p>'; return; }
+  const visible = getVisibleExercises();
+  const filtered = term
+    ? visible.filter(item => {
+        const category = categoryById(item.categoria_id);
+        return [item.nome, item.equipamento, item.instrucoes, item.grupo_muscular, category?.nome]
+          .filter(Boolean)
+          .some(value => normalize(value).includes(term));
+      })
+    : visible.filter(item => item.categoria_id === activeCategoryId);
+
+  if (!filtered.length) {
+    list.innerHTML = `<p class="empty">${term ? 'Nenhum exercício encontrado em nenhuma categoria.' : 'Nenhum exercício nesta categoria.'}</p>`;
+    return;
+  }
+
   list.innerHTML = filtered.map(item => {
     const isGlobal = Boolean(item.global);
     const isCustomized = Boolean(item.origem_global_id);
     const badge = isGlobal ? 'PADRÃO FS FIT' : isCustomized ? 'PERSONALIZADO' : 'MEU EXERCÍCIO';
-    return `<article class="exercise-library-item"><div class="exercise-library-item-content"><div class="exercise-library-item-title"><h3>${esc(item.nome)}</h3><span class="library-badge${isGlobal ? '' : ' personal'}">${badge}</span><span class="library-badge">${prescriptionLabel(item.tipo_prescricao)}</span></div><p>${esc(item.equipamento || 'Sem equipamento informado')}</p>${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}</div><div class="actions library-item-actions${isGlobal ? ' single-action' : ''}"><button class="btn btn-outline library-edit-exercise" type="button" data-edit-exercise="${item.id}">Editar</button>${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}</div></article>`;
+    const category = categoryById(item.categoria_id);
+    const categoryBadge = term && category ? `<span class="library-badge personal">${esc(category.nome)}</span>` : '';
+    return `<article class="exercise-library-item"><div class="exercise-library-item-content"><div class="exercise-library-item-title"><h3>${esc(item.nome)}</h3><span class="library-badge${isGlobal ? '' : ' personal'}">${badge}</span><span class="library-badge">${prescriptionLabel(item.tipo_prescricao)}</span>${categoryBadge}</div><p>${esc(item.equipamento || 'Sem equipamento informado')}</p>${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}</div><div class="actions library-item-actions${isGlobal ? ' single-action' : ''}"><button class="btn btn-outline library-edit-exercise" type="button" data-edit-exercise="${item.id}">Editar</button>${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}</div></article>`;
   }).join('');
 }
 
