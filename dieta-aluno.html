@@ -45,10 +45,14 @@
 
       <article class="card diet-new-meal-card">
         <div class="section-heading compact">
-          <div><small>REFEIÇÕES</small><h2>Nova refeição</h2></div>
+          <div><small>REFEIÇÕES</small><h2>Adicionar refeição</h2></div>
         </div>
-        <p>Adicione uma refeição ao plano ativo informando horário, dias da semana, descrição e substituições.</p>
-        <button id="new-meal-button" class="btn btn-primary" type="button">+ Adicionar refeição</button>
+        <p>Monte uma refeição manualmente ou reutilize uma refeição pronta da sua Biblioteca Alimentar.</p>
+        <div class="actions">
+          <button id="new-meal-button" class="btn btn-primary" type="button">+ Nova refeição</button>
+          <button id="use-library-meal-button" class="btn btn-outline" type="button">Usar refeição da biblioteca</button>
+          <a class="btn btn-outline" href="biblioteca-alimentar.html">Gerenciar biblioteca</a>
+        </div>
       </article>
     </section>
 
@@ -126,6 +130,21 @@
     </section>
   </div>
 
+  <div id="library-meal-modal" class="diet-modal" aria-hidden="true">
+    <div class="diet-modal-backdrop" data-close-library-meal-modal></div>
+    <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="library-meal-modal-title">
+      <button class="diet-modal-close" type="button" data-close-library-meal-modal aria-label="Fechar">×</button>
+      <div class="diet-modal-kicker">BIBLIOTECA ALIMENTAR</div>
+      <h2 id="library-meal-modal-title">Usar refeição salva</h2>
+      <div class="form-group"><label>Buscar refeição</label><input id="library-meal-search" type="search" placeholder="Ex.: Café da manhã, pré-treino, frango..."></div>
+      <div id="library-meal-list" class="diet-library-meal-list"><p>Carregando refeições...</p></div>
+      <div class="diet-modal-actions">
+        <a class="btn btn-primary" href="biblioteca-alimentar.html">+ Criar nova refeição</a>
+        <button class="btn btn-outline" type="button" data-close-library-meal-modal>Fechar</button>
+      </div>
+    </section>
+  </div>
+
   <div id="meal-modal" class="diet-modal" aria-hidden="true">
     <div class="diet-modal-backdrop" data-close-meal-modal></div>
     <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="meal-modal-title">
@@ -142,6 +161,7 @@
   </div>
 
   <script type="module" src="js/dieta-aluno.js"></script>
+  <script type="module" src="js/dieta-biblioteca-refeicoes.js?v=20260716-1"></script>
   <script>
     (() => {
       const modal = document.querySelector('#meal-form-modal');
