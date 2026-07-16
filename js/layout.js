@@ -78,6 +78,23 @@ export async function requireSession() {
     await ensurePersonalProfile(session);
     const access = await getAccessStatus();
 
+    if (access?.tipo_acesso === 'inativo' && !access?.admin) {
+      document.body.innerHTML = `
+        <main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px">
+          <section class="card" style="width:min(520px,100%);text-align:center;padding:32px">
+            <h1>Conta desativada</h1>
+            <p style="margin:12px 0 22px;color:var(--muted)">Seu acesso ao FS Fit foi suspenso pela administração. Entre em contato com o suporte caso precise de ajuda.</p>
+            <button id="inactive-account-logout" class="btn btn-primary" type="button">Voltar para o login</button>
+          </section>
+        </main>`;
+      document.querySelector('#inactive-account-logout')?.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        localStorage.clear();
+        window.location.replace('index.html');
+      });
+      return null;
+    }
+
     if (!access?.acesso_premium && !FREE_ALLOWED_PAGES.has(currentPage())) {
       window.location.replace('painel.html?acesso=free');
       return null;
