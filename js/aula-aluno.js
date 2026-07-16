@@ -46,10 +46,18 @@ function render() {
   const state = sessionState;
   if (!state?.sessao_id) {
     box.innerHTML = `
-      <div class="live-class-header"><div><small>TREINO DE HOJE</small><h2>Pronto para começar?</h2></div><span class="live-status idle">AGUARDANDO</span></div>
-      <p>Faça o check-in quando iniciar seu treino. Seu personal verá que você está em aula e poderá acompanhar seu progresso.</p>
-      <button id="start-live-class" class="btn btn-primary" type="button">Fazer check-in e iniciar treino</button>`;
+      <div class="live-class-header"><div><small>TREINO DE HOJE</small><h2>Pronto para treinar?</h2></div><span class="live-status idle">AGUARDANDO</span></div>
+      <p>Faça seu check-in. Seu personal receberá a solicitação e confirmará o início da aula.</p>
+      <button id="start-live-class" class="btn btn-primary" type="button">Fazer check-in</button>`;
     box.querySelector('#start-live-class')?.addEventListener('click', startSession);
+    return;
+  }
+
+  if (state.status === 'aguardando_confirmacao') {
+    box.innerHTML = `
+      <div class="live-class-header"><div><small>CHECK-IN REALIZADO</small><h2>Aguardando seu personal</h2></div><span class="live-status idle">AGUARDANDO CONFIRMAÇÃO</span></div>
+      <p>Seu check-in foi enviado. O treino será liberado assim que o personal confirmar o início da aula.</p>
+      <div class="live-class-meta"><span>Check-in feito há ${esc(formatElapsed(state.checkin_at))}</span><strong>Aguardando liberação</strong></div>`;
     return;
   }
 
@@ -59,7 +67,7 @@ function render() {
   const percent = total ? Math.round((done / total) * 100) : 0;
   box.innerHTML = `
     <div class="live-class-header"><div><small>EM AULA</small><h2>${esc(state.treino_nome || 'Treino em andamento')}</h2></div><span class="live-status active">EM AULA</span></div>
-    <div class="live-class-meta"><span>Iniciado há ${esc(formatElapsed(state.checkin_at))}</span><strong>${done}/${total} exercícios</strong></div>
+    <div class="live-class-meta"><span>Iniciado há ${esc(formatElapsed(state.iniciado_at || state.checkin_at))}</span><strong>${done}/${total} exercícios</strong></div>
     <div class="live-progress"><span style="width:${percent}%"></span></div>
     <div class="live-exercise-list">
       ${items.length ? items.map(item => `<label class="live-exercise ${item.concluido ? 'done' : ''}">
@@ -81,7 +89,7 @@ async function startSession() {
     await loadSession();
   } catch (error) {
     console.error(error);
-    alert(error.message || 'Não foi possível iniciar o treino.');
+    alert(error.message || 'Não foi possível realizar o check-in.');
     if (button) button.disabled = false;
   }
 }
@@ -122,7 +130,7 @@ async function finishSession() {
 try {
   await resolveAccessToken();
   await loadSession();
-  setInterval(() => { if (sessionState?.sessao_id) loadSession().catch(console.error); }, 30000);
+  setInterval(() => { if (sessionState?.sessao_id) loadSession().catch(console.error); }, 10000);
 } catch (error) {
   console.error(error);
   box.remove();
