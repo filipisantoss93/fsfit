@@ -12,6 +12,7 @@ const originalDaySelect = form?.querySelector('[name="dia_semana"]');
 const weekdayOptions = document.querySelector('#exercise-weekday-options');
 const categorySelect = document.querySelector('#exercise-category');
 const exerciseSelect = document.querySelector('#exercise-select');
+const repetitionsField = form?.repeticoes?.closest('.form-group');
 
 let activeWorkoutId = null;
 let allowedDays = [];
@@ -22,6 +23,23 @@ if (originalDaySelect) {
   originalDaySelect.style.display = 'none';
   originalDaySelect.required = false;
 }
+
+const prescriptionTypeField = document.createElement('div');
+prescriptionTypeField.className = 'form-group';
+prescriptionTypeField.innerHTML = '<label>Tipo de prescrição</label><input id="exercise-prescription-type" type="text" value="Repetições" readonly>';
+repetitionsField?.parentElement?.insertBefore(prescriptionTypeField, repetitionsField);
+
+const durationField = document.createElement('div');
+durationField.className = 'form-group hidden';
+durationField.id = 'exercise-duration-field';
+durationField.innerHTML = '<label>Duração (minutos)</label><input name="duracao_minutos" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Ex.: 30">';
+repetitionsField?.parentElement?.insertBefore(durationField, repetitionsField?.nextSibling || null);
+
+const distanceField = document.createElement('div');
+distanceField.className = 'form-group hidden';
+distanceField.id = 'exercise-distance-field';
+distanceField.innerHTML = '<label>Distância (km)</label><input name="distancia_km" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Ex.: 5">';
+durationField.parentElement?.insertBefore(distanceField, durationField.nextSibling);
 
 function checkedDays() {
   return [...(weekdayOptions?.querySelectorAll('input:checked') || [])].map(input => Number(input.value));
@@ -40,11 +58,34 @@ function categoryName(item) {
   return (item.grupo_muscular || 'Outros').trim() || 'Outros';
 }
 
+function prescriptionLabel(type) {
+  return { repeticoes: 'Repetições', tempo: 'Tempo', distancia: 'Distância' }[type] || 'Repetições';
+}
+
+function selectedExercise() {
+  return exerciseLibrary.find(item => item.id === exerciseSelect?.value) || null;
+}
+
+function syncPrescriptionUI(type = 'repeticoes') {
+  const normalized = ['repeticoes', 'tempo', 'distancia'].includes(type) ? type : 'repeticoes';
+  const typeInput = document.querySelector('#exercise-prescription-type');
+  if (typeInput) typeInput.value = prescriptionLabel(normalized);
+
+  repetitionsField?.classList.toggle('hidden', normalized !== 'repeticoes');
+  durationField.classList.toggle('hidden', normalized !== 'tempo');
+  distanceField.classList.toggle('hidden', normalized !== 'distancia');
+
+  if (normalized !== 'repeticoes' && form?.repeticoes) form.repeticoes.value = '';
+  if (normalized !== 'tempo' && form?.duracao_minutos) form.duracao_minutos.value = '';
+  if (normalized !== 'distancia' && form?.distancia_km) form.distancia_km.value = '';
+}
+
 function populateExerciseOptions(category, selectedExerciseId = '') {
   if (!exerciseSelect) return;
   if (!category) {
     exerciseSelect.innerHTML = '<option value="">Selecione uma categoria primeiro</option>';
     exerciseSelect.disabled = true;
+    syncPrescriptionUI('repeticoes');
     return;
   }
 
@@ -55,6 +96,7 @@ function populateExerciseOptions(category, selectedExerciseId = '') {
   }).join('');
   exerciseSelect.disabled = false;
   if (selectedExerciseId) exerciseSelect.value = selectedExerciseId;
+  syncPrescriptionUI(selectedExercise()?.tipo_prescricao || 'repeticoes');
 }
 
 function syncCategoryForExercise(exerciseId) {
@@ -64,30 +106,26 @@ function syncCategoryForExercise(exerciseId) {
     populateExerciseOptions('');
     return;
   }
-
   const category = categoryName(item);
   categorySelect.value = category;
   populateExerciseOptions(category, exerciseId);
+  syncPrescriptionUI(item.tipo_prescricao || 'repeticoes');
 }
 
 async function loadExerciseLibrary() {
   const { data, error } = await supabase
     .from('exercicios')
-    .select('id,nome,grupo_muscular,equipamento')
+    .select('id,nome,grupo_muscular,equipamento,tipo_prescricao')
     .or(`global.eq.true,personal_id.eq.${session.user.id}`)
     .order('nome');
 
   if (error) throw error;
-  exerciseLibrary = data || [];
+  exerciseLibrary = (data || []).map(item => ({ ...item, tipo_prescricao: item.tipo_prescricao || 'repeticoes' }));
 
-  const categories = [...new Set(exerciseLibrary.map(categoryName))]
-    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
+  const categories = [...new Set(exerciseLibrary.map(categoryName))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   if (categorySelect) {
-    categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>' +
-      categories.map(category => `<option value="${category}">${category}</option>`).join('');
+    categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${category}">${category}</option>`).join('');
   }
-
   populateExerciseOptions('');
 }
 
@@ -111,51 +149,48 @@ async function prepareNewExercise() {
   await refreshActiveWorkoutDays();
   if (categorySelect) categorySelect.value = '';
   populateExerciseOptions('');
+  if (form?.duracao_minutos) form.duracao_minutos.value = '';
+  if (form?.distancia_km) form.distancia_km.value = '';
 }
 
-function prepareExerciseEdit(id) {
+async function prepareExerciseEdit(id) {
   editingExerciseId = id;
   const selectedDay = Number(originalDaySelect?.value);
   setCheckedDays(selectedDay ? [selectedDay] : []);
   syncCategoryForExercise(form?.exercicio_id?.value || '');
+
+  if (!id) return;
+  const { data } = await supabase
+    .from('treino_exercicios')
+    .select('duracao_minutos,distancia_km,exercicio_id')
+    .eq('id', id)
+    .maybeSingle();
+  if (!data) return;
+  syncCategoryForExercise(data.exercicio_id || form?.exercicio_id?.value || '');
+  if (form?.duracao_minutos) form.duracao_minutos.value = data.duracao_minutos ?? '';
+  if (form?.distancia_km) form.distancia_km.value = data.distancia_km ?? '';
 }
 
 async function getNextOrders(days) {
   if (!activeWorkoutId || !days.length) return {};
-
-  const { data, error } = await supabase
-    .from('treino_exercicios')
-    .select('dia_semana,ordem')
-    .eq('treino_id', activeWorkoutId)
-    .in('dia_semana', days);
-
+  const { data, error } = await supabase.from('treino_exercicios').select('dia_semana,ordem').eq('treino_id', activeWorkoutId).in('dia_semana', days);
   if (error) throw error;
-
   const nextOrders = {};
   for (const day of days) {
-    const maxOrder = (data || [])
-      .filter(row => Number(row.dia_semana) === Number(day))
-      .reduce((max, row) => Math.max(max, Number(row.ordem) || 0), 0);
+    const maxOrder = (data || []).filter(row => Number(row.dia_semana) === Number(day)).reduce((max, row) => Math.max(max, Number(row.ordem) || 0), 0);
     nextOrders[day] = maxOrder + 1;
   }
   return nextOrders;
 }
 
-categorySelect?.addEventListener('change', () => {
-  populateExerciseOptions(categorySelect.value);
-});
+categorySelect?.addEventListener('change', () => populateExerciseOptions(categorySelect.value));
+exerciseSelect?.addEventListener('change', () => syncPrescriptionUI(selectedExercise()?.tipo_prescricao || 'repeticoes'));
 
-document.querySelector('#open-exercise-modal')?.addEventListener('click', () => {
-  setTimeout(() => prepareNewExercise(), 0);
-});
-
+document.querySelector('#open-exercise-modal')?.addEventListener('click', () => { setTimeout(() => prepareNewExercise(), 0); });
 document.addEventListener('click', event => {
   const detailRow = event.target.closest('[data-open-exercise-detail]');
   if (detailRow) editingExerciseId = detailRow.dataset.openExerciseDetail;
-
-  if (event.target.closest('#exercise-detail-edit')) {
-    setTimeout(() => prepareExerciseEdit(editingExerciseId), 0);
-  }
+  if (event.target.closest('#exercise-detail-edit')) setTimeout(() => prepareExerciseEdit(editingExerciseId), 0);
 });
 
 form?.addEventListener('submit', async event => {
@@ -163,68 +198,58 @@ form?.addEventListener('submit', async event => {
   event.stopImmediatePropagation();
 
   const days = checkedDays();
-  if (!days.length) {
-    showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
-    return;
-  }
-
+  if (!days.length) return showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
   if (!activeWorkoutId) await refreshActiveWorkoutDays();
-  if (!activeWorkoutId) {
-    showMessage(message, 'Ative um plano de treino antes de adicionar exercícios.', 'error');
-    return;
-  }
+  if (!activeWorkoutId) return showMessage(message, 'Ative um plano de treino antes de adicionar exercícios.', 'error');
 
   const exerciseId = form.exercicio_id.value;
-  if (!exerciseId) {
-    showMessage(message, 'Selecione uma categoria e um exercício.', 'error');
-    return;
-  }
+  if (!exerciseId) return showMessage(message, 'Selecione uma categoria e um exercício.', 'error');
+
+  const exercise = exerciseLibrary.find(item => item.id === exerciseId);
+  const type = exercise?.tipo_prescricao || 'repeticoes';
+  const duration = form.duracao_minutos?.value ? Number(form.duracao_minutos.value) : null;
+  const distance = form.distancia_km?.value ? Number(form.distancia_km.value) : null;
+
+  if (type === 'tempo' && !duration) return showMessage(message, 'Informe a duração do exercício em minutos.', 'error');
+  if (type === 'distancia' && !distance) return showMessage(message, 'Informe a distância do exercício em quilômetros.', 'error');
 
   const commonPayload = {
     treino_id: activeWorkoutId,
     exercicio_id: exerciseId,
     series: form.series.value ? Number(form.series.value) : null,
-    repeticoes: form.repeticoes.value || null,
+    repeticoes: type === 'repeticoes' ? (form.repeticoes.value || null) : null,
+    duracao_minutos: type === 'tempo' ? duration : null,
+    distancia_km: type === 'distancia' ? distance : null,
     carga: form.carga.value.trim() || null,
     descanso_segundos: form.descanso_segundos.value ? Number(form.descanso_segundos.value) : null,
     observacoes: form.observacoes.value.trim() || null
   };
 
   let error = null;
-
   try {
     if (editingExerciseId) {
       const [firstDay, ...extraDays] = days;
       const preservedOrder = Number(form.ordem.value || 1);
-      const updateResult = await supabase
-        .from('treino_exercicios')
-        .update({ ...commonPayload, dia_semana: firstDay, ordem: preservedOrder })
-        .eq('id', editingExerciseId)
-        .eq('treino_id', activeWorkoutId);
+      const updateResult = await supabase.from('treino_exercicios').update({ ...commonPayload, dia_semana: firstDay, ordem: preservedOrder }).eq('id', editingExerciseId).eq('treino_id', activeWorkoutId);
       error = updateResult.error;
-
       if (!error && extraDays.length) {
         const nextOrders = await getNextOrders(extraDays);
-        const insertResult = await supabase
-          .from('treino_exercicios')
-          .insert(extraDays.map(day => ({ ...commonPayload, dia_semana: day, ordem: nextOrders[day] })));
+        const insertResult = await supabase.from('treino_exercicios').insert(extraDays.map(day => ({ ...commonPayload, dia_semana: day, ordem: nextOrders[day] })));
         error = insertResult.error;
       }
     } else {
       const nextOrders = await getNextOrders(days);
-      const insertResult = await supabase
-        .from('treino_exercicios')
-        .insert(days.map(day => ({ ...commonPayload, dia_semana: day, ordem: nextOrders[day] })));
+      const insertResult = await supabase.from('treino_exercicios').insert(days.map(day => ({ ...commonPayload, dia_semana: day, ordem: nextOrders[day] })));
       error = insertResult.error;
     }
   } catch (saveError) {
-    console.error('Erro ao calcular a ordem dos exercícios:', saveError);
+    console.error('Erro ao salvar exercício:', saveError);
     error = saveError;
   }
 
   if (error) {
     console.error('Erro ao salvar exercício em múltiplos dias:', error);
-    showMessage(message, 'Não foi possível salvar o exercício. Verifique os dados e tente novamente.', 'error');
+    showMessage(message, 'Não foi possível salvar o exercício. Verifique se a migração de tipo de prescrição já foi aplicada no Supabase.', 'error');
     return;
   }
 
@@ -240,5 +265,5 @@ try {
   await refreshActiveWorkoutDays();
 } catch (error) {
   console.error(error);
-  showMessage(message, 'Não foi possível carregar as categorias de exercícios.', 'error');
+  showMessage(message, 'Não foi possível carregar as categorias de exercícios. A migração de tipo de prescrição pode ainda não ter sido aplicada no Supabase.', 'error');
 }
