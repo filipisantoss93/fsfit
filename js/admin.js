@@ -26,7 +26,7 @@ function esc(value = '') {
 function normalizePlan(value = '') {
   const plan = String(value || '').trim().toLowerCase();
   if (plan === 'gratis') return 'free';
-  if (plan === 'pago' || plan === 'pro') return 'premium';
+  if (plan === 'pago' || plan === 'pro' || plan === 'profissional') return 'premium';
   return VALID_PLANS.includes(plan) ? plan : 'free';
 }
 
@@ -52,17 +52,23 @@ async function requireAdmin() {
   }
 }
 
-function updateUserStats() {
-  document.querySelector('#stat-accounts').textContent = users.length;
-  document.querySelector('#stat-subscribers').textContent = users.filter(user => normalizePlan(user.plano) === 'premium' && user.ativo !== false).length;
-  document.querySelector('#stat-trial').textContent = users.filter(user => normalizePlan(user.plano) === 'trial').length;
-  document.querySelector('#stat-inactive').textContent = users.filter(user => user.ativo === false).length;
+function applySummary(summary = {}) {
+  document.querySelector('#stat-accounts').textContent = Number(summary.contas || 0);
+  document.querySelector('#stat-subscribers').textContent = Number(summary.assinantes || 0);
+  document.querySelector('#stat-trial').textContent = Number(summary.trial || 0);
+  document.querySelector('#stat-inactive').textContent = Number(summary.inativas || 0);
+  document.querySelector('#stat-revenue-month').textContent = formatMoney(summary.faturamento_mes);
+  document.querySelector('#stat-revenue-total').textContent = formatMoney(summary.faturamento_total);
+  document.querySelector('#finance-approved').textContent = Number(summary.pagamentos_aprovados || 0);
+  document.querySelector('#finance-pending').textContent = Number(summary.pendentes || 0);
+  document.querySelector('#finance-cancelled').textContent = Number(summary.cancelados_estornados || 0);
+  document.querySelector('#finance-ticket').textContent = formatMoney(summary.ticket_medio);
 }
 
 function updateFinanceStats() {
-  const approved = payments.filter(item => ['approved', 'aprovado', 'paid', 'pago'].includes((item.status || '').toLowerCase()));
+  const approved = payments.filter(item => ['approved', 'aprovado', 'paid', 'pago', 'paga'].includes((item.status || '').toLowerCase()));
   const pending = payments.filter(item => ['pending', 'pendente', 'waiting', 'aguardando'].includes((item.status || '').toLowerCase()));
-  const cancelled = payments.filter(item => ['cancelled', 'canceled', 'cancelado', 'refunded', 'estornado'].includes((item.status || '').toLowerCase()));
+  const cancelled = payments.filter(item => ['cancelled', 'canceled', 'cancelado', 'cancelada', 'refunded', 'estornado', 'devolvida'].includes((item.status || '').toLowerCase()));
   const now = new Date();
   const monthApproved = approved.filter(item => {
     const date = new Date(item.paid_at || item.created_at);
@@ -119,22 +125,29 @@ function renderPayments() {
     </tr>`).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma movimentação financeira registrada.</td></tr>';
 }
 
+async function loadSummary() {
+  const { data, error } = await supabase.rpc('fsfit_admin_resumo');
+  if (error) throw error;
+  applySummary(data || {});
+}
+
 async function loadUsers() {
   const { data, error } = await supabase.rpc('fsfit_admin_listar_usuarios');
   if (error) throw error;
   users = (data || []).map(user => ({ ...user, plano: normalizePlan(user.plano) }));
-  updateUserStats();
   renderUsers();
 }
 
 async function loadPayments() {
   const { data, error } = await supabase.rpc('fsfit_admin_listar_pagamentos');
+  const sourceNote = document.querySelector('#finance-source-note');
   if (error) {
     console.warn('Relatório financeiro indisponível:', error.message);
     payments = [];
-    document.querySelector('#finance-source-note').textContent = 'Ainda não há uma fonte financeira compatível configurada. O painel não estima faturamento; ele exibirá somente pagamentos reais registrados.';
+    if (sourceNote) sourceNote.textContent = 'Não foi possível carregar as cobranças PIX registradas. Atualize a página ou verifique a integração financeira.';
   } else {
     payments = data || [];
+    if (sourceNote) sourceNote.textContent = 'Valores calculados a partir das cobranças PIX reais registradas e confirmadas pela integração Efí.';
   }
   updateFinanceStats();
   renderPayments();
@@ -146,22 +159,26 @@ async function updatePlan(userId) {
   if (!VALID_PLANS.includes(plan)) throw new Error('Plano inválido. Use Trial, Free ou Premium.');
   const { error } = await supabase.rpc('fsfit_admin_atualizar_plano', { p_user_id: userId, p_plano: plan });
   if (error) throw error;
-  showMessage(message, 'Plano atualizado com sucesso.');
-  await loadUsers();
+  showMessage(message, plan === 'premium'
+    ? 'Plano Premium aplicado ao acesso real da conta.'
+    : plan === 'trial'
+      ? 'Novo período Trial de 7 dias aplicado com sucesso.'
+      : 'Conta alterada para o plano Free e acessos pagos/trial encerrados.');
+  await Promise.all([loadUsers(), loadSummary()]);
 }
 
 async function toggleUser(userId, active) {
   const { error } = await supabase.rpc('fsfit_admin_definir_conta_ativa', { p_user_id: userId, p_ativo: active });
   if (error) throw error;
-  showMessage(message, active ? 'Conta ativada com sucesso.' : 'Conta desativada com sucesso.');
-  await loadUsers();
+  showMessage(message, active ? 'Conta ativada com sucesso.' : 'Conta desativada. O acesso à plataforma será bloqueado.');
+  await Promise.all([loadUsers(), loadSummary()]);
 }
 
 async function sendPasswordReset(userId) {
   const user = users.find(item => item.id === userId);
   if (!user?.email) throw new Error('Esta conta não possui e-mail disponível para recuperação.');
   const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-    redirectTo: `${window.location.origin}/redefinir-senha.html`
+    redirectTo: `${window.location.origin}/nova-senha.html`
   });
   if (error) throw error;
   showMessage(message, `E-mail de recuperação enviado para ${user.email}.`);
@@ -208,4 +225,4 @@ document.addEventListener('click', async event => {
 });
 
 await requireAdmin();
-await Promise.all([loadUsers(), loadPayments()]);
+await Promise.all([loadUsers(), loadPayments(), loadSummary()]);
