@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Biblioteca alimentar — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-prescricao1">
+  <link rel="stylesheet" href="css/biblioteca-alimentar.css?v=20260716-1">
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container food-library-page">
+    <section class="page-header">
+      <div>
+        <a class="btn btn-outline" href="alunos.html">← Voltar</a>
+        <h1>Biblioteca alimentar</h1>
+        <p>Organize alimentos por categorias e monte refeições reutilizáveis em poucos cliques.</p>
+      </div>
+      <span class="hero-badge">NUTRIÇÃO</span>
+    </section>
+
+    <div id="food-library-message" class="message"></div>
+
+    <section class="card library-create-card">
+      <div class="library-create-heading">
+        <div>
+          <small>BIBLIOTECA</small>
+          <h2>Alimentos e refeições</h2>
+          <p>Use os alimentos padrão do FS Fit ou cadastre itens próprios para montar refeições.</p>
+        </div>
+        <div class="actions">
+          <button id="open-food-category-modal" class="btn btn-outline" type="button">+ Nova categoria</button>
+          <button id="open-food-modal" class="btn btn-primary" type="button">+ Novo alimento</button>
+          <button id="open-meal-builder" class="btn btn-primary" type="button">+ Montar refeição</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card library-list-card">
+      <div class="library-list-heading">
+        <div><small>ALIMENTOS</small><h2 id="selected-food-category-title">Alimentos</h2></div>
+        <div class="form-group library-search"><input id="food-search" type="search" placeholder="Buscar nesta categoria"></div>
+      </div>
+      <div class="library-category-nav-wrap"><div id="food-category-nav" class="library-category-nav" aria-label="Categorias de alimentos"></div></div>
+      <div id="active-food-category-actions" class="library-active-category-actions hidden"></div>
+      <div id="food-library-list" class="exercise-library-list"><p>Carregando alimentos...</p></div>
+    </section>
+
+    <section class="card library-list-card meal-library-section">
+      <div class="library-list-heading">
+        <div><small>REFEIÇÕES SALVAS</small><h2>Minha biblioteca de refeições</h2></div>
+        <div class="form-group library-search"><input id="meal-search" type="search" placeholder="Buscar refeição"></div>
+      </div>
+      <div id="meal-library-list" class="meal-library-list"><p>Carregando refeições...</p></div>
+    </section>
+  </main>
+
+  <div id="food-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-backdrop" data-close-food-modal></div>
+    <section class="library-modal-card" role="dialog" aria-modal="true" aria-labelledby="food-form-title">
+      <button class="library-modal-close" type="button" data-close-food-modal aria-label="Fechar">×</button>
+      <div class="library-modal-kicker">ALIMENTO</div>
+      <h2 id="food-form-title">Novo alimento</h2>
+      <form id="food-form">
+        <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Peito de frango" required></div>
+        <div class="grid grid-2">
+          <div class="form-group"><label>Categoria *</label><select name="categoria_id" required></select></div>
+          <div class="form-group"><label>Porção padrão</label><input name="porcao_padrao" type="number" min="0" step="0.01" placeholder="100"></div>
+          <div class="form-group"><label>Unidade</label><input name="unidade" maxlength="30" placeholder="g, ml, unidade, fatia..."></div>
+          <div class="form-group"><label>Calorias</label><input name="calorias" type="number" min="0" step="0.01"></div>
+          <div class="form-group"><label>Proteínas (g)</label><input name="proteinas_g" type="number" min="0" step="0.01"></div>
+          <div class="form-group"><label>Carboidratos (g)</label><input name="carboidratos_g" type="number" min="0" step="0.01"></div>
+          <div class="form-group"><label>Gorduras (g)</label><input name="gorduras_g" type="number" min="0" step="0.01"></div>
+        </div>
+        <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Informações adicionais sobre o alimento."></textarea></div>
+        <div class="library-modal-actions"><button id="food-submit" class="btn btn-primary" type="submit">Adicionar alimento</button><button id="cancel-food-edit" class="btn btn-outline" type="button">Cancelar</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div id="food-category-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-backdrop" data-close-food-category-modal></div>
+    <section class="library-modal-card library-category-modal-card" role="dialog" aria-modal="true" aria-labelledby="food-category-form-title">
+      <button class="library-modal-close" type="button" data-close-food-category-modal aria-label="Fechar">×</button>
+      <div class="library-modal-kicker">CATEGORIA</div>
+      <h2 id="food-category-form-title">Nova categoria</h2>
+      <form id="food-category-form">
+        <div class="form-group"><label>Nome da categoria *</label><input name="nome" maxlength="80" placeholder="Ex.: Oleaginosas" required></div>
+        <div class="library-modal-actions"><button id="food-category-submit" class="btn btn-primary" type="submit">Criar categoria</button><button id="cancel-food-category-edit" class="btn btn-outline" type="button">Cancelar</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div id="meal-builder-modal" class="library-modal meal-builder-modal" aria-hidden="true">
+    <div class="library-modal-backdrop" data-close-meal-builder></div>
+    <section class="library-modal-card meal-builder-card" role="dialog" aria-modal="true" aria-labelledby="meal-builder-title">
+      <button class="library-modal-close" type="button" data-close-meal-builder aria-label="Fechar">×</button>
+      <div class="library-modal-kicker">MONTADOR</div>
+      <h2 id="meal-builder-title">Montar refeição</h2>
+      <form id="meal-builder-form">
+        <div class="grid grid-2">
+          <div class="form-group"><label>Nome da refeição *</label><input name="nome" maxlength="120" placeholder="Ex.: Café da manhã proteico" required></div>
+          <div class="form-group"><label>Categoria da refeição</label><select name="categoria_id"></select></div>
+        </div>
+        <div class="form-group"><label>Descrição</label><textarea name="descricao" placeholder="Ex.: Opção prática para o café da manhã."></textarea></div>
+        <div class="meal-builder-toolbar">
+          <div class="library-category-nav-wrap"><div id="meal-food-category-nav" class="library-category-nav"></div></div>
+          <div class="form-group"><input id="meal-food-search" type="search" placeholder="Buscar alimento para adicionar"></div>
+        </div>
+        <div id="meal-food-picker" class="meal-food-picker"></div>
+        <div class="meal-selected-heading"><strong>Itens selecionados</strong><span id="meal-selected-count">0 itens</span></div>
+        <div id="meal-selected-items" class="meal-selected-items"><p class="empty">Selecione alimentos acima.</p></div>
+        <div class="library-modal-actions"><button id="meal-submit" class="btn btn-primary" type="submit">Salvar refeição</button><button id="cancel-meal-builder" class="btn btn-outline" type="button">Cancelar</button></div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="js/biblioteca-alimentar.js?v=20260716-1"></script>
+</body>
+</html>
