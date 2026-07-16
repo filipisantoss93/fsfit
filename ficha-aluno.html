@@ -46,9 +46,20 @@
     }
     .student-edit-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
     body.student-edit-open { overflow: hidden; }
+    .student-preview-card {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .student-preview-card .section-intro { margin: 4px 0 0; }
+    .student-preview-card .btn { flex: 0 0 auto; }
     @media (max-width: 640px) {
       .student-edit-modal { padding: 0; }
       .student-edit-dialog { width: 100%; height: 100dvh; border-radius: 0; border: 0; }
+      .student-preview-card { align-items: stretch; flex-direction: column; }
+      .student-preview-card .btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -76,16 +87,15 @@
     </nav>
 
     <div class="record-tab-panel active" data-record-panel="overview">
-      <section class="grid grid-2 record-overview-grid">
-        <article class="card profile-card">
-          <div class="section-heading"><div><small>Perfil</small><h2>Dados cadastrais</h2></div></div>
-          <div id="profile-data" class="profile-data"><p>Carregando...</p></div>
-          <div class="actions">
-            <a id="edit-registration" class="btn btn-secondary" href="alunos.html">Editar cadastro</a>
-            <button id="delete-student" class="btn btn-danger" type="button">Excluir aluno</button>
-          </div>
-        </article>
+      <section class="card student-preview-card">
+        <div>
+          <div class="section-heading"><div><small>Portal do aluno</small><h2>Acompanhe o que seu aluno está vendo</h2></div></div>
+          <p class="section-intro">Abra a visão atual do portal para conferir treino, dieta, observações e conteúdos publicados para este aluno.</p>
+        </div>
+        <a id="student-preview-link" class="btn btn-primary" href="visualizar-aluno.html" target="_blank" rel="noopener">Visualizar como aluno</a>
+      </section>
 
+      <section class="grid grid-2 record-overview-grid">
         <article class="card physical-summary-card">
           <div class="section-heading"><div><small>Acompanhamento</small><h2>Resumo físico</h2></div></div>
           <div class="metric-grid">
@@ -93,6 +103,15 @@
             <div class="metric-card"><span>Gordura corporal</span><strong id="current-fat">—</strong><small>Última avaliação</small></div>
             <div class="metric-card"><span>Altura</span><strong id="student-height">—</strong><small>Cadastro</small></div>
             <div class="metric-card"><span>IMC</span><strong id="student-bmi">—</strong><small>Estimativa</small></div>
+          </div>
+        </article>
+
+        <article class="card profile-card">
+          <div class="section-heading"><div><small>Perfil</small><h2>Dados cadastrais</h2></div></div>
+          <div id="profile-data" class="profile-data"><p>Carregando...</p></div>
+          <div class="actions">
+            <a id="edit-registration" class="btn btn-secondary" href="alunos.html">Editar cadastro</a>
+            <button id="delete-student" class="btn btn-danger" type="button">Excluir aluno</button>
           </div>
         </article>
       </section>
@@ -238,11 +257,16 @@
 
     const deleteButton = document.querySelector('#delete-student');
     const editButton = document.querySelector('#edit-registration');
+    const previewButton = document.querySelector('#student-preview-link');
     const editModal = document.querySelector('#student-edit-modal');
     const editFrame = document.querySelector('#student-edit-frame');
     const editClose = document.querySelector('#student-edit-close');
     const recordMessage = document.querySelector('#record-message');
     const alunoId = new URLSearchParams(location.search).get('id');
+
+    if (previewButton && alunoId) {
+      previewButton.href = `visualizar-aluno.html?id=${encodeURIComponent(alunoId)}`;
+    }
 
     function openEditModal() {
       if (!alunoId) return;
