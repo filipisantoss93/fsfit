@@ -29,282 +29,109 @@ let editingGlobalId = null;
 let editingCategoryId = null;
 let activeCategoryId = null;
 
-function esc(value = '') {
-  const div = document.createElement('div');
-  div.textContent = value ?? '';
-  return div.innerHTML;
-}
-
-function normalize(value = '') {
-  return String(value || '').trim().toLocaleLowerCase('pt-BR');
-}
-
-function categoryById(id) {
-  return categories.find(item => item.id === id);
-}
-
+function esc(value = '') { const div = document.createElement('div'); div.textContent = value ?? ''; return div.innerHTML; }
+function normalize(value = '') { return String(value || '').trim().toLocaleLowerCase('pt-BR'); }
+function categoryById(id) { return categories.find(item => item.id === id); }
 function getVisibleExercises() {
-  const customizedGlobalIds = new Set(
-    exercises
-      .filter(item => !item.global && item.personal_id === session.user.id && item.origem_global_id)
-      .map(item => item.origem_global_id)
-  );
+  const customizedGlobalIds = new Set(exercises.filter(item => !item.global && item.personal_id === session.user.id && item.origem_global_id).map(item => item.origem_global_id));
   return exercises.filter(item => !(item.global && customizedGlobalIds.has(item.id)));
 }
-
 function populateCategorySelect(selectedId = '') {
-  const select = form.categoria_id;
-  select.innerHTML = '<option value="">Selecione uma categoria</option>' + categories
-    .map(category => `<option value="${category.id}">${esc(category.nome)}${category.global ? ' · FS Fit' : ''}</option>`)
-    .join('');
-  select.value = selectedId || '';
+  form.categoria_id.innerHTML = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${category.id}">${esc(category.nome)}${category.global ? ' · FS Fit' : ''}</option>`).join('');
+  form.categoria_id.value = selectedId || '';
 }
-
-function resetExerciseForm() {
-  editingId = null;
-  editingGlobalId = null;
-  form.reset();
-  populateCategorySelect(activeCategoryId || '');
-  formTitle.textContent = 'Novo exercício';
-  submitButton.textContent = 'Adicionar exercício';
-}
-
-function resetCategoryForm() {
-  editingCategoryId = null;
-  categoryForm.reset();
-  categoryFormTitle.textContent = 'Nova categoria';
-  categorySubmit.textContent = 'Criar categoria';
-}
-
-function openModal(target) {
-  target.classList.add('open');
-  target.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('library-modal-open');
-}
-
-function closeModal(target, reset) {
-  target.classList.remove('open');
-  target.setAttribute('aria-hidden', 'true');
-  if (!document.querySelector('.library-modal.open')) document.body.classList.remove('library-modal-open');
-  reset();
-}
+function resetExerciseForm() { editingId = null; editingGlobalId = null; form.reset(); populateCategorySelect(activeCategoryId || ''); formTitle.textContent = 'Novo exercício'; submitButton.textContent = 'Adicionar exercício'; }
+function resetCategoryForm() { editingCategoryId = null; categoryForm.reset(); categoryFormTitle.textContent = 'Nova categoria'; categorySubmit.textContent = 'Criar categoria'; }
+function openModal(target) { target.classList.add('open'); target.setAttribute('aria-hidden', 'false'); document.body.classList.add('library-modal-open'); }
+function closeModal(target, reset) { target.classList.remove('open'); target.setAttribute('aria-hidden', 'true'); if (!document.querySelector('.library-modal.open')) document.body.classList.remove('library-modal-open'); reset(); }
 
 function renderCategories() {
   const visible = getVisibleExercises();
-  if (!categories.length) {
-    categoryGrid.innerHTML = '<p class="empty">Nenhuma categoria disponível.</p>';
-    return;
-  }
-
+  if (!categories.length) { categoryGrid.innerHTML = '<p class="empty">Nenhuma categoria disponível.</p>'; return; }
   categoryGrid.innerHTML = categories.map(category => {
     const count = visible.filter(item => item.categoria_id === category.id).length;
     const own = !category.global && category.personal_id === session.user.id;
-    return `<article class="library-category-card" data-open-category="${category.id}">
-      <button class="library-category-card-main" type="button" data-open-category="${category.id}">
-        <span class="library-category-card-kicker">${category.global ? 'PADRÃO FS FIT' : 'MINHA CATEGORIA'}</span>
-        <strong>${esc(category.nome)}</strong>
-        <span>${count} ${count === 1 ? 'exercício' : 'exercícios'}</span>
-      </button>
-      ${own ? `<div class="library-category-card-actions">
-        <button class="btn btn-outline" type="button" data-edit-category="${category.id}">Editar</button>
-        <button class="btn btn-danger" type="button" data-delete-category="${category.id}" data-name="${esc(category.nome)}">Excluir</button>
-      </div>` : ''}
-    </article>`;
+    return `<article class="library-category-card" data-open-category="${category.id}"><button class="library-category-card-main" type="button" data-open-category="${category.id}"><span class="library-category-card-kicker">${category.global ? 'PADRÃO FS FIT' : 'MINHA CATEGORIA'}</span><strong>${esc(category.nome)}</strong><span>${count} ${count === 1 ? 'exercício' : 'exercícios'}</span></button>${own ? `<div class="library-category-card-actions"><button class="btn btn-outline" type="button" data-edit-category="${category.id}">Editar</button><button class="btn btn-danger" type="button" data-delete-category="${category.id}" data-name="${esc(category.nome)}">Excluir</button></div>` : ''}</article>`;
   }).join('');
 }
 
 function renderExercises() {
   if (!activeCategoryId) return;
   const term = normalize(search.value);
-  const filtered = getVisibleExercises().filter(item =>
-    item.categoria_id === activeCategoryId &&
-    (!term || [item.nome, item.equipamento, item.instrucoes].filter(Boolean).some(value => normalize(value).includes(term)))
-  );
-
-  if (!filtered.length) {
-    list.innerHTML = '<p class="empty">Nenhum exercício nesta categoria.</p>';
-    return;
-  }
-
+  const filtered = getVisibleExercises().filter(item => item.categoria_id === activeCategoryId && (!term || [item.nome, item.equipamento, item.instrucoes].filter(Boolean).some(value => normalize(value).includes(term))));
+  if (!filtered.length) { list.innerHTML = '<p class="empty">Nenhum exercício nesta categoria.</p>'; return; }
   list.innerHTML = filtered.map(item => {
     const isGlobal = Boolean(item.global);
     const isCustomized = Boolean(item.origem_global_id);
     const badge = isGlobal ? 'PADRÃO FS FIT' : isCustomized ? 'PERSONALIZADO' : 'MEU EXERCÍCIO';
-    return `<article class="exercise-library-item">
-      <div class="exercise-library-item-content">
-        <div class="exercise-library-item-title"><h3>${esc(item.nome)}</h3><span class="library-badge${isGlobal ? '' : ' personal'}">${badge}</span></div>
-        <p>${esc(item.equipamento || 'Sem equipamento informado')}</p>
-        ${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}
-        ${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}
-      </div>
-      <div class="actions library-item-actions">
-        <button class="btn btn-outline" type="button" data-edit-exercise="${item.id}">${isGlobal ? 'Personalizar' : 'Editar'}</button>
-        ${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}
-      </div>
-    </article>`;
+    return `<article class="exercise-library-item"><div class="exercise-library-item-content"><div class="exercise-library-item-title"><h3>${esc(item.nome)}</h3><span class="library-badge${isGlobal ? '' : ' personal'}">${badge}</span></div><p>${esc(item.equipamento || 'Sem equipamento informado')}</p>${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo / mídia →</a>` : ''}</div><div class="actions library-item-actions"><button class="btn btn-outline" type="button" data-edit-exercise="${item.id}">Editar</button>${isGlobal ? '' : `<button class="btn btn-danger" type="button" data-delete-exercise="${item.id}" data-name="${esc(item.nome)}">Excluir</button>`}</div></article>`;
   }).join('');
 }
 
-function openCategory(categoryId) {
-  const category = categoryById(categoryId);
-  if (!category) return;
-  activeCategoryId = categoryId;
-  selectedCategoryTitle.textContent = category.nome;
-  search.value = '';
-  categorySection.classList.add('hidden');
-  exerciseSection.classList.remove('hidden');
-  renderExercises();
-}
-
-function showCategories() {
-  activeCategoryId = null;
-  exerciseSection.classList.add('hidden');
-  categorySection.classList.remove('hidden');
-  renderCategories();
-}
-
+function openCategory(categoryId) { const category = categoryById(categoryId); if (!category) return; activeCategoryId = categoryId; selectedCategoryTitle.textContent = category.nome; search.value = ''; categorySection.classList.add('hidden'); exerciseSection.classList.remove('hidden'); renderExercises(); }
+function showCategories() { activeCategoryId = null; exerciseSection.classList.add('hidden'); categorySection.classList.remove('hidden'); renderCategories(); }
 async function loadData() {
   const [{ data: categoryData, error: categoryError }, { data: exerciseData, error: exerciseError }] = await Promise.all([
     supabase.from('categorias_exercicios').select('id,nome,global,personal_id').or(`global.eq.true,personal_id.eq.${session.user.id}`).order('global', { ascending: false }).order('nome'),
     supabase.from('exercicios').select('id,nome,grupo_muscular,equipamento,instrucoes,video_url,global,personal_id,origem_global_id,categoria_id').or(`global.eq.true,personal_id.eq.${session.user.id}`).order('global', { ascending: false }).order('nome')
   ]);
   if (categoryError || exerciseError) throw categoryError || exerciseError;
-  categories = categoryData || [];
-  exercises = exerciseData || [];
-  populateCategorySelect();
-  renderCategories();
-  if (activeCategoryId && categoryById(activeCategoryId)) renderExercises();
+  categories = categoryData || []; exercises = exerciseData || []; populateCategorySelect(); renderCategories(); if (activeCategoryId && categoryById(activeCategoryId)) renderExercises();
 }
-
 function editExercise(id) {
   const item = exercises.find(exercise => exercise.id === id);
   if (!item || (!item.global && item.personal_id !== session.user.id)) return;
-  editingId = item.global ? null : item.id;
-  editingGlobalId = item.global ? item.id : null;
-  form.nome.value = item.nome || '';
-  populateCategorySelect(item.categoria_id);
-  form.equipamento.value = item.equipamento || '';
-  form.instrucoes.value = item.instrucoes || '';
-  form.video_url.value = item.video_url || '';
-  formTitle.textContent = item.global ? `Personalizar ${item.nome}` : `Editar ${item.nome}`;
-  submitButton.textContent = item.global ? 'Salvar minha versão' : 'Salvar alterações';
-  openModal(modal);
+  editingId = item.global ? null : item.id; editingGlobalId = item.global ? item.id : null;
+  form.nome.value = item.nome || ''; populateCategorySelect(item.categoria_id); form.equipamento.value = item.equipamento || ''; form.instrucoes.value = item.instrucoes || ''; form.video_url.value = item.video_url || '';
+  formTitle.textContent = `Editar ${item.nome}`; submitButton.textContent = 'Salvar alterações'; openModal(modal);
 }
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
   const category = categoryById(form.categoria_id.value);
   if (!category) return showMessage(message, 'Selecione uma categoria para o exercício.', 'error');
-  const payload = {
-    personal_id: session.user.id,
-    nome: form.nome.value.trim(),
-    categoria_id: category.id,
-    grupo_muscular: category.nome,
-    equipamento: form.equipamento.value.trim() || null,
-    instrucoes: form.instrucoes.value.trim() || null,
-    video_url: form.video_url.value.trim() || null,
-    global: false
-  };
+  const payload = { personal_id: session.user.id, nome: form.nome.value.trim(), categoria_id: category.id, grupo_muscular: category.nome, equipamento: form.equipamento.value.trim() || null, instrucoes: form.instrucoes.value.trim() || null, video_url: form.video_url.value.trim() || null, global: false };
   if (payload.nome.length < 2) return showMessage(message, 'Informe o nome do exercício.', 'error');
-
+  const wasEditing = Boolean(editingId || editingGlobalId);
   submitButton.disabled = true;
   try {
     let query;
     if (editingGlobalId) query = supabase.from('exercicios').insert({ ...payload, origem_global_id: editingGlobalId });
     else if (editingId) query = supabase.from('exercicios').update(payload).eq('id', editingId).eq('personal_id', session.user.id).eq('global', false);
     else query = supabase.from('exercicios').insert(payload);
-    const { error } = await query;
-    if (error) throw error;
-    closeModal(modal, resetExerciseForm);
-    await loadData();
-    showMessage(message, editingId ? 'Exercício atualizado.' : 'Exercício salvo na categoria selecionada.');
-  } catch (error) {
-    console.error(error);
-    showMessage(message, error.message || 'Não foi possível salvar o exercício.', 'error');
-  } finally {
-    submitButton.disabled = false;
-  }
+    const { error } = await query; if (error) throw error;
+    closeModal(modal, resetExerciseForm); await loadData(); showMessage(message, wasEditing ? 'Exercício atualizado para sua biblioteca.' : 'Exercício salvo na categoria selecionada.');
+  } catch (error) { console.error(error); showMessage(message, error.message || 'Não foi possível salvar o exercício.', 'error'); } finally { submitButton.disabled = false; }
 });
 
 categoryForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  const nome = categoryForm.nome.value.trim();
+  event.preventDefault(); const nome = categoryForm.nome.value.trim();
   if (nome.length < 2) return showMessage(message, 'Informe o nome da categoria.', 'error');
   if (categories.some(item => item.id !== editingCategoryId && normalize(item.nome) === normalize(nome))) return showMessage(message, 'Já existe uma categoria com esse nome.', 'error');
-
-  categorySubmit.disabled = true;
+  const wasEditing = Boolean(editingCategoryId); categorySubmit.disabled = true;
   try {
-    if (editingCategoryId) {
-      const { error } = await supabase.from('categorias_exercicios').update({ nome, updated_at: new Date().toISOString() }).eq('id', editingCategoryId).eq('personal_id', session.user.id).eq('global', false);
-      if (error) throw error;
-      const { error: exerciseError } = await supabase.from('exercicios').update({ grupo_muscular: nome }).eq('categoria_id', editingCategoryId).eq('personal_id', session.user.id).eq('global', false);
-      if (exerciseError) throw exerciseError;
-    } else {
-      const { error } = await supabase.from('categorias_exercicios').insert({ nome, personal_id: session.user.id, global: false });
-      if (error) throw error;
-    }
-    closeModal(categoryModal, resetCategoryForm);
-    await loadData();
-    showMessage(message, editingCategoryId ? 'Categoria atualizada.' : 'Categoria criada com sucesso.');
-  } catch (error) {
-    console.error(error);
-    showMessage(message, error.message || 'Não foi possível salvar a categoria.', 'error');
-  } finally {
-    categorySubmit.disabled = false;
-  }
+    if (editingCategoryId) { const { error } = await supabase.from('categorias_exercicios').update({ nome, updated_at: new Date().toISOString() }).eq('id', editingCategoryId).eq('personal_id', session.user.id).eq('global', false); if (error) throw error; const { error: exerciseError } = await supabase.from('exercicios').update({ grupo_muscular: nome }).eq('categoria_id', editingCategoryId).eq('personal_id', session.user.id).eq('global', false); if (exerciseError) throw exerciseError; }
+    else { const { error } = await supabase.from('categorias_exercicios').insert({ nome, personal_id: session.user.id, global: false }); if (error) throw error; }
+    closeModal(categoryModal, resetCategoryForm); await loadData(); showMessage(message, wasEditing ? 'Categoria atualizada.' : 'Categoria criada com sucesso.');
+  } catch (error) { console.error(error); showMessage(message, error.message || 'Não foi possível salvar a categoria.', 'error'); } finally { categorySubmit.disabled = false; }
 });
 
 document.querySelector('#open-library-modal').addEventListener('click', () => { resetExerciseForm(); openModal(modal); });
 document.querySelector('#open-category-modal').addEventListener('click', () => { resetCategoryForm(); openModal(categoryModal); });
 document.querySelector('#cancel-library-edit').addEventListener('click', () => closeModal(modal, resetExerciseForm));
 document.querySelector('#cancel-category-edit').addEventListener('click', () => closeModal(categoryModal, resetCategoryForm));
-document.querySelector('#back-to-categories').addEventListener('click', showCategories);
-search.addEventListener('input', renderExercises);
-
+document.querySelector('#back-to-categories').addEventListener('click', showCategories); search.addEventListener('input', renderExercises);
 document.addEventListener('click', async event => {
   if (event.target.closest('[data-close-library-modal]')) return closeModal(modal, resetExerciseForm);
   if (event.target.closest('[data-close-category-modal]')) return closeModal(categoryModal, resetCategoryForm);
-
-  const editExerciseButton = event.target.closest('[data-edit-exercise]');
-  if (editExerciseButton) return editExercise(editExerciseButton.dataset.editExercise);
-
+  const editExerciseButton = event.target.closest('[data-edit-exercise]'); if (editExerciseButton) return editExercise(editExerciseButton.dataset.editExercise);
   const editCategoryButton = event.target.closest('[data-edit-category]');
-  if (editCategoryButton) {
-    const category = categoryById(editCategoryButton.dataset.editCategory);
-    if (!category || category.global || category.personal_id !== session.user.id) return;
-    editingCategoryId = category.id;
-    categoryForm.nome.value = category.nome;
-    categoryFormTitle.textContent = `Editar ${category.nome}`;
-    categorySubmit.textContent = 'Salvar alterações';
-    return openModal(categoryModal);
-  }
-
+  if (editCategoryButton) { const category = categoryById(editCategoryButton.dataset.editCategory); if (!category || category.global || category.personal_id !== session.user.id) return; editingCategoryId = category.id; categoryForm.nome.value = category.nome; categoryFormTitle.textContent = `Editar ${category.nome}`; categorySubmit.textContent = 'Salvar alterações'; return openModal(categoryModal); }
   const deleteCategoryButton = event.target.closest('[data-delete-category]');
-  if (deleteCategoryButton) {
-    if (!confirm(`Excluir a categoria ${deleteCategoryButton.dataset.name}?`)) return;
-    const { error } = await supabase.from('categorias_exercicios').delete().eq('id', deleteCategoryButton.dataset.deleteCategory).eq('personal_id', session.user.id).eq('global', false);
-    if (error) return showMessage(message, 'Não é possível excluir uma categoria que possui exercícios. Mova ou exclua os exercícios primeiro.', 'error');
-    await loadData();
-    return showMessage(message, 'Categoria excluída.');
-  }
-
+  if (deleteCategoryButton) { if (!confirm(`Excluir a categoria ${deleteCategoryButton.dataset.name}?`)) return; const { error } = await supabase.from('categorias_exercicios').delete().eq('id', deleteCategoryButton.dataset.deleteCategory).eq('personal_id', session.user.id).eq('global', false); if (error) return showMessage(message, 'Não é possível excluir uma categoria que possui exercícios. Mova ou exclua os exercícios primeiro.', 'error'); await loadData(); return showMessage(message, 'Categoria excluída.'); }
   const deleteExerciseButton = event.target.closest('[data-delete-exercise]');
-  if (deleteExerciseButton) {
-    if (!confirm(`Excluir ${deleteExerciseButton.dataset.name} da biblioteca?`)) return;
-    const { error } = await supabase.from('exercicios').delete().eq('id', deleteExerciseButton.dataset.deleteExercise).eq('personal_id', session.user.id).eq('global', false);
-    if (error) return showMessage(message, 'Não foi possível excluir. O exercício pode estar sendo usado em um treino.', 'error');
-    await loadData();
-    return showMessage(message, 'Exercício excluído.');
-  }
-
-  const openCategoryButton = event.target.closest('[data-open-category]');
-  if (openCategoryButton && !event.target.closest('[data-edit-category],[data-delete-category]')) return openCategory(openCategoryButton.dataset.openCategory);
-});
-
-document.addEventListener('keydown', event => {
-  if (event.key !== 'Escape') return;
-  if (modal.classList.contains('open')) closeModal(modal, resetExerciseForm);
-  if (categoryModal.classList.contains('open')) closeModal(categoryModal, resetCategoryForm);
+  if (deleteExerciseButton) { if (!confirm(`Excluir ${deleteExerciseButton.dataset.name} da biblioteca?`)) return; const { error } = await supabase.from('exercicios').delete().eq('id', deleteExerciseButton.dataset.deleteExercise).eq('personal_id', session.user.id).eq('global', false); if (error) return showMessage(message, 'Não foi possível excluir o exercício.', 'error'); await loadData(); return showMessage(message, 'Exercício excluído.'); }
+  const categoryButton = event.target.closest('[data-open-category]'); if (categoryButton && !event.target.closest('[data-edit-category],[data-delete-category]')) return openCategory(categoryButton.dataset.openCategory);
 });
 
 await loadData();
