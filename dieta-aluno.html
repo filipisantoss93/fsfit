@@ -15,26 +15,31 @@
       <div>
         <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar</a>
         <h1 id="student-name">Plano alimentar</h1>
-        <p>Organize refeições por dias da semana e horários.</p>
+        <p>Gerencie planos e organize refeições por dias da semana e horários.</p>
       </div>
       <span class="hero-badge">DIETA</span>
     </section>
 
     <div id="diet-message" class="message"></div>
 
-    <section class="grid grid-2" style="align-items:start">
-      <article class="card">
-        <h2>Dados do plano</h2>
-        <form id="diet-form">
-          <div class="form-group"><label>Título *</label><input name="titulo" maxlength="120" placeholder="Ex.: Plano alimentar - Hipertrofia" required></div>
-          <div class="grid grid-2">
-            <div class="form-group"><label>Data de início</label><input name="data_inicio" type="date"></div>
-            <div class="form-group"><label>Data de término</label><input name="data_fim" type="date"></div>
-          </div>
-          <div class="form-group"><label>Meta de água (ml/dia)</label><input name="agua_ml" type="number" min="0" max="15000" step="100" placeholder="Ex.: 3000"></div>
-          <div class="form-group"><label>Orientações gerais</label><textarea name="orientacoes" placeholder="Ex.: Preferir alimentos in natura, ajustar porções conforme orientação profissional..."></textarea></div>
-          <div class="actions"><button class="btn btn-primary" type="submit">Salvar plano alimentar</button></div>
-        </form>
+    <section class="card diet-plans-card">
+      <div class="section-heading diet-plans-heading">
+        <div>
+          <small>PLANOS ALIMENTARES</small>
+          <h2>Planos do aluno</h2>
+        </div>
+        <button id="new-plan-button" class="btn btn-primary" type="button">+ Novo plano</button>
+      </div>
+      <div id="plan-list" class="diet-plan-list"><p>Carregando...</p></div>
+    </section>
+
+    <section id="active-plan-workspace" class="grid grid-2 diet-workspace" style="align-items:start">
+      <article class="card diet-active-summary-card">
+        <div class="section-heading compact">
+          <div><small>PLANO ATIVO</small><h2 id="active-plan-title">Nenhum plano ativo</h2></div>
+          <button id="active-plan-details" class="btn btn-outline" type="button">Ver detalhes</button>
+        </div>
+        <div id="active-plan-summary" class="diet-plan-summary"></div>
       </article>
 
       <article class="card">
@@ -69,9 +74,40 @@
         <div><small>PLANO ATIVO</small><strong>Refeições por dia</strong></div>
         <span class="diet-active-badge">Toque em uma refeição para ver detalhes</span>
       </div>
-      <div id="meal-list"><p>Carregando...</p></div>
+      <div id="meal-list"><p>Selecione ou crie um plano alimentar.</p></div>
     </section>
   </main>
+
+  <div id="plan-modal" class="diet-modal" aria-hidden="true">
+    <div class="diet-modal-backdrop" data-close-plan-modal></div>
+    <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="plan-modal-title">
+      <button class="diet-modal-close" type="button" data-close-plan-modal aria-label="Fechar">×</button>
+      <div class="diet-modal-kicker">PLANO ALIMENTAR</div>
+      <h2 id="plan-modal-title">Plano alimentar</h2>
+      <div id="plan-modal-view">
+        <div id="plan-modal-body" class="diet-modal-body"></div>
+        <div class="diet-modal-actions">
+          <button id="plan-modal-activate" class="btn btn-primary" type="button">Tornar ativo</button>
+          <button id="plan-modal-edit" class="btn btn-outline" type="button">Editar plano</button>
+          <button id="plan-modal-delete" class="btn btn-danger" type="button">Excluir plano</button>
+          <button class="btn btn-outline" type="button" data-close-plan-modal>Fechar</button>
+        </div>
+      </div>
+      <form id="plan-form" class="hidden">
+        <div class="form-group"><label>Título *</label><input name="titulo" maxlength="120" placeholder="Ex.: Plano alimentar - Hipertrofia" required></div>
+        <div class="grid grid-2">
+          <div class="form-group"><label>Data de início</label><input name="data_inicio" type="date"></div>
+          <div class="form-group"><label>Data de término</label><input name="data_fim" type="date"></div>
+        </div>
+        <div class="form-group"><label>Meta de água (ml/dia)</label><input name="agua_ml" type="number" min="0" max="15000" step="100" placeholder="Ex.: 3000"></div>
+        <div class="form-group"><label>Orientações gerais</label><textarea name="orientacoes" placeholder="Ex.: Preferir alimentos in natura, ajustar porções conforme orientação profissional..."></textarea></div>
+        <div class="diet-modal-actions">
+          <button class="btn btn-primary" type="submit">Salvar plano</button>
+          <button id="cancel-plan-edit" class="btn btn-outline" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </div>
 
   <div id="meal-modal" class="diet-modal" aria-hidden="true">
     <div class="diet-modal-backdrop" data-close-meal-modal></div>
