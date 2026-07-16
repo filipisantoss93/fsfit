@@ -71,10 +71,14 @@ form?.addEventListener('submit', async event => {
 
     if (fullName.length < 2) throw new Error('Informe seu nome completo.');
 
+    const confirmationRedirect = `${window.location.origin}/?email_confirmado=true`;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, tipo: 'personal' } }
+      options: {
+        emailRedirectTo: confirmationRedirect,
+        data: { full_name: fullName, tipo: 'personal' }
+      }
     });
 
     if (error) throw error;
@@ -103,12 +107,25 @@ form?.addEventListener('submit', async event => {
 
 setMode('login');
 
+const url = new URL(window.location.href);
+const emailConfirmedReturn = url.searchParams.get('email_confirmado') === 'true';
+
+if (emailConfirmedReturn) {
+  show('✅ E-mail confirmado com sucesso! Sua conta foi ativada. Agora você pode acessar o FS Fit.', 'success');
+  url.searchParams.delete('email_confirmado');
+  window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+}
+
 const { data: { session } } = await supabase.auth.getSession();
 if (session) {
-  try {
-    await finishAuthenticatedAccess(session);
-  } catch (error) {
-    console.error(error);
-    show('Não foi possível preparar seu perfil. Tente novamente.');
+  if (emailConfirmedReturn) {
+    await supabase.auth.signOut();
+  } else {
+    try {
+      await finishAuthenticatedAccess(session);
+    } catch (error) {
+      console.error(error);
+      show('Não foi possível preparar seu perfil. Tente novamente.');
+    }
   }
 }
