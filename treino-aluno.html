@@ -10,21 +10,75 @@
 </head>
 <body>
   <div id="header-container"></div>
-  <main class="container">
+  <main class="container workout-page">
     <section class="page-header">
       <div>
-        <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar à ficha</a>
+        <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar</a>
         <h1 id="student-name">Treino do aluno</h1>
-        <p>Monte o treino por dias, exercícios, aparelhos, séries, repetições, carga e descanso.</p>
+        <p>Gerencie planos de treino e organize exercícios por dias da semana.</p>
       </div>
       <span class="hero-badge">TREINO</span>
     </section>
 
     <div id="workout-message" class="message"></div>
 
-    <section class="card">
-      <h2>Configuração do treino</h2>
-      <form id="workout-form">
+    <section class="card workout-plans-card">
+      <div class="section-heading workout-plans-heading">
+        <div><small>PLANOS DE TREINO</small><h2>Treinos do aluno</h2></div>
+        <button id="new-workout-button" class="btn btn-primary" type="button">+ Novo treino</button>
+      </div>
+      <div id="workout-list" class="workout-plan-list"><p>Carregando...</p></div>
+    </section>
+
+    <section id="active-workout-workspace" class="grid grid-2 workout-workspace" style="align-items:start">
+      <article class="card workout-active-summary-card">
+        <div class="section-heading compact">
+          <div><small>PLANO ATIVO</small><h2 id="active-workout-title">Nenhum treino ativo</h2></div>
+          <button id="active-workout-details" class="btn btn-outline" type="button">Ver detalhes</button>
+        </div>
+        <div id="active-workout-summary" class="workout-plan-summary"></div>
+      </article>
+
+      <article class="card workout-add-card">
+        <div class="workout-add-heading">
+          <div>
+            <small>EXERCÍCIOS</small>
+            <h2>Novo exercício</h2>
+            <p>Adicione um exercício ao treino ativo informando dia, séries, repetições, carga e descanso.</p>
+          </div>
+          <div class="actions">
+            <button id="open-exercise-modal" class="btn btn-primary" type="button">+ Adicionar exercício</button>
+            <a class="btn btn-outline" href="biblioteca-exercicios.html">Gerenciar biblioteca</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="card workout-active-card">
+      <div class="section-heading compact workout-active-heading">
+        <div><small>PLANO ATIVO</small><strong>Exercícios por dia</strong></div>
+        <span class="workout-active-badge">Toque em um exercício para ver detalhes</span>
+      </div>
+      <div id="workout-days"><p>Selecione ou crie um plano de treino.</p></div>
+    </section>
+  </main>
+
+  <div id="workout-modal" class="workout-modal" aria-hidden="true">
+    <div class="workout-modal-backdrop" data-close-workout-modal></div>
+    <section class="workout-modal-card" role="dialog" aria-modal="true" aria-labelledby="workout-modal-title">
+      <button class="workout-modal-close" type="button" data-close-workout-modal aria-label="Fechar">×</button>
+      <div class="workout-modal-kicker">PLANO DE TREINO</div>
+      <h2 id="workout-modal-title">Plano de treino</h2>
+      <div id="workout-modal-view">
+        <div id="workout-modal-body" class="workout-modal-body"></div>
+        <div class="workout-modal-actions">
+          <button id="workout-modal-activate" class="btn btn-primary" type="button">Tornar ativo</button>
+          <button id="workout-modal-edit" class="btn btn-outline" type="button">Editar treino</button>
+          <button id="workout-modal-delete" class="btn btn-danger" type="button">Excluir treino</button>
+          <button class="btn btn-outline" type="button" data-close-workout-modal>Fechar</button>
+        </div>
+      </div>
+      <form id="workout-form" class="hidden">
         <div class="form-group"><label>Nome do treino *</label><input name="nome" maxlength="120" placeholder="Ex.: Hipertrofia A/B" required></div>
         <div class="form-group"><label>Descrição</label><textarea name="descricao" placeholder="Objetivo, orientações gerais e observações do ciclo."></textarea></div>
         <div class="grid grid-2">
@@ -33,50 +87,27 @@
         </div>
         <div class="form-group">
           <label>Dias da semana</label>
-          <div class="actions" id="weekday-options">
-            <label><input type="checkbox" value="1"> Segunda</label>
-            <label><input type="checkbox" value="2"> Terça</label>
-            <label><input type="checkbox" value="3"> Quarta</label>
-            <label><input type="checkbox" value="4"> Quinta</label>
-            <label><input type="checkbox" value="5"> Sexta</label>
-            <label><input type="checkbox" value="6"> Sábado</label>
-            <label><input type="checkbox" value="0"> Domingo</label>
+          <div class="workout-weekdays" id="weekday-options">
+            <label><input type="checkbox" value="1"> Seg</label><label><input type="checkbox" value="2"> Ter</label>
+            <label><input type="checkbox" value="3"> Qua</label><label><input type="checkbox" value="4"> Qui</label>
+            <label><input type="checkbox" value="5"> Sex</label><label><input type="checkbox" value="6"> Sáb</label>
+            <label><input type="checkbox" value="7"> Dom</label>
           </div>
         </div>
-        <button class="btn btn-primary" type="submit">Salvar configuração</button>
+        <div class="workout-modal-actions">
+          <button class="btn btn-primary" type="submit">Salvar treino</button>
+          <button id="cancel-workout-edit" class="btn btn-outline" type="button">Cancelar</button>
+        </div>
       </form>
     </section>
+  </div>
 
-    <section class="card workout-add-card" style="margin-top:20px">
-      <div class="workout-add-heading">
-        <div>
-          <small>EXERCÍCIOS</small>
-          <h2>Adicionar exercício ao treino</h2>
-          <p>Escolha um exercício da sua biblioteca sem sair desta página.</p>
-        </div>
-        <div class="actions">
-          <button id="open-exercise-modal" class="btn btn-primary" type="button">+ Adicionar exercício</button>
-          <a class="btn btn-outline" href="biblioteca-exercicios.html">Gerenciar biblioteca</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:20px">
-      <div class="section-heading compact"><div><small>Planejamento</small><strong>Treino estruturado</strong></div></div>
-      <div id="workout-days"><p>Carregando treino...</p></div>
-    </section>
-  </main>
-
-  <div id="exercise-modal" class="exercise-modal hidden" aria-hidden="true">
-    <div class="exercise-modal-backdrop" data-close-exercise-modal></div>
-    <section class="exercise-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
-      <div class="exercise-modal-header">
-        <div>
-          <small>PLANEJAMENTO</small>
-          <h2 id="exercise-modal-title">Adicionar exercício ao treino</h2>
-        </div>
-        <button class="exercise-modal-close" type="button" data-close-exercise-modal aria-label="Fechar">×</button>
-      </div>
+  <div id="exercise-modal" class="workout-modal" aria-hidden="true">
+    <div class="workout-modal-backdrop" data-close-exercise-modal></div>
+    <section class="workout-modal-card" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
+      <button class="workout-modal-close" type="button" data-close-exercise-modal aria-label="Fechar">×</button>
+      <div class="workout-modal-kicker">EXERCÍCIO</div>
+      <h2 id="exercise-modal-title">Novo exercício</h2>
       <form id="workout-exercise-form">
         <div class="grid grid-2">
           <div class="form-group"><label>Dia da semana *</label><select name="dia_semana" required><option value="">Selecione</option></select></div>
@@ -88,11 +119,26 @@
           <div class="form-group"><label>Ordem</label><input name="ordem" type="number" min="1" max="100" step="1" value="1"></div>
         </div>
         <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Cadência, técnica, progressão, intensidade..."></textarea></div>
-        <div class="actions exercise-modal-actions">
-          <button class="btn btn-primary" type="submit">Adicionar exercício</button>
+        <div class="workout-modal-actions">
+          <button class="btn btn-primary" type="submit">Salvar exercício</button>
           <button class="btn btn-outline" type="button" data-close-exercise-modal>Cancelar</button>
         </div>
       </form>
+    </section>
+  </div>
+
+  <div id="exercise-detail-modal" class="workout-modal" aria-hidden="true">
+    <div class="workout-modal-backdrop" data-close-exercise-detail-modal></div>
+    <section class="workout-modal-card" role="dialog" aria-modal="true" aria-labelledby="exercise-detail-title">
+      <button class="workout-modal-close" type="button" data-close-exercise-detail-modal aria-label="Fechar">×</button>
+      <div class="workout-modal-kicker">DETALHES DO EXERCÍCIO</div>
+      <h2 id="exercise-detail-title">Exercício</h2>
+      <div id="exercise-detail-body" class="workout-modal-body"></div>
+      <div class="workout-modal-actions">
+        <button id="exercise-detail-edit" class="btn btn-primary" type="button">Editar exercício</button>
+        <button id="exercise-detail-delete" class="btn btn-danger" type="button">Remover exercício</button>
+        <button class="btn btn-outline" type="button" data-close-exercise-detail-modal>Fechar</button>
+      </div>
     </section>
   </div>
 
