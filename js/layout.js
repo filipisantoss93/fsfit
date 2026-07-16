@@ -6,6 +6,8 @@ const FREE_ALLOWED_PAGES = new Set([
   'contato.html'
 ]);
 
+const messageTimers = new WeakMap();
+
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
   return page || 'index.html';
@@ -122,7 +124,54 @@ export async function setGreeting(session) {
 }
 
 export function showMessage(element, text, type = 'success') {
-  if (!element) return;
+  if (!element || !text) return;
+
+  const previousTimer = messageTimers.get(element);
+  if (previousTimer) clearTimeout(previousTimer);
+
+  const isError = type === 'error';
   element.textContent = text;
   element.className = `message show ${type}`;
+  element.setAttribute('role', isError ? 'alert' : 'status');
+  element.setAttribute('aria-live', isError ? 'assertive' : 'polite');
+
+  Object.assign(element.style, {
+    position: 'fixed',
+    top: 'calc(92px + env(safe-area-inset-top, 0px))',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    zIndex: '10000',
+    width: 'min(520px, calc(100vw - 32px))',
+    maxWidth: 'calc(100vw - 32px)',
+    margin: '0',
+    padding: '14px 18px',
+    borderRadius: '14px',
+    transform: 'translate(-50%, 0)',
+    boxShadow: '0 18px 50px rgba(0, 0, 0, .45)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    cursor: 'pointer',
+    opacity: '1',
+    transition: 'opacity .22s ease, transform .22s ease',
+    background: isError ? 'rgba(68, 30, 34, .96)' : 'rgba(24, 66, 35, .96)',
+    border: isError ? '1px solid rgba(255, 90, 95, .62)' : '1px solid rgba(50, 215, 75, .58)',
+    color: isError ? '#ffd1d3' : '#d7ffdd'
+  });
+
+  const hide = () => {
+    const activeTimer = messageTimers.get(element);
+    if (activeTimer) clearTimeout(activeTimer);
+    messageTimers.delete(element);
+    element.style.opacity = '0';
+    element.style.transform = 'translate(-50%, -10px)';
+    setTimeout(() => {
+      element.classList.remove('show');
+      element.textContent = '';
+    }, 230);
+  };
+
+  element.onclick = hide;
+  const timer = setTimeout(hide, isError ? 6000 : 4000);
+  messageTimers.set(element, timer);
 }
