@@ -64,7 +64,7 @@ function renderCategoryNav() {
 
 function renderExercises() {
   const active = categoryById(activeCategoryId);
-  selectedCategoryTitle.textContent = active ? active.nome : 'Exercícios';
+  if (selectedCategoryTitle) selectedCategoryTitle.textContent = active ? active.nome : 'Exercícios';
   if (!activeCategoryId) { list.innerHTML = '<p class="empty">Nenhuma categoria selecionada.</p>'; return; }
   const term = normalize(search.value);
   const filtered = getVisibleExercises().filter(item => item.categoria_id === activeCategoryId && (!term || [item.nome, item.equipamento, item.instrucoes].filter(Boolean).some(value => normalize(value).includes(term))));
@@ -122,7 +122,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   const category = categoryById(form.categoria_id.value);
   if (!category) return showMessage(message, 'Selecione uma categoria para o exercício.', 'error');
-  const payload = { personal_id: session.user.id, nome: form.nome.value.trim(), categoria_id: category.id, grupo_muscular: category.nome, tipo_prescricao: form.tipo_prescricao.value || 'repeticoes', equipamento: form.equipamento.value.trim() || null, instrucoes: form.instrucoes.value.trim() || null, video_url: form.video_url.value.trim() || null, global: false };
+  const payload = { personal_id: session.user.id, nome: form.nome.value.trim(), categoria_id: category.id, grupo_muscular: category.nome, equipamento: form.equipamento.value.trim() || null, instrucoes: form.instrucoes.value.trim() || null, video_url: form.video_url.value.trim() || null, tipo_prescricao: form.tipo_prescricao.value || 'repeticoes', global: false };
   if (payload.nome.length < 2) return showMessage(message, 'Informe o nome do exercício.', 'error');
   const wasEditing = Boolean(editingId || editingGlobalId);
   submitButton.disabled = true;
