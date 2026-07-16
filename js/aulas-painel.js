@@ -14,6 +14,19 @@ function elapsed(value) {
   return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)}h ${minutes % 60}min`;
 }
 
+async function confirmStart(sessionId, button) {
+  if (!confirm('Confirmar o início desta aula?')) return;
+  button.disabled = true;
+  const { error } = await supabase.rpc('confirmar_inicio_sessao_personal', { p_sessao_id: sessionId });
+  if (error) {
+    console.error(error);
+    alert('Não foi possível confirmar o início da aula.');
+    button.disabled = false;
+    return;
+  }
+  await loadLiveStudents();
+}
+
 async function loadLiveStudents() {
   const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
   if (error) {
@@ -25,16 +38,26 @@ async function loadLiveStudents() {
   const badge = document.querySelector('#live-students-count');
   if (badge) badge.textContent = String(rows.length);
   container.innerHTML = rows.length ? rows.map(row => {
+    const pending = row.status === 'aguardando_confirmacao';
     const total = Number(row.total_exercicios || 0);
     const done = Number(row.exercicios_concluidos || 0);
     const percent = total ? Math.round(done / total * 100) : 0;
-    return `<article class="live-student-row">
-      <div class="live-student-main"><span class="live-dot"></span><div><strong>${esc(row.aluno_nome)}</strong><small>${esc(row.treino_nome || 'Treino')} • ${elapsed(row.checkin_at)}</small></div></div>
-      <div class="live-student-progress"><span>${done}/${total} concluídos</span><div class="live-progress"><span style="width:${percent}%"></span></div></div>
-      <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
+    return `<article class="live-student-row ${pending ? 'pending' : ''}">
+      <div class="live-student-main"><span class="live-dot"></span><div><strong>${esc(row.aluno_nome)}</strong><small>${esc(row.treino_nome || 'Treino')} • ${pending ? `check-in há ${elapsed(row.checkin_at)}` : `em aula há ${elapsed(row.iniciado_at || row.checkin_at)}`}</small></div></div>
+      <div class="live-student-progress">
+        ${pending ? '<span>Aguardando confirmação</span>' : `<span>${done}/${total} concluídos</span><div class="live-progress"><span style="width:${percent}%"></span></div>`}
+      </div>
+      <div class="actions">
+        ${pending ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>` : ''}
+        <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
+      </div>
     </article>`;
-  }).join('') : '<p class="empty">Nenhum aluno está em aula neste momento.</p>';
+  }).join('') : '<p class="empty">Nenhum aluno aguardando confirmação ou em aula neste momento.</p>';
+
+  container.querySelectorAll('[data-confirm-session]').forEach(button => {
+    button.addEventListener('click', () => confirmStart(button.dataset.confirmSession, button));
+  });
 }
 
 await loadLiveStudents();
-setInterval(loadLiveStudents, 15000);
+setInterval(loadLiveStudents, 10000);
