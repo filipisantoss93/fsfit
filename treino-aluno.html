@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Treino do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/treino-aluno.css?v=20260717-defaults1">
+  <link rel="stylesheet" href="css/treino-aluno.css?v=20260717-defaults2">
 </head>
 <body>
   <div id="header-container"></div>
@@ -19,32 +19,21 @@
       </div>
       <span class="hero-badge">TREINO</span>
     </section>
-
     <div id="workout-message" class="message"></div>
-
     <section class="card workout-plans-card">
       <div class="section-heading workout-plans-heading"><div><small>PLANOS DE TREINO</small><h2>Planos do aluno</h2></div></div>
       <button id="new-workout-button" class="btn btn-primary workout-new-plan-button" type="button">+ Novo plano</button>
       <div id="workout-list" class="workout-plan-list"><p>Carregando...</p></div>
     </section>
-
     <section id="active-workout-workspace" class="workout-workspace">
       <article class="card workout-active-summary-card">
-        <div class="section-heading compact workout-summary-heading">
-          <div><small>PLANO ATIVO</small><h2 id="active-workout-title">Nenhum treino ativo</h2></div>
-          <button id="active-workout-details" class="btn btn-outline" type="button">Ver detalhes</button>
-        </div>
+        <div class="section-heading compact workout-summary-heading"><div><small>PLANO ATIVO</small><h2 id="active-workout-title">Nenhum treino ativo</h2></div><button id="active-workout-details" class="btn btn-outline" type="button">Ver detalhes</button></div>
         <div id="active-workout-summary" class="workout-plan-summary"></div>
       </article>
-
       <article class="card workout-add-card">
-        <div class="workout-add-heading">
-          <div><small>EXERCÍCIOS</small><h2>Exercícios do plano</h2><p>Adicione e organize os exercícios do plano ativo por dia da semana.</p></div>
-          <div class="actions"><button id="open-exercise-modal" class="btn btn-primary" type="button">+ Adicionar exercícios</button><a class="btn btn-outline" href="biblioteca-exercicios.html">Gerenciar biblioteca</a></div>
-        </div>
+        <div class="workout-add-heading"><div><small>EXERCÍCIOS</small><h2>Exercícios do plano</h2><p>Adicione e organize os exercícios do plano ativo por dia da semana.</p></div><div class="actions"><button id="open-exercise-modal" class="btn btn-primary" type="button">+ Adicionar exercícios</button><a class="btn btn-outline" href="biblioteca-exercicios.html">Gerenciar biblioteca</a></div></div>
       </article>
     </section>
-
     <section class="card workout-active-card">
       <div class="section-heading compact workout-active-heading"><div><small>PLANEJAMENTO</small><strong>Exercícios por dia</strong></div><span class="workout-active-badge">Toque em um exercício para ver detalhes</span></div>
       <div id="workout-days"><p>Selecione ou crie um plano de treino.</p></div>
@@ -71,39 +60,26 @@
     <div class="workout-modal-backdrop" data-close-exercise-modal></div>
     <section class="workout-modal-card workout-exercise-builder-modal" role="dialog" aria-modal="true" aria-labelledby="exercise-modal-title">
       <button class="workout-modal-close" type="button" data-close-exercise-modal aria-label="Fechar">×</button>
-      <div class="workout-modal-kicker">EXERCÍCIOS</div>
-      <h2 id="exercise-modal-title">Montar sequência</h2>
+      <div class="workout-modal-kicker">EXERCÍCIOS</div><h2 id="exercise-modal-title">Montar sequência</h2>
       <form id="workout-exercise-form">
-        <div class="form-group">
-          <label>Dias da semana *</label>
-          <input type="hidden" name="dia_semana" value="">
-          <div id="exercise-weekday-options" class="workout-weekdays" aria-label="Dias da semana do exercício">
-            <label><input type="checkbox" value="1"> Seg</label><label><input type="checkbox" value="2"> Ter</label><label><input type="checkbox" value="3"> Qua</label><label><input type="checkbox" value="4"> Qui</label><label><input type="checkbox" value="5"> Sex</label><label><input type="checkbox" value="6"> Sáb</label><label><input type="checkbox" value="7"> Dom</label>
-          </div>
-        </div>
-
+        <div class="form-group"><label>Dias da semana *</label><input type="hidden" name="dia_semana" value=""><div id="exercise-weekday-options" class="workout-weekdays" aria-label="Dias da semana do exercício"><label><input type="checkbox" value="1"> Seg</label><label><input type="checkbox" value="2"> Ter</label><label><input type="checkbox" value="3"> Qua</label><label><input type="checkbox" value="4"> Qui</label><label><input type="checkbox" value="5"> Sex</label><label><input type="checkbox" value="6"> Sáb</label><label><input type="checkbox" value="7"> Dom</label></div></div>
         <div id="batch-exercise-selector">
           <div class="form-group"><label>Categoria *</label><select id="exercise-category"><option value="">Selecione uma categoria</option></select></div>
           <div class="form-group"><label>Exercícios</label><p class="workout-builder-help">Marque os exercícios na ordem em que devem aparecer no treino.</p><div id="exercise-checkbox-list" class="exercise-checkbox-list"><p class="empty">Selecione uma categoria para ver os exercícios.</p></div></div>
-          <div id="selected-exercises-section" class="selected-exercises-section hidden">
-            <div class="selected-exercises-heading"><div><small>SEQUÊNCIA</small><strong>Exercícios selecionados</strong></div><span id="selected-exercises-count">0</span></div>
-            <div id="selected-exercises-builder" class="selected-exercises-builder"></div>
-          </div>
+          <div id="selected-exercises-section" class="selected-exercises-section hidden"><div class="selected-exercises-heading"><div><small>SEQUÊNCIA</small><strong>Exercícios selecionados</strong></div><span id="selected-exercises-count">0</span></div><div id="selected-exercises-builder" class="selected-exercises-builder"></div></div>
         </div>
-
         <div id="single-exercise-editor" class="hidden">
           <div class="form-group"><label>Categoria *</label><select id="single-exercise-category"><option value="">Selecione uma categoria</option></select></div>
           <div class="form-group"><label>Exercício *</label><select name="exercicio_id" id="exercise-select"><option value="">Selecione</option></select></div>
           <div class="grid grid-2">
             <div class="form-group"><label>Séries</label><select name="series"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
-            <div class="form-group"><label>Repetições</label><select name="repeticoes">${Array.from({length:60},(_,i)=>`<option value="${i+1}"${i===11?' selected':''}>${i+1}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Repetições</label><select name="repeticoes"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12" selected>12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option><option value="51">51</option><option value="52">52</option><option value="53">53</option><option value="54">54</option><option value="55">55</option><option value="56">56</option><option value="57">57</option><option value="58">58</option><option value="59">59</option><option value="60">60</option></select></div>
             <div class="form-group"><label>Carga</label><input name="carga" maxlength="40" placeholder="30 kg ou ajustar"></div>
             <div class="form-group"><label>Descanso (segundos)</label><input name="descanso_segundos" type="number" min="0" max="1800" step="5" value="60" placeholder="Opcional"></div>
           </div>
           <input name="duracao_minutos" type="hidden"><input name="distancia_km" type="hidden"><input name="ordem" type="hidden" value="1">
           <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Cadência, técnica, progressão, intensidade..."></textarea></div>
         </div>
-
         <div class="workout-modal-actions"><button id="save-exercise-batch" class="btn btn-primary" type="submit">Adicionar exercícios</button><button class="btn btn-outline" type="button" data-close-exercise-modal>Cancelar</button></div>
       </form>
     </section>
@@ -113,13 +89,11 @@
     <div class="workout-modal-backdrop" data-close-exercise-detail-modal></div>
     <section class="workout-modal-card" role="dialog" aria-modal="true" aria-labelledby="exercise-detail-title">
       <button class="workout-modal-close" type="button" data-close-exercise-detail-modal aria-label="Fechar">×</button>
-      <div class="workout-modal-kicker">DETALHES DO EXERCÍCIO</div><h2 id="exercise-detail-title">Exercício</h2>
-      <div id="exercise-detail-body" class="workout-modal-body"></div>
+      <div class="workout-modal-kicker">DETALHES DO EXERCÍCIO</div><h2 id="exercise-detail-title">Exercício</h2><div id="exercise-detail-body" class="workout-modal-body"></div>
       <div class="workout-modal-actions"><button id="exercise-detail-edit" class="btn btn-primary" type="button">Editar exercício</button><button id="exercise-detail-delete" class="btn btn-danger" type="button">Remover exercício</button><button class="btn btn-outline" type="button" data-close-exercise-detail-modal>Fechar</button></div>
     </section>
   </div>
-
-  <script type="module" src="js/treino-aluno.js?v=20260717-defaults1"></script>
-  <script type="module" src="js/treino-multidias.js?v=20260717-defaults1"></script>
+  <script type="module" src="js/treino-aluno.js?v=20260717-defaults2"></script>
+  <script type="module" src="js/treino-multidias.js?v=20260717-defaults2"></script>
 </body>
 </html>
