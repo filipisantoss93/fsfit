@@ -46,9 +46,20 @@
     }
     .student-edit-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
     body.student-edit-open { overflow: hidden; }
+    .student-preview-card {
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .student-preview-card .section-intro { margin: 4px 0 0; }
+    .student-preview-card .btn { flex: 0 0 auto; }
     @media (max-width: 640px) {
       .student-edit-modal { padding: 0; }
       .student-edit-dialog { width: 100%; height: 100dvh; border-radius: 0; border: 0; }
+      .student-preview-card { align-items: stretch; flex-direction: column; }
+      .student-preview-card .btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -76,6 +87,14 @@
     </nav>
 
     <div class="record-tab-panel active" data-record-panel="overview">
+      <section class="card student-preview-card">
+        <div>
+          <div class="section-heading"><div><small>Portal do aluno</small><h2>Acompanhe o que seu aluno está vendo</h2></div></div>
+          <p class="section-intro">Abra a visão atual do portal para conferir treino, dieta, observações e conteúdos publicados para este aluno.</p>
+        </div>
+        <a id="student-preview-link" class="btn btn-primary" href="visualizar-aluno.html" target="_blank" rel="noopener">Visualizar como aluno</a>
+      </section>
+
       <section class="grid grid-2 record-overview-grid">
         <article class="card profile-card">
           <div class="section-heading"><div><small>Perfil</small><h2>Dados cadastrais</h2></div></div>
@@ -238,11 +257,16 @@
 
     const deleteButton = document.querySelector('#delete-student');
     const editButton = document.querySelector('#edit-registration');
+    const previewButton = document.querySelector('#student-preview-link');
     const editModal = document.querySelector('#student-edit-modal');
     const editFrame = document.querySelector('#student-edit-frame');
     const editClose = document.querySelector('#student-edit-close');
     const recordMessage = document.querySelector('#record-message');
     const alunoId = new URLSearchParams(location.search).get('id');
+
+    if (previewButton && alunoId) {
+      previewButton.href = `visualizar-aluno.html?id=${encodeURIComponent(alunoId)}`;
+    }
 
     function openEditModal() {
       if (!alunoId) return;
