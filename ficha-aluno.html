@@ -36,7 +36,10 @@
         <article class="card profile-card">
           <div class="section-heading"><div><small>Perfil</small><h2>Dados cadastrais</h2></div></div>
           <div id="profile-data" class="profile-data"><p>Carregando...</p></div>
-          <div class="actions"><a id="edit-registration" class="btn btn-secondary" href="alunos.html">Editar cadastro</a></div>
+          <div class="actions">
+            <a id="edit-registration" class="btn btn-secondary" href="alunos.html">Editar cadastro</a>
+            <button id="delete-student" class="btn btn-danger" type="button">Excluir aluno</button>
+          </div>
         </article>
 
         <article class="card physical-summary-card">
@@ -123,7 +126,7 @@
               <h3>Segurança</h3>
               <p>Defina ou altere o PIN de acesso do aluno.</p>
               <div class="form-group"><label>Novo PIN de 4 números</label><input name="pin" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></div>
-              <button class="btn btn-secondary" type="submit">Salvar novo PIN</button>
+              <button class="btn btn-secondary" type="submit">Alterar PIN</button>
             </form>
           </article>
         </div>
@@ -177,5 +180,37 @@
     </div>
   </main>
   <script type="module" src="js/ficha-aluno.js"></script>
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+    import { requireSession, showMessage } from './js/layout.js';
+
+    const deleteButton = document.querySelector('#delete-student');
+    const recordMessage = document.querySelector('#record-message');
+    const alunoId = new URLSearchParams(location.search).get('id');
+
+    deleteButton?.addEventListener('click', async () => {
+      const studentName = document.querySelector('#student-name')?.textContent?.trim() || 'este aluno';
+      const confirmed = confirm(`Excluir ${studentName}? Todos os dados vinculados também serão removidos. Esta ação não pode ser desfeita.`);
+      if (!confirmed) return;
+
+      const session = await requireSession();
+      if (!session || !alunoId) return;
+
+      deleteButton.disabled = true;
+      const { error } = await supabase
+        .from('alunos')
+        .delete()
+        .eq('id', alunoId)
+        .eq('personal_id', session.user.id);
+
+      if (error) {
+        deleteButton.disabled = false;
+        showMessage(recordMessage, error.message || 'Não foi possível excluir o aluno.', 'error');
+        return;
+      }
+
+      window.location.href = 'alunos.html';
+    });
+  </script>
 </body>
 </html>
