@@ -28,6 +28,7 @@ async function confirmStart(sessionId, button) {
 }
 
 async function loadLiveStudents() {
+  const openChatSession = container.dataset.openChatSession || '';
   const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
   if (error) {
     console.error(error);
@@ -51,9 +52,13 @@ async function loadLiveStudents() {
         ${pending ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>` : `<button class="btn btn-secondary" type="button" data-open-session-chat="${esc(row.sessao_id)}">Abrir chat</button>`}
         <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
       </div>
-      ${pending ? '' : `<div class="live-chat-inline hidden" data-chat-host="${esc(row.sessao_id)}"></div>`}
+      ${pending ? '' : `<div class="live-chat-inline ${openChatSession === row.sessao_id ? '' : 'hidden'}" data-chat-host="${esc(row.sessao_id)}"></div>`}
     </article>`;
   }).join('') : '<p class="empty">Nenhum aluno aguardando confirmação ou em aula neste momento.</p>';
+
+  if (openChatSession && !rows.some(row => row.sessao_id === openChatSession && row.status === 'em_aula')) {
+    delete container.dataset.openChatSession;
+  }
 
   container.querySelectorAll('[data-confirm-session]').forEach(button => {
     button.addEventListener('click', () => confirmStart(button.dataset.confirmSession, button));
