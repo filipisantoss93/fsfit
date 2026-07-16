@@ -6,10 +6,11 @@
   <meta name="theme-color" content="#0f1115">
   <title>Dieta do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dieta-aluno.css">
 </head>
 <body>
   <div id="header-container"></div>
-  <main class="container">
+  <main class="container diet-page">
     <section class="page-header">
       <div>
         <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar</a>
@@ -63,11 +64,30 @@
       </article>
     </section>
 
-    <section class="card" style="margin-top:20px">
-      <div class="section-heading compact"><div><small>Plano ativo</small><strong>Refeições por dia</strong></div></div>
+    <section class="card diet-active-card">
+      <div class="section-heading compact diet-active-heading">
+        <div><small>PLANO ATIVO</small><strong>Refeições por dia</strong></div>
+        <span class="diet-active-badge">Toque em uma refeição para ver detalhes</span>
+      </div>
       <div id="meal-list"><p>Carregando...</p></div>
     </section>
   </main>
+
+  <div id="meal-modal" class="diet-modal" aria-hidden="true">
+    <div class="diet-modal-backdrop" data-close-meal-modal></div>
+    <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="meal-modal-title">
+      <button class="diet-modal-close" type="button" data-close-meal-modal aria-label="Fechar">×</button>
+      <div class="diet-modal-kicker">DETALHES DA REFEIÇÃO</div>
+      <h2 id="meal-modal-title">Refeição</h2>
+      <div id="meal-modal-body" class="diet-modal-body"></div>
+      <div class="diet-modal-actions">
+        <button id="meal-modal-edit" class="btn btn-primary" type="button">Editar refeição</button>
+        <button id="meal-modal-delete" class="btn btn-danger" type="button">Excluir refeição</button>
+        <button class="btn btn-outline" type="button" data-close-meal-modal>Fechar</button>
+      </div>
+    </section>
+  </div>
+
   <script type="module" src="js/dieta-aluno.js"></script>
 </body>
 </html>
