@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Biblioteca de exercícios — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-2335">
+  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-2355">
 </head>
 <body>
   <div id="header-container"></div>
@@ -15,7 +15,7 @@
       <div>
         <a class="btn btn-outline" href="alunos.html">← Voltar</a>
         <h1>Biblioteca de exercícios</h1>
-        <p>Encontre exercícios prontos por grupo muscular ou crie exercícios personalizados para seus alunos.</p>
+        <p>Escolha uma categoria para visualizar os exercícios ou crie suas próprias categorias.</p>
       </div>
       <span class="hero-badge">BIBLIOTECA</span>
     </section>
@@ -24,30 +24,31 @@
 
     <section class="card library-create-card">
       <div class="library-create-heading">
-        <div><small>CADASTRO</small><h2>Novo exercício</h2><p>Adicione exercícios personalizados à sua biblioteca.</p></div>
-        <button id="open-library-modal" class="btn btn-primary" type="button">+ Novo exercício</button>
+        <div><small>ORGANIZAÇÃO</small><h2>Categorias</h2><p>Os exercícios ficam separados por categoria para facilitar a montagem dos treinos.</p></div>
+        <div class="actions">
+          <button id="open-category-modal" class="btn btn-outline" type="button">+ Nova categoria</button>
+          <button id="open-library-modal" class="btn btn-primary" type="button">+ Novo exercício</button>
+        </div>
       </div>
     </section>
 
-    <section class="card library-list-card">
+    <section id="library-categories-section" class="card library-list-card">
       <div class="library-list-heading">
-        <div><small>GESTÃO</small><h2>Exercícios disponíveis</h2></div>
-        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar por nome, grupo ou equipamento"></div>
+        <div><small>SELECIONE</small><h2>Categorias de exercícios</h2></div>
       </div>
+      <div id="library-category-grid" class="library-category-grid"><p>Carregando categorias...</p></div>
+    </section>
 
-      <div class="library-category-bar" aria-label="Filtrar exercícios por categoria">
-        <button class="library-category active" type="button" data-library-category="Todos">Todos</button>
-        <button class="library-category" type="button" data-library-category="Peito">Peito</button>
-        <button class="library-category" type="button" data-library-category="Costas">Costas</button>
-        <button class="library-category" type="button" data-library-category="Bíceps">Bíceps</button>
-        <button class="library-category" type="button" data-library-category="Tríceps">Tríceps</button>
-        <button class="library-category" type="button" data-library-category="Ombro">Ombro</button>
-        <button class="library-category" type="button" data-library-category="Trapézio">Trapézio</button>
-        <button class="library-category" type="button" data-library-category="Pernas">Pernas</button>
-        <button class="library-category library-category-add" type="button" id="add-category-shortcut">+ Adicionar mais</button>
+    <section id="library-exercises-section" class="card library-list-card hidden">
+      <div class="library-list-heading">
+        <div>
+          <button id="back-to-categories" class="library-back-button" type="button">← Categorias</button>
+          <small>CATEGORIA</small>
+          <h2 id="selected-category-title">Exercícios</h2>
+        </div>
+        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar nesta categoria"></div>
       </div>
-
-      <div id="exercise-library-list" class="exercise-library-list"><p>Carregando...</p></div>
+      <div id="exercise-library-list" class="exercise-library-list"></div>
     </section>
   </main>
 
@@ -61,17 +62,8 @@
         <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Supino reto" required></div>
         <div class="grid grid-2">
           <div class="form-group">
-            <label>Categoria / grupo muscular</label>
-            <input name="grupo_muscular" maxlength="80" list="library-default-categories" placeholder="Ex.: Peito">
-            <datalist id="library-default-categories">
-              <option value="Peito"></option>
-              <option value="Costas"></option>
-              <option value="Bíceps"></option>
-              <option value="Tríceps"></option>
-              <option value="Ombro"></option>
-              <option value="Trapézio"></option>
-              <option value="Pernas"></option>
-            </datalist>
+            <label>Categoria *</label>
+            <select name="categoria_id" required><option value="">Selecione uma categoria</option></select>
           </div>
           <div class="form-group"><label>Aparelho / equipamento</label><input name="equipamento" maxlength="120" placeholder="Banco e barra"></div>
         </div>
@@ -88,6 +80,22 @@
     </section>
   </div>
 
-  <script type="module" src="js/biblioteca-exercicios.js?v=20260716-2335"></script>
+  <div id="category-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-backdrop" data-close-category-modal></div>
+    <section class="library-modal-card library-category-modal-card" role="dialog" aria-modal="true" aria-labelledby="category-form-title">
+      <button class="library-modal-close" type="button" data-close-category-modal aria-label="Fechar">×</button>
+      <div class="library-modal-kicker">CATEGORIA</div>
+      <h2 id="category-form-title">Nova categoria</h2>
+      <form id="category-form">
+        <div class="form-group"><label>Nome da categoria *</label><input name="nome" maxlength="80" placeholder="Ex.: Abdômen" required></div>
+        <div class="library-modal-actions">
+          <button id="category-submit" class="btn btn-primary" type="submit">Criar categoria</button>
+          <button id="cancel-category-edit" class="btn btn-outline" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="js/biblioteca-exercicios.js?v=20260716-2355"></script>
 </body>
 </html>
