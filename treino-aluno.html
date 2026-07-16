@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Treino do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/treino-aluno.css?v=20260715-2202">
+  <link rel="stylesheet" href="css/treino-aluno.css?v=20260715-2256">
 </head>
 <body>
   <div id="header-container"></div>
@@ -14,8 +14,8 @@
     <section class="page-header">
       <div>
         <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar</a>
-        <h1 id="student-name">Treino do aluno</h1>
-        <p>Gerencie planos de treino e organize exercícios por dias da semana.</p>
+        <h1 id="student-name">Plano de treino</h1>
+        <p>Gerencie planos e organize exercícios por dias da semana.</p>
       </div>
       <span class="hero-badge">TREINO</span>
     </section>
@@ -24,16 +24,16 @@
 
     <section class="card workout-plans-card">
       <div class="section-heading workout-plans-heading">
-        <div><small>PLANOS DE TREINO</small><h2>Treinos do aluno</h2></div>
-        <button id="new-workout-button" class="btn btn-primary" type="button">+ Novo treino</button>
+        <div><small>PLANOS DE TREINO</small><h2>Planos do aluno</h2></div>
       </div>
+      <button id="new-workout-button" class="btn btn-primary workout-new-plan-button" type="button">+ Novo plano</button>
       <div id="workout-list" class="workout-plan-list"><p>Carregando...</p></div>
     </section>
 
-    <section id="active-workout-workspace" class="grid grid-2 workout-workspace" style="align-items:start">
+    <section id="active-workout-workspace" class="workout-workspace">
       <article class="card workout-active-summary-card">
-        <div class="section-heading compact">
-          <div><small>PLANO DE TREINO ATIVO</small><h2 id="active-workout-title">Nenhum treino ativo</h2></div>
+        <div class="section-heading compact workout-summary-heading">
+          <div><small>PLANO ATIVO</small><h2 id="active-workout-title">Nenhum treino ativo</h2></div>
           <button id="active-workout-details" class="btn btn-outline" type="button">Ver detalhes</button>
         </div>
         <div id="active-workout-summary" class="workout-plan-summary"></div>
@@ -43,8 +43,8 @@
         <div class="workout-add-heading">
           <div>
             <small>EXERCÍCIOS</small>
-            <h2>Novo exercício</h2>
-            <p>Adicione um exercício ao treino ativo informando dia, séries, repetições, carga e descanso.</p>
+            <h2>Exercícios do plano</h2>
+            <p>Adicione e organize os exercícios do plano ativo por dia da semana.</p>
           </div>
           <div class="actions">
             <button id="open-exercise-modal" class="btn btn-primary" type="button">+ Adicionar exercício</button>
@@ -56,7 +56,7 @@
 
     <section class="card workout-active-card">
       <div class="section-heading compact workout-active-heading">
-        <div><small>PLANO DE TREINO ATIVO</small><strong>Exercícios por dia</strong></div>
+        <div><small>PLANEJAMENTO</small><strong>Exercícios por dia</strong></div>
         <span class="workout-active-badge">Toque em um exercício para ver detalhes</span>
       </div>
       <div id="workout-days"><p>Selecione ou crie um plano de treino.</p></div>
@@ -142,6 +142,6 @@
     </section>
   </div>
 
-  <script type="module" src="js/treino-aluno.js?v=20260715-2202"></script>
+  <script type="module" src="js/treino-aluno.js?v=20260715-2256"></script>
 </body>
 </html>
