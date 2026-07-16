@@ -29,7 +29,10 @@
           <small>PLANOS ALIMENTARES</small>
           <h2>Planos do aluno</h2>
         </div>
-        <button id="new-plan-button" class="btn btn-primary" type="button">+ Novo plano</button>
+        <div class="actions">
+          <button id="use-diet-model-button" class="btn btn-outline" type="button">Usar modelo de dieta</button>
+          <button id="new-plan-button" class="btn btn-primary" type="button">+ Novo plano</button>
+        </div>
       </div>
       <div id="plan-list" class="diet-plan-list"><p>Carregando...</p></div>
     </section>
@@ -145,6 +148,22 @@
     </section>
   </div>
 
+  <div id="diet-model-picker-modal" class="diet-modal" aria-hidden="true">
+    <div class="diet-modal-backdrop" data-close-diet-model-picker></div>
+    <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="diet-model-picker-title">
+      <button class="diet-modal-close" type="button" data-close-diet-model-picker aria-label="Fechar">×</button>
+      <div class="diet-modal-kicker">MODELOS DE DIETA</div>
+      <h2 id="diet-model-picker-title">Usar modelo de dieta</h2>
+      <p>O modelo cria um novo plano ativo para o aluno e copia todas as refeições e alimentos cadastrados.</p>
+      <div class="form-group"><label>Buscar modelo</label><input id="diet-model-picker-search" type="search" placeholder="Ex.: Hipertrofia, emagrecimento..."></div>
+      <div id="diet-model-picker-list" class="diet-library-meal-list"><p>Carregando modelos...</p></div>
+      <div class="diet-modal-actions">
+        <a class="btn btn-primary" href="modelos-dieta.html">Gerenciar modelos</a>
+        <button class="btn btn-outline" type="button" data-close-diet-model-picker>Fechar</button>
+      </div>
+    </section>
+  </div>
+
   <div id="meal-modal" class="diet-modal" aria-hidden="true">
     <div class="diet-modal-backdrop" data-close-meal-modal></div>
     <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="meal-modal-title">
@@ -162,6 +181,7 @@
 
   <script type="module" src="js/dieta-aluno.js"></script>
   <script type="module" src="js/dieta-biblioteca-refeicoes.js?v=20260716-1"></script>
+  <script type="module" src="js/dieta-modelos-aluno.js?v=20260716-1"></script>
   <script>
     (() => {
       const modal = document.querySelector('#meal-form-modal');
