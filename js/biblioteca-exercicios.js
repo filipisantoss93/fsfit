@@ -13,6 +13,8 @@ const search = document.querySelector('#exercise-search');
 const formTitle = document.querySelector('#library-form-title');
 const submitButton = document.querySelector('#library-submit');
 const cancelButton = document.querySelector('#cancel-library-edit');
+const modal = document.querySelector('#library-modal');
+const openModalButton = document.querySelector('#open-library-modal');
 let editingId = null;
 let exercises = [];
 
@@ -27,7 +29,20 @@ function resetForm() {
   form.reset();
   formTitle.textContent = 'Novo exercício';
   submitButton.textContent = 'Adicionar exercício';
-  cancelButton.classList.add('hidden');
+}
+
+function openModal() {
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('library-modal-open');
+  setTimeout(() => form.nome.focus(), 0);
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('library-modal-open');
+  resetForm();
 }
 
 function renderExercises() {
@@ -90,8 +105,7 @@ function editExercise(id) {
   form.video_url.value = item.video_url || '';
   formTitle.textContent = `Editar ${item.nome}`;
   submitButton.textContent = 'Salvar alterações';
-  cancelButton.classList.remove('hidden');
-  form.closest('.library-form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  openModal();
 }
 
 form.addEventListener('submit', async event => {
@@ -116,7 +130,7 @@ form.addEventListener('submit', async event => {
     const { error } = await query;
     if (error) throw error;
     showMessage(message, editingId ? 'Exercício atualizado com sucesso.' : 'Exercício adicionado à biblioteca.');
-    resetForm();
+    closeModal();
     await loadExercises();
   } catch (error) {
     console.error(error);
@@ -126,10 +140,16 @@ form.addEventListener('submit', async event => {
   }
 });
 
-cancelButton.addEventListener('click', resetForm);
+openModalButton.addEventListener('click', () => {
+  resetForm();
+  openModal();
+});
+cancelButton.addEventListener('click', closeModal);
 search.addEventListener('input', renderExercises);
 
 document.addEventListener('click', async event => {
+  if (event.target.closest('[data-close-library-modal]')) return closeModal();
+
   const editButton = event.target.closest('[data-edit-exercise]');
   if (editButton) return editExercise(editButton.dataset.editExercise);
 
@@ -145,7 +165,7 @@ document.addEventListener('click', async event => {
       .eq('personal_id', session.user.id)
       .eq('global', false);
     if (error) throw error;
-    if (editingId === deleteButton.dataset.deleteExercise) resetForm();
+    if (editingId === deleteButton.dataset.deleteExercise) closeModal();
     showMessage(message, 'Exercício excluído da biblioteca.');
     await loadExercises();
   } catch (error) {
@@ -154,6 +174,10 @@ document.addEventListener('click', async event => {
   } finally {
     deleteButton.disabled = false;
   }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
 });
 
 await loadExercises();
