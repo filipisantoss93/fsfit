@@ -7,6 +7,50 @@
   <title>Ficha do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/ficha-aluno.css">
+  <style>
+    .student-edit-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1300;
+      display: none;
+      background: rgba(4, 7, 10, .82);
+      backdrop-filter: blur(6px);
+      padding: 18px;
+      box-sizing: border-box;
+    }
+    .student-edit-modal.open { display: flex; align-items: center; justify-content: center; }
+    .student-edit-dialog {
+      width: min(820px, 100%);
+      height: min(92dvh, 980px);
+      background: #151a1f;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
+      position: relative;
+    }
+    .student-edit-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.16);
+      background: #232a33;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .student-edit-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
+    body.student-edit-open { overflow: hidden; }
+    @media (max-width: 640px) {
+      .student-edit-modal { padding: 0; }
+      .student-edit-dialog { width: 100%; height: 100dvh; border-radius: 0; border: 0; }
+    }
+  </style>
 </head>
 <body class="student-record-page">
   <div id="header-container"></div>
@@ -179,14 +223,58 @@
       </section>
     </div>
   </main>
+
+  <div id="student-edit-modal" class="student-edit-modal" aria-hidden="true">
+    <div class="student-edit-dialog" role="dialog" aria-modal="true" aria-label="Editar cadastro do aluno">
+      <button id="student-edit-close" class="student-edit-close" type="button" aria-label="Fechar">×</button>
+      <iframe id="student-edit-frame" class="student-edit-frame" title="Editar cadastro do aluno"></iframe>
+    </div>
+  </div>
+
   <script type="module" src="js/ficha-aluno.js"></script>
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { requireSession, showMessage } from './js/layout.js';
 
     const deleteButton = document.querySelector('#delete-student');
+    const editButton = document.querySelector('#edit-registration');
+    const editModal = document.querySelector('#student-edit-modal');
+    const editFrame = document.querySelector('#student-edit-frame');
+    const editClose = document.querySelector('#student-edit-close');
     const recordMessage = document.querySelector('#record-message');
     const alunoId = new URLSearchParams(location.search).get('id');
+
+    function openEditModal() {
+      if (!alunoId) return;
+      editFrame.src = `alunos.html?editar=${encodeURIComponent(alunoId)}&embed=1`;
+      editModal.classList.add('open');
+      editModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('student-edit-open');
+    }
+
+    function closeEditModal({ reload = false } = {}) {
+      editModal.classList.remove('open');
+      editModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('student-edit-open');
+      editFrame.src = 'about:blank';
+      if (reload) location.reload();
+    }
+
+    editButton?.addEventListener('click', event => {
+      event.preventDefault();
+      openEditModal();
+    });
+
+    editClose?.addEventListener('click', () => closeEditModal());
+    editModal?.addEventListener('click', event => {
+      if (event.target === editModal) closeEditModal();
+    });
+
+    window.addEventListener('message', event => {
+      if (event.origin !== location.origin) return;
+      if (event.data?.type === 'fsfit-close-student-modal') closeEditModal();
+      if (event.data?.type === 'fsfit-student-updated') closeEditModal({ reload: true });
+    });
 
     deleteButton?.addEventListener('click', async () => {
       const studentName = document.querySelector('#student-name')?.textContent?.trim() || 'este aluno';
