@@ -17,8 +17,10 @@ function formatTime(value) {
 
 async function openChat(sessionId) {
   openSessionId = sessionId;
+  container.dataset.openChatSession = sessionId;
   const host = container.querySelector(`[data-chat-host="${CSS.escape(sessionId)}"]`);
   if (!host) return;
+  host.classList.remove('hidden');
 
   const { data: session, error: sessionError } = await supabase
     .from('sessoes_treino')
@@ -94,12 +96,13 @@ container.addEventListener('click', event => {
   container.querySelectorAll('[data-chat-host]').forEach(item => item.classList.add('hidden'));
   if (!willOpen) {
     openSessionId = null;
+    delete container.dataset.openChatSession;
     return;
   }
-  host.classList.remove('hidden');
   openChat(sessionId).catch(console.error);
 });
 
 setInterval(() => {
-  if (openSessionId) openChat(openSessionId).catch(console.error);
+  const sessionId = container.dataset.openChatSession || openSessionId;
+  if (sessionId) openChat(sessionId).catch(console.error);
 }, 5000);
