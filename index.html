@@ -22,18 +22,6 @@
     .trial-highlight strong { display: block; color: var(--primary); font-size: 1rem; }
     .trial-highlight span { display: block; margin-top: 3px; color: var(--muted); font-size: .9rem; }
     .trial-icon { font-size: 1.5rem; line-height: 1; }
-    .auth-trial-note {
-      margin: -4px 0 18px;
-      padding: 12px 14px;
-      border: 1px solid rgba(50, 215, 75, .3);
-      border-radius: 11px;
-      background: rgba(50, 215, 75, .08);
-      color: var(--text);
-      text-align: center;
-      font-size: .9rem;
-      line-height: 1.5;
-    }
-    .auth-trial-note strong { color: var(--primary); }
     @media (max-width: 620px) {
       .trial-highlight { width: 100%; align-items: flex-start; }
     }
@@ -58,7 +46,6 @@
       <div class="card auth-card">
         <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
         <h2 id="auth-title">Acesse sua conta</h2>
-        <div id="auth-trial-note" class="auth-trial-note"><strong>Novo por aqui?</strong> Crie sua conta e ganhe 7 dias grátis.</div>
         <div id="auth-message" class="message"></div>
         <form id="auth-form">
           <div id="name-group" class="form-group hidden"><label for="full_name">Seu nome</label><input id="full_name" name="full_name" autocomplete="name"></div>
@@ -68,7 +55,7 @@
           <div id="forgot-password-wrap" style="margin:-4px 0 16px;text-align:right"><a href="recuperar-senha.html" style="color:var(--secondary);font-size:.9rem;font-weight:700">Esqueci minha senha</a></div>
           <button id="auth-submit" class="btn btn-primary" type="submit" style="width:100%">Entrar</button>
         </form>
-        <div class="auth-switch"><button id="auth-switch" type="button">Ainda não tem cadastro? Começar 7 dias grátis</button></div>
+        <div class="auth-switch"><button id="auth-switch" type="button">Ainda não tem cadastro? Criar conta</button></div>
       </div>
     </section>
   </main>
