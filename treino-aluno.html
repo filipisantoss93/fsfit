@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Treino do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/treino-aluno.css?v=20260717-batch1">
+  <link rel="stylesheet" href="css/treino-aluno.css?v=20260717-defaults1">
 </head>
 <body>
   <div id="header-container"></div>
@@ -95,10 +95,10 @@
           <div class="form-group"><label>Categoria *</label><select id="single-exercise-category"><option value="">Selecione uma categoria</option></select></div>
           <div class="form-group"><label>Exercício *</label><select name="exercicio_id" id="exercise-select"><option value="">Selecione</option></select></div>
           <div class="grid grid-2">
-            <div class="form-group"><label>Séries</label><select name="series"><option value="">Selecione</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
-            <div class="form-group"><label>Repetições</label><input name="repeticoes" inputmode="numeric" placeholder="Ex.: 12"></div>
+            <div class="form-group"><label>Séries</label><select name="series"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
+            <div class="form-group"><label>Repetições</label><select name="repeticoes">${Array.from({length:60},(_,i)=>`<option value="${i+1}"${i===11?' selected':''}>${i+1}</option>`).join('')}</select></div>
             <div class="form-group"><label>Carga</label><input name="carga" maxlength="40" placeholder="30 kg ou ajustar"></div>
-            <div class="form-group"><label>Descanso (segundos)</label><input name="descanso_segundos" type="number" min="0" max="1800" step="5" placeholder="60"></div>
+            <div class="form-group"><label>Descanso (segundos)</label><input name="descanso_segundos" type="number" min="0" max="1800" step="5" value="60" placeholder="Opcional"></div>
           </div>
           <input name="duracao_minutos" type="hidden"><input name="distancia_km" type="hidden"><input name="ordem" type="hidden" value="1">
           <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Cadência, técnica, progressão, intensidade..."></textarea></div>
@@ -119,7 +119,7 @@
     </section>
   </div>
 
-  <script type="module" src="js/treino-aluno.js?v=20260717-batch1"></script>
-  <script type="module" src="js/treino-multidias.js?v=20260717-batch1"></script>
+  <script type="module" src="js/treino-aluno.js?v=20260717-defaults1"></script>
+  <script type="module" src="js/treino-multidias.js?v=20260717-defaults1"></script>
 </body>
 </html>
