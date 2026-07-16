@@ -13,6 +13,7 @@ const searchInput = document.querySelector('#admin-user-search');
 const planFilter = document.querySelector('#admin-plan-filter');
 const exportButton = document.querySelector('#export-finance');
 
+const VALID_PLANS = ['trial', 'free', 'premium'];
 let users = [];
 let payments = [];
 
@@ -20,6 +21,13 @@ function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
   return div.innerHTML;
+}
+
+function normalizePlan(value = '') {
+  const plan = String(value || '').trim().toLowerCase();
+  if (plan === 'gratis') return 'free';
+  if (plan === 'pago' || plan === 'pro') return 'premium';
+  return VALID_PLANS.includes(plan) ? plan : 'free';
 }
 
 function formatMoney(value) {
@@ -46,8 +54,8 @@ async function requireAdmin() {
 
 function updateUserStats() {
   document.querySelector('#stat-accounts').textContent = users.length;
-  document.querySelector('#stat-subscribers').textContent = users.filter(user => ['premium', 'pago', 'pro'].includes((user.plano || '').toLowerCase()) && user.ativo !== false).length;
-  document.querySelector('#stat-trial').textContent = users.filter(user => (user.plano || '').toLowerCase() === 'trial').length;
+  document.querySelector('#stat-subscribers').textContent = users.filter(user => normalizePlan(user.plano) === 'premium' && user.ativo !== false).length;
+  document.querySelector('#stat-trial').textContent = users.filter(user => normalizePlan(user.plano) === 'trial').length;
   document.querySelector('#stat-inactive').textContent = users.filter(user => user.ativo === false).length;
 }
 
@@ -76,15 +84,17 @@ function renderUsers() {
   const plan = planFilter.value;
   const filtered = users.filter(user => {
     const haystack = `${user.nome || ''} ${user.email || ''}`.toLowerCase();
-    return (!term || haystack.includes(term)) && (!plan || (user.plano || '').toLowerCase() === plan);
+    return (!term || haystack.includes(term)) && (!plan || normalizePlan(user.plano) === plan);
   });
 
-  usersList.innerHTML = filtered.length ? filtered.map(user => `
+  usersList.innerHTML = filtered.length ? filtered.map(user => {
+    const currentPlan = normalizePlan(user.plano);
+    return `
     <tr>
       <td><div class="admin-user-meta"><strong>${esc(user.nome || 'Usuário')}</strong><small>${esc(user.email || 'E-mail não disponível')}</small></div></td>
       <td>
         <select class="admin-inline-select" data-plan-user="${esc(user.id)}">
-          ${['trial','gratis','free','premium','pago'].map(planName => `<option value="${planName}" ${user.plano === planName ? 'selected' : ''}>${planName}</option>`).join('')}
+          ${VALID_PLANS.map(planName => `<option value="${planName}" ${currentPlan === planName ? 'selected' : ''}>${planName}</option>`).join('')}
         </select>
       </td>
       <td><span class="admin-badge ${user.ativo === false ? 'inactive' : 'active'}">${user.ativo === false ? 'Inativa' : 'Ativa'}</span></td>
@@ -94,7 +104,8 @@ function renderUsers() {
         <button class="btn btn-secondary" type="button" data-toggle-user="${esc(user.id)}" data-next-active="${user.ativo === false ? 'true' : 'false'}">${user.ativo === false ? 'Ativar' : 'Desativar'}</button>
         <button class="btn btn-secondary" type="button" data-reset-password="${esc(user.id)}" ${user.email ? '' : 'disabled'}>Recuperar senha</button>
       </div></td>
-    </tr>`).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma conta encontrada.</td></tr>';
+    </tr>`;
+  }).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma conta encontrada.</td></tr>';
 }
 
 function renderPayments() {
@@ -102,7 +113,7 @@ function renderPayments() {
     <tr>
       <td>${formatDate(item.paid_at || item.created_at)}</td>
       <td>${esc(item.nome || item.email || item.user_id || '—')}</td>
-      <td>${esc(item.plano || '—')}</td>
+      <td>${esc(item.plano ? normalizePlan(item.plano) : '—')}</td>
       <td>${formatMoney(item.valor || item.amount)}</td>
       <td>${esc(item.status || '—')}</td>
     </tr>`).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma movimentação financeira registrada.</td></tr>';
@@ -111,7 +122,7 @@ function renderPayments() {
 async function loadUsers() {
   const { data, error } = await supabase.rpc('fsfit_admin_listar_usuarios');
   if (error) throw error;
-  users = data || [];
+  users = (data || []).map(user => ({ ...user, plano: normalizePlan(user.plano) }));
   updateUserStats();
   renderUsers();
 }
@@ -131,7 +142,9 @@ async function loadPayments() {
 
 async function updatePlan(userId) {
   const select = document.querySelector(`[data-plan-user="${CSS.escape(userId)}"]`);
-  const { error } = await supabase.rpc('fsfit_admin_atualizar_plano', { p_user_id: userId, p_plano: select.value });
+  const plan = normalizePlan(select.value);
+  if (!VALID_PLANS.includes(plan)) throw new Error('Plano inválido. Use Trial, Free ou Premium.');
+  const { error } = await supabase.rpc('fsfit_admin_atualizar_plano', { p_user_id: userId, p_plano: plan });
   if (error) throw error;
   showMessage(message, 'Plano atualizado com sucesso.');
   await loadUsers();
@@ -162,7 +175,7 @@ function exportFinanceCsv() {
   const rows = [['Data','Usuário','Plano','Valor','Status'], ...payments.map(item => [
     formatDate(item.paid_at || item.created_at),
     item.nome || item.email || item.user_id || '',
-    item.plano || '',
+    item.plano ? normalizePlan(item.plano) : '',
     Number(item.valor || item.amount || 0).toFixed(2).replace('.', ','),
     item.status || ''
   ])];
