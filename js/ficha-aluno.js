@@ -100,6 +100,36 @@ function isValidSocialUrl(type, url) {
   }
 }
 
+async function normalizeImageFile(file) {
+  const isHeic = ['image/heic', 'image/heif'].includes(file.type.toLowerCase()) || /\.(heic|heif)$/i.test(file.name);
+  if (!isHeic) return file;
+
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = objectUrl;
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error('Não foi possível converter esta foto HEIC/HEIF. Tente enviar a foto como JPG.'));
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Não foi possível preparar a foto para envio.');
+    context.drawImage(image, 0, 0);
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+    if (!blob) throw new Error('Não foi possível converter esta foto para JPG.');
+    const baseName = file.name.replace(/\.(heic|heif)$/i, '') || 'foto';
+    return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 function mediaPreview(item) {
   if (item.tipo === 'foto') {
     return `<div class="student-media-preview"><img src="${esc(item.url)}" alt="${esc(item.titulo || 'Foto do aluno')}" loading="lazy"></div>`;
@@ -211,20 +241,26 @@ async function loadEvolution() {
 setupTabs();
 weightForm.data_registro.value = new Date().toISOString().slice(0, 10);
 assessmentForm.data_avaliacao.value = new Date().toISOString().slice(0, 10);
+if (mediaUploadForm?.arquivo) {
+  mediaUploadForm.arquivo.accept = 'image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/webm,video/quicktime';
+}
 
 mediaUploadForm?.addEventListener('submit', async event => {
   event.preventDefault();
-  const file = mediaUploadForm.arquivo.files?.[0];
-  if (!file) return;
+  const selectedFile = mediaUploadForm.arquivo.files?.[0];
+  if (!selectedFile) return;
 
-  const allowed = ['image/jpeg','image/png','image/webp','video/mp4','video/webm','video/quicktime'];
-  if (!allowed.includes(file.type)) return showMessage(message, 'Formato de arquivo não permitido.', 'error');
-  if (file.size > 50 * 1024 * 1024) return showMessage(message, 'O arquivo deve ter no máximo 50 MB.', 'error');
+  const allowed = ['image/jpeg','image/png','image/webp','image/heic','image/heif','video/mp4','video/webm','video/quicktime'];
+  const fileType = selectedFile.type.toLowerCase();
+  const hasHeicExtension = /\.(heic|heif)$/i.test(selectedFile.name);
+  if (!allowed.includes(fileType) && !hasHeicExtension) return showMessage(message, 'Formato de arquivo não permitido.', 'error');
+  if (selectedFile.size > 50 * 1024 * 1024) return showMessage(message, 'O arquivo deve ter no máximo 50 MB.', 'error');
 
   const button = mediaUploadForm.querySelector('[type=submit]');
   button.disabled = true;
   let storagePath = null;
   try {
+    const file = await normalizeImageFile(selectedFile);
     const ext = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '') || (file.type.startsWith('image/') ? 'jpg' : 'mp4');
     storagePath = `${session.user.id}/${alunoId}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await supabase.storage.from('aluno-midias').upload(storagePath, file, { contentType: file.type, upsert: false });
