@@ -184,7 +184,29 @@
 .diet-modal-card input,
 .diet-modal-card select,
 .diet-modal-card textarea {
+  display: block;
   width: 100%;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+.diet-modal-card input[type="time"],
+.diet-modal-card input[type="date"],
+.diet-modal-card input[type="number"],
+.diet-modal-card input[type="text"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  inline-size: 100% !important;
+  min-inline-size: 0 !important;
+  max-inline-size: 100% !important;
+}
+
+.diet-modal-card .grid-2 > *,
+.diet-modal-card .grid-3 > * {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .diet-modal-close {
