@@ -19,7 +19,7 @@ function ensureHeaderStyles() {
   if (document.querySelector('link[data-fsfit-header-styles]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/header-menu.css?v=20260716-0113';
+  link.href = 'css/header-menu.css?v=20260716-0137';
   link.dataset.fsfitHeaderStyles = 'true';
   document.head.appendChild(link);
 }
@@ -126,10 +126,13 @@ export function renderHeader(active = '') {
             <section id="notification-panel" class="notification-panel" aria-label="Notificações" hidden>
               <div class="notification-panel-header">
                 <div><small>CENTRAL</small><strong>Notificações</strong></div>
-                <button id="notification-mark-all" type="button" class="notification-mark-all hidden">Marcar todas como lidas</button>
+                <div class="notification-panel-actions">
+                  <button id="notification-mark-all" type="button" class="notification-mark-all hidden">Marcar todas como lidas</button>
+                  <button id="notification-clear-all" type="button" class="notification-clear-all hidden">Limpar notificações</button>
+                </div>
               </div>
               <div id="notification-list" class="notification-list">
-                <p class="notification-empty">Nenhuma notificação nova.</p>
+                <p class="notification-empty">Nenhuma notificação.</p>
               </div>
             </section>
           </div>
@@ -170,9 +173,7 @@ export function renderHeader(active = '') {
     setNotificationsOpen(notificationPanel?.hidden ?? true);
   });
 
-  menu?.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => setMenuOpen(false));
-  });
+  menu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
 
   document.addEventListener('click', event => {
     if (!host.contains(event.target)) {
@@ -217,6 +218,7 @@ async function loadNotifications(session) {
   const badge = document.querySelector('#notification-badge');
   const list = document.querySelector('#notification-list');
   const markAll = document.querySelector('#notification-mark-all');
+  const clearAll = document.querySelector('#notification-clear-all');
   if (!badge || !list || !session?.user?.id) return;
 
   try {
@@ -235,6 +237,7 @@ async function loadNotifications(session) {
     badge.textContent = unread.length > 99 ? '99+' : String(unread.length);
     badge.classList.toggle('hidden', unread.length === 0);
     markAll?.classList.toggle('hidden', unread.length === 0);
+    clearAll?.classList.toggle('hidden', notifications.length === 0);
 
     list.innerHTML = notifications.length
       ? notifications.map(item => `
@@ -246,36 +249,62 @@ async function loadNotifications(session) {
               <small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small>
             </span>
           </${item.link ? 'a' : 'div'}>`).join('')
-      : '<p class="notification-empty">Nenhuma notificação nova.</p>';
+      : '<p class="notification-empty">Nenhuma notificação.</p>';
 
     list.querySelectorAll('[data-notification-id]').forEach(item => {
       item.addEventListener('click', async () => {
         if (!item.classList.contains('unread')) return;
-        await supabase.from('notificacoes').update({ lida: true }).eq('id', item.dataset.notificationId).eq('destinatario_id', session.user.id);
+        await supabase
+          .from('notificacoes')
+          .update({ lida: true, lida_em: new Date().toISOString() })
+          .eq('id', item.dataset.notificationId)
+          .eq('destinatario_id', session.user.id);
       });
     });
 
-    markAll?.addEventListener('click', async () => {
-      markAll.disabled = true;
-      try {
-        const { error: updateError } = await supabase
-          .from('notificacoes')
-          .update({ lida: true })
-          .eq('destinatario_id', session.user.id)
-          .eq('lida', false);
-        if (updateError) throw updateError;
-        await loadNotifications(session);
-      } catch (updateError) {
-        console.error('Não foi possível marcar as notificações como lidas:', updateError);
-      } finally {
-        markAll.disabled = false;
-      }
-    }, { once: true });
+    if (markAll) {
+      markAll.onclick = async () => {
+        markAll.disabled = true;
+        try {
+          const { error: updateError } = await supabase
+            .from('notificacoes')
+            .update({ lida: true, lida_em: new Date().toISOString() })
+            .eq('destinatario_id', session.user.id)
+            .eq('lida', false);
+          if (updateError) throw updateError;
+          await loadNotifications(session);
+        } catch (updateError) {
+          console.error('Não foi possível marcar as notificações como lidas:', updateError);
+        } finally {
+          markAll.disabled = false;
+        }
+      };
+    }
+
+    if (clearAll) {
+      clearAll.onclick = async () => {
+        if (!window.confirm('Apagar todas as suas notificações? Esta ação não pode ser desfeita.')) return;
+        clearAll.disabled = true;
+        try {
+          const { error: deleteError } = await supabase
+            .from('notificacoes')
+            .delete()
+            .eq('destinatario_id', session.user.id);
+          if (deleteError) throw deleteError;
+          await loadNotifications(session);
+        } catch (deleteError) {
+          console.error('Não foi possível limpar as notificações:', deleteError);
+        } finally {
+          clearAll.disabled = false;
+        }
+      };
+    }
   } catch (error) {
     console.info('Central de notificações ainda não disponível:', error?.message || error);
     badge.classList.add('hidden');
     if (markAll) markAll.classList.add('hidden');
-    list.innerHTML = '<p class="notification-empty">Nenhuma notificação nova.</p>';
+    if (clearAll) clearAll.classList.add('hidden');
+    list.innerHTML = '<p class="notification-empty">Nenhuma notificação.</p>';
   }
 }
 
