@@ -24,8 +24,25 @@ const dayNames = {
   7: 'Domingo'
 };
 
+const dayShortNames = {
+  1: 'Seg',
+  2: 'Ter',
+  3: 'Qua',
+  4: 'Qui',
+  5: 'Sex',
+  6: 'Sáb',
+  7: 'Dom'
+};
+
+function todayDayNumber() {
+  const day = new Date().getDay();
+  return day === 0 ? 7 : day;
+}
+
 let workoutItems = [];
 let mealItems = [];
+let selectedWorkoutDay = todayDayNumber();
+let selectedDietDay = todayDayNumber();
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -82,13 +99,23 @@ function workoutSummary(item) {
   ].filter(Boolean).join(' • ') || 'Ver detalhes';
 }
 
-function renderWorkoutAgenda(items) {
+function weekdayNav(selectedDay, type) {
+  return `<div class="student-weekday-nav" aria-label="Dias da semana">
+    ${Object.entries(dayShortNames).map(([day, label]) => `
+      <button class="student-weekday-button ${Number(day) === Number(selectedDay) ? 'active' : ''}" type="button" data-${type}-day="${day}">
+        ${label}
+      </button>`).join('')}
+  </div>`;
+}
+
+function renderWorkoutAgenda(items = workoutItems) {
   workoutItems = items || [];
-  workoutContent.innerHTML = Object.entries(dayNames).map(([day, label]) => {
-    const rows = workoutItems.filter(item => Number(item.dia_semana) === Number(day));
-    return `<section class="student-agenda-day">
+  const rows = workoutItems.filter(item => Number(item.dia_semana) === Number(selectedWorkoutDay));
+  workoutContent.innerHTML = `
+    ${weekdayNav(selectedWorkoutDay, 'workout')}
+    <section class="student-agenda-day student-agenda-day-single">
       <div class="student-agenda-day-header">
-        <strong>${label}</strong>
+        <div><small>${selectedWorkoutDay === todayDayNumber() ? 'HOJE' : 'DIA DA SEMANA'}</small><strong>${dayNames[selectedWorkoutDay]}</strong></div>
         <span>${rows.length ? `${rows.length} ${rows.length === 1 ? 'exercício' : 'exercícios'}` : 'Descanso'}</span>
       </div>
       <div class="student-agenda-list">
@@ -99,21 +126,21 @@ function renderWorkoutAgenda(items) {
             <span>${esc(workoutSummary(item))}</span>
           </span>
           <span class="student-compact-arrow">›</span>
-        </button>`).join('') : '<p class="student-agenda-empty">Nenhum treino programado.</p>'}
+        </button>`).join('') : '<p class="student-agenda-empty">Nenhum treino programado para este dia.</p>'}
       </div>
     </section>`;
-  }).join('');
 }
 
-function renderDietAgenda(items) {
+function renderDietAgenda(items = mealItems) {
   mealItems = items || [];
-  dietContent.innerHTML = Object.entries(dayNames).map(([day, label]) => {
-    const rows = mealItems
-      .filter(item => (item.dias_semana || []).map(Number).includes(Number(day)))
-      .sort((a, b) => String(a.horario || '').localeCompare(String(b.horario || '')) || Number(a.ordem || 0) - Number(b.ordem || 0));
-    return `<section class="student-agenda-day">
+  const rows = mealItems
+    .filter(item => (item.dias_semana || []).map(Number).includes(Number(selectedDietDay)))
+    .sort((a, b) => String(a.horario || '').localeCompare(String(b.horario || '')) || Number(a.ordem || 0) - Number(b.ordem || 0));
+  dietContent.innerHTML = `
+    ${weekdayNav(selectedDietDay, 'diet')}
+    <section class="student-agenda-day student-agenda-day-single">
       <div class="student-agenda-day-header">
-        <strong>${label}</strong>
+        <div><small>${selectedDietDay === todayDayNumber() ? 'HOJE' : 'DIA DA SEMANA'}</small><strong>${dayNames[selectedDietDay]}</strong></div>
         <span>${rows.length ? `${rows.length} ${rows.length === 1 ? 'refeição' : 'refeições'}` : 'Sem refeições'}</span>
       </div>
       <div class="student-agenda-list">
@@ -121,10 +148,9 @@ function renderDietAgenda(items) {
           <span class="student-compact-time">${esc(item.horario ? String(item.horario).slice(0, 5) : '—')}</span>
           <span class="student-compact-main"><strong>${esc(item.nome || 'Refeição')}</strong></span>
           <span class="student-compact-arrow">›</span>
-        </button>`).join('') : '<p class="student-agenda-empty">Nenhuma refeição programada.</p>'}
+        </button>`).join('') : '<p class="student-agenda-empty">Nenhuma refeição programada para este dia.</p>'}
       </div>
     </section>`;
-  }).join('');
 }
 
 function openWorkoutItem(id) {
@@ -218,7 +244,7 @@ async function load() {
   document.querySelector('#trainer-name').textContent = portal?.personal_nome || 'Seu personal trainer';
   document.querySelector('#student-observations').textContent = String(student.observacoes || '').trim() || 'Nenhuma observação publicada ainda.';
 
-  let updatedAt = portal?.plano_atualizado_em || workout?.updated_at || diet?.updated_at;
+  const updatedAt = portal?.plano_atualizado_em || workout?.updated_at || diet?.updated_at;
   if (updatedAt) document.querySelector('#updated-at').textContent = `Atualizado em ${new Date(updatedAt).toLocaleString('pt-BR')}`;
 
   if (workout) {
@@ -259,11 +285,23 @@ async function load() {
 }
 
 workoutContent?.addEventListener('click', event => {
+  const dayButton = event.target.closest('[data-workout-day]');
+  if (dayButton) {
+    selectedWorkoutDay = Number(dayButton.dataset.workoutDay);
+    renderWorkoutAgenda();
+    return;
+  }
   const button = event.target.closest('[data-workout-item]');
   if (button) openWorkoutItem(button.dataset.workoutItem);
 });
 
 dietContent?.addEventListener('click', event => {
+  const dayButton = event.target.closest('[data-diet-day]');
+  if (dayButton) {
+    selectedDietDay = Number(dayButton.dataset.dietDay);
+    renderDietAgenda();
+    return;
+  }
   const button = event.target.closest('[data-meal-item]');
   if (button) openMealItem(button.dataset.mealItem);
 });
