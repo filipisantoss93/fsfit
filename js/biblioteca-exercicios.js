@@ -15,13 +15,20 @@ const submitButton = document.querySelector('#library-submit');
 const cancelButton = document.querySelector('#cancel-library-edit');
 const modal = document.querySelector('#library-modal');
 const openModalButton = document.querySelector('#open-library-modal');
+const addCategoryShortcut = document.querySelector('#add-category-shortcut');
+const categoryButtons = [...document.querySelectorAll('[data-library-category]')];
 let editingId = null;
 let exercises = [];
+let activeCategory = 'Todos';
 
 function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
   return div.innerHTML;
+}
+
+function normalize(value = '') {
+  return String(value || '').trim().toLocaleLowerCase('pt-BR');
 }
 
 function resetForm() {
@@ -31,11 +38,11 @@ function resetForm() {
   submitButton.textContent = 'Adicionar exercício';
 }
 
-function openModal() {
+function openModal({ focusCategory = false } = {}) {
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('library-modal-open');
-  setTimeout(() => form.nome.focus(), 0);
+  setTimeout(() => (focusCategory ? form.grupo_muscular : form.nome).focus(), 0);
 }
 
 function closeModal() {
@@ -45,14 +52,29 @@ function closeModal() {
   resetForm();
 }
 
+function setActiveCategory(category) {
+  activeCategory = category;
+  categoryButtons.forEach(button => {
+    const isActive = button.dataset.libraryCategory === category;
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+  renderExercises();
+}
+
 function renderExercises() {
-  const term = search.value.trim().toLowerCase();
-  const filtered = exercises.filter(item => [item.nome, item.grupo_muscular, item.equipamento]
-    .filter(Boolean)
-    .some(value => String(value).toLowerCase().includes(term)));
+  const term = normalize(search.value);
+  const category = normalize(activeCategory);
+  const filtered = exercises.filter(item => {
+    const matchesSearch = !term || [item.nome, item.grupo_muscular, item.equipamento]
+      .filter(Boolean)
+      .some(value => normalize(value).includes(term));
+    const matchesCategory = activeCategory === 'Todos' || normalize(item.grupo_muscular) === category;
+    return matchesSearch && matchesCategory;
+  });
 
   if (!filtered.length) {
-    list.innerHTML = '<p class="empty">Nenhum exercício encontrado.</p>';
+    list.innerHTML = '<p class="empty">Nenhum exercício encontrado nesta categoria.</p>';
     return;
   }
 
@@ -62,9 +84,10 @@ function renderExercises() {
       <div class="exercise-library-item-content">
         <div class="exercise-library-item-title">
           <h3>${esc(item.nome)}</h3>
+          ${item.grupo_muscular ? `<span class="library-category-badge">${esc(item.grupo_muscular)}</span>` : ''}
           ${isGlobal ? '<span class="library-badge">PADRÃO FS FIT</span>' : '<span class="library-badge personal">MEU EXERCÍCIO</span>'}
         </div>
-        <p>${esc([item.grupo_muscular, item.equipamento].filter(Boolean).join(' • ') || 'Sem classificação')}</p>
+        <p>${esc(item.equipamento || 'Sem equipamento informado')}</p>
         ${item.instrucoes ? `<p class="library-instructions">${esc(item.instrucoes)}</p>` : ''}
         ${item.video_url ? `<a class="record-secondary-link" href="${esc(item.video_url)}" target="_blank" rel="noopener">Abrir vídeo →</a>` : ''}
       </div>
@@ -144,6 +167,16 @@ openModalButton.addEventListener('click', () => {
   resetForm();
   openModal();
 });
+
+addCategoryShortcut.addEventListener('click', () => {
+  resetForm();
+  openModal({ focusCategory: true });
+});
+
+categoryButtons.forEach(button => {
+  button.addEventListener('click', () => setActiveCategory(button.dataset.libraryCategory));
+});
+
 cancelButton.addEventListener('click', closeModal);
 search.addEventListener('input', renderExercises);
 
