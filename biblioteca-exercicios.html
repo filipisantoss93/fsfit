@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Biblioteca de exercícios — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-2351-editfix">
+  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-prescricao1">
 </head>
 <body>
   <div id="header-container"></div>
@@ -19,9 +19,7 @@
       </div>
       <span class="hero-badge">BIBLIOTECA</span>
     </section>
-
     <div id="library-message" class="message"></div>
-
     <section class="card library-create-card">
       <div class="library-create-heading">
         <div><small>CADASTRO</small><h2>Biblioteca de exercícios</h2><p>Adicione exercícios e organize sua biblioteca por categorias.</p></div>
@@ -31,17 +29,12 @@
         </div>
       </div>
     </section>
-
     <section id="library-exercises-section" class="card library-list-card">
       <div class="library-list-heading">
         <div><small>GESTÃO</small><h2 id="selected-category-title">Exercícios</h2></div>
         <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar nesta categoria"></div>
       </div>
-
-      <div class="library-category-nav-wrap">
-        <div id="library-category-nav" class="library-category-nav" aria-label="Categorias de exercícios"></div>
-      </div>
-
+      <div class="library-category-nav-wrap"><div id="library-category-nav" class="library-category-nav" aria-label="Categorias de exercícios"></div></div>
       <div id="active-category-actions" class="library-active-category-actions hidden"></div>
       <div id="exercise-library-list" class="exercise-library-list"><p>Carregando exercícios...</p></div>
     </section>
@@ -57,14 +50,12 @@
         <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Supino reto" required></div>
         <div class="grid grid-2">
           <div class="form-group"><label>Categoria *</label><select name="categoria_id" required><option value="">Selecione uma categoria</option></select></div>
+          <div class="form-group"><label>Tipo de prescrição *</label><select name="tipo_prescricao" required><option value="repeticoes">Repetições</option><option value="tempo">Tempo</option><option value="distancia">Distância</option></select></div>
           <div class="form-group"><label>Aparelho / equipamento</label><input name="equipamento" maxlength="120" placeholder="Banco e barra"></div>
         </div>
         <div class="form-group"><label>Instruções</label><textarea name="instrucoes" placeholder="Orientações de execução e segurança."></textarea></div>
         <div class="form-group"><label>Vídeo (YouTube ou Instagram)</label><input name="video_url" type="url" placeholder="https://youtube.com/... ou https://instagram.com/..."></div>
-        <div class="library-modal-actions">
-          <button id="library-submit" class="btn btn-primary" type="submit">Adicionar exercício</button>
-          <button id="cancel-library-edit" class="btn btn-outline" type="button">Cancelar</button>
-        </div>
+        <div class="library-modal-actions"><button id="library-submit" class="btn btn-primary" type="submit">Adicionar exercício</button><button id="cancel-library-edit" class="btn btn-outline" type="button">Cancelar</button></div>
       </form>
     </section>
   </div>
@@ -77,14 +68,10 @@
       <h2 id="category-form-title">Nova categoria</h2>
       <form id="category-form">
         <div class="form-group"><label>Nome da categoria *</label><input name="nome" maxlength="80" placeholder="Ex.: Abdômen" required></div>
-        <div class="library-modal-actions">
-          <button id="category-submit" class="btn btn-primary" type="submit">Criar categoria</button>
-          <button id="cancel-category-edit" class="btn btn-outline" type="button">Cancelar</button>
-        </div>
+        <div class="library-modal-actions"><button id="category-submit" class="btn btn-primary" type="submit">Criar categoria</button><button id="cancel-category-edit" class="btn btn-outline" type="button">Cancelar</button></div>
       </form>
     </section>
   </div>
-
-  <script type="module" src="js/biblioteca-exercicios.js?v=20260716-2351-editfix"></script>
+  <script type="module" src="js/biblioteca-exercicios.js?v=20260716-prescricao1"></script>
 </body>
 </html>
