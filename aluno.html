@@ -1,1 +1,102 @@
-<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f1115"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><title>Meu plano — FS Fit</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/aluno-midias.css"><link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-0030"></head><body class="student-page"><main class="student-shell"><header class="student-header"><div class="auth-logo"><strong>FS</strong><span>Fit</span></div><p>Portal do aluno</p></header><section id="loading-state" class="card" style="text-align:center">Carregando seu plano...</section><section id="error-state" class="card hidden" style="text-align:center"></section><div id="student-content" class="hidden"><section class="card" style="text-align:center;margin-bottom:18px"><small>ALUNO</small><h1 id="student-name"></h1><p>Orientado por <strong id="trainer-name"></strong></p><p id="updated-at" class="updated"></p><div class="actions" style="justify-content:center;margin-top:16px"><a id="personal-page-button" class="btn btn-outline hidden">Ver página do meu personal</a></div></section><section class="card" style="margin-bottom:18px"><h2>Notificações</h2><p id="notification-status">Verificando disponibilidade de notificações...</p><div class="actions"><button id="enable-notifications" class="btn btn-primary hidden" type="button">Ativar notificações</button><button id="disable-notifications" class="btn btn-outline hidden" type="button">Desativar neste aparelho</button><button id="install-app" class="btn btn-secondary hidden" type="button">Instalar FS Fit</button></div></section><section class="grid grid-2"><article class="card"><h2>🏋️ Meu treino</h2><div id="workout-content" class="plan-section"></div></article><article class="card"><h2>🥗 Orientações alimentares</h2><div id="diet-content" class="plan-section"></div></article></section><section id="student-media-section" class="card student-portal-media-section hidden"><div class="student-portal-media-heading"><div><small>CONTEÚDO DO PERSONAL</small><h2>Fotos e vídeos</h2></div></div><div id="student-media-list" class="student-portal-media-grid"></div></section><div class="actions" style="justify-content:center;margin-top:20px"><a id="whatsapp-button" class="btn btn-primary hidden" target="_blank" rel="noopener">Falar com meu personal</a></div></div></main><script type="module" src="js/aluno.js"></script><script type="module" src="js/aluno-treino-player.js?v=20260716-0030"></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Meu plano — FS Fit</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/aluno-midias.css">
+  <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-student-tabs3">
+</head>
+<body class="student-page">
+  <main class="student-shell">
+    <header class="student-header">
+      <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
+      <p>Portal do aluno</p>
+    </header>
+
+    <section id="loading-state" class="card student-state">Carregando seu plano...</section>
+    <section id="error-state" class="card student-state hidden"></section>
+
+    <div id="student-content" class="hidden">
+      <section class="student-profile-summary">
+        <small>ALUNO</small>
+        <h1 id="student-name"></h1>
+        <p>Orientado por <strong id="trainer-name"></strong></p>
+        <p id="updated-at" class="updated"></p>
+        <div class="actions" style="justify-content:center;margin-top:14px">
+          <a id="personal-page-button" class="btn btn-outline hidden">Ver página do meu personal</a>
+        </div>
+      </section>
+
+      <section class="card" style="margin-bottom:14px">
+        <h2>Notificações</h2>
+        <p id="notification-status">Verificando disponibilidade de notificações...</p>
+        <div class="actions">
+          <button id="enable-notifications" class="btn btn-primary hidden" type="button">Ativar notificações</button>
+          <button id="disable-notifications" class="btn btn-outline hidden" type="button">Desativar neste aparelho</button>
+          <button id="install-app" class="btn btn-secondary hidden" type="button">Instalar FS Fit</button>
+        </div>
+      </section>
+
+      <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
+        <button class="student-plan-tab active" type="button" data-student-tab="treino">Treino</button>
+        <button class="student-plan-tab" type="button" data-student-tab="dieta">Dieta</button>
+        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Observações</button>
+      </nav>
+
+      <section class="student-tab-panel active" data-student-panel="treino">
+        <div class="student-section-heading">
+          <div><small>AGENDA SEMANAL</small><h2>Treino</h2></div>
+          <span id="workout-plan-name"></span>
+        </div>
+        <div id="workout-content" class="student-week-agenda"></div>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="dieta">
+        <div class="student-section-heading">
+          <div><small>AGENDA SEMANAL</small><h2>Dieta</h2></div>
+          <span id="diet-plan-name"></span>
+        </div>
+        <div id="diet-content" class="student-week-agenda"></div>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="observacoes">
+        <section class="student-observation-card">
+          <small>OBSERVAÇÕES DO PERSONAL</small>
+          <p id="student-observations">Nenhuma observação publicada ainda.</p>
+        </section>
+
+        <section id="student-media-section" class="student-portal-media-section hidden">
+          <div class="student-portal-media-heading">
+            <div><small>CONTEÚDO DO PERSONAL</small><h2>Fotos e vídeos</h2></div>
+          </div>
+          <div id="student-media-list" class="student-portal-media-grid"></div>
+        </section>
+      </section>
+
+      <div class="actions" style="justify-content:center;margin-top:20px">
+        <a id="whatsapp-button" class="btn btn-primary hidden" target="_blank" rel="noopener">Falar com meu personal</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="student-detail-modal" class="student-detail-modal" aria-hidden="true">
+    <button class="student-detail-backdrop" type="button" data-close-student-detail aria-label="Fechar detalhes"></button>
+    <section class="student-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="student-detail-title">
+      <div class="student-detail-header">
+        <h2 id="student-detail-title">Detalhes</h2>
+        <button class="student-detail-close" type="button" data-close-student-detail aria-label="Fechar">×</button>
+      </div>
+      <div id="student-detail-body" class="student-detail-body"></div>
+    </section>
+  </div>
+
+  <script type="module" src="js/aluno.js?v=20260716-student-tabs3"></script>
+</body>
+</html>
