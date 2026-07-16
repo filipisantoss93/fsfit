@@ -93,6 +93,7 @@ export function renderHeader(active = '') {
           <li><a data-page="painel" href="painel.html">Início</a></li>
           <li><a data-page="alunos" href="alunos.html">Alunos</a></li>
           <li><a data-page="exercicios" href="biblioteca-exercicios.html">Exercícios</a></li>
+          <li><a data-page="alimentacao" href="biblioteca-alimentar.html">Alimentação</a></li>
           <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
           <li><a data-page="contato" href="contato.html">Contato</a></li>
           <li id="admin-support-nav" class="hidden"><a data-page="admin-suporte" href="admin-contatos.html">Suporte</a></li>
