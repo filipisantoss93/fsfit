@@ -48,9 +48,10 @@ async function loadLiveStudents() {
         ${pending ? '<span>Aguardando confirmação</span>' : `<span>${done}/${total} concluídos</span><div class="live-progress"><span style="width:${percent}%"></span></div>`}
       </div>
       <div class="actions">
-        ${pending ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>` : ''}
+        ${pending ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>` : `<button class="btn btn-secondary" type="button" data-open-session-chat="${esc(row.sessao_id)}">Abrir chat</button>`}
         <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
       </div>
+      ${pending ? '' : `<div class="live-chat-inline hidden" data-chat-host="${esc(row.sessao_id)}"></div>`}
     </article>`;
   }).join('') : '<p class="empty">Nenhum aluno aguardando confirmação ou em aula neste momento.</p>';
 
