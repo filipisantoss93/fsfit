@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Biblioteca de exercícios — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/biblioteca-exercicios.css">
+  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260715-2330">
 </head>
 <body>
   <div id="header-container"></div>
@@ -22,23 +22,11 @@
 
     <div id="library-message" class="message"></div>
 
-    <section class="card library-form-card">
-      <div class="section-heading">
-        <div><small>CADASTRO</small><h2 id="library-form-title">Novo exercício</h2></div>
+    <section class="card library-create-card">
+      <div class="library-create-heading">
+        <div><small>CADASTRO</small><h2>Novo exercício</h2><p>Adicione exercícios personalizados à sua biblioteca.</p></div>
+        <button id="open-library-modal" class="btn btn-primary" type="button">+ Novo exercício</button>
       </div>
-      <form id="exercise-library-form">
-        <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Supino reto" required></div>
-        <div class="grid grid-2">
-          <div class="form-group"><label>Grupo muscular</label><input name="grupo_muscular" maxlength="80" placeholder="Peitoral"></div>
-          <div class="form-group"><label>Aparelho / equipamento</label><input name="equipamento" maxlength="120" placeholder="Banco e barra"></div>
-        </div>
-        <div class="form-group"><label>Instruções</label><textarea name="instrucoes" placeholder="Orientações de execução e segurança."></textarea></div>
-        <div class="form-group"><label>Vídeo (URL)</label><input name="video_url" type="url" placeholder="https://..."></div>
-        <div class="actions">
-          <button id="library-submit" class="btn btn-primary" type="submit">Adicionar exercício</button>
-          <button id="cancel-library-edit" class="btn btn-outline hidden" type="button">Cancelar edição</button>
-        </div>
-      </form>
     </section>
 
     <section class="card library-list-card">
@@ -49,6 +37,29 @@
       <div id="exercise-library-list" class="exercise-library-list"><p>Carregando...</p></div>
     </section>
   </main>
-  <script type="module" src="js/biblioteca-exercicios.js"></script>
+
+  <div id="library-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-backdrop" data-close-library-modal></div>
+    <section class="library-modal-card" role="dialog" aria-modal="true" aria-labelledby="library-form-title">
+      <button class="library-modal-close" type="button" data-close-library-modal aria-label="Fechar">×</button>
+      <div class="library-modal-kicker">EXERCÍCIO</div>
+      <h2 id="library-form-title">Novo exercício</h2>
+      <form id="exercise-library-form">
+        <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" placeholder="Ex.: Supino reto" required></div>
+        <div class="grid grid-2">
+          <div class="form-group"><label>Grupo muscular</label><input name="grupo_muscular" maxlength="80" placeholder="Peitoral"></div>
+          <div class="form-group"><label>Aparelho / equipamento</label><input name="equipamento" maxlength="120" placeholder="Banco e barra"></div>
+        </div>
+        <div class="form-group"><label>Instruções</label><textarea name="instrucoes" placeholder="Orientações de execução e segurança."></textarea></div>
+        <div class="form-group"><label>Vídeo (URL)</label><input name="video_url" type="url" placeholder="https://..."></div>
+        <div class="library-modal-actions">
+          <button id="library-submit" class="btn btn-primary" type="submit">Adicionar exercício</button>
+          <button id="cancel-library-edit" class="btn btn-outline" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="js/biblioteca-exercicios.js?v=20260715-2330"></script>
 </body>
 </html>
