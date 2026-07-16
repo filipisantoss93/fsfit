@@ -1,1 +1,90 @@
-<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f1115"><title>Prévia do portal — FS Fit</title><link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/aluno-midias.css"><link rel="stylesheet" href="css/aluno-treino-player.css?v=20260717-preview1"></head><body class="student-page"><main class="student-shell"><header class="student-header"><div class="auth-logo"><strong>FS</strong><span>Fit</span></div><p>Pré-visualização do portal do aluno</p></header><section class="card" style="margin-bottom:18px;border-color:rgba(50,215,75,.45)"><strong style="display:block;margin-bottom:6px;color:var(--primary)">MODO DE PRÉ-VISUALIZAÇÃO</strong><p style="margin:0;color:var(--muted)">Você está vendo o portal como personal trainer. Nenhuma autenticação do aluno é necessária nesta tela.</p><div class="actions" style="margin-top:14px"><button class="btn btn-outline" type="button" onclick="window.close()">Fechar prévia</button></div></section><section id="loading-state" class="card" style="text-align:center">Carregando portal do aluno...</section><section id="error-state" class="card hidden" style="text-align:center"></section><div id="student-content" class="hidden"><section class="card" style="text-align:center;margin-bottom:18px"><small>ALUNO</small><h1 id="student-name"></h1><p>Orientado por <strong id="trainer-name"></strong></p><p id="updated-at" class="updated"></p></section><section class="grid grid-2"><article class="card"><h2>🏋️ Meu treino</h2><div id="workout-content" class="plan-section"></div></article><article class="card"><h2>🥗 Orientações alimentares</h2><div id="diet-content" class="plan-section"></div></article></section><section id="student-media-section" class="card student-portal-media-section hidden"><div class="student-portal-media-heading"><div><small>CONTEÚDO DO PERSONAL</small><h2>Fotos e vídeos</h2></div></div><div id="student-media-list" class="student-portal-media-grid"></div></section></div></main><script type="module" src="js/aluno-preview.js?v=20260717-preview1"></script><script type="module" src="js/aluno-treino-player.js?v=20260717-preview1"></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Prévia do portal — FS Fit</title>
+  <link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/aluno-midias.css">
+  <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-student-tabs1">
+</head>
+<body class="student-page">
+  <main class="student-shell">
+    <header class="student-header">
+      <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
+      <p>Pré-visualização do portal do aluno</p>
+    </header>
+
+    <section class="student-preview-banner">
+      <div>
+        <strong>MODO DE PRÉ-VISUALIZAÇÃO</strong>
+        <span>Visualização do aluno em tempo real.</span>
+      </div>
+      <button class="btn btn-outline" type="button" onclick="window.close()">Fechar</button>
+    </section>
+
+    <section id="loading-state" class="card student-state">Carregando portal do aluno...</section>
+    <section id="error-state" class="card student-state hidden"></section>
+
+    <div id="student-content" class="hidden">
+      <section class="student-profile-summary">
+        <small>ALUNO</small>
+        <h1 id="student-name"></h1>
+        <p>Orientado por <strong id="trainer-name"></strong></p>
+        <p id="updated-at" class="updated"></p>
+      </section>
+
+      <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
+        <button class="student-plan-tab active" type="button" data-student-tab="treino">Treino</button>
+        <button class="student-plan-tab" type="button" data-student-tab="dieta">Dieta</button>
+        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Observações</button>
+      </nav>
+
+      <section class="student-tab-panel active" data-student-panel="treino">
+        <div class="student-section-heading">
+          <div><small>AGENDA SEMANAL</small><h2>Treino</h2></div>
+          <span id="workout-plan-name"></span>
+        </div>
+        <div id="workout-content" class="student-week-agenda"></div>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="dieta">
+        <div class="student-section-heading">
+          <div><small>AGENDA SEMANAL</small><h2>Dieta</h2></div>
+          <span id="diet-plan-name"></span>
+        </div>
+        <div id="diet-content" class="student-week-agenda"></div>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="observacoes">
+        <section class="student-observation-card">
+          <small>OBSERVAÇÕES DO PERSONAL</small>
+          <p id="student-observations">Nenhuma observação publicada ainda.</p>
+        </section>
+
+        <section id="student-media-section" class="student-portal-media-section hidden">
+          <div class="student-portal-media-heading">
+            <div><small>CONTEÚDO DO PERSONAL</small><h2>Fotos e vídeos</h2></div>
+          </div>
+          <div id="student-media-list" class="student-portal-media-grid"></div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div id="student-detail-modal" class="student-detail-modal" aria-hidden="true">
+    <button class="student-detail-backdrop" type="button" data-close-student-detail aria-label="Fechar detalhes"></button>
+    <section class="student-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="student-detail-title">
+      <div class="student-detail-header">
+        <h2 id="student-detail-title">Detalhes</h2>
+        <button class="student-detail-close" type="button" data-close-student-detail aria-label="Fechar">×</button>
+      </div>
+      <div id="student-detail-body" class="student-detail-body"></div>
+    </section>
+  </div>
+
+  <script type="module" src="js/aluno-preview.js?v=20260716-student-tabs1"></script>
+</body>
+</html>
