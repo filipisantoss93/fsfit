@@ -9,6 +9,12 @@ if (session) {
 
   const access = session.fsfitAccess;
   const freeMode = !access?.acesso_premium;
+  const card = document.querySelector('#public-link-card');
+  const linkText = document.querySelector('#dashboard-public-link');
+  const description = document.querySelector('#public-link-description');
+  const openLink = document.querySelector('#open-dashboard-public-link');
+  const copyButton = document.querySelector('#copy-dashboard-public-link');
+  const configureLink = document.querySelector('#configure-dashboard-public-link');
 
   const { data: publicProfile, error: publicProfileError } = await supabase
     .from('perfis_publicos')
@@ -18,12 +24,6 @@ if (session) {
 
   if (!publicProfileError && publicProfile?.slug) {
     const url = `${window.location.origin}/p/${encodeURIComponent(publicProfile.slug)}`;
-    const card = document.querySelector('#public-link-card');
-    const linkText = document.querySelector('#dashboard-public-link');
-    const openLink = document.querySelector('#open-dashboard-public-link');
-    const copyButton = document.querySelector('#copy-dashboard-public-link');
-
-    card.style.display = 'block';
     linkText.textContent = url;
     linkText.title = url;
     openLink.href = url;
@@ -39,6 +39,13 @@ if (session) {
         setTimeout(() => { copyButton.textContent = originalText; }, 2200);
       }
     });
+  } else {
+    card.classList.add('public-link-unconfigured');
+    description.textContent = 'Configure sua página profissional para ter um link único e compartilhar com seus alunos.';
+    linkText.textContent = 'Sua página pública ainda não está configurada.';
+    copyButton.classList.add('hidden');
+    openLink.classList.add('hidden');
+    configureLink.classList.remove('hidden');
   }
 
   if (freeMode) {
