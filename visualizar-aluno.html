@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <title>Visualizar como aluno — FS Fit</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/aluno-midias.css">
+  <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-student-tabs3">
+  <link rel="stylesheet" href="css/aulas.css?v=20260716-live1">
+  <style>
+    .personal-preview-banner {
+      width: min(760px, calc(100% - 28px));
+      margin: 14px auto 0;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      text-align: center;
+    }
+    .personal-preview-banner strong { display: block; margin-bottom: 3px; }
+    .personal-preview-banner span { opacity: .78; font-size: .92rem; }
+    .personal-preview-back { margin-top: 10px; display: inline-flex; }
+  </style>
+</head>
+<body class="student-page">
+  <main class="student-shell">
+    <header class="student-header">
+      <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
+      <p>Portal do aluno</p>
+    </header>
+
+    <section class="personal-preview-banner">
+      <strong>Pré-visualização do personal</strong>
+      <span>Esta é a visão atual que o aluno recebe no portal.</span><br>
+      <a id="back-to-record" class="btn btn-outline personal-preview-back" href="alunos.html">Voltar para a ficha</a>
+    </section>
+
+    <section id="loading-state" class="card student-state">Carregando visão do aluno...</section>
+    <section id="error-state" class="card student-state hidden"></section>
+
+    <div id="student-content" class="hidden">
+      <section class="student-profile-summary">
+        <small>ALUNO</small>
+        <h1 id="student-name"></h1>
+        <p>Orientado por <strong id="trainer-name"></strong></p>
+        <p id="updated-at" class="updated"></p>
+        <div class="actions" style="justify-content:center;margin-top:14px">
+          <a id="personal-page-button" class="btn btn-outline hidden" target="_blank" rel="noopener">Ver página do meu personal</a>
+        </div>
+      </section>
+
+      <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
+        <button class="student-plan-tab active" type="button" data-student-tab="treino">Treino</button>
+        <button class="student-plan-tab" type="button" data-student-tab="dieta">Dieta</button>
+        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Observações</button>
+      </nav>
+
+      <section class="student-tab-panel active" data-student-panel="treino">
+        <div class="student-section-heading">
+          <div><small>AGENDA SEMANAL</small><h2>Treino</h2></div>
+          <span id="workout-plan-name"></span>
+        </div>
+        <div id="workout-content" class="student-week-agenda"></div>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="dieta">
+        <div class="student-section-heading">
+          <div><small>AGENDA SEMANAL</small><h2>Dieta</h2></div>
+          <span id="diet-plan-name"></span>
+        </div>
+        <div id="diet-content" class="student-week-agenda"></div>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="observacoes">
+        <section class="student-observation-card">
+          <small>OBSERVAÇÕES DO PERSONAL</small>
+          <p id="student-observations">Nenhuma observação publicada ainda.</p>
+        </section>
+
+        <section id="student-media-section" class="student-portal-media-section hidden">
+          <div class="student-portal-media-heading">
+            <div><small>CONTEÚDO DO PERSONAL</small><h2>Fotos e vídeos</h2></div>
+          </div>
+          <div id="student-media-list" class="student-portal-media-grid"></div>
+        </section>
+      </section>
+
+      <div class="actions" style="justify-content:center;margin-top:20px">
+        <a id="whatsapp-button" class="btn btn-primary hidden" target="_blank" rel="noopener">Falar com meu personal</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="student-detail-modal" class="student-detail-modal" aria-hidden="true">
+    <button class="student-detail-backdrop" type="button" data-close-student-detail aria-label="Fechar detalhes"></button>
+    <section class="student-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="student-detail-title">
+      <div class="student-detail-header">
+        <h2 id="student-detail-title">Detalhes</h2>
+        <button class="student-detail-close" type="button" data-close-student-detail aria-label="Fechar">×</button>
+      </div>
+      <div id="student-detail-body" class="student-detail-body"></div>
+    </section>
+  </div>
+
+  <script type="module" src="js/visualizar-aluno.js?v=20260716-preview1"></script>
+</body>
+</html>
