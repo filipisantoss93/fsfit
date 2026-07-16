@@ -37,6 +37,13 @@ function removeBox() {
   chatBox = null;
 }
 
+async function notifyPersonal() {
+  const { error } = await supabase.functions.invoke('chat-push', {
+    body: { action: 'notify_from_aluno', token: sessionToken }
+  });
+  if (error) console.error('Falha ao notificar personal:', error);
+}
+
 async function loadChat() {
   const data = await rpc('get_aluno_chat_sessao', { p_access_token: accessToken });
   const state = Array.isArray(data) ? data[0] : data;
@@ -71,6 +78,7 @@ async function sendMessage(event) {
   button.disabled = true;
   try {
     await rpc('enviar_aluno_mensagem_sessao', { p_access_token: accessToken, p_mensagem: message });
+    await notifyPersonal();
     form.reset();
     await loadChat();
   } catch (error) {
