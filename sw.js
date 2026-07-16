@@ -1,15 +1,17 @@
-const CACHE_NAME = 'fsfit-shell-v1';
+const CACHE_NAME = 'fsfit-shell-v2';
 const APP_SHELL = [
   '/',
   '/acesso-aluno.html',
   '/aluno.html',
   '/css/style.css',
+  '/css/aluno-midias.css',
   '/js/supabase.js',
   '/js/acesso-aluno.js',
   '/js/aluno.js',
   '/manifest.webmanifest',
   '/assets/fsfit-icon.svg'
 ];
+const APP_SHELL_PATHS = new Set(APP_SHELL.map(path => new URL(path, self.location.origin).pathname));
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).catch(() => undefined));
@@ -24,7 +26,14 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // O service worker pertence ao portal/PWA do aluno. Não armazenar páginas e scripts
+  // administrativos do personal, evitando servir versões antigas da biblioteca e painel.
+  if (!APP_SHELL_PATHS.has(url.pathname)) return;
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
