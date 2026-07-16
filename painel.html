@@ -22,7 +22,8 @@
     .today-list { display:grid; }
     .today-entry { display:grid; grid-template-columns:62px minmax(0,1fr) auto; gap:14px; align-items:center; padding:15px 22px; border-bottom:1px solid var(--border); transition:.2s ease; }
     .today-entry:last-child { border-bottom:0; }
-    .today-entry:hover { background:var(--surface-light); }
+    a.today-entry:hover { background:var(--surface-light); }
+    .today-entry.locked { cursor:not-allowed; opacity:.62; }
     .today-time { color:var(--primary); font-size:1.05rem; font-weight:900; }
     .today-entry-main { min-width:0; }
     .today-entry-main strong, .today-entry-main span, .today-entry-main small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -40,6 +41,7 @@
     .attention-number.warning { color:var(--warning); }
     .attention-number.primary { color:var(--primary); }
     .dashboard-empty { padding:28px 22px; color:var(--muted); text-align:center; }
+    .premium-locked { opacity:.5 !important; cursor:not-allowed !important; pointer-events:none !important; }
     @media (max-width:860px) { .dashboard-main-grid { grid-template-columns:1fr; } }
     @media (max-width:620px) {
       .dashboard-main-grid { gap:14px; margin-bottom:16px; }
@@ -60,7 +62,7 @@
         <h1>Painel de Controle</h1>
         <p>O que importa para sua consultoria hoje.</p>
       </div>
-      <a id="new-student-button" class="btn btn-primary" href="alunos.html?novo=1">+ Novo aluno</a>
+      <a id="new-student-button" class="btn btn-primary" href="alunos.html?novo=1" data-premium-link>+ Novo aluno</a>
     </section>
 
     <section class="stats dashboard-stats">
@@ -87,11 +89,11 @@
           <h2>Atenção</h2>
           <p>Pontos que merecem uma ação rápida.</p>
           <div class="attention-list">
-            <a class="attention-item" href="alunos.html">
+            <a class="attention-item" href="alunos.html" data-premium-link>
               <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
               <span id="attention-no-workout" class="attention-number warning">—</span>
             </a>
-            <a class="attention-item" href="agenda.html">
+            <a class="attention-item" href="agenda.html" data-premium-link>
               <div><strong>Atendimentos de hoje</strong><small>Abrir agenda completa</small></div>
               <span id="attention-today" class="attention-number primary">—</span>
             </a>
@@ -119,19 +121,19 @@
     <section class="quick-actions">
       <h2>Atalhos rápidos</h2>
       <div class="quick-actions-grid">
-        <a class="card quick-action" href="alunos.html"><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
-        <a class="card quick-action" href="agenda.html"><strong>📅 Agenda</strong><small>Consultar os treinos do dia</small></a>
-        <a class="card quick-action" href="exercicios.html"><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
+        <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
+        <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda</strong><small>Consultar os treinos do dia</small></a>
+        <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
         <a class="card quick-action" href="perfil.html"><strong>👤 Meu perfil</strong><small>Editar sua página pública</small></a>
       </div>
     </section>
 
     <section class="card">
-      <div class="page-header" style="color:inherit;margin-top:0"><div><h2>Alunos recentes</h2></div><a id="view-all-students" class="btn btn-secondary" href="alunos.html">Ver todos</a></div>
+      <div class="page-header" style="color:inherit;margin-top:0"><div><h2>Alunos recentes</h2></div><a id="view-all-students" class="btn btn-secondary" href="alunos.html" data-premium-link>Ver todos</a></div>
       <div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Cadastro</th><th>Ação</th></tr></thead><tbody id="recent-list"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
     </section>
   </main>
-  <script type="module" src="js/painel.js?v=20260716-dashboard2"></script>
+  <script type="module" src="js/painel.js?v=20260716-dashboard3"></script>
   <script type="module" src="js/aulas-painel.js?v=20260716-live2"></script>
   <script type="module" src="js/chat-aula-painel.js?v=20260716-live3"></script>
   <script type="module" src="js/push-personal.js?v=20260716-live3"></script>
