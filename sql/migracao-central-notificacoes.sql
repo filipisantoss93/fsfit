@@ -41,6 +41,13 @@ create policy "usuario atualiza proprias notificacoes"
   using (auth.uid() = destinatario_id)
   with check (auth.uid() = destinatario_id);
 
+drop policy if exists "usuario apaga proprias notificacoes" on public.notificacoes;
+create policy "usuario apaga proprias notificacoes"
+  on public.notificacoes
+  for delete
+  to authenticated
+  using (auth.uid() = destinatario_id);
+
 -- A criação de notificações deve ocorrer por funções security definer específicas
 -- de cada fluxo (personal -> aluno, aluno -> personal, suporte -> admin), evitando
 -- inserts diretos e impedindo falsificação de remetente pelo cliente.
