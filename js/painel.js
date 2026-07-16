@@ -10,6 +10,37 @@ if (session) {
   const access = session.fsfitAccess;
   const freeMode = !access?.acesso_premium;
 
+  const { data: publicProfile, error: publicProfileError } = await supabase
+    .from('perfis_publicos')
+    .select('slug')
+    .eq('personal_id', session.user.id)
+    .maybeSingle();
+
+  if (!publicProfileError && publicProfile?.slug) {
+    const url = `${window.location.origin}/p/${encodeURIComponent(publicProfile.slug)}`;
+    const card = document.querySelector('#public-link-card');
+    const linkText = document.querySelector('#dashboard-public-link');
+    const openLink = document.querySelector('#open-dashboard-public-link');
+    const copyButton = document.querySelector('#copy-dashboard-public-link');
+
+    card.style.display = 'block';
+    linkText.textContent = url;
+    linkText.title = url;
+    openLink.href = url;
+
+    copyButton.addEventListener('click', async () => {
+      const originalText = copyButton.textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+        copyButton.textContent = 'Link copiado!';
+        setTimeout(() => { copyButton.textContent = originalText; }, 1800);
+      } catch {
+        copyButton.textContent = 'Não foi possível copiar';
+        setTimeout(() => { copyButton.textContent = originalText; }, 2200);
+      }
+    });
+  }
+
   if (freeMode) {
     const notice = document.querySelector('#access-notice');
     if (notice) {
