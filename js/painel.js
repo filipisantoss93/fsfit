@@ -68,20 +68,144 @@ if (session) {
     });
   }
 
-  const { data: alunos, error } = await supabase.from('alunos').select('id,nome,created_at').order('created_at', { ascending: false });
-  if (!error) {
-    document.querySelector('#total-alunos').textContent = alunos?.length || 0;
-    document.querySelector('#novos-alunos').textContent = (alunos || []).filter(a => Date.now() - new Date(a.created_at).getTime() <= 30 * 86400000).length;
-    document.querySelector('#ultimo-aluno').textContent = alunos?.[0]?.nome || 'Nenhum';
-    const list = document.querySelector('#recent-list');
-    list.innerHTML = alunos?.length
-      ? alunos.slice(0, 5).map(a => `<tr><td>${escapeHtml(a.nome)}</td><td>${new Date(a.created_at).toLocaleDateString('pt-BR')}</td><td>${freeMode ? '<span style="color:var(--muted);font-weight:700">Bloqueado</span>' : `<a class="btn btn-outline" href="alunos.html?editar=${a.id}">Abrir</a>`}</td></tr>`).join('')
-      : '<tr><td colspan="3" class="empty">Nenhum aluno cadastrado.</td></tr>';
+  await loadDashboardData(freeMode);
+}
+
+async function loadDashboardData(freeMode) {
+  const [studentsResult, workoutsResult] = await Promise.all([
+    supabase
+      .from('alunos')
+      .select('id,nome,created_at')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('treinos')
+      .select('id,nome,dias_semana,status,aluno_id,alunos!inner(id,nome,periodo_aula,horario_aula,local_aula)')
+      .eq('personal_id', session.user.id)
+      .eq('status', 'ativo')
+      .order('updated_at', { ascending: false })
+  ]);
+
+  const alunos = studentsResult.data || [];
+  const treinos = workoutsResult.data || [];
+
+  if (studentsResult.error) console.error('Erro ao carregar alunos do painel:', studentsResult.error);
+  if (workoutsResult.error) console.error('Erro ao carregar treinos do painel:', workoutsResult.error);
+
+  renderStudents(alunos, treinos, freeMode);
+  renderTodayAgenda(treinos, freeMode);
+}
+
+function renderStudents(alunos, treinos, freeMode) {
+  const activeStudentIds = new Set(
+    treinos
+      .map(treino => treino.aluno_id || treino.alunos?.id)
+      .filter(Boolean)
+  );
+  const noWorkoutCount = alunos.filter(aluno => !activeStudentIds.has(aluno.id)).length;
+
+  setText('#total-alunos', alunos.length);
+  setText('#sem-treino', noWorkoutCount);
+  setText('#attention-no-workout', noWorkoutCount);
+
+  const list = document.querySelector('#recent-list');
+  if (!list) return;
+
+  list.innerHTML = alunos.length
+    ? alunos.slice(0, 5).map(aluno => `
+        <tr>
+          <td>${escapeHtml(aluno.nome)}</td>
+          <td>${new Date(aluno.created_at).toLocaleDateString('pt-BR')}</td>
+          <td>${freeMode
+            ? '<span style="color:var(--muted);font-weight:700">Bloqueado</span>'
+            : `<a class="btn btn-outline" href="alunos.html?editar=${encodeURIComponent(aluno.id)}">Abrir</a>`}
+          </td>
+        </tr>`).join('')
+    : '<tr><td colspan="3" class="empty">Nenhum aluno cadastrado.</td></tr>';
+}
+
+function renderTodayAgenda(treinos, freeMode) {
+  const today = new Date();
+  const todayDay = today.getDay();
+  const entries = [];
+  const seen = new Set();
+
+  treinos.forEach(treino => {
+    const student = treino.alunos;
+    if (!student?.id || !Array.isArray(treino.dias_semana)) return;
+    if (!treino.dias_semana.map(Number).includes(todayDay)) return;
+    if (seen.has(student.id)) return;
+    seen.add(student.id);
+
+    entries.push({
+      id: student.id,
+      nome: student.nome,
+      horario: student.horario_aula,
+      periodo: student.periodo_aula,
+      local: student.local_aula,
+      treino: treino.nome
+    });
+  });
+
+  entries.sort((a, b) => {
+    if (!a.horario && !b.horario) return String(a.nome).localeCompare(String(b.nome), 'pt-BR');
+    if (!a.horario) return 1;
+    if (!b.horario) return -1;
+    return String(a.horario).localeCompare(String(b.horario));
+  });
+
+  setText('#alunos-hoje', entries.length);
+  setText('#attention-today', entries.length);
+  setText('#today-count', entries.length);
+
+  const dateLabel = new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long'
+  }).format(today);
+  setText('#today-date', capitalize(dateLabel));
+
+  const list = document.querySelector('#today-list');
+  if (!list) return;
+
+  if (!entries.length) {
+    list.innerHTML = '<p class="dashboard-empty">Nenhum aluno programado para hoje. Sua agenda está livre.</p>';
+    return;
   }
+
+  list.innerHTML = entries.map(entry => {
+    const href = freeMode ? 'agenda.html' : `ficha-aluno.html?id=${encodeURIComponent(entry.id)}`;
+    const time = entry.horario ? String(entry.horario).slice(0, 5) : '—';
+    const period = periodLabel(entry.periodo);
+    const details = [period, entry.local || 'Local não informado'].filter(Boolean).join(' · ');
+
+    return `
+      <a class="today-entry" href="${href}">
+        <div class="today-time">${escapeHtml(time)}</div>
+        <div class="today-entry-main">
+          <strong>${escapeHtml(entry.nome)}</strong>
+          <span>${escapeHtml(entry.treino || 'Treino ativo')}</span>
+          <small>${escapeHtml(details)}</small>
+        </div>
+        <span class="today-open">${freeMode ? 'Ver agenda →' : 'Abrir ficha →'}</span>
+      </a>`;
+  }).join('');
+}
+
+function periodLabel(value) {
+  return ({ manha: 'Manhã', tarde: 'Tarde', noite: 'Noite' })[value] || 'Período não informado';
+}
+
+function capitalize(value = '') {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+}
+
+function setText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value;
 }
 
 function escapeHtml(value = '') {
   const div = document.createElement('div');
-  div.textContent = value;
+  div.textContent = value ?? '';
   return div.innerHTML;
 }
