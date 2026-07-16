@@ -15,6 +15,13 @@ function formatTime(value) {
   return new Date(value).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
+async function notifyAluno(sessionId) {
+  const { error } = await supabase.functions.invoke('chat-push', {
+    body: { action: 'notify_from_personal', session_id: sessionId }
+  });
+  if (error) console.error('Falha ao notificar aluno:', error);
+}
+
 async function openChat(sessionId) {
   openSessionId = sessionId;
   container.dataset.openChatSession = sessionId;
@@ -77,6 +84,7 @@ async function sendMessage(event) {
       mensagem: message
     });
     if (error) throw error;
+    await notifyAluno(sessionId);
     form.reset();
     await openChat(sessionId);
   } catch (error) {
