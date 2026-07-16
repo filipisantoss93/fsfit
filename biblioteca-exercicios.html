@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Biblioteca de exercícios — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-prescricao1">
+  <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-clean1">
 </head>
 <body>
   <div id="header-container"></div>
@@ -15,24 +15,17 @@
       <div>
         <a class="btn btn-outline" href="alunos.html">← Voltar</a>
         <h1>Biblioteca de exercícios</h1>
-        <p>Escolha uma categoria para visualizar os exercícios ou crie suas próprias categorias.</p>
+        <p>Selecione uma categoria e gerencie os exercícios disponíveis.</p>
       </div>
-      <span class="hero-badge">BIBLIOTECA</span>
+      <div class="actions">
+        <button id="open-category-modal" class="btn btn-outline" type="button">+ Nova categoria</button>
+        <button id="open-library-modal" class="btn btn-primary" type="button">+ Novo exercício</button>
+      </div>
     </section>
     <div id="library-message" class="message"></div>
-    <section class="card library-create-card">
-      <div class="library-create-heading">
-        <div><small>CADASTRO</small><h2>Biblioteca de exercícios</h2><p>Adicione exercícios e organize sua biblioteca por categorias.</p></div>
-        <div class="actions">
-          <button id="open-category-modal" class="btn btn-outline" type="button">+ Nova categoria</button>
-          <button id="open-library-modal" class="btn btn-primary" type="button">+ Novo exercício</button>
-        </div>
-      </div>
-    </section>
     <section id="library-exercises-section" class="card library-list-card">
       <div class="library-list-heading">
-        <div><small>GESTÃO</small><h2 id="selected-category-title">Exercícios</h2></div>
-        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar nesta categoria"></div>
+        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar nesta categoria" aria-label="Buscar exercício nesta categoria"></div>
       </div>
       <div class="library-category-nav-wrap"><div id="library-category-nav" class="library-category-nav" aria-label="Categorias de exercícios"></div></div>
       <div id="active-category-actions" class="library-active-category-actions hidden"></div>
@@ -72,6 +65,6 @@
       </form>
     </section>
   </div>
-  <script type="module" src="js/biblioteca-exercicios.js?v=20260716-prescricao1"></script>
+  <script type="module" src="js/biblioteca-exercicios.js?v=20260716-clean1"></script>
 </body>
 </html>
