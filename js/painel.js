@@ -56,15 +56,11 @@ if (session) {
       notice.textContent = 'Seu período gratuito de 7 dias terminou e sua conta voltou para o plano Free. As áreas de gestão de alunos, exercícios e agenda ficam bloqueadas até a ativação de um plano pago.';
     }
 
-    const newStudentButton = document.querySelector('#new-student-button');
-    const viewAllStudents = document.querySelector('#view-all-students');
-
-    [newStudentButton, viewAllStudents].forEach(link => {
-      if (!link) return;
+    document.querySelectorAll('[data-premium-link]').forEach(link => {
       link.removeAttribute('href');
       link.setAttribute('aria-disabled', 'true');
-      link.style.opacity = '.5';
-      link.style.pointerEvents = 'none';
+      link.setAttribute('title', 'Disponível em um plano pago');
+      link.classList.add('premium-locked');
     });
   }
 
@@ -173,21 +169,21 @@ function renderTodayAgenda(treinos, freeMode) {
   }
 
   list.innerHTML = entries.map(entry => {
-    const href = freeMode ? 'agenda.html' : `ficha-aluno.html?id=${encodeURIComponent(entry.id)}`;
     const time = entry.horario ? String(entry.horario).slice(0, 5) : '—';
     const period = periodLabel(entry.periodo);
     const details = [period, entry.local || 'Local não informado'].filter(Boolean).join(' · ');
-
-    return `
-      <a class="today-entry" href="${href}">
+    const content = `
         <div class="today-time">${escapeHtml(time)}</div>
         <div class="today-entry-main">
           <strong>${escapeHtml(entry.nome)}</strong>
           <span>${escapeHtml(entry.treino || 'Treino ativo')}</span>
           <small>${escapeHtml(details)}</small>
         </div>
-        <span class="today-open">${freeMode ? 'Ver agenda →' : 'Abrir ficha →'}</span>
-      </a>`;
+        <span class="today-open">${freeMode ? 'Bloqueado' : 'Abrir ficha →'}</span>`;
+
+    return freeMode
+      ? `<div class="today-entry locked" aria-disabled="true" title="Disponível em um plano pago">${content}</div>`
+      : `<a class="today-entry" href="ficha-aluno.html?id=${encodeURIComponent(entry.id)}">${content}</a>`;
   }).join('');
 }
 
