@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0f1115">
-  <title>Agenda semanal — FS Fit</title>
+  <title>Agenda — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/agenda.css">
 </head>
@@ -13,10 +13,20 @@
   <main class="container agenda-page">
     <section class="page-header agenda-header">
       <div>
-        <h1>Agenda semanal</h1>
-        <p>Visualize a rotina recorrente de aulas dos seus alunos em uma única página.</p>
+        <h1>Agenda</h1>
+        <p>Consulte os alunos programados para cada dia sem sobrecarregar a visualização.</p>
       </div>
       <a class="btn btn-secondary" href="alunos.html">Gerenciar alunos</a>
+    </section>
+
+    <section class="card agenda-toolbar" aria-label="Selecionar dia da agenda">
+      <button id="agenda-prev-day" class="btn btn-secondary agenda-nav-btn" type="button" aria-label="Dia anterior">←</button>
+      <label class="agenda-date-field" for="agenda-date">
+        <span>Dia da agenda</span>
+        <input id="agenda-date" type="date">
+      </label>
+      <button id="agenda-next-day" class="btn btn-secondary agenda-nav-btn" type="button" aria-label="Próximo dia">→</button>
+      <button id="agenda-today" class="btn btn-secondary" type="button">Hoje</button>
     </section>
 
     <div id="agenda-message" class="message"></div>
