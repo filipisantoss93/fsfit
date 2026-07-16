@@ -55,11 +55,31 @@
     }
     .student-preview-card .section-intro { margin: 4px 0 0; }
     .student-preview-card .btn { flex: 0 0 auto; }
+    .workout-history-list { display: grid; gap: 14px; }
+    .workout-history-item {
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 18px;
+      background: rgba(255,255,255,.025);
+      padding: 18px;
+    }
+    .workout-history-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .workout-history-head small { color: #9aa4b2; }
+    .workout-history-head h3 { margin: 5px 0 0; }
+    .workout-history-status { color: #69e39b; background: rgba(42,184,105,.14); border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+    .workout-history-metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+    .workout-history-metrics div { background: #232a33; border-radius: 14px; padding: 12px; }
+    .workout-history-metrics span { display: block; color: #9aa4b2; font-size: 12px; margin-bottom: 4px; }
+    .workout-history-metrics strong { font-size: 17px; }
+    .workout-history-progress { height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 14px; }
+    .workout-history-progress span { display: block; height: 100%; background: #2bd957; border-radius: inherit; }
+    .workout-history-times { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; color: #9aa4b2; font-size: 13px; margin-top: 12px; }
     @media (max-width: 640px) {
       .student-edit-modal { padding: 0; }
       .student-edit-dialog { width: 100%; height: 100dvh; border-radius: 0; border: 0; }
       .student-preview-card { align-items: stretch; flex-direction: column; }
       .student-preview-card .btn { width: 100%; justify-content: center; }
+      .workout-history-metrics { grid-template-columns: 1fr; }
+      .workout-history-head { flex-direction: column; }
     }
   </style>
 </head>
@@ -83,6 +103,7 @@
       <button class="record-tab active" type="button" data-record-tab="overview">Visão geral</button>
       <button class="record-tab" type="button" data-record-tab="planning">Planejamento</button>
       <button class="record-tab" type="button" data-record-tab="evolution">Evolução</button>
+      <button class="record-tab" type="button" data-record-tab="history">Histórico</button>
       <button class="record-tab" type="button" data-record-tab="access">Acesso</button>
     </nav>
 
@@ -241,6 +262,19 @@
         <div class="table-wrap responsive-history"><table><thead><tr><th>Data</th><th>Peso</th><th>Variação</th><th>Observações</th></tr></thead><tbody id="weight-history"><tr><td colspan="4">Carregando...</td></tr></tbody></table></div>
       </section>
     </div>
+
+    <div class="record-tab-panel" data-record-panel="history">
+      <section class="card record-section-card">
+        <div class="section-heading">
+          <div><small>Acompanhamento</small><h2>Histórico de treinos</h2></div>
+          <span id="workout-history-summary" class="media-count">Carregando...</span>
+        </div>
+        <p class="section-intro">Sessões concluídas por este aluno, com duração e progresso registrado durante a aula.</p>
+        <div id="workout-history-list" class="workout-history-list">
+          <p class="empty">Carregando histórico de treinos...</p>
+        </div>
+      </section>
+    </div>
   </main>
 
   <div id="student-edit-modal" class="student-edit-modal" aria-hidden="true">
@@ -251,6 +285,7 @@
   </div>
 
   <script type="module" src="js/ficha-aluno.js"></script>
+  <script type="module" src="js/historico-treinos-aluno.js"></script>
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { requireSession, showMessage } from './js/layout.js';
