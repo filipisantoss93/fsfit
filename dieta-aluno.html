@@ -43,30 +43,12 @@
         <div id="active-plan-summary" class="diet-plan-summary"></div>
       </article>
 
-      <article class="card">
-        <h2>Nova refeição</h2>
-        <form id="meal-form">
-          <div class="form-group"><label>Nome da refeição *</label><input name="nome" maxlength="100" placeholder="Ex.: Café da manhã" required></div>
-          <div class="grid grid-2">
-            <div class="form-group"><label>Horário</label><input name="horario" type="time"></div>
-            <div class="form-group"><label>Ordem</label><input name="ordem" type="number" min="1" max="50" value="1"></div>
-          </div>
-          <div class="form-group">
-            <label>Dias da semana *</label>
-            <div class="actions" id="meal-days">
-              <label><input type="checkbox" value="1"> Seg</label>
-              <label><input type="checkbox" value="2"> Ter</label>
-              <label><input type="checkbox" value="3"> Qua</label>
-              <label><input type="checkbox" value="4"> Qui</label>
-              <label><input type="checkbox" value="5"> Sex</label>
-              <label><input type="checkbox" value="6"> Sáb</label>
-              <label><input type="checkbox" value="7"> Dom</label>
-            </div>
-          </div>
-          <div class="form-group"><label>Descrição *</label><textarea name="descricao" placeholder="Ex.: 2 ovos, 1 fatia de pão integral, 1 banana..." required></textarea></div>
-          <div class="form-group"><label>Substituições</label><textarea name="substituicoes" placeholder="Ex.: Trocar banana por maçã; pão por tapioca..."></textarea></div>
-          <div class="actions"><button class="btn btn-primary" type="submit">Adicionar refeição</button></div>
-        </form>
+      <article class="card diet-new-meal-card">
+        <div class="section-heading compact">
+          <div><small>REFEIÇÕES</small><h2>Nova refeição</h2></div>
+        </div>
+        <p>Adicione uma refeição ao plano ativo informando horário, dias da semana, descrição e substituições.</p>
+        <button id="new-meal-button" class="btn btn-primary" type="button">+ Adicionar refeição</button>
       </article>
     </section>
 
@@ -110,6 +92,40 @@
     </section>
   </div>
 
+  <div id="meal-form-modal" class="diet-modal" aria-hidden="true">
+    <div class="diet-modal-backdrop" data-close-meal-form-modal></div>
+    <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="meal-form-modal-title">
+      <button class="diet-modal-close" type="button" data-close-meal-form-modal aria-label="Fechar">×</button>
+      <div class="diet-modal-kicker">REFEIÇÃO</div>
+      <h2 id="meal-form-modal-title">Nova refeição</h2>
+      <form id="meal-form">
+        <div class="form-group"><label>Nome da refeição *</label><input name="nome" maxlength="100" placeholder="Ex.: Café da manhã" required></div>
+        <div class="grid grid-2">
+          <div class="form-group"><label>Horário</label><input name="horario" type="time"></div>
+          <div class="form-group"><label>Ordem</label><input name="ordem" type="number" min="1" max="50" value="1"></div>
+        </div>
+        <div class="form-group">
+          <label>Dias da semana *</label>
+          <div class="actions" id="meal-days">
+            <label><input type="checkbox" value="1"> Seg</label>
+            <label><input type="checkbox" value="2"> Ter</label>
+            <label><input type="checkbox" value="3"> Qua</label>
+            <label><input type="checkbox" value="4"> Qui</label>
+            <label><input type="checkbox" value="5"> Sex</label>
+            <label><input type="checkbox" value="6"> Sáb</label>
+            <label><input type="checkbox" value="7"> Dom</label>
+          </div>
+        </div>
+        <div class="form-group"><label>Descrição *</label><textarea name="descricao" placeholder="Ex.: 2 ovos, 1 fatia de pão integral, 1 banana..." required></textarea></div>
+        <div class="form-group"><label>Substituições</label><textarea name="substituicoes" placeholder="Ex.: Trocar banana por maçã; pão por tapioca..."></textarea></div>
+        <div class="diet-modal-actions">
+          <button class="btn btn-primary" type="submit">Adicionar refeição</button>
+          <button class="btn btn-outline" type="button" data-close-meal-form-modal>Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
   <div id="meal-modal" class="diet-modal" aria-hidden="true">
     <div class="diet-modal-backdrop" data-close-meal-modal></div>
     <section class="diet-modal-card" role="dialog" aria-modal="true" aria-labelledby="meal-modal-title">
@@ -126,5 +142,50 @@
   </div>
 
   <script type="module" src="js/dieta-aluno.js"></script>
+  <script>
+    (() => {
+      const modal = document.querySelector('#meal-form-modal');
+      const title = document.querySelector('#meal-form-modal-title');
+      const form = document.querySelector('#meal-form');
+      const openButton = document.querySelector('#new-meal-button');
+
+      const openModal = (editing = false) => {
+        title.textContent = editing ? 'Editar refeição' : 'Nova refeição';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('diet-modal-open');
+        setTimeout(() => form.querySelector('input[name="nome"]')?.focus(), 0);
+      };
+
+      const closeModal = () => {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        if (!document.querySelector('.diet-modal.open')) document.body.classList.remove('diet-modal-open');
+      };
+
+      openButton?.addEventListener('click', () => {
+        form.reset();
+        if (form.ordem) form.ordem.value = '1';
+        form.querySelectorAll('#meal-days input').forEach(input => { input.checked = false; });
+        form.querySelector('[type="submit"]').textContent = 'Adicionar refeição';
+        openModal(false);
+      });
+
+      document.addEventListener('click', event => {
+        if (event.target.closest('[data-close-meal-form-modal]')) closeModal();
+        if (event.target.closest('#meal-modal-edit')) setTimeout(() => openModal(true), 0);
+      });
+
+      form?.addEventListener('submit', () => {
+        setTimeout(() => {
+          if (!document.querySelector('#diet-message.message.error.show')) closeModal();
+        }, 500);
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+      });
+    })();
+  </script>
 </body>
 </html>
