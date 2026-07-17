@@ -24,7 +24,7 @@ function setMode(nextMode, { preserveMessage = false } = {}) {
   const signup = mode === 'signup';
   title.textContent = signup ? 'Comece seus 7 dias grátis' : 'Acesse sua conta';
   submit.textContent = signup ? 'Começar meus 7 dias grátis' : 'Entrar';
-  switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Começar 7 dias grátis';
+  switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Clique aqui.';
   if (trialNote) {
     trialNote.innerHTML = signup
       ? '<strong>7 dias grátis.</strong> Crie sua conta agora. Depois do período gratuito, continue por R$ 29,90.'
