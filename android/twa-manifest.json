@@ -1,0 +1,39 @@
+{
+  "packageId": "tech.fssolucoes.fit",
+  "host": "fit.fssolucoes.tech",
+  "name": "FS Fit",
+  "launcherName": "FS Fit",
+  "display": "standalone",
+  "themeColor": "#0f1115",
+  "themeColorDark": "#0f1115",
+  "navigationColor": "#0f1115",
+  "navigationColorDark": "#0f1115",
+  "navigationDividerColor": "#0f1115",
+  "navigationDividerColorDark": "#0f1115",
+  "backgroundColor": "#0f1115",
+  "enableNotifications": true,
+  "enableSiteSettingsShortcut": true,
+  "startUrl": "/",
+  "iconUrl": "https://fit.fssolucoes.tech/assets/icons/02-pwa/icon-512x512.png",
+  "maskableIconUrl": "https://fit.fssolucoes.tech/assets/icons/02-pwa/icon-maskable-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://fit.fssolucoes.tech/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "orientation": "default",
+  "minSdkVersion": 23,
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "features": {},
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "signingKey": {
+    "path": "fsfit-upload-key.jks",
+    "alias": "fsfit"
+  }
+}
