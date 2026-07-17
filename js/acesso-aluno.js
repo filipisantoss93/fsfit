@@ -4,6 +4,23 @@ const message = document.querySelector('#access-message');
 const loginForm = document.querySelector('#login-form');
 const activationForm = document.querySelector('#activation-form');
 
+function getStoredStudentToken() {
+  const token = String(localStorage.getItem('fsfit_aluno_token') || '').trim();
+  const expiresAt = String(localStorage.getItem('fsfit_aluno_token_expira_em') || '').trim();
+  if (!token) return '';
+
+  if (expiresAt) {
+    const expires = new Date(expiresAt);
+    if (!Number.isNaN(expires.getTime()) && expires <= new Date()) {
+      localStorage.removeItem('fsfit_aluno_token');
+      localStorage.removeItem('fsfit_aluno_token_expira_em');
+      return '';
+    }
+  }
+
+  return token;
+}
+
 async function redirectPersonalPreview() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return false;
@@ -22,7 +39,7 @@ async function redirectPersonalPreview() {
 }
 
 if (!(await redirectPersonalPreview())) {
-  if (localStorage.getItem('fsfit_aluno_token')) {
+  if (getStoredStudentToken()) {
     window.location.replace('aluno.html');
   } else {
     const params = new URLSearchParams(window.location.search);
