@@ -173,8 +173,16 @@ activationForm.addEventListener('submit', async event => {
   if (pin.length !== 4 || pinConfirm.length !== 4) return show('Crie e confirme um PIN de 4 números.');
   if (pin !== pinConfirm) return show('Os PINs informados não coincidem.');
   const button = activationForm.querySelector('[type="submit"]'); button.disabled = true;
-  try { const result = await invoke({ action: 'activate', telefone: phone, codigo, pin, personal_slug: slug }); saveSession(result); }
-  catch (error) { show(error.message); } finally { button.disabled = false; }
+  try {
+    const { data: validado, error: validationError } = await supabase.rpc('fsfit_validar_codigo_ativacao_aluno', {
+      p_personal_slug: slug,
+      p_telefone: phone,
+      p_codigo: codigo
+    });
+    if (validationError || validado !== true) throw new Error('Código de ativação inválido ou expirado. Solicite um novo código ao seu personal.');
+    const result = await invoke({ action: 'activate', telefone: phone, pin, personal_slug: slug });
+    saveSession(result);
+  } catch (error) { show(error.message); } finally { button.disabled = false; }
 });
 
 if (!(await redirectStoredStudentSession())) await loadProfile();
