@@ -106,12 +106,29 @@ async function loadTickets() {
   renderList();
 }
 
+async function markTicketNotificationsRead(id) {
+  try {
+    const { error } = await supabase
+      .from('notificacoes')
+      .update({ lida: true, lida_em: new Date().toISOString() })
+      .eq('destinatario_id', session.user.id)
+      .eq('lida', false)
+      .eq('link', `admin-contatos.html?id=${id}`)
+      .in('tipo', ['suporte_novo', 'suporte_resposta']);
+    if (error) throw error;
+  } catch (error) {
+    console.error('Não foi possível marcar os alertas deste atendimento como lidos:', error);
+  }
+}
+
 async function openTicket(id, { updateUrl = true } = {}) {
   selectedId = id;
   renderList();
   const ticket = tickets.find(item => item.id === id);
   if (!ticket) return;
   const profile = profiles.get(ticket.user_id);
+
+  await markTicketNotificationsRead(id);
 
   if (updateUrl) {
     const url = new URL(window.location.href);
