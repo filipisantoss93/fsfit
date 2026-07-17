@@ -1,1 +1,42 @@
-<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f1115"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><title>Acesso do aluno — FS Fit</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"></head><body class="student-page"><main class="student-shell"><header class="student-header"><div class="auth-logo"><strong>FS</strong><span>Fit</span></div><p>Acesso do aluno</p></header><section class="card"><div id="access-message" class="message"></div><div class="grid grid-2"><form id="login-form"><h2>Entrar</h2><div class="form-group"><label>WhatsApp</label><input name="telefone" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div><div class="form-group"><label>PIN de 4 números</label><input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required></div><button class="btn btn-primary" type="submit">Entrar no meu plano</button></form><form id="activation-form"><h2>Primeiro acesso</h2><div class="form-group"><label>WhatsApp</label><input name="telefone" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" required></div><div class="form-group"><label>Código de ativação</label><input name="codigo" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required></div><div class="form-group"><label>Crie seu PIN</label><input name="pin" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required></div><button class="btn btn-secondary" type="submit">Ativar meu acesso</button></form></div></section></main><script type="module" src="js/acesso-aluno.js?v=20260717-preview1"></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Acesso do aluno — FS Fit</title>
+  <meta name="description" content="Acesse seus treinos e acompanhamento no FS Fit usando seu WhatsApp cadastrado.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="student-page">
+  <main class="student-shell">
+    <header class="student-header">
+      <a class="auth-logo" href="index.html" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
+      <p>Acesso do aluno</p>
+    </header>
+
+    <section class="card" style="max-width:520px;margin:0 auto">
+      <span class="hero-badge">ÁREA DO ALUNO</span>
+      <h1 style="margin-top:14px">Acesse seus treinos</h1>
+      <p>Informe o WhatsApp cadastrado pelo seu personal trainer. Vamos localizar sua página de acesso com segurança.</p>
+
+      <div id="access-message" class="message"></div>
+
+      <form id="student-resolver-form">
+        <div class="form-group">
+          <label for="student-access-phone">Seu WhatsApp</label>
+          <input id="student-access-phone" name="telefone" inputmode="numeric" autocomplete="tel" maxlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Continuar para minha área</button>
+      </form>
+
+      <p style="margin:18px 0 0;color:var(--muted);font-size:.84rem;text-align:center">No primeiro acesso, tenha em mãos o código de ativação fornecido pelo seu personal.</p>
+    </section>
+  </main>
+  <script type="module" src="js/acesso-aluno.js?v=20260717-direct-access1"></script>
+</body>
+</html>
