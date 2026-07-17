@@ -11,14 +11,26 @@
   <link rel="icon" href="assets/fsfit-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/aluno-midias.css">
+  <link rel="stylesheet" href="css/aluno-notificacoes.css?v=20260716-notifications1">
   <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-student-tabs4">
   <link rel="stylesheet" href="css/aulas.css?v=20260716-live2">
 </head>
 <body class="student-page">
   <main class="student-shell">
-    <header class="student-header">
-      <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
-      <p>Portal do aluno</p>
+    <header class="student-header student-header-bar">
+      <div class="student-header-identity">
+        <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
+        <p>Portal do aluno</p>
+      </div>
+      <div class="student-header-actions" aria-label="Ações do portal do aluno">
+        <button id="student-notification-button" class="student-icon-button" type="button" aria-label="Abrir notificações">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+          <span id="student-notification-badge" class="student-notification-badge hidden">0</span>
+        </button>
+        <button id="student-settings-button" class="student-icon-button" type="button" aria-label="Abrir configurações">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.14.38.35.72.6 1 .3.3.69.47 1.1.4H21v4h-.09A1.7 1.7 0 0 0 19.4 15z"></path></svg>
+        </button>
+      </div>
     </header>
 
     <section id="loading-state" class="card student-state">Carregando seu plano...</section>
@@ -32,16 +44,6 @@
         <p id="updated-at" class="updated"></p>
         <div class="actions" style="justify-content:center;margin-top:14px">
           <a id="personal-page-button" class="btn btn-outline hidden">Ver página do meu personal</a>
-        </div>
-      </section>
-
-      <section class="card" style="margin-bottom:14px">
-        <h2>Notificações</h2>
-        <p id="notification-status">Verificando disponibilidade de notificações...</p>
-        <div class="actions">
-          <button id="enable-notifications" class="btn btn-primary hidden" type="button">Ativar notificações</button>
-          <button id="disable-notifications" class="btn btn-outline hidden" type="button">Desativar neste aparelho</button>
-          <button id="install-app" class="btn btn-secondary hidden" type="button">Instalar FS Fit</button>
         </div>
       </section>
 
@@ -87,6 +89,44 @@
     </div>
   </main>
 
+  <div id="student-notification-sheet" class="student-sheet" aria-hidden="true">
+    <button class="student-sheet-backdrop" type="button" data-close-student-sheet aria-label="Fechar notificações"></button>
+    <section class="student-sheet-dialog" role="dialog" aria-modal="true" aria-labelledby="student-notification-title">
+      <div class="student-sheet-header">
+        <h2 id="student-notification-title">Notificações</h2>
+        <button class="student-sheet-close" type="button" data-close-student-sheet aria-label="Fechar">×</button>
+      </div>
+      <div class="student-sheet-toolbar">
+        <button id="student-mark-all-notifications" class="btn btn-outline hidden" type="button">Marcar todas como lidas</button>
+        <button id="student-clear-notifications" class="btn btn-secondary hidden" type="button">Limpar</button>
+      </div>
+      <div id="student-notification-list" class="student-notification-list">
+        <p class="student-notification-empty">Carregando notificações...</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="student-settings-sheet" class="student-sheet" aria-hidden="true">
+    <button class="student-sheet-backdrop" type="button" data-close-student-sheet aria-label="Fechar configurações"></button>
+    <section class="student-sheet-dialog" role="dialog" aria-modal="true" aria-labelledby="student-settings-title">
+      <div class="student-sheet-header">
+        <h2 id="student-settings-title">Configurações</h2>
+        <button class="student-sheet-close" type="button" data-close-student-sheet aria-label="Fechar">×</button>
+      </div>
+      <div class="student-settings-body">
+        <section class="student-settings-group">
+          <h3>Notificações no celular</h3>
+          <p id="notification-status">Verificando disponibilidade de notificações...</p>
+          <div class="actions">
+            <button id="enable-notifications" class="btn btn-primary hidden" type="button">Ativar notificações</button>
+            <button id="disable-notifications" class="btn btn-outline hidden" type="button">Desativar neste aparelho</button>
+            <button id="install-app" class="btn btn-secondary hidden" type="button">Instalar FS Fit</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
   <div id="student-detail-modal" class="student-detail-modal" aria-hidden="true">
     <button class="student-detail-backdrop" type="button" data-close-student-detail aria-label="Fechar detalhes"></button>
     <section class="student-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="student-detail-title">
@@ -99,6 +139,7 @@
   </div>
 
   <script type="module" src="js/aluno.js?v=20260716-student-tabs3"></script>
+  <script type="module" src="js/aluno-notificacoes.js?v=20260716-notifications1"></script>
   <script type="module" src="js/aula-aluno.js?v=20260716-live2"></script>
   <script type="module" src="js/chat-aula-aluno.js?v=20260716-live4"></script>
 </body>
