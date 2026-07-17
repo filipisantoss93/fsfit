@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Administração — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/admin.css?v=20260717-support2">
+  <link rel="stylesheet" href="css/admin.css?v=20260717-users-modal1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -66,12 +66,12 @@
         <div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div>
       </div>
       <div class="admin-toolbar">
-        <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome ou e-mail"></div>
+        <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome, e-mail, empresa ou telefone"></div>
         <div class="form-group"><label for="admin-plan-filter">Plano</label><select id="admin-plan-filter"><option value="">Todos</option><option value="trial">Trial</option><option value="free">Free</option><option value="premium">Premium</option></select></div>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Usuário</th><th>Plano</th><th>Status</th><th>Trial</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Usuário</th><th>Plano</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="admin-users-list"><tr><td colspan="5">Carregando...</td></tr></tbody>
         </table>
       </div>
@@ -87,6 +87,20 @@
       </div>
     </section>
   </main>
-  <script type="module" src="js/admin.js?v=20260717-support2"></script>
+
+  <div id="admin-user-modal" class="admin-modal-backdrop hidden" role="presentation">
+    <section class="admin-user-modal" role="dialog" aria-modal="true" aria-labelledby="admin-user-modal-title">
+      <div class="admin-modal-header">
+        <div>
+          <small>CONTA DO USUÁRIO</small>
+          <h2 id="admin-user-modal-title">Detalhes do usuário</h2>
+        </div>
+        <button id="admin-user-modal-close" class="admin-modal-close" type="button" aria-label="Fechar">×</button>
+      </div>
+      <div id="admin-user-modal-content"></div>
+    </section>
+  </div>
+
+  <script type="module" src="js/admin.js?v=20260717-users-modal1"></script>
 </body>
 </html>
