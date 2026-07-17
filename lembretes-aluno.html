@@ -44,8 +44,8 @@
               <label>Canal *</label>
               <select name="canal" required>
                 <option value="push">Notificação no celular</option>
-                <option value="whatsapp">WhatsApp</option>
-                <option value="ambos">Notificação + WhatsApp</option>
+                <option value="whatsapp">WhatsApp pelo personal — gratuito</option>
+                <option value="ambos">Notificação + WhatsApp gratuito</option>
               </select>
             </div>
           </div>
@@ -79,8 +79,9 @@
       <article class="card">
         <h2>Como funciona</h2>
         <p>O lembrete fica vinculado exclusivamente a este aluno e ao personal autenticado.</p>
-        <p><strong>Notificação no celular:</strong> o agendamento já fica pronto no banco. A entrega em segundo plano depende do aluno autorizar notificações no dispositivo e da infraestrutura Web Push/PWA estar ativa.</p>
-        <p><strong>WhatsApp:</strong> o canal fica registrado para futura automação de envio. O sistema não dispara mensagens pelo WhatsApp sem integração oficial configurada.</p>
+        <p><strong>Notificação no celular:</strong> o aluno recebe o Push automaticamente no horário programado, desde que tenha autorizado as notificações no aparelho.</p>
+        <p><strong>WhatsApp pelo personal — gratuito:</strong> no horário programado, o FS Fit avisa o personal. Ao tocar no aviso, o WhatsApp do personal abre na conversa com o aluno e com a mensagem já preenchida. O personal apenas confirma o envio.</p>
+        <p><strong>Notificação + WhatsApp:</strong> o aluno recebe o Push automaticamente e o personal recebe, ao mesmo tempo, o atalho para enviar a mensagem pronta pelo próprio WhatsApp.</p>
       </article>
     </section>
 
@@ -96,6 +97,6 @@
       </div>
     </section>
   </main>
-  <script type="module" src="js/lembretes-aluno.js"></script>
+  <script type="module" src="js/lembretes-aluno.js?v=20260717-wa1"></script>
 </body>
 </html>
