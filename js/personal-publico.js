@@ -76,9 +76,6 @@ async function redirectStoredStudentSession() {
   const stored = storedStudentSession();
   if (!stored) return false;
 
-  // Só reaproveita automaticamente a sessão ao abrir novamente a página
-  // do mesmo personal. Em caso de falha temporária de rede, preserva o
-  // localStorage para que o aluno não precise digitar WhatsApp e PIN de novo.
   if (stored.personalSlug && slug && stored.personalSlug !== slug) return false;
 
   try {
@@ -88,8 +85,8 @@ async function redirectStoredStudentSession() {
     window.location.replace('/aluno.html');
     return true;
   } catch (error) {
-    const message = String(error?.message || '').toLowerCase();
-    if (message.includes('sessão expirada') || message.includes('sessão inválida')) clearStoredStudentSession();
+    const errorMessage = String(error?.message || '').toLowerCase();
+    if (errorMessage.includes('sessão expirada') || errorMessage.includes('sessão inválida')) clearStoredStudentSession();
     return false;
   }
 }
@@ -137,6 +134,7 @@ async function loadProfile() {
 
 phoneForm.telefone.addEventListener('input', () => { phoneForm.telefone.value = digits(phoneForm.telefone.value); });
 pinForm.pin.addEventListener('input', () => { pinForm.pin.value = digits(pinForm.pin.value, 4); });
+activationForm.codigo.addEventListener('input', () => { activationForm.codigo.value = digits(activationForm.codigo.value, 6); });
 activationForm.pin.addEventListener('input', () => { activationForm.pin.value = digits(activationForm.pin.value, 4); });
 activationForm.pin_confirm.addEventListener('input', () => { activationForm.pin_confirm.value = digits(activationForm.pin_confirm.value, 4); });
 document.querySelector('#change-phone').addEventListener('click', resetAccess);
@@ -146,8 +144,16 @@ phoneForm.addEventListener('submit', async event => {
   event.preventDefault(); clearMessage(); phone = digits(phoneForm.telefone.value);
   if (phone.length !== 11) return show('Informe seu WhatsApp com DDD e número, totalizando 11 dígitos.');
   const button = phoneForm.querySelector('[type="submit"]'); button.disabled = true;
-  try { const result = await invoke({ action: 'lookup', telefone: phone, personal_slug: slug }); phoneForm.classList.add('hidden'); if (result.next === 'activate') activationForm.classList.remove('hidden'); else pinForm.classList.remove('hidden'); }
-  catch (error) { show(error.message); } finally { button.disabled = false; }
+  try {
+    const result = await invoke({ action: 'lookup', telefone: phone, personal_slug: slug });
+    phoneForm.classList.add('hidden');
+    if (result.next === 'activate') {
+      activationForm.classList.remove('hidden');
+      show('Primeiro acesso: informe o código de ativação enviado pelo seu personal.', 'success');
+    } else {
+      pinForm.classList.remove('hidden');
+    }
+  } catch (error) { show(error.message); } finally { button.disabled = false; }
 });
 
 pinForm.addEventListener('submit', async event => {
@@ -160,12 +166,14 @@ pinForm.addEventListener('submit', async event => {
 
 activationForm.addEventListener('submit', async event => {
   event.preventDefault(); clearMessage();
+  const codigo = digits(activationForm.codigo.value, 6);
   const pin = digits(activationForm.pin.value, 4);
   const pinConfirm = digits(activationForm.pin_confirm.value, 4);
+  if (codigo.length !== 6) return show('Informe o código de ativação de 6 números recebido do seu personal.');
   if (pin.length !== 4 || pinConfirm.length !== 4) return show('Crie e confirme um PIN de 4 números.');
   if (pin !== pinConfirm) return show('Os PINs informados não coincidem.');
   const button = activationForm.querySelector('[type="submit"]'); button.disabled = true;
-  try { const result = await invoke({ action: 'activate', telefone: phone, pin, personal_slug: slug }); saveSession(result); }
+  try { const result = await invoke({ action: 'activate', telefone: phone, codigo, pin, personal_slug: slug }); saveSession(result); }
   catch (error) { show(error.message); } finally { button.disabled = false; }
 });
 
