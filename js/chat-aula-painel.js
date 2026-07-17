@@ -15,6 +15,14 @@ function formatTime(value) {
   return new Date(value).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
+function updateChatButtons(openId = null) {
+  container.querySelectorAll('[data-open-session-chat]').forEach(button => {
+    const isOpen = Boolean(openId) && button.dataset.openSessionChat === openId;
+    button.textContent = isOpen ? 'Fechar chat' : 'Abrir chat';
+    button.setAttribute('aria-expanded', String(isOpen));
+  });
+}
+
 async function notifyAluno(sessionId) {
   const { error } = await supabase.functions.invoke('chat-push', {
     body: { action: 'notify_from_personal', session_id: sessionId }
@@ -43,6 +51,7 @@ function ensureChatShell(host, sessionId) {
 async function openChat(sessionId) {
   openSessionId = sessionId;
   container.dataset.openChatSession = sessionId;
+  updateChatButtons(sessionId);
 
   const host = container.querySelector(`[data-chat-host="${CSS.escape(sessionId)}"]`);
   if (!host) return;
@@ -56,6 +65,9 @@ async function openChat(sessionId) {
 
   if (sessionError || !session || session.status !== 'em_aula') {
     host.innerHTML = '<p class="empty">O chat é encerrado automaticamente quando a aula termina.</p>';
+    openSessionId = null;
+    delete container.dataset.openChatSession;
+    updateChatButtons();
     return;
   }
 
@@ -140,9 +152,11 @@ container.addEventListener('click', event => {
   if (!willOpen) {
     openSessionId = null;
     delete container.dataset.openChatSession;
+    updateChatButtons();
     return;
   }
 
+  updateChatButtons(sessionId);
   openChat(sessionId).catch(console.error);
 });
 
