@@ -9,6 +9,9 @@ const FREE_ALLOWED_PAGES = new Set([
 ]);
 
 const messageTimers = new WeakMap();
+let notificationChannel = null;
+let notificationChannelUserId = null;
+let notificationRefreshTimer = null;
 
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
@@ -231,6 +234,25 @@ function formatNotificationDate(value) {
   return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
+function safeNotificationLink(value) {
+  if (!value) return '';
+  try {
+    const url = new URL(String(value), window.location.origin);
+    if (url.origin !== window.location.origin) return '';
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return '';
+  }
+}
+
+function scheduleNotificationRefresh(session) {
+  if (notificationRefreshTimer) clearTimeout(notificationRefreshTimer);
+  notificationRefreshTimer = setTimeout(() => {
+    notificationRefreshTimer = null;
+    loadNotifications(session).catch(error => console.error('Não foi possível atualizar as notificações:', error));
+  }, 120);
+}
+
 async function loadNotifications(session) {
   const badge = document.querySelector('#notification-badge');
   const list = document.querySelector('#notification-list');
@@ -239,43 +261,68 @@ async function loadNotifications(session) {
   if (!badge || !list || !session?.user?.id) return;
 
   try {
-    const { data, error } = await supabase
-      .from('notificacoes')
-      .select('id,titulo,mensagem,link,lida,created_at')
-      .eq('destinatario_id', session.user.id)
-      .order('created_at', { ascending: false })
-      .limit(20);
+    const [notificationsResult, unreadResult] = await Promise.all([
+      supabase
+        .from('notificacoes')
+        .select('id,titulo,mensagem,link,lida,created_at')
+        .eq('destinatario_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('notificacoes')
+        .select('id', { count: 'exact', head: true })
+        .eq('destinatario_id', session.user.id)
+        .eq('lida', false)
+    ]);
 
-    if (error) throw error;
+    if (notificationsResult.error) throw notificationsResult.error;
+    if (unreadResult.error) throw unreadResult.error;
 
-    const notifications = data || [];
-    const unread = notifications.filter(item => !item.lida);
+    const notifications = notificationsResult.data || [];
+    const unreadCount = Number(unreadResult.count || 0);
 
-    badge.textContent = unread.length > 99 ? '99+' : String(unread.length);
-    badge.classList.toggle('hidden', unread.length === 0);
-    markAll?.classList.toggle('hidden', unread.length === 0);
+    badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+    badge.classList.toggle('hidden', unreadCount === 0);
+    markAll?.classList.toggle('hidden', unreadCount === 0);
     clearAll?.classList.toggle('hidden', notifications.length === 0);
 
     list.innerHTML = notifications.length
-      ? notifications.map(item => `
-          <${item.link ? `a href="${escapeNotificationHtml(item.link)}"` : 'div'} class="notification-item ${item.lida ? '' : 'unread'}" data-notification-id="${item.id}">
-            <span class="notification-dot" aria-hidden="true"></span>
-            <span class="notification-copy">
-              <strong>${escapeNotificationHtml(item.titulo || 'Notificação')}</strong>
-              <span>${escapeNotificationHtml(item.mensagem || '')}</span>
-              <small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small>
-            </span>
-          </${item.link ? 'a' : 'div'}>`).join('')
+      ? notifications.map(item => {
+          const link = safeNotificationLink(item.link);
+          const tag = link ? `a href="${escapeNotificationHtml(link)}"` : 'div';
+          return `
+            <${tag} class="notification-item ${item.lida ? '' : 'unread'}" data-notification-id="${item.id}">
+              <span class="notification-dot" aria-hidden="true"></span>
+              <span class="notification-copy">
+                <strong>${escapeNotificationHtml(item.titulo || 'Notificação')}</strong>
+                <span>${escapeNotificationHtml(item.mensagem || '')}</span>
+                <small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small>
+              </span>
+            </${link ? 'a' : 'div'}>`;
+        }).join('')
       : '<p class="notification-empty">Nenhuma notificação.</p>';
 
     list.querySelectorAll('[data-notification-id]').forEach(item => {
-      item.addEventListener('click', async () => {
+      item.addEventListener('click', async event => {
         if (!item.classList.contains('unread')) return;
-        await supabase
-          .from('notificacoes')
-          .update({ lida: true, lida_em: new Date().toISOString() })
-          .eq('id', item.dataset.notificationId)
-          .eq('destinatario_id', session.user.id);
+
+        const targetLink = item.tagName === 'A' ? item.getAttribute('href') : '';
+        if (targetLink) event.preventDefault();
+
+        try {
+          const { error: updateError } = await supabase
+            .from('notificacoes')
+            .update({ lida: true, lida_em: new Date().toISOString() })
+            .eq('id', item.dataset.notificationId)
+            .eq('destinatario_id', session.user.id);
+
+          if (updateError) throw updateError;
+          await loadNotifications(session);
+        } catch (updateError) {
+          console.error('Não foi possível marcar a notificação como lida:', updateError);
+        } finally {
+          if (targetLink) window.location.assign(targetLink);
+        }
       });
     });
 
@@ -325,6 +372,41 @@ async function loadNotifications(session) {
   }
 }
 
+async function setupNotificationRealtime(session) {
+  const userId = session?.user?.id;
+  if (!userId || notificationChannelUserId === userId) return;
+
+  if (notificationChannel) {
+    await supabase.removeChannel(notificationChannel);
+    notificationChannel = null;
+  }
+
+  notificationChannelUserId = userId;
+  const filter = `destinatario_id=eq.${userId}`;
+
+  notificationChannel = supabase
+    .channel(`fsfit-notificacoes-${userId}`)
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'notificacoes', filter },
+      () => scheduleNotificationRefresh(session)
+    )
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'notificacoes', filter },
+      () => scheduleNotificationRefresh(session)
+    )
+    .subscribe(status => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('Atualização em tempo real das notificações indisponível:', status);
+      }
+    });
+
+  window.addEventListener('beforeunload', () => {
+    if (notificationChannel) supabase.removeChannel(notificationChannel);
+  }, { once: true });
+}
+
 export async function setGreeting(session) {
   const target = document.querySelector('#user-greeting');
   if (!target || !session) return;
@@ -336,6 +418,7 @@ export async function setGreeting(session) {
   target.textContent = `Olá, ${name}`;
   if (admin) document.querySelector('#admin-nav')?.classList.remove('hidden');
   await loadNotifications(session);
+  await setupNotificationRealtime(session);
 }
 
 export function showMessage(element, text, type = 'success') {
