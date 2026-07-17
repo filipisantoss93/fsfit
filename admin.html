@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f1115">
   <title>Administração — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/admin.css?v=20260717-users-modal1">
+  <link rel="stylesheet" href="css/admin.css?v=20260717-admin-complete1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -33,6 +33,15 @@
       <div class="card stat-card"><small>INATIVAS</small><strong id="stat-inactive">—</strong></div>
       <div class="card stat-card"><small>FATURAMENTO MÊS</small><strong id="stat-revenue-month">R$ 0,00</strong></div>
       <div class="card stat-card"><small>FATURAMENTO TOTAL</small><strong id="stat-revenue-total">R$ 0,00</strong></div>
+    </section>
+
+    <section class="admin-management-grid">
+      <div class="card stat-card"><small>RECEITA 30 DIAS</small><strong id="metric-revenue-30">R$ 0,00</strong><span id="metric-revenue-periods" class="admin-stat-note">7d: R$ 0,00 · 90d: R$ 0,00</span></div>
+      <div class="card stat-card"><small>MRR ESTIMADO</small><strong id="metric-mrr">R$ 0,00</strong><span class="admin-stat-note">Receita mensal recorrente normalizada</span></div>
+      <div class="card stat-card"><small>ASSINATURAS ATIVAS</small><strong id="metric-active-subscriptions">0</strong><span class="admin-stat-note">Com acesso vigente</span></div>
+      <div class="card stat-card"><small>NOVOS ASSINANTES 30D</small><strong id="metric-new-subscribers">0</strong><span class="admin-stat-note">Primeiro pagamento no período</span></div>
+      <div class="card stat-card"><small>CANCELAMENTOS 30D</small><strong id="metric-cancellations">0</strong><span class="admin-stat-note">Usuários com cancelamento no período</span></div>
+      <div class="card stat-card"><small>CONVERSÃO TRIAL → PREMIUM</small><strong id="metric-conversion">0%</strong><span id="metric-revenue-per-customer" class="admin-stat-note">Receita média/cliente: R$ 0,00</span></div>
     </section>
 
     <section class="admin-grid">
@@ -63,6 +72,15 @@
 
     <section class="card admin-section-card">
       <div class="section-heading">
+        <div><small>EVOLUÇÃO</small><h2>Receita dos últimos 6 meses</h2></div>
+      </div>
+      <div id="admin-revenue-trend" class="admin-revenue-trend" aria-label="Gráfico de receita mensal">
+        <p class="admin-empty">Carregando evolução financeira...</p>
+      </div>
+    </section>
+
+    <section class="card admin-section-card">
+      <div class="section-heading">
         <div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div>
       </div>
       <div class="admin-toolbar">
@@ -75,15 +93,31 @@
           <tbody id="admin-users-list"><tr><td colspan="5">Carregando...</td></tr></tbody>
         </table>
       </div>
+      <div class="admin-pagination">
+        <button id="admin-users-prev" class="btn btn-outline" type="button">Anterior</button>
+        <span id="admin-users-page-info">Página 1 de 1</span>
+        <button id="admin-users-next" class="btn btn-outline" type="button">Próxima</button>
+      </div>
     </section>
 
     <section class="card admin-section-card">
       <div class="section-heading"><div><small>HISTÓRICO</small><h2>Movimentações financeiras</h2></div></div>
+      <div class="admin-finance-toolbar">
+        <div class="form-group"><label for="admin-finance-search">Buscar</label><input id="admin-finance-search" placeholder="Usuário, e-mail, TXID ou E2E"></div>
+        <div class="form-group"><label for="admin-finance-status">Status</label><select id="admin-finance-status"><option value="">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="cancelado">Cancelado</option><option value="estornado">Estornado</option><option value="expirado">Expirado</option></select></div>
+        <div class="form-group"><label for="admin-finance-start">De</label><input id="admin-finance-start" type="date"></div>
+        <div class="form-group"><label for="admin-finance-end">Até</label><input id="admin-finance-end" type="date"></div>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th></tr></thead>
-          <tbody id="admin-finance-list"><tr><td colspan="5">Carregando...</td></tr></tbody>
+          <thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th><th>Transação</th></tr></thead>
+          <tbody id="admin-finance-list"><tr><td colspan="6">Carregando...</td></tr></tbody>
         </table>
+      </div>
+      <div class="admin-pagination">
+        <button id="admin-finance-prev" class="btn btn-outline" type="button">Anterior</button>
+        <span id="admin-finance-page-info">Página 1 de 1</span>
+        <button id="admin-finance-next" class="btn btn-outline" type="button">Próxima</button>
       </div>
     </section>
   </main>
@@ -101,6 +135,6 @@
     </section>
   </div>
 
-  <script type="module" src="js/admin.js?v=20260717-users-modal1"></script>
+  <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
 </body>
 </html>
