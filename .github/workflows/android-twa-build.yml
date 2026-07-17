@@ -89,16 +89,24 @@ jobs:
         run: |
           set -o pipefail
           docker run --rm \
+            --entrypoint /bin/bash \
             -e BUBBLEWRAP_KEYSTORE_PASSWORD \
             -e BUBBLEWRAP_KEY_PASSWORD \
             -v "$GITHUB_WORKSPACE/android:/app" \
             -w /app \
             ghcr.io/googlechromelabs/bubblewrap:latest \
-            build \
-            --skipPwaValidation \
-            --manifest=./twa-manifest.json \
-            --signingKeyPath=./fsfit-upload-key.jks \
-            --signingKeyAlias=fsfit 2>&1 | tee android/bubblewrap-build.log
+            -lc '
+              set -e
+              SDKMANAGER="$(find /root/.bubblewrap/android_sdk -type f -name sdkmanager | head -n 1)"
+              test -n "$SDKMANAGER"
+              yes | "$SDKMANAGER" --licenses >/dev/null || true
+              "$SDKMANAGER" "platforms;android-36" "build-tools;35.0.0"
+              bubblewrap build \
+                --skipPwaValidation \
+                --manifest=./twa-manifest.json \
+                --signingKeyPath=./fsfit-upload-key.jks \
+                --signingKeyAlias=fsfit
+            ' 2>&1 | tee android/bubblewrap-build.log
 
       - name: Upload Bubblewrap diagnostic
         if: ${{ always() }}
