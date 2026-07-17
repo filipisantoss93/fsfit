@@ -1,5 +1,5 @@
 {
-  "name": "FS Fit — Personal Trainer",
+  "name": "FS Fit",
   "short_name": "FS Fit",
   "description": "Gestão de alunos, treinos e acompanhamento para personal trainers.",
   "start_url": "/painel.html",
@@ -9,19 +9,19 @@
   "theme_color": "#0f1115",
   "icons": [
     {
-      "src": "/assets/fsfit-icon-192.png",
+      "src": "/assets/icons/02-pwa/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/fsfit-icon-512.png",
+      "src": "/assets/icons/02-pwa/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/fsfit-icon-maskable-512.png",
+      "src": "/assets/icons/02-pwa/icon-maskable-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
