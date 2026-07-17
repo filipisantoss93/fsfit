@@ -12,6 +12,7 @@ const form = document.querySelector('#reminder-form');
 const list = document.querySelector('#reminders-list');
 const formTitle = document.querySelector('#form-title');
 const cancelEdit = document.querySelector('#cancel-edit');
+const recurrenceIntervalFields = document.querySelector('#recurrence-interval-fields');
 let editingId = null;
 let studentPhone = '';
 
@@ -33,26 +34,61 @@ function normalizeWhatsAppNumber(value = '') {
   return '';
 }
 
-function recurrenceToRrule(value) {
+function recurrenceToRrule(value, intervalValue, intervalUnit) {
   if (value === 'daily') return 'FREQ=DAILY';
   if (value === 'weekly') return 'FREQ=WEEKLY';
   if (value === 'weekdays') return 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR';
+  if (value === 'interval') {
+    const amount = Number(intervalValue);
+    if (!Number.isInteger(amount) || amount < 1 || amount > 999) return null;
+    const freq = { minutes: 'MINUTELY', hours: 'HOURLY', days: 'DAILY' }[intervalUnit];
+    return freq ? `FREQ=${freq};INTERVAL=${amount}` : null;
+  }
   return null;
 }
 
-function rruleToRecurrence(value) {
-  if (value === 'FREQ=DAILY') return 'daily';
-  if (value === 'FREQ=WEEKLY') return 'weekly';
-  if (value === 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR') return 'weekdays';
-  return '';
+function parseRrule(value) {
+  if (value === 'FREQ=DAILY') return { recurrence: 'daily', intervalValue: 30, intervalUnit: 'minutes' };
+  if (value === 'FREQ=WEEKLY') return { recurrence: 'weekly', intervalValue: 30, intervalUnit: 'minutes' };
+  if (value === 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR') return { recurrence: 'weekdays', intervalValue: 30, intervalUnit: 'minutes' };
+
+  const match = /^FREQ=(MINUTELY|HOURLY|DAILY);INTERVAL=([1-9]\d*)$/.exec(String(value || ''));
+  if (match) {
+    return {
+      recurrence: 'interval',
+      intervalValue: Number(match[2]),
+      intervalUnit: { MINUTELY: 'minutes', HOURLY: 'hours', DAILY: 'days' }[match[1]]
+    };
+  }
+
+  return { recurrence: '', intervalValue: 30, intervalUnit: 'minutes' };
 }
 
 function recurrenceLabel(value) {
-  return {
+  const fixed = {
     'FREQ=DAILY': 'Diário',
     'FREQ=WEEKLY': 'Semanal',
     'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR': 'Seg. a sex.'
-  }[value] || 'Uma vez';
+  }[value];
+  if (fixed) return fixed;
+
+  const match = /^FREQ=(MINUTELY|HOURLY|DAILY);INTERVAL=([1-9]\d*)$/.exec(String(value || ''));
+  if (!match) return 'Uma vez';
+
+  const amount = Number(match[2]);
+  const labels = {
+    MINUTELY: amount === 1 ? 'minuto' : 'minutos',
+    HOURLY: amount === 1 ? 'hora' : 'horas',
+    DAILY: amount === 1 ? 'dia' : 'dias'
+  };
+  return `A cada ${amount} ${labels[match[1]]}`;
+}
+
+function toggleIntervalFields() {
+  const isInterval = form.recorrencia.value === 'interval';
+  recurrenceIntervalFields?.classList.toggle('hidden', !isInterval);
+  if (form.intervalo_valor) form.intervalo_valor.required = isInterval;
+  if (form.intervalo_unidade) form.intervalo_unidade.required = isInterval;
 }
 
 function channelLabel(value) {
@@ -141,6 +177,10 @@ function resetForm() {
   form.agendado_para.value = toLocalInput(now.toISOString());
   form.canal.value = 'push';
   form.status.value = 'agendado';
+  form.recorrencia.value = '';
+  form.intervalo_valor.value = '30';
+  form.intervalo_unidade.value = 'minutes';
+  toggleIntervalFields();
 }
 
 async function editReminder(id) {
@@ -153,23 +193,46 @@ async function editReminder(id) {
 
   if (error) return showMessage(message, 'Não foi possível abrir o lembrete.', 'error');
 
+  const recurrence = parseRrule(data.recorrencia_rrule);
   editingId = data.id;
   formTitle.textContent = `Editar ${data.titulo}`;
   form.titulo.value = data.titulo;
   form.mensagem.value = data.mensagem;
   form.agendado_para.value = toLocalInput(data.agendado_para);
   form.canal.value = data.canal;
-  form.recorrencia.value = rruleToRecurrence(data.recorrencia_rrule);
+  form.recorrencia.value = recurrence.recurrence;
+  form.intervalo_valor.value = String(recurrence.intervalValue);
+  form.intervalo_unidade.value = recurrence.intervalUnit;
   form.status.value = ['agendado', 'cancelado'].includes(data.status) ? data.status : 'agendado';
+  toggleIntervalFields();
   cancelEdit.classList.remove('hidden');
   form.scrollIntoView({ behavior: 'smooth' });
 }
+
+form.recorrencia.addEventListener('change', toggleIntervalFields);
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
 
   const scheduled = new Date(form.agendado_para.value);
   if (Number.isNaN(scheduled.getTime())) return showMessage(message, 'Informe uma data e horário válidos.', 'error');
+
+  if (form.recorrencia.value === 'interval') {
+    const intervalValue = Number(form.intervalo_valor.value);
+    if (!Number.isInteger(intervalValue) || intervalValue < 1 || intervalValue > 999) {
+      return showMessage(message, 'Informe um intervalo inteiro entre 1 e 999.', 'error');
+    }
+  }
+
+  const recurrenceRrule = recurrenceToRrule(
+    form.recorrencia.value,
+    form.intervalo_valor.value,
+    form.intervalo_unidade.value
+  );
+
+  if (form.recorrencia.value && !recurrenceRrule) {
+    return showMessage(message, 'Não foi possível configurar a recorrência informada.', 'error');
+  }
 
   const payload = {
     personal_id: session.user.id,
@@ -178,7 +241,7 @@ form.addEventListener('submit', async event => {
     mensagem: form.mensagem.value.trim(),
     canal: form.canal.value,
     agendado_para: scheduled.toISOString(),
-    recorrencia_rrule: recurrenceToRrule(form.recorrencia.value),
+    recorrencia_rrule: recurrenceRrule,
     status: form.status.value,
     erro: null
   };
