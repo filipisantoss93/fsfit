@@ -8,6 +8,8 @@ const switchButton = document.querySelector('#auth-switch');
 const nameGroup = document.querySelector('#name-group');
 const confirmGroup = document.querySelector('#confirm-group');
 const forgotWrap = document.querySelector('#forgot-password-wrap');
+const legalConsentGroup = document.querySelector('#legal-consent-group');
+const legalConsent = document.querySelector('#legal-consent');
 const trialNote = document.querySelector('#auth-trial-note');
 const message = document.querySelector('#auth-message');
 let mode = 'login';
@@ -30,9 +32,13 @@ function setMode(nextMode, { preserveMessage = false } = {}) {
   }
   nameGroup.classList.toggle('hidden', !signup);
   confirmGroup.classList.toggle('hidden', !signup);
+  legalConsentGroup?.classList.toggle('hidden', !signup);
   forgotWrap?.classList.toggle('hidden', signup);
   form.password.autocomplete = signup ? 'new-password' : 'current-password';
-  if (!signup) form.confirm_password.value = '';
+  if (!signup) {
+    form.confirm_password.value = '';
+    if (legalConsent) legalConsent.checked = false;
+  }
   if (!preserveMessage) message.className = 'message';
 }
 
@@ -57,6 +63,9 @@ form?.addEventListener('submit', async event => {
   if (mode === 'signup' && password !== confirmPassword) {
     return show('As senhas não coincidem.');
   }
+  if (mode === 'signup' && !legalConsent?.checked) {
+    return show('Para criar sua conta, leia e aceite os Termos de Uso e a Política de Privacidade.');
+  }
 
   submit.disabled = true;
   submit.textContent = 'Aguarde...';
@@ -71,13 +80,21 @@ form?.addEventListener('submit', async event => {
 
     if (fullName.length < 2) throw new Error('Informe seu nome completo.');
 
+    const acceptedAt = new Date().toISOString();
     const confirmationRedirect = `${window.location.origin}/?email_confirmado=true`;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: confirmationRedirect,
-        data: { full_name: fullName, tipo: 'personal' }
+        data: {
+          full_name: fullName,
+          tipo: 'personal',
+          termos_aceitos_em: acceptedAt,
+          politica_privacidade_aceita_em: acceptedAt,
+          versao_termos: '2026-07-17',
+          versao_privacidade: '2026-07-17'
+        }
       }
     });
 
