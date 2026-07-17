@@ -5,9 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f1115">
   <title>FS Fit — Gestão simples para personal trainers</title>
-  <meta name="description" content="Cadastre-se no FS Fit e ganhe 7 dias grátis para organizar alunos, treinos e sua consultoria online. Depois, continue por R$ 29,90.">
+  <meta name="description" content="Cadastre-se no FS Fit e ganhe 7 dias grátis para organizar alunos, treinos e sua consultoria online. Alunos também podem acessar seus treinos diretamente pelo FS Fit.">
   <link rel="stylesheet" href="css/style.css">
   <style>
+    .landing-nav {
+      justify-content: space-between;
+    }
+    .student-header-access {
+      min-height: 40px;
+      padding-inline: 14px;
+      white-space: nowrap;
+    }
     .trial-highlight {
       display: flex;
       align-items: center;
@@ -22,13 +30,61 @@
     .trial-highlight strong { display: block; color: var(--primary); font-size: 1rem; }
     .trial-highlight span { display: block; margin-top: 3px; color: var(--muted); font-size: .9rem; }
     .trial-icon { font-size: 1.5rem; line-height: 1; }
+    .student-access-highlight {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      max-width: 680px;
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid rgba(59, 130, 246, .42);
+      border-radius: 14px;
+      background: rgba(59, 130, 246, .09);
+    }
+    .student-access-highlight strong {
+      display: block;
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .student-access-highlight span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+    .student-access-highlight .btn {
+      flex: 0 0 auto;
+    }
+    .auth-context {
+      margin: -8px 0 8px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
     @media (max-width: 620px) {
       .trial-highlight { width: 100%; align-items: flex-start; }
+      .student-header-access { min-height: 38px; padding-inline: 11px; font-size: .82rem; }
+      .student-access-highlight {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .student-access-highlight .btn { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <header class="main-header"><nav class="nav-container"><a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a></nav></header>
+  <header class="main-header">
+    <nav class="nav-container landing-nav">
+      <a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a>
+      <a class="btn btn-outline student-header-access" href="acesso-aluno.html">Área do aluno</a>
+    </nav>
+  </header>
   <main class="container">
     <section class="hero">
       <div>
@@ -42,9 +98,17 @@
             <span>Teste o FS Fit e, depois do período gratuito, continue por apenas R$ 29,90.</span>
           </div>
         </div>
+        <div class="student-access-highlight">
+          <div>
+            <strong>Já é aluno?</strong>
+            <span>Acesse seus treinos, orientações e acompanhamento usando seu WhatsApp e PIN.</span>
+          </div>
+          <a class="btn btn-outline" href="acesso-aluno.html">Acessar meus treinos</a>
+        </div>
       </div>
       <div class="card auth-card">
         <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
+        <div class="auth-context">Área do personal trainer</div>
         <h2 id="auth-title">Acesse sua conta</h2>
         <div id="auth-message" class="message"></div>
         <form id="auth-form">
