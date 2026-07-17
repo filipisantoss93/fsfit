@@ -23,6 +23,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      FSFIT_ANDROID_KEYSTORE_BASE64: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 }}
+      FSFIT_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
+      FSFIT_ANDROID_KEY_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -72,18 +76,22 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Check production signing secrets
+        if: ${{ env.FSFIT_ANDROID_KEYSTORE_BASE64 == '' || env.FSFIT_ANDROID_KEYSTORE_PASSWORD == '' || env.FSFIT_ANDROID_KEY_PASSWORD == '' }}
+        run: |
+          echo 'Os secrets de assinatura Android não estão completos.'
+          exit 1
+
       - name: Restore production signing key
-        if: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 != '' }}
         working-directory: android
         shell: bash
-        run: echo '${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > fsfit-upload-key.jks
+        run: printf '%s' "$FSFIT_ANDROID_KEYSTORE_BASE64" | base64 --decode > fsfit-upload-key.jks
 
       - name: Build signed production APK and AAB
-        if: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 != '' }}
         working-directory: android
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEY_PASSWORD }}
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.FSFIT_ANDROID_KEY_PASSWORD }}
         run: |
           bubblewrap build \
             --skipPwaValidation \
@@ -92,7 +100,6 @@ jobs:
             --signingKeyAlias=fsfit
 
       - name: Upload signed production artifacts
-        if: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: fsfit-android-production
