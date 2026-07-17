@@ -13,6 +13,7 @@ const list = document.querySelector('#reminders-list');
 const formTitle = document.querySelector('#form-title');
 const cancelEdit = document.querySelector('#cancel-edit');
 let editingId = null;
+let studentPhone = '';
 
 if (!alunoId) {
   showMessage(message, 'Aluno não informado.', 'error');
@@ -23,6 +24,13 @@ function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
   return div.innerHTML;
+}
+
+function normalizeWhatsAppNumber(value = '') {
+  const digits = String(value).replace(/\D/g, '');
+  if (/^55\d{10,11}$/.test(digits)) return digits;
+  if (/^\d{10,11}$/.test(digits)) return `55${digits}`;
+  return '';
 }
 
 function recurrenceToRrule(value) {
@@ -48,7 +56,24 @@ function recurrenceLabel(value) {
 }
 
 function channelLabel(value) {
-  return { push: 'Notificação', whatsapp: 'WhatsApp', ambos: 'Ambos' }[value] || value;
+  return {
+    push: 'Notificação',
+    whatsapp: 'WhatsApp manual',
+    ambos: 'Notificação + WhatsApp'
+  }[value] || value;
+}
+
+function statusLabel(value) {
+  return {
+    agendado: 'AGENDADO',
+    processando: 'PROCESSANDO',
+    enviado: 'ENVIADO',
+    whatsapp_pendente: 'AGUARDANDO ENVIO NO WHATSAPP',
+    whatsapp_aberto: 'ABERTO NO WHATSAPP',
+    falhou: 'FALHOU',
+    falhou_parcial: 'FALHOU PARCIALMENTE',
+    cancelado: 'CANCELADO'
+  }[value] || String(value || '').replaceAll('_', ' ').toUpperCase();
 }
 
 function formatDateTime(value) {
@@ -65,7 +90,7 @@ function toLocalInput(value) {
 
 async function loadStudent() {
   const { data, error } = await supabase.from('alunos')
-    .select('id,nome')
+    .select('id,nome,telefone')
     .eq('id', alunoId)
     .eq('personal_id', session.user.id)
     .single();
@@ -75,6 +100,7 @@ async function loadStudent() {
     throw error;
   }
 
+  studentPhone = data.telefone || '';
   document.querySelector('#student-name').textContent = `Lembretes de ${data.nome}`;
   document.querySelector('#back-link').href = `ficha-aluno.html?id=${data.id}`;
 }
@@ -97,7 +123,7 @@ async function loadReminders() {
       <td><strong>${esc(item.titulo)}</strong><br><small>${esc(item.mensagem)}</small></td>
       <td>${esc(channelLabel(item.canal))}</td>
       <td>${esc(recurrenceLabel(item.recorrencia_rrule))}</td>
-      <td><span class="badge">${esc(String(item.status).toUpperCase())}</span>${item.erro ? `<br><small>${esc(item.erro)}</small>` : ''}</td>
+      <td><span class="badge">${esc(statusLabel(item.status))}</span>${item.erro ? `<br><small>${esc(item.erro)}</small>` : ''}</td>
       <td><div class="actions">
         <button class="btn btn-outline" data-edit="${item.id}">Editar</button>
         ${item.status !== 'cancelado' ? `<button class="btn btn-secondary" data-cancel="${item.id}">Cancelar</button>` : ''}
@@ -161,13 +187,20 @@ form.addEventListener('submit', async event => {
     return showMessage(message, 'Informe título e mensagem do lembrete.', 'error');
   }
 
+  if (['whatsapp', 'ambos'].includes(payload.canal) && !normalizeWhatsAppNumber(studentPhone)) {
+    return showMessage(message, 'Cadastre um WhatsApp válido na ficha do aluno antes de usar este canal.', 'error');
+  }
+
   const result = editingId
     ? await supabase.from('lembretes').update(payload).eq('id', editingId).eq('personal_id', session.user.id).eq('aluno_id', alunoId)
     : await supabase.from('lembretes').insert(payload);
 
   if (result.error) return showMessage(message, result.error.message, 'error');
 
-  showMessage(message, editingId ? 'Lembrete atualizado com sucesso.' : 'Lembrete programado com sucesso.');
+  const successText = ['whatsapp', 'ambos'].includes(payload.canal)
+    ? 'Lembrete programado. No horário definido, você receberá o atalho para abrir o WhatsApp com a mensagem pronta.'
+    : (editingId ? 'Lembrete atualizado com sucesso.' : 'Lembrete programado com sucesso.');
+  showMessage(message, successText);
   resetForm();
   await loadReminders();
 });
