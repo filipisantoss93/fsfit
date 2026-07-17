@@ -24,6 +24,22 @@ const statusLabels = {
   resolvido: 'Resolvido'
 };
 
+function prefillFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const categoria = params.get('categoria');
+  const assunto = params.get('assunto');
+  const mensagemInicial = params.get('mensagem');
+
+  if (categoria && categoryLabels[categoria]) form.categoria.value = categoria;
+  if (assunto) form.assunto.value = assunto.slice(0, 160);
+  if (mensagemInicial) form.mensagem.value = mensagemInicial.slice(0, 5000);
+
+  if (assunto || mensagemInicial) {
+    form.assunto.focus();
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
@@ -100,6 +116,7 @@ form.addEventListener('submit', async event => {
     const { error } = await supabase.from('contatos_suporte').insert(payload);
     if (error) throw error;
     form.reset();
+    window.history.replaceState({}, '', 'contato.html');
     showMessage(message, 'Mensagem enviada. Você pode acompanhar a resposta nesta página.');
     await loadTickets();
   } catch (error) {
@@ -135,4 +152,5 @@ document.addEventListener('submit', async event => {
   }
 });
 
+prefillFromUrl();
 await loadTickets();
