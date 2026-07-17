@@ -1,13 +1,15 @@
-const CACHE_NAME = 'fsfit-shell-v2';
+const CACHE_NAME = 'fsfit-shell-v3';
 const APP_SHELL = [
   '/',
   '/acesso-aluno.html',
   '/aluno.html',
   '/css/style.css',
   '/css/aluno-midias.css',
+  '/css/aluno-notificacoes.css',
   '/js/supabase.js',
   '/js/acesso-aluno.js',
   '/js/aluno.js',
+  '/js/aluno-notificacoes.js',
   '/manifest.webmanifest',
   '/assets/fsfit-icon.svg'
 ];
