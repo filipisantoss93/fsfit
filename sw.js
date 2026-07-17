@@ -11,7 +11,9 @@ const APP_SHELL = [
   '/js/aluno.js',
   '/js/aluno-notificacoes.js',
   '/manifest.webmanifest',
-  '/assets/fsfit-icon.svg'
+  '/assets/icons/02-pwa/icon-192x192.png',
+  '/assets/icons/02-pwa/icon-512x512.png',
+  '/assets/icons/02-pwa/icon-maskable-512x512.png'
 ];
 const APP_SHELL_PATHS = new Set(APP_SHELL.map(path => new URL(path, self.location.origin).pathname));
 
@@ -58,8 +60,8 @@ self.addEventListener('push', event => {
   const title = payload.title || 'FS Fit';
   const options = {
     body: payload.body || payload.message || 'Você recebeu um novo lembrete do seu personal.',
-    icon: '/assets/fsfit-icon.svg',
-    badge: '/assets/fsfit-icon.svg',
+    icon: '/assets/icons/02-pwa/icon-192x192.png',
+    badge: '/assets/icons/02-pwa/icon-192x192.png',
     data: { url: payload.url || '/aluno.html' },
     tag: payload.tag || 'fsfit-lembrete',
     renotify: true
