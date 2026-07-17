@@ -39,6 +39,10 @@ function formatDate(value) {
   return new Date(value).toLocaleString('pt-BR');
 }
 
+function requestedTicketId() {
+  return new URLSearchParams(window.location.search).get('id');
+}
+
 async function requireAdmin() {
   const { data, error } = await supabase.from('platform_admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
   if (error || !data) {
@@ -102,12 +106,18 @@ async function loadTickets() {
   renderList();
 }
 
-async function openTicket(id) {
+async function openTicket(id, { updateUrl = true } = {}) {
   selectedId = id;
   renderList();
   const ticket = tickets.find(item => item.id === id);
   if (!ticket) return;
   const profile = profiles.get(ticket.user_id);
+
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', id);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  }
 
   const { data: replies, error } = await supabase
     .from('contatos_suporte_respostas')
@@ -193,3 +203,8 @@ filter.addEventListener('change', renderList);
 
 await requireAdmin();
 await loadTickets();
+
+const initialTicketId = requestedTicketId();
+if (initialTicketId && tickets.some(ticket => ticket.id === initialTicketId)) {
+  await openTicket(initialTicketId, { updateUrl: false });
+}
