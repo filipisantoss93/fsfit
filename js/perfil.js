@@ -14,6 +14,12 @@ const workplaceFile = document.querySelector('#workplace-file');
 const galleryFiles = document.querySelector('#gallery-files');
 const galleryAdmin = document.querySelector('#gallery-admin');
 const galleryCount = document.querySelector('#gallery-count');
+const passwordModal = document.querySelector('#password-modal');
+const passwordForm = document.querySelector('#password-form');
+const passwordMessage = document.querySelector('#password-message');
+const openPasswordModalButton = document.querySelector('#open-password-modal');
+const closePasswordModalButton = document.querySelector('#close-password-modal');
+const cancelPasswordChangeButton = document.querySelector('#cancel-password-change');
 const BUCKET = 'perfil-publico';
 let avatarUrl = '';
 let workplaceUrl = '';
@@ -84,6 +90,81 @@ function renderGallery() {
     } catch (error) { console.error(error); showMessage(message, 'Não foi possível remover a foto.', 'error'); button.disabled = false; }
   }));
 }
+
+function openPasswordModal() {
+  passwordForm.reset();
+  passwordMessage.className = 'message';
+  passwordMessage.textContent = '';
+  passwordModal.classList.add('open');
+  passwordModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => passwordForm.current_password.focus(), 0);
+}
+
+function closePasswordModal() {
+  passwordModal.classList.remove('open');
+  passwordModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  passwordForm.reset();
+  passwordMessage.className = 'message';
+  passwordMessage.textContent = '';
+}
+
+openPasswordModalButton?.addEventListener('click', openPasswordModal);
+closePasswordModalButton?.addEventListener('click', closePasswordModal);
+cancelPasswordChangeButton?.addEventListener('click', closePasswordModal);
+passwordModal?.addEventListener('click', event => {
+  if (event.target === passwordModal) closePasswordModal();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && passwordModal?.classList.contains('open')) closePasswordModal();
+});
+
+passwordForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const currentPassword = passwordForm.current_password.value;
+  const newPassword = passwordForm.new_password.value;
+  const confirmPassword = passwordForm.confirm_password.value;
+
+  if (!currentPassword) return showMessage(passwordMessage, 'Informe sua senha atual.', 'error');
+  if (newPassword.length < 6) return showMessage(passwordMessage, 'A nova senha deve ter pelo menos 6 caracteres.', 'error');
+  if (newPassword !== confirmPassword) return showMessage(passwordMessage, 'A confirmação da senha não corresponde à nova senha.', 'error');
+  if (currentPassword === newPassword) return showMessage(passwordMessage, 'A nova senha deve ser diferente da senha atual.', 'error');
+  if (!session.user.email) return showMessage(passwordMessage, 'Não foi possível identificar o e-mail da sua conta.', 'error');
+
+  const submitButton = passwordForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = 'Alterando...';
+
+  try {
+    const { error: reauthError } = await supabase.auth.signInWithPassword({
+      email: session.user.email,
+      password: currentPassword
+    });
+    if (reauthError) {
+      throw new Error('Senha atual incorreta. Verifique e tente novamente.');
+    }
+
+    const { error: updatePasswordError } = await supabase.auth.updateUser({ password: newPassword });
+    if (updatePasswordError) throw updatePasswordError;
+
+    closePasswordModal();
+    showMessage(message, 'Senha alterada com sucesso.');
+  } catch (error) {
+    console.error(error);
+    const text = String(error?.message || '').toLowerCase();
+    if (text.includes('same password') || text.includes('different from the old password')) {
+      showMessage(passwordMessage, 'A nova senha deve ser diferente da senha atual.', 'error');
+    } else if (text.includes('password should be at least')) {
+      showMessage(passwordMessage, 'A nova senha não atende aos requisitos mínimos de segurança.', 'error');
+    } else {
+      showMessage(passwordMessage, error.message || 'Não foi possível alterar sua senha.', 'error');
+    }
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Salvar nova senha';
+  }
+});
 
 const [{ data: profile, error: profileError }, { data: publicProfile, error: publicError }, { data: photos, error: photosError }] = await Promise.all([
   supabase.from('perfis').select('nome,telefone,nome_empresa,plano,ativo').eq('id', session.user.id).single(),
