@@ -1,0 +1,60 @@
+name: Importar ícones FS Fit
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-fsfit-icons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Gerar pacote completo de ícones
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode assets/icons-source/fsfit-source.jpeg.b64 > /tmp/fsfit-source.jpeg
+          python scripts/generate-fsfit-icons.py /tmp/fsfit-source.jpeg assets/icons
+
+          # Limpa arquivos temporários usados apenas para realizar este upload.
+          rm -rf assets/icons-source
+          rm -f scripts/generate-fsfit-icons.py
+
+          # Remove marcadores temporários criados durante a preparação do upload.
+          rm -f assets/icons/UPLOAD-PLACEHOLDER.txt
+          rm -f assets/icons/test-base64.txt
+          rm -f assets/icons/.keep
+          rm -f assets/icons/README-UPLOAD.md
+          rm -f assets/icons/NOTE.txt
+          rm -f assets/icons/STOP-ACCIDENT.txt
+          rm -f assets/icons/TEMP.txt
+          rm -f assets/icons/TEMP2.txt
+          rm -f assets/icons/TEMP3.txt
+
+      - name: Commitar imagens geradas
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração para commitar.'
+            exit 0
+          fi
+          git commit -m 'chore: adiciona pacote completo de ícones do FS Fit'
+          git push
