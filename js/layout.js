@@ -22,7 +22,7 @@ function ensureHeaderStyles() {
   if (document.querySelector('link[data-fsfit-header-styles]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/header-menu.css?v=20260716-0137';
+  link.href = 'css/header-menu.css?v=20260717-support2';
   link.dataset.fsfitHeaderStyles = 'true';
   document.head.appendChild(link);
 }
@@ -132,7 +132,13 @@ export function renderHeader(active = '') {
           <li class="nav-divider" aria-hidden="true"></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
           <li><a data-page="contato" href="contato.html">Contato</a></li>
-          <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html"><span aria-hidden="true">⚙</span> Administração</a></li>
+          <li id="admin-nav" class="hidden nav-admin-item">
+            <a data-page="admin" href="admin.html">
+              <span aria-hidden="true">⚙</span>
+              <span>Administração</span>
+              <span class="admin-support-nav-badge hidden" data-admin-support-badge aria-label="0 notificações de suporte">0</span>
+            </a>
+          </li>
           <li class="nav-divider" aria-hidden="true"></li>
           <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
         </ul>
@@ -245,6 +251,15 @@ function safeNotificationLink(value) {
   }
 }
 
+function updateAdminSupportBadges(count) {
+  const value = Number(count || 0);
+  document.querySelectorAll('[data-admin-support-badge]').forEach(badge => {
+    badge.textContent = value > 99 ? '99+' : String(value);
+    badge.classList.toggle('hidden', value === 0);
+    badge.setAttribute('aria-label', `${value} ${value === 1 ? 'notificação' : 'notificações'} de suporte`);
+  });
+}
+
 function scheduleNotificationRefresh(session) {
   if (notificationRefreshTimer) clearTimeout(notificationRefreshTimer);
   notificationRefreshTimer = setTimeout(() => {
@@ -261,7 +276,7 @@ async function loadNotifications(session) {
   if (!badge || !list || !session?.user?.id) return;
 
   try {
-    const [notificationsResult, unreadResult] = await Promise.all([
+    const [notificationsResult, unreadResult, supportUnreadResult] = await Promise.all([
       supabase
         .from('notificacoes')
         .select('id,titulo,mensagem,link,lida,created_at')
@@ -272,19 +287,28 @@ async function loadNotifications(session) {
         .from('notificacoes')
         .select('id', { count: 'exact', head: true })
         .eq('destinatario_id', session.user.id)
+        .eq('lida', false),
+      supabase
+        .from('notificacoes')
+        .select('id', { count: 'exact', head: true })
+        .eq('destinatario_id', session.user.id)
         .eq('lida', false)
+        .in('tipo', ['suporte_novo', 'suporte_resposta'])
     ]);
 
     if (notificationsResult.error) throw notificationsResult.error;
     if (unreadResult.error) throw unreadResult.error;
+    if (supportUnreadResult.error) throw supportUnreadResult.error;
 
     const notifications = notificationsResult.data || [];
     const unreadCount = Number(unreadResult.count || 0);
+    const supportUnreadCount = Number(supportUnreadResult.count || 0);
 
     badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
     badge.classList.toggle('hidden', unreadCount === 0);
     markAll?.classList.toggle('hidden', unreadCount === 0);
     clearAll?.classList.toggle('hidden', notifications.length === 0);
+    updateAdminSupportBadges(supportUnreadCount);
 
     list.innerHTML = notifications.length
       ? notifications.map(item => {
@@ -368,6 +392,7 @@ async function loadNotifications(session) {
     badge.classList.add('hidden');
     if (markAll) markAll.classList.add('hidden');
     if (clearAll) clearAll.classList.add('hidden');
+    updateAdminSupportBadges(0);
     list.innerHTML = '<p class="notification-empty">Nenhuma notificação.</p>';
   }
 }
