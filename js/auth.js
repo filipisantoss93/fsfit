@@ -1,6 +1,20 @@
 import { supabase } from './supabase.js';
 import { ensurePersonalProfile } from './layout.js';
 
+const PLAY_DISTRIBUTION_KEY = 'fsfit_distribution';
+const PLAY_DISTRIBUTION_VALUE = 'google-play';
+const currentUrl = new URL(window.location.href);
+const launchedFromGooglePlay = currentUrl.searchParams.get('platform') === 'android-play';
+
+if (launchedFromGooglePlay) {
+  localStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
+  sessionStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
+}
+
+const isGooglePlayDistribution = launchedFromGooglePlay
+  || localStorage.getItem(PLAY_DISTRIBUTION_KEY) === PLAY_DISTRIBUTION_VALUE
+  || sessionStorage.getItem(PLAY_DISTRIBUTION_KEY) === PLAY_DISTRIBUTION_VALUE;
+
 const form = document.querySelector('#auth-form');
 const title = document.querySelector('#auth-title');
 const submit = document.querySelector('#auth-submit');
@@ -11,6 +25,8 @@ const forgotWrap = document.querySelector('#forgot-password-wrap');
 const legalConsentGroup = document.querySelector('#legal-consent-group');
 const legalConsent = document.querySelector('#legal-consent');
 const trialNote = document.querySelector('#auth-trial-note');
+const priceNote = document.querySelector('.auth-price-note');
+const heroBadge = document.querySelector('.hero-badge');
 const message = document.querySelector('#auth-message');
 let mode = 'login';
 
@@ -19,12 +35,21 @@ function show(text, type = 'error') {
   message.className = `message show ${type}`;
 }
 
+function applyGooglePlayConsumptionMode() {
+  if (!isGooglePlayDistribution) return;
+  switchButton?.closest('.auth-switch')?.classList.add('hidden');
+  heroBadge?.classList.add('hidden');
+  if (priceNote) priceNote.textContent = 'Acesse com sua conta FS Fit existente.';
+}
+
 function setMode(nextMode, { preserveMessage = false } = {}) {
+  if (isGooglePlayDistribution && nextMode === 'signup') nextMode = 'login';
+
   mode = nextMode;
   const signup = mode === 'signup';
   title.textContent = signup ? 'Comece seus 7 dias grátis' : 'Acesse sua conta';
   submit.textContent = signup ? 'Começar meus 7 dias grátis' : 'Entrar';
-  switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Clique aqui.';
+  if (switchButton) switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Clique aqui.';
   if (trialNote) {
     trialNote.innerHTML = signup
       ? '<strong>7 dias grátis.</strong> Crie sua conta agora. Depois do período gratuito, continue por R$ 29,90.'
@@ -43,17 +68,27 @@ function setMode(nextMode, { preserveMessage = false } = {}) {
 }
 
 function toggleMode() {
+  if (isGooglePlayDistribution) return;
   setMode(mode === 'login' ? 'signup' : 'login');
 }
 
 async function finishAuthenticatedAccess(session) {
+  if (isGooglePlayDistribution) {
+    localStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
+    sessionStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
+  }
   await ensurePersonalProfile(session);
   window.location.replace('painel.html');
 }
 
-switchButton?.addEventListener('click', toggleMode);
+if (!isGooglePlayDistribution) switchButton?.addEventListener('click', toggleMode);
 form?.addEventListener('submit', async event => {
   event.preventDefault();
+
+  if (isGooglePlayDistribution && mode !== 'login') {
+    setMode('login');
+    return show('No aplicativo Google Play, acesse com uma conta FS Fit existente.');
+  }
 
   const email = form.email.value.trim().toLowerCase();
   const password = form.password.value;
@@ -122,6 +157,7 @@ form?.addEventListener('submit', async event => {
   }
 });
 
+applyGooglePlayConsumptionMode();
 setMode('login');
 
 const url = new URL(window.location.href);
