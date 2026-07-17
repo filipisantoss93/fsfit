@@ -15,12 +15,32 @@ const exportButton = document.querySelector('#export-finance');
 const userModal = document.querySelector('#admin-user-modal');
 const userModalContent = document.querySelector('#admin-user-modal-content');
 const userModalClose = document.querySelector('#admin-user-modal-close');
+const usersPrev = document.querySelector('#admin-users-prev');
+const usersNext = document.querySelector('#admin-users-next');
+const usersPageInfo = document.querySelector('#admin-users-page-info');
+const financeSearch = document.querySelector('#admin-finance-search');
+const financeStatus = document.querySelector('#admin-finance-status');
+const financeStart = document.querySelector('#admin-finance-start');
+const financeEnd = document.querySelector('#admin-finance-end');
+const financePrev = document.querySelector('#admin-finance-prev');
+const financeNext = document.querySelector('#admin-finance-next');
+const financePageInfo = document.querySelector('#admin-finance-page-info');
+const revenueTrend = document.querySelector('#admin-revenue-trend');
 
 const VALID_PLANS = ['trial', 'free', 'premium'];
 const PLAN_LABELS = { trial: 'Trial', free: 'Free', premium: 'Premium' };
+const PAGE_SIZE = 25;
 let users = [];
 let payments = [];
 let openUserId = null;
+let userPage = 1;
+let userPages = 1;
+let userTotal = 0;
+let financePage = 1;
+let financePages = 1;
+let financeTotal = 0;
+let userSearchTimer = null;
+let financeSearchTimer = null;
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -45,6 +65,10 @@ function formatMoney(value) {
 
 function formatMoneyCents(value) {
   return formatMoney(Number(value || 0) / 100);
+}
+
+function formatPercent(value) {
+  return `${Number(value || 0).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`;
 }
 
 function formatDate(value) {
@@ -76,6 +100,22 @@ function initials(name = '') {
   return parts.map(part => part[0]?.toUpperCase()).join('') || 'U';
 }
 
+function safeImageUrl(value) {
+  if (!value) return '';
+  try {
+    const url = new URL(String(value), window.location.origin);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
+function monthLabel(value) {
+  if (!/^\d{4}-\d{2}$/.test(String(value || ''))) return value || '—';
+  const date = new Date(`${value}-01T12:00:00`);
+  return date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '');
+}
+
 async function requireAdmin() {
   const { data, error } = await supabase
     .from('platform_admins')
@@ -102,15 +142,37 @@ function applySummary(summary = {}) {
   document.querySelector('#finance-ticket').textContent = formatMoney(summary.ticket_medio);
 }
 
-function renderUsers() {
-  const term = searchInput.value.trim().toLowerCase();
-  const plan = planFilter.value;
-  const filtered = users.filter(user => {
-    const haystack = `${user.nome || ''} ${user.email || ''} ${user.nome_empresa || ''} ${user.telefone || ''}`.toLowerCase();
-    return (!term || haystack.includes(term)) && (!plan || normalizePlan(user.plano) === plan);
-  });
+function applyManagementMetrics(metrics = {}) {
+  document.querySelector('#metric-revenue-30').textContent = formatMoney(metrics.receita_30d);
+  document.querySelector('#metric-revenue-periods').textContent = `7d: ${formatMoney(metrics.receita_7d)} · 90d: ${formatMoney(metrics.receita_90d)}`;
+  document.querySelector('#metric-mrr').textContent = formatMoney(metrics.mrr);
+  document.querySelector('#metric-active-subscriptions').textContent = Number(metrics.assinaturas_ativas || 0);
+  document.querySelector('#metric-new-subscribers').textContent = Number(metrics.novos_assinantes_30d || 0);
+  document.querySelector('#metric-cancellations').textContent = Number(metrics.cancelamentos_30d || 0);
+  document.querySelector('#metric-conversion').textContent = formatPercent(metrics.conversao_trial_premium);
+  document.querySelector('#metric-revenue-per-customer').textContent = `Receita média/cliente: ${formatMoney(metrics.receita_media_cliente)}`;
+  renderRevenueTrend(metrics.tendencia_mensal || []);
+}
 
-  usersList.innerHTML = filtered.length ? filtered.map(user => {
+function renderRevenueTrend(items) {
+  if (!Array.isArray(items) || !items.length) {
+    revenueTrend.innerHTML = '<p class="admin-empty">Ainda não há dados financeiros suficientes para exibir a evolução.</p>';
+    return;
+  }
+  const max = Math.max(...items.map(item => Number(item.valor || 0)), 1);
+  revenueTrend.innerHTML = items.map(item => {
+    const value = Number(item.valor || 0);
+    const height = value > 0 ? Math.max(8, Math.round((value / max) * 100)) : 2;
+    return `<div class="admin-trend-item" title="${esc(monthLabel(item.mes))}: ${esc(formatMoney(value))}">
+      <strong>${esc(formatMoney(value))}</strong>
+      <div class="admin-trend-track"><div class="admin-trend-bar" style="height:${height}%"></div></div>
+      <span>${esc(monthLabel(item.mes))}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderUsers() {
+  usersList.innerHTML = users.length ? users.map(user => {
     const currentPlan = normalizePlan(user.plano);
     const expiry = formatExpiry(user);
     return `
@@ -127,17 +189,26 @@ function renderUsers() {
       </div></td>
     </tr>`;
   }).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma conta encontrada.</td></tr>';
+
+  usersPageInfo.textContent = `Página ${userPage} de ${userPages} · ${userTotal} ${userTotal === 1 ? 'usuário' : 'usuários'}`;
+  usersPrev.disabled = userPage <= 1;
+  usersNext.disabled = userPage >= userPages;
 }
 
 function renderPayments() {
   financeList.innerHTML = payments.length ? payments.map(item => `
     <tr>
       <td>${formatDate(item.paid_at || item.created_at)}</td>
-      <td>${esc(item.nome || item.email || item.user_id || '—')}</td>
+      <td><div class="admin-user-meta"><strong>${esc(item.nome || 'Usuário')}</strong><small>${esc(item.email || item.user_id || '—')}</small></div></td>
       <td>${esc(item.plano ? planLabel(item.plano) : '—')}</td>
-      <td>${formatMoney(item.valor || item.amount)}</td>
-      <td>${esc(item.status || '—')}</td>
-    </tr>`).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma movimentação financeira registrada.</td></tr>';
+      <td>${formatMoney(item.valor)}</td>
+      <td><span class="admin-badge">${esc(item.status || '—')}</span></td>
+      <td><div class="admin-user-meta"><strong>${esc(item.txid || '—')}</strong>${item.e2e_id ? `<small>E2E: ${esc(item.e2e_id)}</small>` : ''}</div></td>
+    </tr>`).join('') : '<tr><td colspan="6" class="admin-empty">Nenhuma movimentação financeira encontrada.</td></tr>';
+
+  financePageInfo.textContent = `Página ${financePage} de ${financePages} · ${financeTotal} ${financeTotal === 1 ? 'movimentação' : 'movimentações'}`;
+  financePrev.disabled = financePage <= 1;
+  financeNext.disabled = financePage >= financePages;
 }
 
 function detailItem(label, value) {
@@ -153,12 +224,13 @@ function closeUserModal() {
 
 function openUserModal(userId, { focusPlan = false } = {}) {
   const user = users.find(item => item.id === userId);
-  if (!user) throw new Error('Usuário não encontrado.');
+  if (!user) throw new Error('Usuário não encontrado nesta página.');
   openUserId = userId;
   const currentPlan = normalizePlan(user.plano);
   const expiry = formatExpiry(user);
-  const avatar = user.avatar_url
-    ? `<img class="admin-user-avatar" src="${esc(user.avatar_url)}" alt="Foto de ${esc(user.nome || 'usuário')}">`
+  const avatarUrl = safeImageUrl(user.avatar_url);
+  const avatar = avatarUrl
+    ? `<img class="admin-user-avatar" src="${esc(avatarUrl)}" alt="Foto de ${esc(user.nome || 'usuário')}">`
     : `<div class="admin-user-avatar admin-user-avatar-placeholder" aria-hidden="true">${esc(initials(user.nome))}</div>`;
 
   userModalContent.innerHTML = `
@@ -254,25 +326,58 @@ async function loadSummary() {
   applySummary(data || {});
 }
 
-async function loadUsers() {
-  const { data, error } = await supabase.rpc('fsfit_admin_listar_usuarios_detalhes');
+async function loadManagementMetrics() {
+  const { data, error } = await supabase.rpc('fsfit_admin_metricas_gestao');
   if (error) throw error;
-  users = (data || []).map(user => ({ ...user, plano: normalizePlan(user.plano) }));
+  applyManagementMetrics(data || {});
+}
+
+async function loadUsers() {
+  const { data, error } = await supabase.rpc('fsfit_admin_listar_usuarios_paginado', {
+    p_busca: searchInput.value.trim() || null,
+    p_plano: planFilter.value || null,
+    p_pagina: userPage,
+    p_limite: PAGE_SIZE
+  });
+  if (error) throw error;
+  const result = data || {};
+  users = Array.isArray(result.itens) ? result.itens.map(user => ({ ...user, plano: normalizePlan(user.plano) })) : [];
+  userPage = Number(result.pagina || 1);
+  userPages = Number(result.paginas || 1);
+  userTotal = Number(result.total || 0);
   renderUsers();
-  if (openUserId && users.some(user => user.id === openUserId)) openUserModal(openUserId);
+  if (openUserId) {
+    if (users.some(user => user.id === openUserId)) openUserModal(openUserId);
+    else closeUserModal();
+  }
 }
 
 async function loadPayments() {
-  const { data, error } = await supabase.rpc('fsfit_admin_listar_pagamentos');
   const sourceNote = document.querySelector('#finance-source-note');
+  const { data, error } = await supabase.rpc('fsfit_admin_listar_pagamentos_paginado', {
+    p_busca: financeSearch.value.trim() || null,
+    p_status: financeStatus.value || null,
+    p_data_inicio: financeStart.value || null,
+    p_data_fim: financeEnd.value || null,
+    p_pagina: financePage,
+    p_limite: PAGE_SIZE
+  });
   if (error) {
     console.warn('Relatório financeiro indisponível:', error.message);
     payments = [];
+    financePage = 1;
+    financePages = 1;
+    financeTotal = 0;
+    renderPayments();
     if (sourceNote) sourceNote.textContent = 'Não foi possível carregar as cobranças PIX registradas. Atualize a página ou verifique a integração financeira.';
-  } else {
-    payments = data || [];
-    if (sourceNote) sourceNote.textContent = 'Valores calculados a partir das cobranças PIX reais registradas e confirmadas pela integração Efí.';
+    return;
   }
+  const result = data || {};
+  payments = Array.isArray(result.itens) ? result.itens : [];
+  financePage = Number(result.pagina || 1);
+  financePages = Number(result.paginas || 1);
+  financeTotal = Number(result.total || 0);
+  if (sourceNote) sourceNote.textContent = 'Valores calculados a partir das cobranças PIX reais registradas e confirmadas pela integração Efí.';
   renderPayments();
 }
 
@@ -290,7 +395,7 @@ async function updatePlan(userId) {
     : plan === 'trial'
       ? 'Novo período Trial de 7 dias aplicado com sucesso.'
       : 'Conta alterada para o plano Free e acessos pagos/trial encerrados.');
-  await Promise.all([loadUsers(), loadSummary()]);
+  await Promise.all([loadUsers(), loadSummary(), loadManagementMetrics()]);
 }
 
 async function toggleUser(userId, active) {
@@ -300,7 +405,7 @@ async function toggleUser(userId, active) {
   const { error } = await supabase.rpc('fsfit_admin_definir_conta_ativa', { p_user_id: userId, p_ativo: active });
   if (error) throw error;
   showMessage(message, active ? 'Conta ativada com sucesso.' : 'Conta desativada. O acesso à plataforma será bloqueado.');
-  await Promise.all([loadUsers(), loadSummary()]);
+  await Promise.all([loadUsers(), loadSummary(), loadManagementMetrics()]);
 }
 
 async function sendPasswordReset(userId) {
@@ -316,34 +421,112 @@ async function sendPasswordReset(userId) {
   showMessage(message, `E-mail de recuperação enviado para ${user.email}.`);
 }
 
-function exportFinanceCsv() {
-  if (!payments.length) {
-    showMessage(message, 'Não há movimentações financeiras para exportar.', 'error');
-    return;
+async function exportFinanceCsv() {
+  const originalText = exportButton.textContent;
+  exportButton.disabled = true;
+  exportButton.textContent = 'Gerando CSV...';
+  try {
+    const { data, error } = await supabase.rpc('fsfit_admin_exportar_pagamentos', {
+      p_busca: financeSearch.value.trim() || null,
+      p_status: financeStatus.value || null,
+      p_data_inicio: financeStart.value || null,
+      p_data_fim: financeEnd.value || null
+    });
+    if (error) throw error;
+    const rowsData = Array.isArray(data) ? data : [];
+    if (!rowsData.length) {
+      showMessage(message, 'Não há movimentações financeiras para exportar com os filtros atuais.', 'error');
+      return;
+    }
+    const rows = [['Data','Usuário','E-mail','Plano','Valor','Status','TXID','E2E','Vencimento da cobrança'], ...rowsData.map(item => [
+      formatDateTime(item.data),
+      item.nome || '',
+      item.email || '',
+      item.plano ? planLabel(item.plano) : '',
+      Number(item.valor || 0).toFixed(2).replace('.', ','),
+      item.status || '',
+      item.txid || '',
+      item.e2e_id || '',
+      formatDateTime(item.vence_em)
+    ])];
+    const csv = rows.map(row => row.map(value => `"${String(value).replaceAll('"','""')}"`).join(';')).join('\n');
+    const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `fsfit-financeiro-${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error(error);
+    showMessage(message, error.message || 'Não foi possível exportar o relatório financeiro.', 'error');
+  } finally {
+    exportButton.disabled = false;
+    exportButton.textContent = originalText;
   }
-  const rows = [['Data','Usuário','Plano','Valor','Status'], ...payments.map(item => [
-    formatDate(item.paid_at || item.created_at),
-    item.nome || item.email || item.user_id || '',
-    item.plano ? planLabel(item.plano) : '',
-    Number(item.valor || item.amount || 0).toFixed(2).replace('.', ','),
-    item.status || ''
-  ])];
-  const csv = rows.map(row => row.map(value => `"${String(value).replaceAll('"','""')}"`).join(';')).join('\n');
-  const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `fsfit-financeiro-${new Date().toISOString().slice(0,10)}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
 }
 
-searchInput.addEventListener('input', renderUsers);
-planFilter.addEventListener('change', renderUsers);
+function scheduleUserSearch() {
+  clearTimeout(userSearchTimer);
+  userSearchTimer = setTimeout(async () => {
+    userPage = 1;
+    try {
+      await loadUsers();
+    } catch (error) {
+      console.error(error);
+      showMessage(message, 'Não foi possível filtrar os usuários.', 'error');
+    }
+  }, 280);
+}
+
+function scheduleFinanceSearch() {
+  clearTimeout(financeSearchTimer);
+  financeSearchTimer = setTimeout(async () => {
+    financePage = 1;
+    try {
+      await loadPayments();
+    } catch (error) {
+      console.error(error);
+      showMessage(message, 'Não foi possível filtrar as movimentações financeiras.', 'error');
+    }
+  }, 280);
+}
+
+searchInput.addEventListener('input', scheduleUserSearch);
+planFilter.addEventListener('change', async () => {
+  userPage = 1;
+  try { await loadUsers(); } catch (error) { console.error(error); showMessage(message, 'Não foi possível filtrar os usuários.', 'error'); }
+});
 exportButton.addEventListener('click', exportFinanceCsv);
 userModalClose.addEventListener('click', closeUserModal);
 userModal.addEventListener('click', event => { if (event.target === userModal) closeUserModal(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !userModal.classList.contains('hidden')) closeUserModal(); });
+
+usersPrev.addEventListener('click', async () => {
+  if (userPage <= 1) return;
+  userPage -= 1;
+  try { await loadUsers(); } catch (error) { console.error(error); showMessage(message, 'Não foi possível carregar a página anterior.', 'error'); }
+});
+usersNext.addEventListener('click', async () => {
+  if (userPage >= userPages) return;
+  userPage += 1;
+  try { await loadUsers(); } catch (error) { console.error(error); showMessage(message, 'Não foi possível carregar a próxima página.', 'error'); }
+});
+
+financeSearch.addEventListener('input', scheduleFinanceSearch);
+financeStatus.addEventListener('change', scheduleFinanceSearch);
+financeStart.addEventListener('change', scheduleFinanceSearch);
+financeEnd.addEventListener('change', scheduleFinanceSearch);
+financePrev.addEventListener('click', async () => {
+  if (financePage <= 1) return;
+  financePage -= 1;
+  try { await loadPayments(); } catch (error) { console.error(error); showMessage(message, 'Não foi possível carregar a página anterior.', 'error'); }
+});
+financeNext.addEventListener('click', async () => {
+  if (financePage >= financePages) return;
+  financePage += 1;
+  try { await loadPayments(); } catch (error) { console.error(error); showMessage(message, 'Não foi possível carregar a próxima página.', 'error'); }
+});
 
 document.addEventListener('click', async event => {
   const openButton = event.target.closest('[data-open-user]');
@@ -364,4 +547,4 @@ document.addEventListener('click', async event => {
 });
 
 await requireAdmin();
-await Promise.all([loadUsers(), loadPayments(), loadSummary()]);
+await Promise.all([loadUsers(), loadPayments(), loadSummary(), loadManagementMetrics()]);
