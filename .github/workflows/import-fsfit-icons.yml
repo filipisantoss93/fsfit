@@ -2,6 +2,8 @@ name: Importar ícones FS Fit
 
 on:
   push:
+    branches:
+      - main
     paths:
       - '.github/workflows/import-fsfit-icons.yml'
   workflow_dispatch:
@@ -31,12 +33,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode assets/icons-source/fsfit-source.jpeg.b64 > /tmp/fsfit-source.jpeg
+          cat assets/icons-source-v5/fsfit-source.part* | base64 --decode > /tmp/fsfit-source.jpeg
+          echo "f5cb361f69d38099824e383571759b01ec5ad427cc26eb83ebab1a059bfef2ce  /tmp/fsfit-source.jpeg" | sha256sum -c -
           python scripts/generate-fsfit-icons.py /tmp/fsfit-source.jpeg assets/icons
 
-          rm -rf assets/icons-source
+          # Limpa fontes e arquivos temporários usados somente nesta importação.
+          rm -rf assets/icons-source assets/icons-source-v2 assets/icons-source-v3 assets/icons-source-v4 assets/icons-source-v5
           rm -f scripts/generate-fsfit-icons.py
 
+          # Limpa marcadores temporários de tentativas anteriores.
           rm -f assets/icons/UPLOAD-PLACEHOLDER.txt
           rm -f assets/icons/test-base64.txt
           rm -f assets/icons/.keep
@@ -49,6 +54,24 @@ jobs:
           rm -f assets/icons/DO-NOT-USE.txt
           rm -f assets/icons/DO-NOT-USE-2.txt
           rm -f assets/icons/temporary-check.txt
+          rm -f assets/icons/.upload-status.txt
+          rm -f assets/icons/.upload-method.txt
+          rm -f assets/icons/.keep-binary-upload.txt
+          rm -f assets/icons/.ignore-upload.txt
+          rm -f assets/icons/.tree-upload-note.txt
+          rm -f assets/icons/.tmp-upload-marker.txt
+          rm -f assets/icons/.final-upload-prep.txt
+          rm -f assets/icons/.direct-upload-prep.txt
+          rm -f assets/icons/.oops.txt
+          rm -f assets/icons/.tmp2.txt
+          rm -f assets/icons/.last-temp.txt
+          rm -f assets/icons/.tmp3.txt
+          rm -f assets/icons/.tmp4.txt
+          rm -f assets/icons/.tmp5.txt
+          rm -f assets/icons/.tmp6.txt
+          rm -f assets/icons/.tmp7.txt
+          rm -f assets/icons/.tmp8.txt
+          rm -f assets/icons/.tree-test
 
       - name: Commitar imagens geradas
         shell: bash
