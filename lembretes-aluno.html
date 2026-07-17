@@ -55,6 +55,7 @@
               <label>Recorrência</label>
               <select name="recorrencia">
                 <option value="">Não repetir</option>
+                <option value="interval">A cada intervalo</option>
                 <option value="daily">Todos os dias</option>
                 <option value="weekly">Toda semana</option>
                 <option value="weekdays">Segunda a sexta</option>
@@ -69,6 +70,21 @@
             </div>
           </div>
 
+          <div id="recurrence-interval-fields" class="grid grid-2 hidden">
+            <div class="form-group">
+              <label>A cada</label>
+              <input name="intervalo_valor" type="number" min="1" max="999" step="1" value="30" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label>Unidade</label>
+              <select name="intervalo_unidade">
+                <option value="minutes">Minuto(s)</option>
+                <option value="hours">Hora(s)</option>
+                <option value="days">Dia(s)</option>
+              </select>
+            </div>
+          </div>
+
           <div class="actions">
             <button class="btn btn-primary" type="submit">Salvar lembrete</button>
             <button id="cancel-edit" class="btn btn-secondary hidden" type="button">Cancelar edição</button>
@@ -79,6 +95,7 @@
       <article class="card">
         <h2>Como funciona</h2>
         <p>O lembrete fica vinculado exclusivamente a este aluno e ao personal autenticado.</p>
+        <p><strong>Recorrência:</strong> além das opções diárias e semanais, você pode repetir em intervalos personalizados, como a cada 30 minutos, 3 horas ou 3 dias.</p>
         <p><strong>Notificação no celular:</strong> o aluno recebe o Push automaticamente no horário programado, desde que tenha autorizado as notificações no aparelho.</p>
         <p><strong>WhatsApp pelo personal — gratuito:</strong> no horário programado, o FS Fit avisa o personal. Ao tocar no aviso, o WhatsApp do personal abre na conversa com o aluno e com a mensagem já preenchida. O personal apenas confirma o envio.</p>
         <p><strong>Notificação + WhatsApp:</strong> o aluno recebe o Push automaticamente e o personal recebe, ao mesmo tempo, o atalho para enviar a mensagem pronta pelo próprio WhatsApp.</p>
@@ -97,6 +114,6 @@
       </div>
     </section>
   </main>
-  <script type="module" src="js/lembretes-aluno.js?v=20260717-wa1"></script>
+  <script type="module" src="js/lembretes-aluno.js?v=20260717-intervals1"></script>
 </body>
 </html>
