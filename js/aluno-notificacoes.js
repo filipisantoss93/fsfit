@@ -44,10 +44,9 @@ function safeLink(value) {
   }
 }
 
-async function invoke(body) {
-  const { data, error } = await supabase.functions.invoke('aluno-push', { body });
+async function rpc(name, params = {}) {
+  const { data, error } = await supabase.rpc(name, params);
   if (error) throw error;
-  if (data?.error) throw new Error(data.error);
   return data;
 }
 
@@ -79,11 +78,16 @@ async function loadNotifications() {
   const sessionToken = token();
   if (!sessionToken) return;
   try {
-    const data = await invoke({ action: 'list_notifications', token: sessionToken });
-    renderNotifications(data?.notifications || []);
-    updateBadge(data?.unread_count || 0);
-    markAllButton?.classList.toggle('hidden', !(Number(data?.unread_count || 0) > 0));
-    clearButton?.classList.toggle('hidden', !(data?.notifications || []).length);
+    const [notifications, unreadCount] = await Promise.all([
+      rpc('listar_notificacoes_aluno', { p_session_token: sessionToken }),
+      rpc('contar_notificacoes_nao_lidas_aluno', { p_session_token: sessionToken })
+    ]);
+    const items = Array.isArray(notifications) ? notifications : [];
+    const unread = Number(unreadCount || 0);
+    renderNotifications(items);
+    updateBadge(unread);
+    markAllButton?.classList.toggle('hidden', unread === 0);
+    clearButton?.classList.toggle('hidden', items.length === 0);
   } catch (error) {
     console.error('Não foi possível carregar as notificações do aluno:', error);
     if (notificationList) notificationList.innerHTML = '<p class="student-notification-empty">Não foi possível carregar as notificações agora.</p>';
@@ -131,7 +135,10 @@ notificationList?.addEventListener('click', async event => {
 
   item.disabled = true;
   try {
-    await invoke({ action: 'mark_notification_read', token: sessionToken, notification_id: notificationId });
+    await rpc('marcar_notificacao_aluno_lida', {
+      p_session_token: sessionToken,
+      p_notificacao_id: notificationId
+    });
     await loadNotifications();
     if (link) window.location.assign(link);
   } catch (error) {
@@ -145,7 +152,7 @@ markAllButton?.addEventListener('click', async () => {
   if (!sessionToken) return;
   markAllButton.disabled = true;
   try {
-    await invoke({ action: 'mark_all_notifications_read', token: sessionToken });
+    await rpc('marcar_todas_notificacoes_aluno_lidas', { p_session_token: sessionToken });
     await loadNotifications();
   } catch (error) {
     console.error('Não foi possível marcar todas as notificações como lidas:', error);
@@ -160,7 +167,7 @@ clearButton?.addEventListener('click', async () => {
   if (!sessionToken) return;
   clearButton.disabled = true;
   try {
-    await invoke({ action: 'clear_notifications', token: sessionToken });
+    await rpc('limpar_notificacoes_aluno', { p_session_token: sessionToken });
     await loadNotifications();
   } catch (error) {
     console.error('Não foi possível limpar as notificações:', error);
