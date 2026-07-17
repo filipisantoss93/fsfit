@@ -12,10 +12,15 @@ const financeList = document.querySelector('#admin-finance-list');
 const searchInput = document.querySelector('#admin-user-search');
 const planFilter = document.querySelector('#admin-plan-filter');
 const exportButton = document.querySelector('#export-finance');
+const userModal = document.querySelector('#admin-user-modal');
+const userModalContent = document.querySelector('#admin-user-modal-content');
+const userModalClose = document.querySelector('#admin-user-modal-close');
 
 const VALID_PLANS = ['trial', 'free', 'premium'];
+const PLAN_LABELS = { trial: 'Trial', free: 'Free', premium: 'Premium' };
 let users = [];
 let payments = [];
+let openUserId = null;
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -30,13 +35,45 @@ function normalizePlan(value = '') {
   return VALID_PLANS.includes(plan) ? plan : 'free';
 }
 
+function planLabel(value = '') {
+  return PLAN_LABELS[normalizePlan(value)] || 'Free';
+}
+
 function formatMoney(value) {
   return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
+function formatMoneyCents(value) {
+  return formatMoney(Number(value || 0) / 100);
+}
+
 function formatDate(value) {
   if (!value) return '—';
-  return new Date(value).toLocaleDateString('pt-BR');
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('pt-BR');
+}
+
+function formatDateTime(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('pt-BR');
+}
+
+function formatBoolean(value, yes = 'Sim', no = 'Não') {
+  if (value === null || value === undefined) return '—';
+  return value ? yes : no;
+}
+
+function formatExpiry(user) {
+  const plan = normalizePlan(user.plano);
+  if (plan === 'free') return { date: 'Sem vencimento', detail: 'Acesso gratuito' };
+  if (!user.vencimento_plano) return { date: 'Não informado', detail: plan === 'trial' ? 'Trial' : 'Premium' };
+  return { date: formatDate(user.vencimento_plano), detail: plan === 'trial' ? 'Fim do trial' : 'Fim do acesso' };
+}
+
+function initials(name = '') {
+  const parts = String(name || 'U').trim().split(/\s+/).filter(Boolean).slice(0, 2);
+  return parts.map(part => part[0]?.toUpperCase()).join('') || 'U';
 }
 
 async function requireAdmin() {
@@ -65,48 +102,26 @@ function applySummary(summary = {}) {
   document.querySelector('#finance-ticket').textContent = formatMoney(summary.ticket_medio);
 }
 
-function updateFinanceStats() {
-  const approved = payments.filter(item => ['approved', 'aprovado', 'paid', 'pago', 'paga'].includes((item.status || '').toLowerCase()));
-  const pending = payments.filter(item => ['pending', 'pendente', 'waiting', 'aguardando'].includes((item.status || '').toLowerCase()));
-  const cancelled = payments.filter(item => ['cancelled', 'canceled', 'cancelado', 'cancelada', 'refunded', 'estornado', 'devolvida'].includes((item.status || '').toLowerCase()));
-  const now = new Date();
-  const monthApproved = approved.filter(item => {
-    const date = new Date(item.paid_at || item.created_at);
-    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-  });
-  const total = approved.reduce((sum, item) => sum + Number(item.valor || item.amount || 0), 0);
-  const monthTotal = monthApproved.reduce((sum, item) => sum + Number(item.valor || item.amount || 0), 0);
-
-  document.querySelector('#stat-revenue-month').textContent = formatMoney(monthTotal);
-  document.querySelector('#stat-revenue-total').textContent = formatMoney(total);
-  document.querySelector('#finance-approved').textContent = approved.length;
-  document.querySelector('#finance-pending').textContent = pending.length;
-  document.querySelector('#finance-cancelled').textContent = cancelled.length;
-  document.querySelector('#finance-ticket').textContent = formatMoney(approved.length ? total / approved.length : 0);
-}
-
 function renderUsers() {
   const term = searchInput.value.trim().toLowerCase();
   const plan = planFilter.value;
   const filtered = users.filter(user => {
-    const haystack = `${user.nome || ''} ${user.email || ''}`.toLowerCase();
+    const haystack = `${user.nome || ''} ${user.email || ''} ${user.nome_empresa || ''} ${user.telefone || ''}`.toLowerCase();
     return (!term || haystack.includes(term)) && (!plan || normalizePlan(user.plano) === plan);
   });
 
   usersList.innerHTML = filtered.length ? filtered.map(user => {
     const currentPlan = normalizePlan(user.plano);
+    const expiry = formatExpiry(user);
     return `
     <tr>
-      <td><div class="admin-user-meta"><strong>${esc(user.nome || 'Usuário')}</strong><small>${esc(user.email || 'E-mail não disponível')}</small></div></td>
-      <td>
-        <select class="admin-inline-select" data-plan-user="${esc(user.id)}">
-          ${VALID_PLANS.map(planName => `<option value="${planName}" ${currentPlan === planName ? 'selected' : ''}>${planName}</option>`).join('')}
-        </select>
-      </td>
+      <td><div class="admin-user-meta"><strong>${esc(user.nome || 'Usuário')}</strong><small>${esc(user.email || 'E-mail não disponível')}</small>${user.nome_empresa ? `<small>${esc(user.nome_empresa)}</small>` : ''}</div></td>
+      <td><span class="admin-badge ${currentPlan}">${esc(planLabel(currentPlan))}</span></td>
+      <td><div class="admin-expiry"><strong>${esc(expiry.date)}</strong><small>${esc(expiry.detail)}</small></div></td>
       <td><span class="admin-badge ${user.ativo === false ? 'inactive' : 'active'}">${user.ativo === false ? 'Inativa' : 'Ativa'}</span></td>
-      <td>${formatDate(user.trial_fim)}</td>
       <td><div class="admin-actions">
-        <button class="btn btn-outline" type="button" data-save-plan="${esc(user.id)}">Salvar plano</button>
+        <button class="btn btn-outline" type="button" data-open-user="${esc(user.id)}">Detalhes</button>
+        <button class="btn btn-secondary" type="button" data-open-plan="${esc(user.id)}">Alterar plano</button>
         <button class="btn btn-secondary" type="button" data-toggle-user="${esc(user.id)}" data-next-active="${user.ativo === false ? 'true' : 'false'}">${user.ativo === false ? 'Ativar' : 'Desativar'}</button>
         <button class="btn btn-secondary" type="button" data-reset-password="${esc(user.id)}" ${user.email ? '' : 'disabled'}>Recuperar senha</button>
       </div></td>
@@ -119,10 +134,118 @@ function renderPayments() {
     <tr>
       <td>${formatDate(item.paid_at || item.created_at)}</td>
       <td>${esc(item.nome || item.email || item.user_id || '—')}</td>
-      <td>${esc(item.plano ? normalizePlan(item.plano) : '—')}</td>
+      <td>${esc(item.plano ? planLabel(item.plano) : '—')}</td>
       <td>${formatMoney(item.valor || item.amount)}</td>
       <td>${esc(item.status || '—')}</td>
     </tr>`).join('') : '<tr><td colspan="5" class="admin-empty">Nenhuma movimentação financeira registrada.</td></tr>';
+}
+
+function detailItem(label, value) {
+  return `<div class="admin-detail-item"><span>${esc(label)}</span><strong>${esc(value ?? '—')}</strong></div>`;
+}
+
+function closeUserModal() {
+  openUserId = null;
+  userModal.classList.add('hidden');
+  document.body.classList.remove('admin-modal-open');
+  userModalContent.innerHTML = '';
+}
+
+function openUserModal(userId, { focusPlan = false } = {}) {
+  const user = users.find(item => item.id === userId);
+  if (!user) throw new Error('Usuário não encontrado.');
+  openUserId = userId;
+  const currentPlan = normalizePlan(user.plano);
+  const expiry = formatExpiry(user);
+  const avatar = user.avatar_url
+    ? `<img class="admin-user-avatar" src="${esc(user.avatar_url)}" alt="Foto de ${esc(user.nome || 'usuário')}">`
+    : `<div class="admin-user-avatar admin-user-avatar-placeholder" aria-hidden="true">${esc(initials(user.nome))}</div>`;
+
+  userModalContent.innerHTML = `
+    <div class="admin-user-hero">
+      ${avatar}
+      <div class="admin-user-hero-copy">
+        <h3>${esc(user.nome || 'Usuário')}</h3>
+        <p>${esc(user.email || 'E-mail não disponível')}</p>
+        <div class="admin-user-hero-badges">
+          <span class="admin-badge ${currentPlan}">${esc(planLabel(currentPlan))}</span>
+          <span class="admin-badge ${user.ativo === false ? 'inactive' : 'active'}">${user.ativo === false ? 'Conta inativa' : 'Conta ativa'}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-detail-grid">
+      <section class="admin-detail-section">
+        <small>CADASTRO</small><h3>Informações do usuário</h3>
+        <div class="admin-detail-list">
+          ${detailItem('ID', user.id)}
+          ${detailItem('Nome', user.nome || '—')}
+          ${detailItem('E-mail', user.email || '—')}
+          ${detailItem('Telefone', user.telefone || '—')}
+          ${detailItem('Empresa / local', user.nome_empresa || '—')}
+          ${detailItem('Cadastro em', formatDateTime(user.created_at))}
+          ${detailItem('Última atualização', formatDateTime(user.updated_at))}
+        </div>
+      </section>
+
+      <section class="admin-detail-section">
+        <small>ACESSO</small><h3>Plano e vencimento</h3>
+        <div class="admin-detail-list">
+          ${detailItem('Plano atual', planLabel(currentPlan))}
+          ${detailItem('Vencimento', expiry.date)}
+          ${detailItem('Início do trial', formatDateTime(user.trial_inicio))}
+          ${detailItem('Fim do trial', formatDateTime(user.trial_fim))}
+          ${detailItem('Conta ativa', user.ativo === false ? 'Não' : 'Sim')}
+        </div>
+      </section>
+
+      <section class="admin-detail-section">
+        <small>ASSINATURA</small><h3>Dados da assinatura</h3>
+        <div class="admin-detail-list">
+          ${detailItem('Plano contratado', user.assinatura_plano_nome || '—')}
+          ${detailItem('Código do plano', user.assinatura_plano_codigo || '—')}
+          ${detailItem('Status', user.assinatura_status || '—')}
+          ${detailItem('Periodicidade', user.periodicidade_meses ? `${user.periodicidade_meses} ${Number(user.periodicidade_meses) === 1 ? 'mês' : 'meses'}` : '—')}
+          ${detailItem('Acesso válido até', formatDateTime(user.acesso_valido_ate))}
+          ${detailItem('Próxima cobrança', formatDateTime(user.proxima_cobranca_em))}
+          ${detailItem('Preço contratado', user.preco_contratado_centavos !== null && user.preco_contratado_centavos !== undefined ? formatMoneyCents(user.preco_contratado_centavos) : '—')}
+          ${detailItem('Meio de pagamento', user.meio_pagamento || '—')}
+          ${detailItem('Renovação automática', formatBoolean(user.renovacao_automatica))}
+          ${detailItem('Última cobrança', user.ultima_cobranca_status || '—')}
+        </div>
+      </section>
+
+      <section class="admin-detail-section">
+        <small>FINANCEIRO</small><h3>Último pagamento PIX</h3>
+        <div class="admin-detail-list">
+          ${detailItem('Status', user.ultimo_pagamento_status || '—')}
+          ${detailItem('Pago em', formatDateTime(user.ultimo_pagamento_em))}
+          ${detailItem('Valor', user.ultimo_pagamento_valor_centavos !== null && user.ultimo_pagamento_valor_centavos !== undefined ? formatMoneyCents(user.ultimo_pagamento_valor_centavos) : '—')}
+          ${detailItem('TXID', user.ultimo_pagamento_txid || '—')}
+        </div>
+      </section>
+
+      <section class="admin-detail-section full">
+        <small>ADMINISTRAÇÃO</small><h3>Alterar plano</h3>
+        <div class="admin-modal-plan-row">
+          <div class="form-group">
+            <label for="admin-modal-plan-select">Plano</label>
+            <select id="admin-modal-plan-select" data-plan-user="${esc(user.id)}">
+              ${VALID_PLANS.map(planName => `<option value="${planName}" ${currentPlan === planName ? 'selected' : ''}>${PLAN_LABELS[planName]}</option>`).join('')}
+            </select>
+          </div>
+          <button class="btn btn-primary" type="button" data-save-plan="${esc(user.id)}">Salvar plano</button>
+        </div>
+        <div class="admin-modal-actions">
+          <button class="btn btn-secondary" type="button" data-toggle-user="${esc(user.id)}" data-next-active="${user.ativo === false ? 'true' : 'false'}">${user.ativo === false ? 'Ativar conta' : 'Desativar conta'}</button>
+          <button class="btn btn-outline" type="button" data-reset-password="${esc(user.id)}" ${user.email ? '' : 'disabled'}>Enviar recuperação de senha</button>
+        </div>
+      </section>
+    </div>`;
+
+  userModal.classList.remove('hidden');
+  document.body.classList.add('admin-modal-open');
+  if (focusPlan) setTimeout(() => userModalContent.querySelector('#admin-modal-plan-select')?.focus(), 0);
 }
 
 async function loadSummary() {
@@ -132,10 +255,11 @@ async function loadSummary() {
 }
 
 async function loadUsers() {
-  const { data, error } = await supabase.rpc('fsfit_admin_listar_usuarios');
+  const { data, error } = await supabase.rpc('fsfit_admin_listar_usuarios_detalhes');
   if (error) throw error;
   users = (data || []).map(user => ({ ...user, plano: normalizePlan(user.plano) }));
   renderUsers();
+  if (openUserId && users.some(user => user.id === openUserId)) openUserModal(openUserId);
 }
 
 async function loadPayments() {
@@ -149,14 +273,16 @@ async function loadPayments() {
     payments = data || [];
     if (sourceNote) sourceNote.textContent = 'Valores calculados a partir das cobranças PIX reais registradas e confirmadas pela integração Efí.';
   }
-  updateFinanceStats();
   renderPayments();
 }
 
 async function updatePlan(userId) {
   const select = document.querySelector(`[data-plan-user="${CSS.escape(userId)}"]`);
+  if (!select) throw new Error('Seletor de plano não encontrado.');
   const plan = normalizePlan(select.value);
   if (!VALID_PLANS.includes(plan)) throw new Error('Plano inválido. Use Trial, Free ou Premium.');
+  const user = users.find(item => item.id === userId);
+  if (!window.confirm(`Alterar o plano de ${user?.nome || 'este usuário'} para ${planLabel(plan)}?`)) return;
   const { error } = await supabase.rpc('fsfit_admin_atualizar_plano', { p_user_id: userId, p_plano: plan });
   if (error) throw error;
   showMessage(message, plan === 'premium'
@@ -168,6 +294,9 @@ async function updatePlan(userId) {
 }
 
 async function toggleUser(userId, active) {
+  const user = users.find(item => item.id === userId);
+  const action = active ? 'ativar' : 'desativar';
+  if (!window.confirm(`Deseja ${action} a conta de ${user?.nome || 'este usuário'}?`)) return;
   const { error } = await supabase.rpc('fsfit_admin_definir_conta_ativa', { p_user_id: userId, p_ativo: active });
   if (error) throw error;
   showMessage(message, active ? 'Conta ativada com sucesso.' : 'Conta desativada. O acesso à plataforma será bloqueado.');
@@ -177,10 +306,13 @@ async function toggleUser(userId, active) {
 async function sendPasswordReset(userId) {
   const user = users.find(item => item.id === userId);
   if (!user?.email) throw new Error('Esta conta não possui e-mail disponível para recuperação.');
+  if (!window.confirm(`Enviar um e-mail de recuperação de senha para ${user.email}?`)) return;
   const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
     redirectTo: `${window.location.origin}/nova-senha.html`
   });
   if (error) throw error;
+  const { error: auditError } = await supabase.rpc('fsfit_admin_registrar_recuperacao_senha', { p_user_id: userId });
+  if (auditError) console.warn('Não foi possível registrar a recuperação de senha na auditoria:', auditError.message);
   showMessage(message, `E-mail de recuperação enviado para ${user.email}.`);
 }
 
@@ -192,7 +324,7 @@ function exportFinanceCsv() {
   const rows = [['Data','Usuário','Plano','Valor','Status'], ...payments.map(item => [
     formatDate(item.paid_at || item.created_at),
     item.nome || item.email || item.user_id || '',
-    item.plano ? normalizePlan(item.plano) : '',
+    item.plano ? planLabel(item.plano) : '',
     Number(item.valor || item.amount || 0).toFixed(2).replace('.', ','),
     item.status || ''
   ])];
@@ -209,12 +341,19 @@ function exportFinanceCsv() {
 searchInput.addEventListener('input', renderUsers);
 planFilter.addEventListener('change', renderUsers);
 exportButton.addEventListener('click', exportFinanceCsv);
+userModalClose.addEventListener('click', closeUserModal);
+userModal.addEventListener('click', event => { if (event.target === userModal) closeUserModal(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !userModal.classList.contains('hidden')) closeUserModal(); });
 
 document.addEventListener('click', async event => {
+  const openButton = event.target.closest('[data-open-user]');
+  const openPlanButton = event.target.closest('[data-open-plan]');
   const savePlanButton = event.target.closest('[data-save-plan]');
   const toggleButton = event.target.closest('[data-toggle-user]');
   const resetButton = event.target.closest('[data-reset-password]');
   try {
+    if (openButton) return openUserModal(openButton.dataset.openUser);
+    if (openPlanButton) return openUserModal(openPlanButton.dataset.openPlan, { focusPlan: true });
     if (savePlanButton) await updatePlan(savePlanButton.dataset.savePlan);
     if (toggleButton) await toggleUser(toggleButton.dataset.toggleUser, toggleButton.dataset.nextActive === 'true');
     if (resetButton) await sendPasswordReset(resetButton.dataset.resetPassword);
