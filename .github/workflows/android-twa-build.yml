@@ -23,6 +23,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      FSFIT_ANDROID_KEYSTORE_BASE64: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 }}
+      FSFIT_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
+      FSFIT_ANDROID_KEY_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -39,12 +43,6 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install Android SDK packages
-        shell: bash
-        run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
-
       - name: Install Bubblewrap
         run: npm install --global @bubblewrap/cli@1.24.1
 
@@ -58,41 +56,55 @@ jobs:
         working-directory: android
         run: bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json
 
-      - name: Build installable debug APK
-        working-directory: android
+      - name: Check production signing secrets
+        if: ${{ env.FSFIT_ANDROID_KEYSTORE_BASE64 == '' || env.FSFIT_ANDROID_KEYSTORE_PASSWORD == '' || env.FSFIT_ANDROID_KEY_PASSWORD == '' }}
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
-
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: fsfit-android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 14
+          echo 'Os secrets de assinatura Android não estão completos.'
+          exit 1
 
       - name: Restore production signing key
-        if: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 != '' }}
         working-directory: android
         shell: bash
-        run: echo '${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > fsfit-upload-key.jks
+        run: printf '%s' "$FSFIT_ANDROID_KEYSTORE_BASE64" | base64 --decode > fsfit-upload-key.jks
 
       - name: Build signed production APK and AAB
-        if: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 != '' }}
-        working-directory: android
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.FSFIT_ANDROID_KEY_PASSWORD }}
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.FSFIT_ANDROID_KEY_PASSWORD }}
+        shell: bash
         run: |
-          bubblewrap build \
-            --skipPwaValidation \
-            --manifest=./twa-manifest.json \
-            --signingKeyPath=./fsfit-upload-key.jks \
-            --signingKeyAlias=fsfit
+          set -o pipefail
+          docker run --rm \
+            --entrypoint /bin/bash \
+            -e BUBBLEWRAP_KEYSTORE_PASSWORD \
+            -e BUBBLEWRAP_KEY_PASSWORD \
+            -v "$GITHUB_WORKSPACE/android:/app" \
+            -w /app \
+            ghcr.io/googlechromelabs/bubblewrap:latest \
+            -lc '
+              set -e
+              SDK_ROOT="/root/.bubblewrap/android_sdk"
+              SDKMANAGER="$(find "$SDK_ROOT" -type f -name sdkmanager | head -n 1)"
+              test -n "$SDKMANAGER"
+              yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
+              "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platforms;android-36" "build-tools;35.0.0"
+              bubblewrap build \
+                --skipPwaValidation \
+                --manifest=./twa-manifest.json \
+                --signingKeyPath=./fsfit-upload-key.jks \
+                --signingKeyAlias=fsfit
+            ' 2>&1 | tee android/bubblewrap-build.log
+
+      - name: Upload Bubblewrap diagnostic
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsfit-bubblewrap-build-log
+          path: android/bubblewrap-build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload signed production artifacts
-        if: ${{ secrets.FSFIT_ANDROID_KEYSTORE_BASE64 != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: fsfit-android-production
