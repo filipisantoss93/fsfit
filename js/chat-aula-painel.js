@@ -88,7 +88,9 @@ async function openChat(sessionId) {
 
 async function sendMessage(event) {
   event.preventDefault();
-  const form = event.currentTarget;
+  const form = event.target.closest('[data-personal-chat-form]');
+  if (!form) return;
+
   const sessionId = form.dataset.personalChatForm;
   const message = form.mensagem.value.trim();
   if (!message) return;
@@ -120,9 +122,8 @@ async function sendMessage(event) {
 }
 
 container.addEventListener('submit', event => {
-  const form = event.target.closest('[data-personal-chat-form]');
-  if (!form) return;
-  sendMessage.call(form, event).catch(console.error);
+  if (!event.target.closest('[data-personal-chat-form]')) return;
+  sendMessage(event).catch(console.error);
 });
 
 container.addEventListener('click', event => {
