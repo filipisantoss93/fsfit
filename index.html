@@ -12,26 +12,28 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     .landing-nav { justify-content:space-between; }
-    .student-header-access { min-height:40px; padding-inline:14px; white-space:nowrap; }
-    .student-access-highlight { display:flex; align-items:center; justify-content:space-between; gap:18px; max-width:680px; margin-top:16px; padding:16px; border:1px solid rgba(59,130,246,.42); border-radius:14px; background:rgba(59,130,246,.09); }
-    .student-access-highlight strong { display:block; color:var(--text); font-size:1rem; }
-    .student-access-highlight span { display:block; margin-top:4px; color:var(--muted); font-size:.88rem; line-height:1.45; }
-    .student-access-highlight .btn { flex:0 0 auto; }
-    .launch-price { display:flex; align-items:center; gap:14px; max-width:680px; margin-top:18px; }
-    .launch-price strong { color:var(--text); font-size:1.8rem; line-height:1; white-space:nowrap; }
-    .launch-price span { display:block; color:var(--muted); font-size:.86rem; line-height:1.4; }
+    .student-header-access {
+      min-height:48px;
+      padding-inline:20px;
+      white-space:nowrap;
+      color:#101410;
+      background:linear-gradient(135deg,var(--primary),var(--warning));
+      border:0;
+      box-shadow:0 10px 28px rgba(50,215,75,.24);
+      font-weight:900;
+    }
+    .student-header-access:hover { background:linear-gradient(135deg,#54e768,#ffd43b); }
     .auth-context { margin:-8px 0 8px; color:var(--muted); text-align:center; font-size:.82rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
     .legal-consent { display:flex; align-items:flex-start; gap:9px; margin:0 0 16px; color:var(--muted); font-size:.82rem; line-height:1.45; }
     .legal-consent input { width:auto; margin-top:3px; }
-    .legal-consent a { color:var(--secondary); font-weight:700; }
+    .legal-consent a,
+    #forgot-password-wrap a,
+    .auth-switch button { color:var(--primary) !important; font-weight:800; }
     .landing-footer { padding:24px 20px 34px; text-align:center; color:var(--muted); font-size:.82rem; }
     .landing-footer nav { display:flex; justify-content:center; flex-wrap:wrap; gap:14px; margin-bottom:10px; }
-    .landing-footer a { color:var(--muted); }
+    .landing-footer a { color:#d5dbe3; }
     @media (max-width:620px) {
-      .student-header-access { min-height:38px; padding-inline:11px; font-size:.82rem; }
-      .student-access-highlight { width:100%; flex-direction:column; align-items:stretch; }
-      .student-access-highlight .btn { width:100%; }
-      .launch-price { align-items:flex-start; flex-direction:column; gap:6px; }
+      .student-header-access { min-height:44px; padding-inline:15px; font-size:.86rem; }
     }
   </style>
 </head>
@@ -39,7 +41,7 @@
   <header class="main-header">
     <nav class="nav-container landing-nav">
       <a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a>
-      <a class="btn btn-outline student-header-access" href="acesso-aluno.html">Área do aluno</a>
+      <a class="btn student-header-access" href="acesso-aluno.html">Área do aluno</a>
     </nav>
   </header>
   <main class="container">
@@ -48,17 +50,6 @@
         <span class="hero-badge">7 DIAS GRÁTIS PARA NOVOS USUÁRIOS</span>
         <h1>Seus alunos, treinos e orientações em um só lugar.</h1>
         <p>Organize sua consultoria, atualize planos sem reenviar PDFs e entregue a cada aluno um portal individual pronto para celular.</p>
-        <div class="launch-price" aria-label="Preço de lançamento">
-          <strong>R$ 29,90/mês</strong>
-          <span>Preço de lançamento no plano mensal. Pagamento por PIX e sem renovação automática. Teste grátis por 7 dias antes de assinar.</span>
-        </div>
-        <div class="student-access-highlight">
-          <div>
-            <strong>Já é aluno?</strong>
-            <span>Acesse seus treinos, orientações e acompanhamento usando seu WhatsApp e PIN.</span>
-          </div>
-          <a class="btn btn-outline" href="acesso-aluno.html">Acessar meus treinos</a>
-        </div>
       </div>
       <div class="card auth-card">
         <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
@@ -74,7 +65,7 @@
             <input id="legal-consent" name="legal_consent" type="checkbox">
             <span>Li e aceito os <a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
           </label>
-          <div id="forgot-password-wrap" style="margin:-4px 0 16px;text-align:right"><a href="recuperar-senha.html" style="color:var(--secondary);font-size:.9rem;font-weight:700">Esqueci minha senha</a></div>
+          <div id="forgot-password-wrap" style="margin:-4px 0 16px;text-align:right"><a href="recuperar-senha.html" style="font-size:.9rem;font-weight:700">Esqueci minha senha</a></div>
           <button id="auth-submit" class="btn btn-primary" type="submit" style="width:100%">Entrar</button>
         </form>
         <div class="auth-switch"><button id="auth-switch" type="button">Ainda não tem cadastro? Criar conta</button></div>
