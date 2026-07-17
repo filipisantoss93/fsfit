@@ -46,15 +46,8 @@
     }
     .student-edit-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
     body.student-edit-open { overflow: hidden; }
-    .student-preview-card {
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    .student-preview-card .section-intro { margin: 4px 0 0; }
-    .student-preview-card .btn { flex: 0 0 auto; }
+    .student-preview-action { margin: 18px 0 20px; }
+    .student-preview-action .btn { width: 100%; justify-content: center; box-sizing: border-box; }
     .workout-history-list { display: grid; gap: 14px; }
     .workout-history-item {
       border: 1px solid rgba(255,255,255,.11);
@@ -76,8 +69,6 @@
     @media (max-width: 640px) {
       .student-edit-modal { padding: 0; }
       .student-edit-dialog { width: 100%; height: 100dvh; border-radius: 0; border: 0; }
-      .student-preview-card { align-items: stretch; flex-direction: column; }
-      .student-preview-card .btn { width: 100%; justify-content: center; }
       .workout-history-metrics { grid-template-columns: 1fr; }
       .workout-history-head { flex-direction: column; }
     }
@@ -97,6 +88,10 @@
       </div>
     </section>
 
+    <div class="student-preview-action">
+      <a id="student-preview-link" class="btn btn-primary" href="visualizar-aluno.html" target="_blank" rel="noopener">Visualizar página do aluno</a>
+    </div>
+
     <div id="record-message" class="message"></div>
 
     <nav class="record-tabs" aria-label="Seções da ficha do aluno">
@@ -108,14 +103,6 @@
     </nav>
 
     <div class="record-tab-panel active" data-record-panel="overview">
-      <section class="card student-preview-card">
-        <div>
-          <div class="section-heading"><div><small>Portal do aluno</small><h2>Acompanhe o que seu aluno está vendo</h2></div></div>
-          <p class="section-intro">Abra a visão atual do portal para conferir treino, dieta, observações e conteúdos publicados para este aluno.</p>
-        </div>
-        <a id="student-preview-link" class="btn btn-primary" href="visualizar-aluno.html" target="_blank" rel="noopener">Visualizar como aluno</a>
-      </section>
-
       <section class="grid grid-2 record-overview-grid">
         <article class="card physical-summary-card">
           <div class="section-heading"><div><small>Acompanhamento</small><h2>Resumo físico</h2></div></div>
@@ -137,7 +124,6 @@
         </article>
       </section>
     </div>
-
     <div class="record-tab-panel" data-record-panel="planning">
       <section class="card record-section-card">
         <div class="section-heading"><div><small>Plano individual</small><h2>Planejamento do aluno</h2></div></div>
