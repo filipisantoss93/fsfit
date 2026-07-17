@@ -82,18 +82,23 @@ jobs:
         run: printf '%s' "$FSFIT_ANDROID_KEYSTORE_BASE64" | base64 --decode > fsfit-upload-key.jks
 
       - name: Build signed production APK and AAB
-        working-directory: android
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.FSFIT_ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ env.FSFIT_ANDROID_KEY_PASSWORD }}
         shell: bash
         run: |
           set -o pipefail
-          bubblewrap build \
+          docker run --rm \
+            -e BUBBLEWRAP_KEYSTORE_PASSWORD \
+            -e BUBBLEWRAP_KEY_PASSWORD \
+            -v "$GITHUB_WORKSPACE/android:/app" \
+            -w /app \
+            ghcr.io/googlechromelabs/bubblewrap:latest \
+            build \
             --skipPwaValidation \
             --manifest=./twa-manifest.json \
             --signingKeyPath=./fsfit-upload-key.jks \
-            --signingKeyAlias=fsfit 2>&1 | tee bubblewrap-build.log
+            --signingKeyAlias=fsfit 2>&1 | tee android/bubblewrap-build.log
 
       - name: Upload Bubblewrap diagnostic
         if: ${{ always() }}
