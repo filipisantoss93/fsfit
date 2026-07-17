@@ -1,0 +1,80 @@
+name: Aplicar ícones oficiais FS Fit em todas as páginas
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/apply-fsfit-icons-all-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Padronizar ícones em todas as páginas HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          VERSION = '20260717-icons-global1'
+          BLOCK = f'''  <meta name="apple-mobile-web-app-title" content="FS Fit">
+            <meta name="application-name" content="FS Fit">
+            <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v={VERSION}" sizes="any">
+            <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v={VERSION}">
+            <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v={VERSION}">'''
+
+          icon_link = re.compile(
+              r'(?im)^[ \t]*<link\b(?=[^>]*\brel=["\'][^"\']*(?:apple-touch-icon|(?:^|\s)icon(?:\s|$)|shortcut\s+icon)[^"\']*["\'])[^>]*>\s*\n?'
+          )
+          app_meta = re.compile(
+              r'(?im)^[ \t]*<meta\b(?=[^>]*\bname=["\'](?:apple-mobile-web-app-title|application-name)["\'])[^>]*>\s*\n?'
+          )
+
+          changed = []
+          for path in sorted(Path('.').rglob('*.html')):
+              if any(part in {'.git', 'node_modules'} for part in path.parts):
+                  continue
+              text = path.read_text(encoding='utf-8')
+              if not re.search(r'(?i)<head\b', text) or not re.search(r'(?i)</head>', text):
+                  continue
+
+              updated = icon_link.sub('', text)
+              updated = app_meta.sub('', updated)
+              updated = re.sub(r'(?i)</head>', BLOCK + '\n</head>', updated, count=1)
+
+              if updated != text:
+                  path.write_text(updated, encoding='utf-8')
+                  changed.append(str(path))
+
+          print(f'Páginas atualizadas: {len(changed)}')
+          for item in changed:
+              print(item)
+          PY
+
+      - name: Commitar padronização global dos ícones
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '*.html' '**/*.html' || true
+          if git diff --cached --quiet; then
+            echo 'Nenhuma página precisou ser alterada.'
+            exit 0
+          fi
+          git commit -m 'fix: aplicar ícone oficial FS Fit em todas as páginas'
+          git pull --rebase origin main
+          git push origin main
