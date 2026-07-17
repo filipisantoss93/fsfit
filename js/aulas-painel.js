@@ -3,6 +3,8 @@ import { supabase } from './supabase.js';
 const container = document.querySelector('#live-students-list');
 if (!container) throw new Error('Área Em aula não encontrada');
 
+let loadingLiveStudents = false;
+
 function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
@@ -28,41 +30,65 @@ async function confirmStart(sessionId, button) {
 }
 
 async function loadLiveStudents() {
-  const openChatSession = container.dataset.openChatSession || '';
-  const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
-  if (error) {
-    console.error(error);
-    container.innerHTML = '<p class="empty">Não foi possível carregar os alunos em aula.</p>';
-    return;
-  }
-  const rows = data || [];
-  const badge = document.querySelector('#live-students-count');
-  if (badge) badge.textContent = String(rows.length);
-  container.innerHTML = rows.length ? rows.map(row => {
-    const pending = row.status === 'aguardando_confirmacao';
-    const total = Number(row.total_exercicios || 0);
-    const done = Number(row.exercicios_concluidos || 0);
-    const percent = total ? Math.round(done / total * 100) : 0;
-    return `<article class="live-student-row ${pending ? 'pending' : ''}">
-      <div class="live-student-main"><span class="live-dot"></span><div><strong>${esc(row.aluno_nome)}</strong><small>${esc(row.treino_nome || 'Treino')} • ${pending ? `check-in há ${elapsed(row.checkin_at)}` : `em aula há ${elapsed(row.iniciado_at || row.checkin_at)}`}</small></div></div>
-      <div class="live-student-progress">
-        ${pending ? '<span>Aguardando confirmação</span>' : `<span>${done}/${total} concluídos</span><div class="live-progress"><span style="width:${percent}%"></span></div>`}
-      </div>
-      <div class="actions">
-        ${pending ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>` : `<button class="btn btn-secondary" type="button" data-open-session-chat="${esc(row.sessao_id)}">Abrir chat</button>`}
-        <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
-      </div>
-      ${pending ? '' : `<div class="live-chat-inline ${openChatSession === row.sessao_id ? '' : 'hidden'}" data-chat-host="${esc(row.sessao_id)}"></div>`}
-    </article>`;
-  }).join('') : '<p class="empty">Nenhum aluno aguardando confirmação ou em aula neste momento.</p>';
+  if (loadingLiveStudents) return;
+  loadingLiveStudents = true;
 
-  if (openChatSession && !rows.some(row => row.sessao_id === openChatSession && row.status === 'em_aula')) {
-    delete container.dataset.openChatSession;
-  }
+  try {
+    const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
+    if (error) {
+      console.error(error);
+      if (!container.querySelector('.live-student-row')) {
+        container.innerHTML = '<p class="empty">Não foi possível carregar os alunos em aula.</p>';
+      }
+      return;
+    }
 
-  container.querySelectorAll('[data-confirm-session]').forEach(button => {
-    button.addEventListener('click', () => confirmStart(button.dataset.confirmSession, button));
-  });
+    const rows = data || [];
+    const openChatSession = container.dataset.openChatSession || '';
+    const preservedChatHost = openChatSession
+      ? container.querySelector(`[data-chat-host="${CSS.escape(openChatSession)}"]`)
+      : null;
+
+    const badge = document.querySelector('#live-students-count');
+    if (badge) badge.textContent = String(rows.length);
+
+    container.innerHTML = rows.length ? rows.map(row => {
+      const pending = row.status === 'aguardando_confirmacao';
+      const total = Number(row.total_exercicios || 0);
+      const done = Number(row.exercicios_concluidos || 0);
+      const percent = total ? Math.round(done / total * 100) : 0;
+      return `<article class="live-student-row ${pending ? 'pending' : ''}">
+        <div class="live-student-main"><span class="live-dot"></span><div><strong>${esc(row.aluno_nome)}</strong><small>${esc(row.treino_nome || 'Treino')} • ${pending ? `check-in há ${elapsed(row.checkin_at)}` : `em aula há ${elapsed(row.iniciado_at || row.checkin_at)}`}</small></div></div>
+        <div class="live-student-progress">
+          ${pending ? '<span>Aguardando confirmação</span>' : `<span>${done}/${total} concluídos</span><div class="live-progress"><span style="width:${percent}%"></span></div>`}
+        </div>
+        <div class="actions">
+          ${pending ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>` : `<button class="btn btn-secondary" type="button" data-open-session-chat="${esc(row.sessao_id)}">Abrir chat</button>`}
+          <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
+        </div>
+        ${pending ? '' : `<div class="live-chat-inline ${openChatSession === row.sessao_id ? '' : 'hidden'}" data-chat-host="${esc(row.sessao_id)}"></div>`}
+      </article>`;
+    }).join('') : '<p class="empty">Nenhum aluno aguardando confirmação ou em aula neste momento.</p>';
+
+    const openSessionStillActive = openChatSession
+      && rows.some(row => row.sessao_id === openChatSession && row.status === 'em_aula');
+
+    if (openSessionStillActive && preservedChatHost) {
+      const placeholder = container.querySelector(`[data-chat-host="${CSS.escape(openChatSession)}"]`);
+      if (placeholder) {
+        preservedChatHost.classList.remove('hidden');
+        placeholder.replaceWith(preservedChatHost);
+      }
+    } else if (openChatSession && !openSessionStillActive) {
+      delete container.dataset.openChatSession;
+    }
+
+    container.querySelectorAll('[data-confirm-session]').forEach(button => {
+      button.addEventListener('click', () => confirmStart(button.dataset.confirmSession, button));
+    });
+  } finally {
+    loadingLiveStudents = false;
+  }
 }
 
 await loadLiveStudents();
