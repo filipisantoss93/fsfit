@@ -1,0 +1,1 @@
+Este arquivo registra a aplicação do pacote oficial de ícones FS Fit no PWA do personal trainer. O manifesto `manifest-personal.webmanifest` e `painel.html` devem usar os ícones em `assets/icons/` e o nome curto `FS Fit`.
