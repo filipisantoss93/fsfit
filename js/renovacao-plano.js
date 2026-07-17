@@ -1,5 +1,10 @@
 import { supabase } from './supabase.js';
 
+const PLAY_DISTRIBUTION_KEY = 'fsfit_distribution';
+const PLAY_DISTRIBUTION_VALUE = 'google-play';
+const isGooglePlayDistribution = localStorage.getItem(PLAY_DISTRIBUTION_KEY) === PLAY_DISTRIBUTION_VALUE
+  || sessionStorage.getItem(PLAY_DISTRIBUTION_KEY) === PLAY_DISTRIBUTION_VALUE;
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 let pollTimer = null;
 
@@ -45,6 +50,62 @@ function money(cents) {
 
 function removeExistingCard() {
   document.querySelector('#plan-renewal-card')?.remove();
+}
+
+function renderGooglePlayAccessCard(access) {
+  removeExistingCard();
+  if (access?.admin) return;
+
+  const main = document.querySelector('main.container');
+  const header = main?.querySelector('.page-header');
+  if (!main || !header) return;
+
+  const type = access?.tipo_acesso || (access?.plano === 'free' ? 'free' : null);
+  const remaining = daysRemaining(access?.acesso_valido_ate);
+
+  let visible = false;
+  let className = '';
+  let label = '';
+  let title = '';
+  let detail = '';
+
+  if (type === 'pago' && remaining !== null && remaining <= 7) {
+    visible = true;
+    className = remaining <= 3 ? 'urgent' : '';
+    label = remaining <= 3 ? 'VENCIMENTO PRÓXIMO' : 'ASSINATURA';
+    title = remaining > 0
+      ? `Seu plano vence em ${remaining} ${remaining === 1 ? 'dia' : 'dias'}`
+      : 'Seu plano vence hoje';
+    detail = `Seu acesso profissional permanece válido até ${formatDate(access.acesso_valido_ate)}.`;
+  } else if (type === 'trial' && remaining !== null && remaining <= 7) {
+    visible = true;
+    className = remaining <= 3 ? 'urgent trial' : 'trial';
+    label = 'PERÍODO GRATUITO';
+    title = remaining > 0
+      ? `Seu período gratuito termina em ${remaining} ${remaining === 1 ? 'dia' : 'dias'}`
+      : 'Seu período gratuito termina hoje';
+    detail = `Seu acesso atual permanece válido até ${formatDate(access.acesso_valido_ate)}.`;
+  } else if (type === 'free') {
+    visible = true;
+    className = 'expired';
+    label = 'STATUS DA CONTA';
+    title = 'Seu acesso premium não está ativo';
+    detail = 'Entre em contato com o suporte para informações sobre o status da sua conta.';
+  }
+
+  if (!visible) return;
+
+  const card = document.createElement('section');
+  card.id = 'plan-renewal-card';
+  card.className = `plan-renewal-card ${className}`.trim();
+  card.innerHTML = `
+    <div class="plan-renewal-copy">
+      <small>${label}</small>
+      <strong>${title}</strong>
+      <span>${detail}</span>
+    </div>`;
+
+  header.insertAdjacentElement('afterend', card);
 }
 
 function renderRenewalCard(access) {
@@ -117,6 +178,7 @@ function closeModal() {
 }
 
 async function openPlanModal() {
+  if (isGooglePlayDistribution) return;
   closeModal();
   const backdrop = document.createElement('div');
   backdrop.id = 'plan-modal-backdrop';
@@ -162,6 +224,7 @@ async function openPlanModal() {
 }
 
 async function createPix(planId, content) {
+  if (isGooglePlayDistribution) return;
   content.innerHTML = '<p>Gerando sua cobrança PIX...</p>';
   try {
     const { data, error } = await supabase.functions.invoke('criar-pix-fsfit', {
@@ -235,6 +298,10 @@ async function init() {
     if (!session) return;
     const { data, error } = await supabase.rpc('fsfit_sincronizar_meu_acesso');
     if (error) throw error;
+    if (isGooglePlayDistribution) {
+      renderGooglePlayAccessCard(data);
+      return;
+    }
     renderRenewalCard(data);
   } catch (error) {
     console.error('Não foi possível carregar o status de renovação:', error);
