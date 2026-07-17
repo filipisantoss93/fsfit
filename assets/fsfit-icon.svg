@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="FS Fit"><rect width="512" height="512" rx="112" fill="#0f1115"/><circle cx="256" cy="256" r="176" fill="#171b22"/><path d="M132 166h114v54h-58v38h52v52h-52v98h-56V166Zm140 0h108v54h-52v188h-56V220h-52v-54Z" fill="#27d980"/><path d="M120 352h272" stroke="#f3c74f" stroke-width="18" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">FS Fit</title>
+  <desc id="desc">Símbolo oficial FS em verde e amarelo sobre fundo escuro.</desc>
+  <rect width="512" height="512" rx="112" fill="#0f1115"/>
+  <rect x="36" y="36" width="440" height="440" rx="92" fill="none" stroke="#ffc107" stroke-width="10"/>
+  <path fill="#32d74b" d="M92 105h218v72H169v66h117v72H169v113H92z"/>
+  <path fill="#ffc107" d="M304 105h116v72H313c-31 0-31 55 0 55h40c116 0 116 196 0 196H225v-72h119c37 0 37-61 0-61h-38c-112 0-112-190-2-190z"/>
+</svg>
