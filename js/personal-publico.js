@@ -16,7 +16,30 @@ function digits(value = '', max = 11) { return String(value).replace(/\D/g, '').
 function show(text, type = 'error') { message.textContent = text; message.className = `message show ${type}`; }
 function clearMessage() { message.className = 'message'; message.textContent = ''; }
 function resetAccess() { phone = ''; phoneForm.classList.remove('hidden'); pinForm.classList.add('hidden'); activationForm.classList.add('hidden'); phoneForm.reset(); pinForm.reset(); activationForm.reset(); clearMessage(); }
-function saveSession(result) { localStorage.setItem('fsfit_aluno_token', result.token); localStorage.setItem('fsfit_aluno_token_expira_em', result.expira_em || ''); localStorage.setItem('fsfit_personal_slug', slug); window.location.href = '/aluno.html'; }
+function clearStoredStudentSession() {
+  localStorage.removeItem('fsfit_aluno_token');
+  localStorage.removeItem('fsfit_aluno_token_expira_em');
+}
+function storedStudentSession() {
+  const token = String(localStorage.getItem('fsfit_aluno_token') || '').trim();
+  const expiresAt = String(localStorage.getItem('fsfit_aluno_token_expira_em') || '').trim();
+  const personalSlug = String(localStorage.getItem('fsfit_personal_slug') || '').trim().toLowerCase();
+  if (!token) return null;
+  if (expiresAt) {
+    const expires = new Date(expiresAt);
+    if (!Number.isNaN(expires.getTime()) && expires <= new Date()) {
+      clearStoredStudentSession();
+      return null;
+    }
+  }
+  return { token, personalSlug };
+}
+function saveSession(result) {
+  localStorage.setItem('fsfit_aluno_token', result.token);
+  localStorage.setItem('fsfit_aluno_token_expira_em', result.expira_em || '');
+  localStorage.setItem('fsfit_personal_slug', slug);
+  window.location.replace('/aluno.html');
+}
 
 async function renderOwnerReturnButton(personalId) {
   const { data: { session } } = await supabase.auth.getSession();
@@ -47,6 +70,28 @@ async function invoke(body) {
   }
   if (data?.error) throw new Error(data.error);
   return data;
+}
+
+async function redirectStoredStudentSession() {
+  const stored = storedStudentSession();
+  if (!stored) return false;
+
+  // Só reaproveita automaticamente a sessão ao abrir novamente a página
+  // do mesmo personal. Em caso de falha temporária de rede, preserva o
+  // localStorage para que o aluno não precise digitar WhatsApp e PIN de novo.
+  if (stored.personalSlug && slug && stored.personalSlug !== slug) return false;
+
+  try {
+    const result = await invoke({ action: 'me', token: stored.token });
+    const sessionSlug = String(result?.personal?.slug || stored.personalSlug || '').trim().toLowerCase();
+    if (!result?.success || !result?.aluno || (sessionSlug && slug && sessionSlug !== slug)) return false;
+    window.location.replace('/aluno.html');
+    return true;
+  } catch (error) {
+    const message = String(error?.message || '').toLowerCase();
+    if (message.includes('sessão expirada') || message.includes('sessão inválida')) clearStoredStudentSession();
+    return false;
+  }
 }
 
 function createLightbox() {
@@ -124,4 +169,4 @@ activationForm.addEventListener('submit', async event => {
   catch (error) { show(error.message); } finally { button.disabled = false; }
 });
 
-await loadProfile();
+if (!(await redirectStoredStudentSession())) await loadProfile();
