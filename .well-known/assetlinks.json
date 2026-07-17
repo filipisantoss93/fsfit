@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "tech.fssolucoes.fit",
       "sha256_cert_fingerprints": [
-        "FD:AE:92:B3:A6:92:4B:8F:AC:1A:F8:61:4B:9C:64:F3:C0:AE:86:B5:35:7C:61:32:95:4E:00:11:CE:63:7F:02"
+        "FD:AE:92:B3:A6:92:4B:8F:AC:1A:F8:61:4B:9C:64:F3:C0:AE:86:B5:35:7C:61:32:95:4E:00:11:CE:63:7F:02",
+        "08:82:B0:F8:F1:E8:33:02:55:8F:5E:DF:DD:A7:27:A2:2D:5D:5F:60:BA:86:02:FF:25:99:C6:D3:BB:F4:71:69"
       ]
     }
   }
