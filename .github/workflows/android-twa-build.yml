@@ -56,20 +56,6 @@ jobs:
         working-directory: android
         run: bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json
 
-      - name: Build installable debug APK
-        working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
-
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: fsfit-android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 14
-
       - name: Check production signing secrets
         if: ${{ env.FSFIT_ANDROID_KEYSTORE_BASE64 == '' || env.FSFIT_ANDROID_KEYSTORE_PASSWORD == '' || env.FSFIT_ANDROID_KEY_PASSWORD == '' }}
         run: |
@@ -97,10 +83,11 @@ jobs:
             ghcr.io/googlechromelabs/bubblewrap:latest \
             -lc '
               set -e
-              SDKMANAGER="$(find /root/.bubblewrap/android_sdk -type f -name sdkmanager | head -n 1)"
+              SDK_ROOT="/root/.bubblewrap/android_sdk"
+              SDKMANAGER="$(find "$SDK_ROOT" -type f -name sdkmanager | head -n 1)"
               test -n "$SDKMANAGER"
-              yes | "$SDKMANAGER" --licenses >/dev/null || true
-              "$SDKMANAGER" "platforms;android-36" "build-tools;35.0.0"
+              yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null || true
+              "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platforms;android-36" "build-tools;35.0.0"
               bubblewrap build \
                 --skipPwaValidation \
                 --manifest=./twa-manifest.json \
