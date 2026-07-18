@@ -1,3 +1,5 @@
+import './treino-validacao-duplicados.js?v=20260718-duplicates1';
+
 const builder = document.querySelector('#selected-exercises-builder');
 
 function repetitionOptions(selected = '12') {
