@@ -76,7 +76,9 @@ document.addEventListener('click', event => {
   if (event.target.closest('[data-close-exercise-modal]')) editingExerciseId = null;
 });
 
-form?.addEventListener('submit', async event => {
+document.addEventListener('submit', async event => {
+  if (event.target !== form) return;
+
   if (bypassValidation) {
     bypassValidation = false;
     return;
