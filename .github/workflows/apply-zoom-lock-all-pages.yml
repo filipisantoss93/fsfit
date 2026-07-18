@@ -30,7 +30,7 @@ jobs:
           import re
 
           VIEWPORT = '  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">'
-          SCRIPT = '  <script src="/js/zoom-lock.js?v=20260717-zoom-lock2"></script>'
+          SCRIPT = '  <script src="/js/zoom-lock.js?v=20260717-zoom-lock3"></script>'
 
           viewport_meta = re.compile(
               r'(?im)^[ \t]*<meta\b(?=[^>]*\bname=["\']viewport["\'])[^>]*>\s*\n?'
@@ -77,6 +77,6 @@ jobs:
             echo 'Nenhuma página precisou ser alterada.'
             exit 0
           fi
-          git commit -m 'fix: reforçar bloqueio de zoom em todas as páginas'
+          git commit -m 'fix: bloquear deslocamento horizontal em todas as páginas'
           git pull --rebase origin main
           git push origin main
