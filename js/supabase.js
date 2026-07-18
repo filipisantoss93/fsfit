@@ -13,6 +13,8 @@ const AUTO_REFRESH_COOLDOWN_MS = 12 * 1000;
 const nativeFetch = globalThis.fetch.bind(globalThis);
 const refreshInFlight = new Map();
 let autoRefreshTimer = null;
+let coldLoadingTimer = null;
+let coldNetworkRequests = 0;
 let userInteracted = false;
 
 const SAFE_RPC_PREFIXES = [
@@ -49,6 +51,49 @@ if (typeof window !== 'undefined') {
   ['pointerdown', 'keydown', 'input', 'change'].forEach(type => {
     window.addEventListener(type, markUserInteraction, { once: true, capture: true });
   });
+}
+
+function ensureColdLoadingIndicator() {
+  if (typeof document === 'undefined') return null;
+  let indicator = document.querySelector('#fsfit-data-loading');
+  if (indicator) return indicator;
+
+  if (!document.querySelector('style[data-fsfit-data-loading]')) {
+    const style = document.createElement('style');
+    style.dataset.fsfitDataLoading = 'true';
+    style.textContent = `
+      #fsfit-data-loading{position:fixed;top:10px;left:50%;z-index:12000;transform:translate(-50%,-12px);display:flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid var(--border,rgba(255,255,255,.12));border-radius:999px;background:var(--surface,#171a20);color:var(--muted,#a6adbb);font:700 11px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.02em;box-shadow:0 8px 28px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+      #fsfit-data-loading.show{opacity:.96;transform:translate(-50%,0)}
+      #fsfit-data-loading span{width:7px;height:7px;border-radius:50%;background:var(--primary,#6f8cff);animation:fsfitDataPulse .9s ease-in-out infinite alternate}
+      @keyframes fsfitDataPulse{from{opacity:.35;transform:scale(.8)}to{opacity:1;transform:scale(1.15)}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  indicator = document.createElement('div');
+  indicator.id = 'fsfit-data-loading';
+  indicator.setAttribute('role', 'status');
+  indicator.setAttribute('aria-live', 'polite');
+  indicator.innerHTML = '<span aria-hidden="true"></span>Sincronizando dados';
+  document.body.appendChild(indicator);
+  return indicator;
+}
+
+function beginColdNetworkRequest() {
+  coldNetworkRequests += 1;
+  if (coldLoadingTimer) return;
+  coldLoadingTimer = setTimeout(() => {
+    coldLoadingTimer = null;
+    if (coldNetworkRequests > 0) ensureColdLoadingIndicator()?.classList.add('show');
+  }, 140);
+}
+
+function endColdNetworkRequest() {
+  coldNetworkRequests = Math.max(0, coldNetworkRequests - 1);
+  if (coldNetworkRequests > 0) return;
+  clearTimeout(coldLoadingTimer);
+  coldLoadingTimer = null;
+  ensureColdLoadingIndicator()?.classList.remove('show');
 }
 
 function getRequestUrl(input) {
@@ -320,6 +365,7 @@ async function fsFitFetch(input, init = {}) {
       return createResponseFromCache(cached);
     }
 
+    beginColdNetworkRequest();
     try {
       const response = await nativeFetch(input, init);
       if (response.ok) void storeResponse(meta.key, response.clone());
@@ -328,6 +374,8 @@ async function fsFitFetch(input, init = {}) {
       const stale = readCacheEntry(meta.key, { allowExpired: true });
       if (stale) return createResponseFromCache(stale);
       throw error;
+    } finally {
+      endColdNetworkRequest();
     }
   }
 
