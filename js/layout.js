@@ -129,6 +129,7 @@ export function renderHeader(active = '') {
           <li><a data-page="exercicios" href="biblioteca-exercicios.html">Exercícios</a></li>
           <li><a data-page="alimentacao" href="biblioteca-alimentar.html">Alimentação</a></li>
           <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
+          <li><a data-page="financeiro" href="financeiro.html">Financeiro</a></li>
           <li class="nav-divider" aria-hidden="true"></li>
           <li><a data-page="perfil" href="perfil.html">Meu perfil</a></li>
           <li><a data-page="contato" href="contato.html">Contato</a></li>
