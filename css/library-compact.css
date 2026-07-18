@@ -1,0 +1,30 @@
+.exercise-library-list{gap:8px!important}
+.exercise-library-item{padding:12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important}
+.exercise-library-item-title{gap:6px!important}
+.exercise-library-item-title h3{margin:0!important;font-size:1rem!important;line-height:1.25}
+.exercise-library-item p{margin:3px 0 0!important;font-size:.84rem!important;line-height:1.35}
+.library-instructions{display:-webkit-box!important;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:2}
+.library-badge{min-height:22px!important;padding:3px 7px!important;font-size:.6rem!important}
+.library-item-actions{gap:6px!important}
+.library-item-actions .btn{min-height:38px!important;padding:0 12px!important;font-size:.8rem!important}
+.food-library-item{padding:12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important}
+.food-library-item>div:first-child{min-width:0}
+.food-library-item h3{margin:0 0 4px!important;font-size:1rem!important;line-height:1.25}
+.food-library-item p{margin:3px 0!important;font-size:.84rem!important;line-height:1.35}
+.food-macros{margin-top:6px!important;gap:5px!important}
+.food-macro-chip{padding:3px 6px!important;font-size:.68rem!important}
+.food-library-item>.actions{gap:6px!important}
+.food-library-item>.actions .btn{min-height:38px!important;padding:0 12px!important;font-size:.8rem!important}
+@media(max-width:760px){
+  .exercise-library-item{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important}
+  .library-item-actions,.library-item-actions.single-action{display:flex!important;flex-direction:column!important;width:auto!important;min-width:0!important;gap:6px!important}
+  .library-item-actions .btn{width:auto!important;min-width:76px!important}
+  .food-library-item{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important}
+  .food-library-item>.actions{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;gap:6px!important}
+  .food-library-item>.actions .btn{width:auto!important;min-width:76px!important}
+}
+@media(max-width:420px){
+  .exercise-library-item,.food-library-item{padding:11px 12px!important;gap:9px!important}
+  .exercise-library-item-title h3,.food-library-item h3{font-size:.95rem!important}
+  .library-item-actions .btn,.food-library-item>.actions .btn{min-width:70px!important;padding:0 10px!important;font-size:.76rem!important}
+}
