@@ -17,6 +17,25 @@ function currentPage() {
   return page || 'index.html';
 }
 
+function ensureMobileOverflowGuard() {
+  if (document.querySelector('style[data-fsfit-mobile-overflow-guard]')) return;
+  const style = document.createElement('style');
+  style.dataset.fsfitMobileOverflowGuard = 'true';
+  style.textContent = `
+    html,body{max-width:100%;overflow-x:clip}
+    @media(max-width:860px){
+      #header-container .nav-menu{
+        transform:translateY(-8px) scale(.98)!important;
+        transform-origin:top right!important;
+      }
+      #header-container .nav-menu.active{
+        transform:translateY(0) scale(1)!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function ensureSubscriptionMenuLink(active = '') {
   const menu = document.querySelector('#nav-menu');
   if (!menu || menu.querySelector('[data-page="assinatura"]')) return;
@@ -37,6 +56,7 @@ function ensureSubscriptionMenuLink(active = '') {
 
 export function renderHeader(active = '') {
   core.renderHeader(active);
+  ensureMobileOverflowGuard();
   ensureSubscriptionMenuLink(active);
 }
 
