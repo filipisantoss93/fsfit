@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f1115">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="FS Fit">
+  <title>Financeiro — FS Fit</title>
+  <link rel="manifest" href="manifest-personal.webmanifest?v=20260717-icons2">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260717-icons2">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/financeiro.css?v=20260717-financeiro1">
+  <meta name="apple-mobile-web-app-title" content="FS Fit">
+  <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260717-icons-global2">
+</head>
+<body>
+  <div id="header-container"></div>
+
+  <main class="container finance-page">
+    <section class="page-header finance-page-header">
+      <div>
+        <span class="hero-badge">FINANCEIRO</span>
+        <h1>Mensalidades dos alunos</h1>
+        <p>Controle vencimentos e recebimentos. O Pix é enviado diretamente para sua conta, sem comissão do FS Fit.</p>
+      </div>
+    </section>
+
+    <div id="finance-message" class="message"></div>
+
+    <section class="finance-summary-grid" aria-label="Resumo financeiro do mês">
+      <article class="card finance-summary-card">
+        <small>PREVISTO NO MÊS</small>
+        <strong id="summary-expected">R$ 0,00</strong>
+        <span id="summary-expected-count">0 mensalidades</span>
+      </article>
+      <article class="card finance-summary-card">
+        <small>RECEBIDO</small>
+        <strong id="summary-received">R$ 0,00</strong>
+        <span id="summary-received-count">0 confirmadas</span>
+      </article>
+      <article class="card finance-summary-card finance-summary-warning">
+        <small>AGUARDANDO CONFIRMAÇÃO</small>
+        <strong id="summary-waiting">R$ 0,00</strong>
+        <span id="summary-waiting-count">0 pagamentos informados</span>
+      </article>
+      <article class="card finance-summary-card finance-summary-danger">
+        <small>EM ATRASO</small>
+        <strong id="summary-overdue">R$ 0,00</strong>
+        <span id="summary-overdue-count">0 mensalidades</span>
+      </article>
+    </section>
+
+    <section class="card finance-pix-card">
+      <div class="section-heading finance-section-heading">
+        <div>
+          <small>RECEBIMENTO DIRETO</small>
+          <h2>Configuração do Pix</h2>
+          <p>Os pagamentos vão direto da conta do aluno para a sua chave Pix. O FS Fit apenas gera o QR Code e o Pix Copia e Cola.</p>
+        </div>
+        <span class="finance-zero-fee-badge">Sem comissão do FS Fit</span>
+      </div>
+
+      <form id="pix-config-form" class="finance-pix-form">
+        <div class="form-group">
+          <label for="pix-tipo">Tipo de chave</label>
+          <select id="pix-tipo" name="pix_tipo">
+            <option value="">Selecione</option>
+            <option value="cpf">CPF</option>
+            <option value="cnpj">CNPJ</option>
+            <option value="email">E-mail</option>
+            <option value="telefone">Telefone</option>
+            <option value="aleatoria">Chave aleatória</option>
+          </select>
+        </div>
+        <div class="form-group finance-pix-key-field">
+          <label for="pix-chave">Chave Pix</label>
+          <input id="pix-chave" name="pix_chave" autocomplete="off" placeholder="Informe a chave que receberá os pagamentos">
+        </div>
+        <div class="form-group">
+          <label for="pix-nome">Nome do recebedor</label>
+          <input id="pix-nome" name="pix_nome_recebedor" maxlength="25" placeholder="Nome exibido no QR Code">
+        </div>
+        <div class="form-group">
+          <label for="pix-cidade">Cidade</label>
+          <input id="pix-cidade" name="pix_cidade" maxlength="15" placeholder="Ex.: SAO PAULO">
+        </div>
+        <div class="finance-pix-actions">
+          <button id="save-pix-button" class="btn btn-primary" type="submit">Salvar configuração Pix</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="payment-confirmations-card" class="card finance-confirmations-card hidden">
+      <div class="section-heading finance-section-heading">
+        <div>
+          <small>AÇÃO NECESSÁRIA</small>
+          <h2>Pagamentos informados pelos alunos</h2>
+          <p>Confira o recebimento na sua conta e confirme manualmente no FS Fit.</p>
+        </div>
+        <span id="payment-confirmations-count" class="finance-count-badge">0</span>
+      </div>
+      <div id="payment-confirmations-list" class="finance-confirmations-list"></div>
+    </section>
+
+    <section class="card finance-students-card">
+      <div class="section-heading finance-section-heading">
+        <div>
+          <small>CONFIGURAÇÃO POR ALUNO</small>
+          <h2>Mensalidades</h2>
+          <p>Defina o valor e o dia de vencimento. O alerta aparecerá para o aluno a partir de 7 dias antes do vencimento.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap finance-table-wrap">
+        <table class="finance-table">
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Valor mensal</th>
+              <th>Dia do vencimento</th>
+              <th>Ativa</th>
+              <th>Status do mês</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="finance-students-list">
+            <tr><td colspan="6">Carregando alunos...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/financeiro.js?v=20260717-financeiro1"></script>
+</body>
+</html>
