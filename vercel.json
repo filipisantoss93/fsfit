@@ -1,4 +1,14 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "*": false
+    }
+  },
+  "github": {
+    "autoJobCancelation": true
+  },
   "rewrites": [
     {
       "source": "/p/:slug",
