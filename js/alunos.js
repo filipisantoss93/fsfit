@@ -53,6 +53,34 @@ function formSexo(value) {
   return { masculino: 'Masculino', feminino: 'Feminino', outro: 'Outro', nao_informado: 'Prefiro não informar' }[value] || 'Prefiro não informar';
 }
 
+function formatBirthDateInput(value = '') {
+  const digits = String(value).replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
+function isoToBirthDate(value = '') {
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return '';
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+function birthDateToIso(value = '') {
+  const match = String(value).trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  const date = new Date(year, month - 1, day, 12, 0, 0);
+
+  const valid = date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  if (!valid) return null;
+
+  return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
 function age(date) {
   if (!date) return null;
   const birth = new Date(`${date}T12:00:00`);
@@ -65,7 +93,8 @@ function age(date) {
 }
 
 function updateAge() {
-  const years = age(form.data_nascimento.value);
+  const isoDate = birthDateToIso(form.data_nascimento.value);
+  const years = isoDate ? age(isoDate) : null;
   form.idade.value = years == null ? '' : `${years} anos`;
 }
 
@@ -145,7 +174,7 @@ async function editStudent(id) {
   form.nome.value = data.nome || '';
   form.whatsapp.value = data.telefone || '';
   form.sexo.value = formSexo(data.sexo);
-  form.data_nascimento.value = data.data_nascimento || '';
+  form.data_nascimento.value = isoToBirthDate(data.data_nascimento || '');
   form.altura_cm.value = data.altura_cm ?? '';
   form.peso_inicial_kg.value = data.peso_inicial_kg ?? '';
   form.percentual_gordura_inicial.value = data.percentual_gordura_inicial ?? '';
@@ -168,7 +197,16 @@ function resetForm() {
   document.querySelector('#cancel-edit').classList.add('hidden');
 }
 
-form.data_nascimento.addEventListener('change', updateAge);
+form.data_nascimento.addEventListener('input', () => {
+  form.data_nascimento.value = formatBirthDateInput(form.data_nascimento.value);
+  updateAge();
+});
+form.data_nascimento.addEventListener('blur', () => {
+  if (!form.data_nascimento.value) return;
+  if (!birthDateToIso(form.data_nascimento.value)) {
+    showMessage(message, 'Informe uma data de nascimento válida no formato DD/MM/AAAA.', 'error');
+  }
+});
 form.whatsapp.addEventListener('input', () => { form.whatsapp.value = phone(form.whatsapp.value); });
 form.horario_aula.addEventListener('change', () => {
   if (form.horario_aula.value && !isHalfHourSlot(form.horario_aula.value)) {
@@ -228,12 +266,25 @@ document.addEventListener('click', async event => {
 form.addEventListener('submit', async event => {
   event.preventDefault();
   const wasEditing = Boolean(editingId);
+  const birthDateText = form.data_nascimento.value.trim();
+  const birthDateIso = birthDateText ? birthDateToIso(birthDateText) : null;
+
+  if (birthDateText && !birthDateIso) {
+    return showMessage(message, 'Informe uma data de nascimento válida no formato DD/MM/AAAA.', 'error');
+  }
+
+  if (birthDateIso) {
+    const birth = new Date(`${birthDateIso}T12:00:00`);
+    const today = new Date();
+    if (birth > today) return showMessage(message, 'A data de nascimento não pode estar no futuro.', 'error');
+  }
+
   const payload = {
     personal_id: session.user.id,
     nome: form.nome.value.trim(),
     telefone: phone(form.whatsapp.value),
     sexo: dbSexo(form.sexo.value),
-    data_nascimento: form.data_nascimento.value || null,
+    data_nascimento: birthDateIso,
     periodo_aula: form.periodo_aula.value || null,
     horario_aula: form.horario_aula.value || null,
     local_aula: form.local_aula.value.trim() || null,
