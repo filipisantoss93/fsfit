@@ -1,0 +1,20 @@
+.library-category-nav,
+.record-tabs {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100%;
+  touch-action: pan-x pan-y !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.library-category-nav::-webkit-scrollbar,
+.record-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.library-category-pill,
+.record-tab {
+  flex-shrink: 0;
+}
