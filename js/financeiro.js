@@ -10,10 +10,24 @@ const studentsList = document.querySelector('#finance-students-list');
 const confirmationsCard = document.querySelector('#payment-confirmations-card');
 const confirmationsList = document.querySelector('#payment-confirmations-list');
 const confirmationsCount = document.querySelector('#payment-confirmations-count');
+const studentModal = document.querySelector('#student-finance-modal');
+const studentModalTitle = document.querySelector('#student-finance-modal-title');
+const studentModalStatus = document.querySelector('#student-finance-modal-status');
+const studentModalValue = document.querySelector('#student-finance-value');
+const studentModalDay = document.querySelector('#student-finance-day');
+const studentModalActive = document.querySelector('#student-finance-active');
+const studentModalCompetence = document.querySelector('#student-finance-competence');
+const studentModalDueDate = document.querySelector('#student-finance-due-date');
+const studentModalChargeValue = document.querySelector('#student-finance-charge-value');
+const studentModalReportedAt = document.querySelector('#student-finance-reported-at');
+const studentModalConfirmedAt = document.querySelector('#student-finance-confirmed-at');
+const studentModalSave = document.querySelector('#student-finance-save');
+const studentModalMarkPaid = document.querySelector('#student-finance-mark-paid');
 
 let students = [];
 let payments = [];
 let profile = null;
+let selectedStudentId = null;
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -41,6 +55,20 @@ function formatDate(value) {
   const [year, month, day] = String(value).slice(0, 10).split('-').map(Number);
   if (!year || !month || !day) return '—';
   return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
+}
+
+function formatDateTime(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleString('pt-BR');
+}
+
+function formatCompetence(value) {
+  if (!value) return '—';
+  const [year, month] = String(value).slice(0, 7).split('-').map(Number);
+  if (!year || !month) return '—';
+  return new Date(year, month - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 }
 
 function todayIso() {
@@ -150,24 +178,17 @@ function renderConfirmations() {
 
 function renderStudents() {
   if (!students.length) {
-    studentsList.innerHTML = '<tr><td colspan="6" class="finance-empty">Nenhum aluno ativo cadastrado.</td></tr>';
+    studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Nenhum aluno ativo cadastrado.</td></tr>';
     return;
   }
 
   studentsList.innerHTML = students.map(student => {
     const payment = paymentForStudent(student.id);
     const status = statusInfo(payment, student);
-    const action = payment && payment.status !== 'pago'
-      ? `<button class="btn btn-outline" type="button" data-mark-payment="${esc(payment.id)}">${payment.status === 'informado' ? 'Confirmar' : 'Marcar pago'}</button>`
-      : '';
 
-    return `<tr data-student-row="${esc(student.id)}">
-      <td><strong>${esc(student.nome)}</strong></td>
-      <td><input class="finance-value-input" type="number" min="0" step="0.01" value="${student.mensalidade_valor != null ? esc(Number(student.mensalidade_valor).toFixed(2)) : ''}" placeholder="0,00"></td>
-      <td><input class="finance-day-input" type="number" min="1" max="31" step="1" value="${student.mensalidade_dia_vencimento || ''}" placeholder="Dia"></td>
-      <td><label class="finance-active-toggle"><input class="finance-active-input" type="checkbox" ${student.mensalidade_ativa ? 'checked' : ''}> Ativa</label></td>
-      <td><span class="finance-status ${status.className}">${esc(status.label)}</span></td>
-      <td><div class="finance-row-actions"><button class="btn btn-primary" type="button" data-save-student="${esc(student.id)}">Salvar</button>${action}</div></td>
+    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}">
+      <td><div class="finance-student-name"><strong>${esc(student.nome)}</strong></div></td>
+      <td><div class="finance-student-status-cell"><span class="finance-status ${status.className}">${esc(status.label)}</span><span class="finance-student-open" aria-hidden="true">›</span></div></td>
     </tr>`;
   }).join('');
 }
@@ -178,6 +199,115 @@ function fillPixForm() {
   pixForm.pix_chave.value = profile.pix_chave || '';
   pixForm.pix_nome_recebedor.value = profile.pix_nome_recebedor || '';
   pixForm.pix_cidade.value = profile.pix_cidade || '';
+}
+
+function openStudentModal(studentId) {
+  if (!studentModal) return;
+  const student = students.find(item => item.id === studentId);
+  if (!student) return;
+
+  selectedStudentId = studentId;
+  const payment = paymentForStudent(studentId);
+  const status = statusInfo(payment, student);
+
+  studentModalTitle.textContent = student.nome;
+  studentModalStatus.textContent = status.label;
+  studentModalStatus.className = `finance-status ${status.className}`;
+  studentModalValue.value = student.mensalidade_valor != null ? Number(student.mensalidade_valor).toFixed(2) : '';
+  studentModalDay.value = student.mensalidade_dia_vencimento || '';
+  studentModalActive.checked = Boolean(student.mensalidade_ativa);
+  studentModalCompetence.textContent = payment ? formatCompetence(payment.competencia) : formatCompetence(currentCompetence());
+  studentModalDueDate.textContent = payment ? formatDate(payment.vencimento) : (student.mensalidade_dia_vencimento ? formatDate(dueDateForDay(student.mensalidade_dia_vencimento)) : '—');
+  studentModalChargeValue.textContent = payment ? formatCurrency(payment.valor) : (student.mensalidade_valor ? formatCurrency(student.mensalidade_valor) : '—');
+  studentModalReportedAt.textContent = payment ? formatDateTime(payment.informado_em) : '—';
+  studentModalConfirmedAt.textContent = payment ? formatDateTime(payment.confirmado_em) : '—';
+
+  if (payment && payment.status !== 'pago') {
+    studentModalMarkPaid.classList.remove('hidden');
+    studentModalMarkPaid.dataset.paymentId = payment.id;
+    studentModalMarkPaid.textContent = payment.status === 'informado' ? 'Confirmar pagamento' : 'Marcar como pago';
+  } else {
+    studentModalMarkPaid.classList.add('hidden');
+    studentModalMarkPaid.removeAttribute('data-payment-id');
+  }
+
+  studentModal.classList.remove('hidden');
+  document.body.classList.add('finance-modal-open');
+  requestAnimationFrame(() => document.querySelector('[data-close-finance-modal]')?.focus());
+}
+
+function closeStudentModal() {
+  if (!studentModal) return;
+  studentModal.classList.add('hidden');
+  document.body.classList.remove('finance-modal-open');
+  selectedStudentId = null;
+}
+
+async function saveStudentConfig(studentId, value, day, active, button) {
+  if (active && (!(value > 0) || day < 1 || day > 31)) {
+    show('Para ativar a mensalidade, informe um valor maior que zero e um dia de vencimento entre 1 e 31.', 'error');
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const { error } = await supabase
+      .from('alunos')
+      .update({
+        mensalidade_valor: value > 0 ? value : null,
+        mensalidade_dia_vencimento: day >= 1 && day <= 31 ? day : null,
+        mensalidade_ativa: active,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', studentId);
+    if (error) throw error;
+
+    const student = students.find(item => item.id === studentId);
+    if (student) {
+      student.mensalidade_valor = value > 0 ? value : null;
+      student.mensalidade_dia_vencimento = day >= 1 && day <= 31 ? day : null;
+      student.mensalidade_ativa = active;
+    }
+
+    if (active) {
+      const existing = paymentForStudent(studentId);
+      const payload = {
+        valor: value,
+        vencimento: dueDateForDay(day),
+        updated_at: new Date().toISOString()
+      };
+
+      if (!existing) {
+        const { error: insertError } = await supabase.from('mensalidades_alunos').insert({
+          personal_id: session.user.id,
+          aluno_id: studentId,
+          competencia: currentCompetence(),
+          vencimento: payload.vencimento,
+          valor: payload.valor,
+          status: 'pendente'
+        });
+        if (insertError) throw insertError;
+      } else if (existing.status === 'pendente') {
+        const { error: updateError } = await supabase
+          .from('mensalidades_alunos')
+          .update(payload)
+          .eq('id', existing.id);
+        if (updateError) throw updateError;
+      }
+    }
+
+    await fetchPayments();
+    renderSummary();
+    renderConfirmations();
+    renderStudents();
+    openStudentModal(studentId);
+    show('Mensalidade do aluno atualizada.');
+  } catch (error) {
+    console.error(error);
+    show('Não foi possível atualizar a mensalidade deste aluno.', 'error');
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function load() {
@@ -248,85 +378,40 @@ pixForm?.addEventListener('submit', async event => {
   }
 });
 
-studentsList?.addEventListener('click', async event => {
-  const saveButton = event.target.closest('[data-save-student]');
-  const markButton = event.target.closest('[data-mark-payment]');
+studentsList?.addEventListener('click', event => {
+  const row = event.target.closest('[data-student-row]');
+  if (!row) return;
+  openStudentModal(row.dataset.studentRow);
+});
 
-  if (markButton) {
-    await confirmPayment(markButton.dataset.markPayment, markButton);
-    return;
-  }
+studentsList?.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const row = event.target.closest('[data-student-row]');
+  if (!row) return;
+  event.preventDefault();
+  openStudentModal(row.dataset.studentRow);
+});
 
-  if (!saveButton) return;
-  const studentId = saveButton.dataset.saveStudent;
-  const row = saveButton.closest('[data-student-row]');
-  const value = Number(row.querySelector('.finance-value-input')?.value || 0);
-  const day = Number(row.querySelector('.finance-day-input')?.value || 0);
-  const active = Boolean(row.querySelector('.finance-active-input')?.checked);
+studentModal?.addEventListener('click', event => {
+  if (event.target.closest('[data-close-finance-modal]')) closeStudentModal();
+});
 
-  if (active && (!(value > 0) || day < 1 || day > 31)) {
-    show('Para ativar a mensalidade, informe um valor maior que zero e um dia de vencimento entre 1 e 31.', 'error');
-    return;
-  }
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !studentModal?.classList.contains('hidden')) closeStudentModal();
+});
 
-  saveButton.disabled = true;
-  try {
-    const { error } = await supabase
-      .from('alunos')
-      .update({
-        mensalidade_valor: value > 0 ? value : null,
-        mensalidade_dia_vencimento: day >= 1 && day <= 31 ? day : null,
-        mensalidade_ativa: active,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', studentId);
-    if (error) throw error;
+studentModalSave?.addEventListener('click', async () => {
+  if (!selectedStudentId) return;
+  const value = Number(studentModalValue.value || 0);
+  const day = Number(studentModalDay.value || 0);
+  const active = Boolean(studentModalActive.checked);
+  await saveStudentConfig(selectedStudentId, value, day, active, studentModalSave);
+});
 
-    const student = students.find(item => item.id === studentId);
-    if (student) {
-      student.mensalidade_valor = value > 0 ? value : null;
-      student.mensalidade_dia_vencimento = day >= 1 && day <= 31 ? day : null;
-      student.mensalidade_ativa = active;
-    }
-
-    if (active) {
-      const existing = paymentForStudent(studentId);
-      const payload = {
-        valor: value,
-        vencimento: dueDateForDay(day),
-        updated_at: new Date().toISOString()
-      };
-
-      if (!existing) {
-        const { error: insertError } = await supabase.from('mensalidades_alunos').insert({
-          personal_id: session.user.id,
-          aluno_id: studentId,
-          competencia: currentCompetence(),
-          vencimento: payload.vencimento,
-          valor: payload.valor,
-          status: 'pendente'
-        });
-        if (insertError) throw insertError;
-      } else if (existing.status === 'pendente') {
-        const { error: updateError } = await supabase
-          .from('mensalidades_alunos')
-          .update(payload)
-          .eq('id', existing.id);
-        if (updateError) throw updateError;
-      }
-    }
-
-    await fetchPayments();
-    renderSummary();
-    renderConfirmations();
-    renderStudents();
-    show('Mensalidade do aluno atualizada.');
-  } catch (error) {
-    console.error(error);
-    show('Não foi possível atualizar a mensalidade deste aluno.', 'error');
-  } finally {
-    saveButton.disabled = false;
-  }
+studentModalMarkPaid?.addEventListener('click', async () => {
+  const paymentId = studentModalMarkPaid.dataset.paymentId;
+  if (!paymentId) return;
+  await confirmPayment(paymentId, studentModalMarkPaid);
 });
 
 confirmationsList?.addEventListener('click', async event => {
@@ -350,6 +435,7 @@ async function confirmPayment(paymentId, button) {
     renderSummary();
     renderConfirmations();
     renderStudents();
+    if (selectedStudentId) openStudentModal(selectedStudentId);
     show('Pagamento confirmado com sucesso.');
   } catch (error) {
     console.error(error);
@@ -362,5 +448,5 @@ async function confirmPayment(paymentId, button) {
 load().catch(error => {
   console.error('Erro ao carregar financeiro:', error);
   show('Não foi possível carregar o Financeiro. Atualize a página e tente novamente.', 'error');
-  studentsList.innerHTML = '<tr><td colspan="6" class="finance-empty">Não foi possível carregar os dados financeiros.</td></tr>';
+  studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Não foi possível carregar os dados financeiros.</td></tr>';
 });
