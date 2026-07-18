@@ -3,8 +3,8 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260717-zoom-lock4"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="application-name" content="FS Fit">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest-personal.webmanifest?v=20260717-icons2">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260717-icons2">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/financeiro.css?v=20260717-financeiro2">
+  <link rel="stylesheet" href="css/financeiro.css?v=20260718-financeiro3">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260717-icons-global2">
@@ -111,7 +111,7 @@
         <div>
           <small>CONFIGURAÇÃO POR ALUNO</small>
           <h2>Mensalidades</h2>
-          <p>Defina o valor e o dia de vencimento. O alerta aparecerá para o aluno a partir de 7 dias antes do vencimento.</p>
+          <p>Toque no aluno para visualizar e editar todas as informações da mensalidade.</p>
         </div>
       </div>
 
@@ -120,21 +120,71 @@
           <thead>
             <tr>
               <th>Aluno</th>
-              <th>Valor mensal</th>
-              <th>Dia do vencimento</th>
-              <th>Ativa</th>
               <th>Status do mês</th>
-              <th>Ação</th>
             </tr>
           </thead>
           <tbody id="finance-students-list">
-            <tr><td colspan="6">Carregando alunos...</td></tr>
+            <tr><td colspan="2">Carregando alunos...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <script type="module" src="js/financeiro.js?v=20260717-financeiro1"></script>
+  <div id="student-finance-modal" class="finance-modal hidden" role="dialog" aria-modal="true" aria-labelledby="student-finance-modal-title">
+    <div class="finance-modal-backdrop" data-close-finance-modal></div>
+    <section class="finance-modal-panel">
+      <header class="finance-modal-header">
+        <div>
+          <small>MENSALIDADE DO ALUNO</small>
+          <h2 id="student-finance-modal-title">Aluno</h2>
+        </div>
+        <button class="finance-modal-close" type="button" data-close-finance-modal aria-label="Fechar">×</button>
+      </header>
+
+      <div class="finance-modal-body">
+        <div class="finance-modal-status-card">
+          <div>
+            <small>STATUS DO MÊS</small>
+            <strong>Situação atual</strong>
+          </div>
+          <span id="student-finance-modal-status" class="finance-status">Pendente</span>
+        </div>
+
+        <div class="finance-modal-grid">
+          <div class="form-group">
+            <label for="student-finance-value">Valor mensal</label>
+            <input id="student-finance-value" type="number" min="0" step="0.01" placeholder="0,00">
+          </div>
+          <div class="form-group">
+            <label for="student-finance-day">Dia do vencimento</label>
+            <input id="student-finance-day" type="number" min="1" max="31" step="1" placeholder="Dia">
+          </div>
+          <div class="form-group">
+            <label>Mensalidade</label>
+            <div class="finance-modal-active">
+              <label class="finance-active-toggle"><input id="student-finance-active" type="checkbox"> Ativa para este aluno</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="finance-charge-details" aria-label="Detalhes da cobrança atual">
+          <div class="finance-charge-detail"><small>COMPETÊNCIA</small><strong id="student-finance-competence">—</strong></div>
+          <div class="finance-charge-detail"><small>VENCIMENTO DO MÊS</small><strong id="student-finance-due-date">—</strong></div>
+          <div class="finance-charge-detail"><small>VALOR DA COBRANÇA</small><strong id="student-finance-charge-value">—</strong></div>
+          <div class="finance-charge-detail"><small>PAGAMENTO INFORMADO</small><strong id="student-finance-reported-at">—</strong></div>
+          <div class="finance-charge-detail"><small>PAGAMENTO CONFIRMADO</small><strong id="student-finance-confirmed-at">—</strong></div>
+        </div>
+
+        <div class="finance-modal-actions">
+          <button class="btn btn-secondary" type="button" data-close-finance-modal>Fechar</button>
+          <button id="student-finance-mark-paid" class="btn btn-outline hidden" type="button">Marcar como pago</button>
+          <button id="student-finance-save" class="btn btn-primary" type="button">Salvar mensalidade</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="js/financeiro.js?v=20260718-financeiro2"></script>
 </body>
 </html>
