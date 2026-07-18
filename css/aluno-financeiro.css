@@ -1,0 +1,172 @@
+.student-payment-alert {
+  margin:0 0 18px;
+  padding:17px;
+  border:1px solid rgba(255,193,7,.28);
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,193,7,.11),rgba(255,255,255,.02));
+}
+.student-payment-alert.overdue {
+  border-color:rgba(255,107,107,.35);
+  background:linear-gradient(135deg,rgba(255,107,107,.12),rgba(255,255,255,.02));
+}
+.student-payment-alert.waiting {
+  border-color:rgba(50,215,75,.28);
+  background:linear-gradient(135deg,rgba(50,215,75,.09),rgba(255,255,255,.02));
+}
+.student-payment-alert-header {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+.student-payment-alert small {
+  display:block;
+  margin-bottom:5px;
+  color:var(--warning);
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.student-payment-alert.overdue small { color:#ff7b7b; }
+.student-payment-alert.waiting small { color:var(--primary); }
+.student-payment-alert h2 { margin:0 0 5px; font-size:1.05rem; }
+.student-payment-alert p { margin:0; color:var(--muted); font-size:.83rem; }
+.student-payment-value {
+  flex:0 0 auto;
+  font-size:1.15rem;
+  font-weight:900;
+  white-space:nowrap;
+}
+.student-payment-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
+}
+.student-payment-actions .btn { flex:1 1 160px; }
+.student-payment-note {
+  display:block;
+  margin-top:10px;
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.45;
+}
+
+.student-pix-modal {
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+}
+.student-pix-modal.open { display:flex; }
+.student-pix-backdrop {
+  position:absolute;
+  inset:0;
+  border:0;
+  background:rgba(0,0,0,.72);
+}
+.student-pix-dialog {
+  position:relative;
+  z-index:1;
+  width:min(520px,100%);
+  max-height:92vh;
+  overflow:auto;
+  padding:22px;
+  border:1px solid var(--border);
+  border-radius:22px 22px 0 0;
+  background:var(--surface);
+  box-shadow:0 -18px 50px rgba(0,0,0,.35);
+}
+.student-pix-header {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.student-pix-header small {
+  display:block;
+  margin-bottom:5px;
+  color:var(--primary);
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.student-pix-header h2 { margin:0; }
+.student-pix-close {
+  width:38px;
+  height:38px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface-light);
+  color:inherit;
+  font-size:1.35rem;
+  cursor:pointer;
+}
+.student-pix-summary {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:16px 0;
+}
+.student-pix-summary div {
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface-light);
+}
+.student-pix-summary small,
+.student-pix-summary strong { display:block; }
+.student-pix-summary small { color:var(--muted); font-size:.68rem; }
+.student-pix-summary strong { margin-top:4px; }
+.student-pix-qr {
+  display:grid;
+  place-items:center;
+  min-height:250px;
+  margin:0 auto 16px;
+  padding:16px;
+  border-radius:16px;
+  background:#fff;
+}
+.student-pix-qr img,
+.student-pix-qr canvas { max-width:100%; height:auto !important; }
+.student-pix-copy label {
+  display:block;
+  margin-bottom:7px;
+  font-size:.78rem;
+  font-weight:800;
+}
+.student-pix-copy textarea {
+  min-height:92px;
+  resize:none;
+  font-size:.74rem;
+  line-height:1.4;
+  word-break:break-all;
+}
+.student-pix-modal-actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:12px;
+}
+.student-pix-security-note {
+  margin:14px 0 0;
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.45;
+  text-align:center;
+}
+body.student-pix-open { overflow:hidden; }
+
+@media (min-width:640px) {
+  .student-pix-modal { align-items:center; padding:20px; }
+  .student-pix-dialog { border-radius:22px; }
+}
+
+@media (max-width:520px) {
+  .student-payment-alert-header { display:grid; }
+  .student-payment-value { font-size:1.05rem; }
+  .student-pix-summary { grid-template-columns:1fr; }
+  .student-pix-modal-actions { grid-template-columns:1fr; }
+}
