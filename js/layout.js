@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import * as core from './layout-core.js';
+import './checkout-endereco.js';
 
 export * from './layout-core.js';
 
