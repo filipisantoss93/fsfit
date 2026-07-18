@@ -110,19 +110,10 @@
   font-weight: 800;
 }
 
-.notification-mark-all {
-  color: var(--secondary);
-}
-
-.notification-clear-all {
-  color: #ff9da1;
-}
-
+.notification-mark-all { color: var(--secondary); }
+.notification-clear-all { color: #ff9da1; }
 .notification-mark-all:disabled,
-.notification-clear-all:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
+.notification-clear-all:disabled { opacity: .5; cursor: not-allowed; }
 
 .notification-list {
   max-height: min(58vh, 470px);
@@ -137,9 +128,7 @@
   transition: .2s ease;
 }
 
-.notification-item:hover {
-  background: var(--surface-light);
-}
+.notification-item:hover { background: var(--surface-light); }
 
 .notification-dot {
   flex: 0 0 auto;
@@ -150,9 +139,7 @@
   background: transparent;
 }
 
-.notification-item.unread .notification-dot {
-  background: var(--primary);
-}
+.notification-item.unread .notification-dot { background: var(--primary); }
 
 .notification-copy {
   display: grid;
@@ -160,20 +147,9 @@
   min-width: 0;
 }
 
-.notification-copy strong {
-  font-size: .86rem;
-}
-
-.notification-copy span {
-  color: var(--muted);
-  font-size: .78rem;
-  line-height: 1.42;
-}
-
-.notification-copy small {
-  color: #88919e;
-  font-size: .68rem;
-}
+.notification-copy strong { font-size: .86rem; }
+.notification-copy span { color: var(--muted); font-size: .78rem; line-height: 1.42; }
+.notification-copy small { color: #88919e; font-size: .68rem; }
 
 .notification-empty {
   margin: 0;
@@ -183,9 +159,7 @@
   font-size: .82rem;
 }
 
-.nav-divider {
-  display: none;
-}
+.nav-divider { display: none; }
 
 .nav-admin-item a {
   display: flex;
@@ -217,36 +191,16 @@
 }
 
 @media (min-width: 861px) {
-  .menu-mobile-btn {
-    display: none;
-  }
-
-  .nav-header-actions {
-    margin-left: 0;
-    order: 3;
-  }
-
-  .notification-button {
-    margin-left: 2px;
-  }
-
-  .nav-menu {
-    order: 2;
-  }
-
-  .user-greeting {
-    margin-left: auto;
-  }
-
-  .admin-support-nav-badge {
-    margin-left: 2px;
-  }
+  .menu-mobile-btn { display: none; }
+  .nav-header-actions { margin-left: 0; order: 3; }
+  .notification-button { margin-left: 2px; }
+  .nav-menu { order: 2; }
+  .user-greeting { margin-left: auto; }
+  .admin-support-nav-badge { margin-left: 2px; }
 }
 
 @media (max-width: 860px) {
-  body.nav-menu-open {
-    overflow: hidden;
-  }
+  body.nav-menu-open { overflow: hidden; }
 
   body.nav-menu-open::before {
     content: "";
@@ -260,15 +214,14 @@
 
   .main-header {
     z-index: 1000;
+    overflow: visible;
   }
 
   .nav-container {
     gap: 12px;
   }
 
-  .nav-header-actions {
-    margin-left: auto;
-  }
+  .nav-header-actions { margin-left: auto; }
 
   .menu-mobile-btn {
     display: inline-grid !important;
@@ -288,33 +241,37 @@
     font-size: 1.25rem;
   }
 
+  /* O menu precisa ficar absoluto dentro do header. Usar position:fixed aqui faz
+     o backdrop-filter do header virar o containing block em alguns WebKit/iOS,
+     colapsando o drawer e deixando somente o primeiro item visível. */
   .nav-menu {
-    position: fixed !important;
-    top: 84px !important;
-    right: 10px !important;
-    bottom: 10px !important;
+    position: absolute !important;
+    top: 76px !important;
+    right: 12px !important;
+    bottom: auto !important;
     left: auto !important;
     z-index: 1002;
     display: flex !important;
-    width: min(86vw, 340px);
-    max-height: none;
+    width: min(50vw, 280px);
+    min-width: 190px;
+    max-height: calc(100dvh - 92px);
     margin: 0 !important;
-    padding: 12px !important;
+    padding: 10px !important;
     overflow-x: hidden;
     overflow-y: auto;
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 2px !important;
     border: 1px solid var(--border) !important;
-    border-radius: 20px !important;
+    border-radius: 16px !important;
     background: rgba(22, 26, 32, .985) !important;
-    box-shadow: 0 28px 90px rgba(0, 0, 0, .68) !important;
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .62) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateX(calc(100% + 20px));
+    transform: translateX(calc(100% + 24px));
     transition: transform .24s ease, opacity .2s ease, visibility .2s ease;
     overscroll-behavior: contain;
   }
@@ -329,39 +286,37 @@
   .nav-menu::before {
     content: "NAVEGAÇÃO";
     display: block;
-    padding: 3px 12px 8px;
+    padding: 2px 10px 6px;
     color: #7f8996;
-    font-size: .65rem;
+    font-size: .62rem;
     font-weight: 900;
-    letter-spacing: .12em;
+    letter-spacing: .11em;
   }
 
-  .nav-menu li {
-    width: 100%;
-  }
+  .nav-menu li { width: 100%; }
 
   .nav-menu a,
   .nav-menu button {
     position: relative;
     display: flex !important;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     width: 100% !important;
-    min-height: 50px !important;
-    padding: 0 14px !important;
-    border-radius: 12px !important;
+    min-height: 46px !important;
+    padding: 0 11px !important;
+    border-radius: 10px !important;
     text-align: left !important;
-    font-size: .94rem !important;
-    font-weight: 760 !important;
+    font-size: .9rem !important;
+    font-weight: 750 !important;
   }
 
   .nav-menu a::before,
   .nav-menu .logout::before {
-    flex: 0 0 22px;
-    width: 22px;
+    flex: 0 0 20px;
+    width: 20px;
     color: #98a2af;
     text-align: center;
-    font-size: 1rem;
+    font-size: .95rem;
     line-height: 1;
   }
 
@@ -376,9 +331,7 @@
   .nav-menu a[data-page="admin"]::before { content: "⚙"; }
   .nav-menu .logout::before { content: "↪"; }
 
-  .nav-admin-item a > span:first-child {
-    display: none;
-  }
+  .nav-admin-item a > span:first-child { display: none; }
 
   .nav-menu a:hover {
     background: rgba(255, 255, 255, .045) !important;
@@ -395,8 +348,8 @@
   .nav-menu a.active::after {
     content: "";
     position: absolute;
-    top: 10px;
-    bottom: 10px;
+    top: 9px;
+    bottom: 9px;
     left: 0;
     width: 3px;
     border-radius: 999px;
@@ -404,22 +357,20 @@
     box-shadow: 0 0 14px rgba(50, 215, 75, .45);
   }
 
-  .nav-menu a.active::before {
-    color: var(--primary);
-  }
+  .nav-menu a.active::before { color: var(--primary); }
 
   .nav-divider {
     display: block !important;
     width: auto !important;
     height: 1px !important;
-    margin: 8px 8px !important;
+    margin: 6px 7px !important;
     background: var(--border);
   }
 
   .nav-divider:nth-child(7) {
     position: relative;
-    height: 24px !important;
-    margin: 9px 8px 2px !important;
+    height: 22px !important;
+    margin: 7px 7px 1px !important;
     background: transparent;
     border-top: 1px solid var(--border);
   }
@@ -427,29 +378,30 @@
   .nav-divider:nth-child(7)::after {
     content: "CONTA";
     position: absolute;
-    top: 8px;
-    left: 6px;
+    top: 7px;
+    left: 5px;
     color: #7f8996;
-    font-size: .64rem;
+    font-size: .61rem;
     font-weight: 900;
-    letter-spacing: .12em;
+    letter-spacing: .11em;
   }
 
   .nav-admin-item {
-    margin-top: 7px;
-    padding-top: 23px;
+    position: relative;
+    margin-top: 5px;
+    padding-top: 21px;
     border-top: 1px solid var(--border);
   }
 
   .nav-admin-item::before {
     content: "ADMIN";
     position: absolute;
-    margin-top: -17px;
-    margin-left: 14px;
+    top: 7px;
+    left: 11px;
     color: #7f8996;
-    font-size: .64rem;
+    font-size: .61rem;
     font-weight: 900;
-    letter-spacing: .12em;
+    letter-spacing: .11em;
   }
 
   .nav-admin-item a {
@@ -458,16 +410,14 @@
   }
 
   .nav-menu .logout {
-    min-height: 48px !important;
+    min-height: 46px !important;
     margin-top: 0;
     border: 0 !important;
     background: transparent !important;
     color: #ff9da1 !important;
   }
 
-  .nav-menu .logout:hover {
-    background: rgba(255, 90, 95, .08) !important;
-  }
+  .nav-menu .logout:hover { background: rgba(255, 90, 95, .08) !important; }
 
   .notification-panel {
     position: fixed;
@@ -478,15 +428,11 @@
     max-height: calc(100dvh - 96px);
   }
 
-  .notification-list {
-    max-height: calc(100dvh - 185px);
-  }
+  .notification-list { max-height: calc(100dvh - 185px); }
 }
 
 @media (max-width: 420px) {
-  body.nav-menu-open::before {
-    inset-top: 70px;
-  }
+  body.nav-menu-open::before { inset: 70px 0 0; }
 
   .nav-container {
     width: min(calc(100% - 24px), var(--container));
@@ -504,42 +450,30 @@
     height: 42px;
   }
 
-  .nav-header-actions {
-    gap: 4px;
-  }
+  .nav-header-actions { gap: 4px; }
 
   .nav-menu {
-    top: 78px !important;
+    top: 70px !important;
     right: 8px !important;
-    bottom: 8px !important;
-    width: min(88vw, 330px);
-    padding: 10px !important;
+    bottom: auto !important;
+    width: min(50vw, 220px);
+    min-width: 188px;
+    max-height: calc(100dvh - 82px);
+    padding: 8px !important;
   }
 
   .nav-menu a,
   .nav-menu button {
-    min-height: 47px !important;
-    padding-inline: 12px !important;
-    font-size: .91rem !important;
+    min-height: 44px !important;
+    padding-inline: 10px !important;
+    font-size: .87rem !important;
   }
 
-  .notification-panel {
-    top: calc(70px + env(safe-area-inset-top, 0px));
-  }
-
-  .notification-panel-header {
-    gap: 8px;
-    padding-inline: 14px;
-  }
-
-  .notification-panel-actions {
-    gap: 5px;
-  }
-
+  .notification-panel { top: calc(70px + env(safe-area-inset-top, 0px)); }
+  .notification-panel-header { gap: 8px; padding-inline: 14px; }
+  .notification-panel-actions { gap: 5px; }
   .notification-mark-all,
-  .notification-clear-all {
-    font-size: .68rem;
-  }
+  .notification-clear-all { font-size: .68rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
