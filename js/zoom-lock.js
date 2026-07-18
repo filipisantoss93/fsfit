@@ -1,6 +1,12 @@
 (() => {
   const VIEWPORT_CONTENT = 'width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover';
-  const HORIZONTAL_SCROLL_SELECTOR = '.table-wrap,.admin-revenue-trend,[data-allow-horizontal-scroll="true"]';
+  const HORIZONTAL_SCROLL_SELECTOR = [
+    '.table-wrap',
+    '.admin-revenue-trend',
+    '.library-category-nav',
+    '.record-tabs',
+    '[data-allow-horizontal-scroll="true"]'
+  ].join(',');
   let lastTouchEndAt = 0;
   let touchStartX = 0;
   let touchStartY = 0;
@@ -19,7 +25,10 @@
 
   function applyTouchLock() {
     const root = document.documentElement;
-    root.style.touchAction = 'pan-y';
+
+    // Permite que componentes internos com overflow-x capturem o gesto horizontal.
+    // O deslocamento horizontal do documento continua bloqueado pelo handler abaixo.
+    root.style.touchAction = 'pan-x pan-y';
     root.style.webkitTextSizeAdjust = '100%';
     root.style.overflowX = 'clip';
     root.style.maxWidth = '100%';
@@ -27,13 +36,19 @@
     root.style.overscrollBehaviorX = 'none';
 
     if (document.body) {
-      document.body.style.touchAction = 'pan-y';
+      document.body.style.touchAction = 'pan-x pan-y';
       document.body.style.webkitTextSizeAdjust = '100%';
       document.body.style.overflowX = 'clip';
       document.body.style.maxWidth = '100%';
       document.body.style.width = '100%';
       document.body.style.overscrollBehaviorX = 'none';
     }
+
+    document.querySelectorAll(HORIZONTAL_SCROLL_SELECTOR).forEach(element => {
+      element.style.touchAction = 'pan-x pan-y';
+      element.style.webkitOverflowScrolling = 'touch';
+      element.style.overscrollBehaviorX = 'contain';
+    });
 
     keepHorizontalPositionLocked();
   }
@@ -71,7 +86,9 @@
       return;
     }
 
+    // Menus, abas, tabelas e gráficos horizontalmente roláveis cuidam do próprio gesto.
     if (allowHorizontalScroll) return;
+
     const touch = event.touches?.[0];
     if (!touch) return;
 
@@ -120,7 +137,6 @@
   }, { passive: false, capture: true });
 
   window.addEventListener('scroll', keepHorizontalPositionLocked, { passive: true });
-  document.addEventListener('scroll', keepHorizontalPositionLocked, { passive: true, capture: true });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applyTouchLock, { once: true });
