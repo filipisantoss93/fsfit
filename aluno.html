@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/aluno-notificacoes.css?v=20260716-notifications1">
   <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-student-tabs4">
   <link rel="stylesheet" href="css/aulas.css?v=20260716-live2">
+  <link rel="stylesheet" href="css/aluno-financeiro.css?v=20260717-financeiro1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -48,6 +49,22 @@
         <h1 id="student-name"></h1>
         <p>Orientado por <strong id="trainer-name"></strong></p>
         <p id="updated-at" class="updated"></p>
+      </section>
+
+      <section id="student-payment-alert" class="student-payment-alert hidden" aria-live="polite">
+        <div class="student-payment-alert-header">
+          <div>
+            <small>MENSALIDADE</small>
+            <h2 id="student-payment-title">Próximo vencimento</h2>
+            <p id="student-payment-text"></p>
+          </div>
+          <strong id="student-payment-value" class="student-payment-value">R$ 0,00</strong>
+        </div>
+        <div class="student-payment-actions">
+          <button id="student-open-pix" class="btn btn-primary" type="button">Gerar QR Code Pix</button>
+          <button id="student-paid-button" class="btn btn-outline" type="button">Já paguei</button>
+        </div>
+        <span id="student-payment-note" class="student-payment-note"></span>
       </section>
 
       <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
@@ -134,6 +151,37 @@
     </section>
   </div>
 
+  <div id="student-pix-modal" class="student-pix-modal" aria-hidden="true">
+    <button class="student-pix-backdrop" type="button" data-close-student-pix aria-label="Fechar pagamento Pix"></button>
+    <section class="student-pix-dialog" role="dialog" aria-modal="true" aria-labelledby="student-pix-title">
+      <div class="student-pix-header">
+        <div>
+          <small>PAGAMENTO DIRETO AO PERSONAL</small>
+          <h2 id="student-pix-title">Pagar mensalidade com Pix</h2>
+        </div>
+        <button class="student-pix-close" type="button" data-close-student-pix aria-label="Fechar">×</button>
+      </div>
+
+      <div class="student-pix-summary">
+        <div><small>VALOR</small><strong id="student-pix-amount">R$ 0,00</strong></div>
+        <div><small>VENCIMENTO</small><strong id="student-pix-due-date">—</strong></div>
+      </div>
+
+      <div id="student-pix-qr" class="student-pix-qr" aria-label="QR Code Pix"></div>
+
+      <div class="student-pix-copy">
+        <label for="student-pix-code">Pix Copia e Cola</label>
+        <textarea id="student-pix-code" readonly></textarea>
+      </div>
+
+      <div class="student-pix-modal-actions">
+        <button id="student-copy-pix" class="btn btn-primary" type="button">Copiar código Pix</button>
+        <button id="student-modal-paid-button" class="btn btn-outline" type="button">Já paguei</button>
+      </div>
+      <p class="student-pix-security-note">O valor é enviado diretamente para a chave Pix cadastrada pelo seu personal. O FS Fit não recebe nem retém este pagamento.</p>
+    </section>
+  </div>
+
   <div id="student-detail-modal" class="student-detail-modal" aria-hidden="true">
     <button class="student-detail-backdrop" type="button" data-close-student-detail aria-label="Fechar detalhes"></button>
     <section class="student-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="student-detail-title">
@@ -145,7 +193,9 @@
     </section>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script type="module" src="js/aluno.js?v=20260716-student-tabs3"></script>
+  <script type="module" src="js/aluno-financeiro.js?v=20260717-financeiro1"></script>
   <script type="module" src="js/aluno-notificacoes.js?v=20260716-notifications1"></script>
   <script type="module" src="js/aula-aluno.js?v=20260716-live2"></script>
   <script type="module" src="js/chat-aula-aluno.js?v=20260716-live4"></script>
