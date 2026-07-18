@@ -102,3 +102,9 @@ export async function requireSession() {
 
   return session;
 }
+
+if (currentPage() === 'ficha-aluno.html') {
+  import('./ficha-treinos-salvos.js?v=20260718-workout-library1').catch(error => {
+    console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error);
+  });
+}
