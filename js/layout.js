@@ -24,6 +24,7 @@ function ensureMobileOverflowGuard() {
   style.dataset.fsfitMobileOverflowGuard = 'true';
   style.textContent = `
     html,body{max-width:100%;overflow-x:clip}
+    #header-container .user-greeting{display:none!important}
     @media(max-width:860px){
       #header-container .nav-menu{
         transform:translateY(-8px) scale(.98)!important;
@@ -37,6 +38,14 @@ function ensureMobileOverflowGuard() {
   document.head.appendChild(style);
 }
 
+function normalizeHeaderLabels() {
+  const profileLink = document.querySelector('#nav-menu [data-page="perfil"]');
+  if (profileLink) profileLink.textContent = 'Perfil';
+
+  const subscriptionLink = document.querySelector('#nav-menu [data-page="assinatura"]');
+  if (subscriptionLink) subscriptionLink.textContent = 'Assinatura';
+}
+
 function ensureSubscriptionMenuLink(active = '') {
   const menu = document.querySelector('#nav-menu');
   if (!menu || menu.querySelector('[data-page="assinatura"]')) return;
@@ -46,7 +55,7 @@ function ensureSubscriptionMenuLink(active = '') {
   const link = document.createElement('a');
   link.dataset.page = 'assinatura';
   link.href = 'assinatura.html';
-  link.textContent = 'Minha assinatura';
+  link.textContent = 'Assinatura';
   if (active === 'assinatura') link.classList.add('active');
   link.addEventListener('click', () => menu.classList.remove('active'));
   item.appendChild(link);
@@ -59,6 +68,18 @@ export function renderHeader(active = '') {
   core.renderHeader(active);
   ensureMobileOverflowGuard();
   ensureSubscriptionMenuLink(active);
+  normalizeHeaderLabels();
+}
+
+export async function setGreeting(session) {
+  await core.setGreeting(session);
+
+  const headerGreeting = document.querySelector('#user-greeting');
+  const dashboardGreeting = document.querySelector('#dashboard-user-greeting');
+  if (dashboardGreeting) {
+    dashboardGreeting.textContent = headerGreeting?.textContent || '';
+    dashboardGreeting.classList.toggle('hidden', !dashboardGreeting.textContent.trim());
+  }
 }
 
 export async function requireSession() {
