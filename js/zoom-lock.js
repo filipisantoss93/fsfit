@@ -13,12 +13,24 @@
   }
 
   function applyTouchLock() {
-    document.documentElement.style.touchAction = 'pan-x pan-y';
-    document.documentElement.style.webkitTextSizeAdjust = '100%';
+    const root = document.documentElement;
+    root.style.touchAction = 'pan-y';
+    root.style.webkitTextSizeAdjust = '100%';
+    root.style.overflowX = 'hidden';
+    root.style.maxWidth = '100%';
+
     if (document.body) {
-      document.body.style.touchAction = 'pan-x pan-y';
+      document.body.style.touchAction = 'pan-y';
       document.body.style.webkitTextSizeAdjust = '100%';
+      document.body.style.overflowX = 'hidden';
+      document.body.style.maxWidth = '100%';
+      document.body.style.width = '100%';
     }
+
+    // Em navegadores iOS uma página previamente deslocada pode manter scrollLeft.
+    if (window.scrollX !== 0) window.scrollTo(0, window.scrollY);
+    if (root.scrollLeft !== 0) root.scrollLeft = 0;
+    if (document.body?.scrollLeft) document.body.scrollLeft = 0;
   }
 
   function preventZoom(event) {
@@ -27,6 +39,10 @@
 
   function preventMultiTouch(event) {
     if (event.touches && event.touches.length > 1) preventZoom(event);
+  }
+
+  function keepHorizontalPositionLocked() {
+    if (window.scrollX !== 0) window.scrollTo(0, window.scrollY);
   }
 
   // Executa imediatamente no <head>, antes de qualquer interação do usuário.
@@ -52,6 +68,8 @@
   document.addEventListener('wheel', event => {
     if (event.ctrlKey || event.metaKey) preventZoom(event);
   }, { passive: false, capture: true });
+
+  window.addEventListener('scroll', keepHorizontalPositionLocked, { passive: true });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applyTouchLock, { once: true });
