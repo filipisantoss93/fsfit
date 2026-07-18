@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { showMessage } from './layout.js';
+import { showMessage } from './layout-core.js';
 
 const alunoId = new URLSearchParams(location.search).get('id');
 const planningActions = document.querySelector('.planning-actions');
