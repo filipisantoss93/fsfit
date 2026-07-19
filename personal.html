@@ -46,11 +46,7 @@
       </form>
 
       <form id="activation-form" class="hidden">
-        <p>Este é seu primeiro acesso. Informe o código de ativação recebido do seu personal e crie um PIN de 4 números para os próximos acessos.</p>
-        <div class="form-group">
-          <label for="activation-code">Código de ativação</label>
-          <input id="activation-code" name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 números" required>
-        </div>
+        <p>Este é seu primeiro acesso. Crie um PIN de 4 números para proteger sua área e usar nos próximos acessos.</p>
         <div class="form-group">
           <label for="activation-pin">Crie um PIN de 4 números</label>
           <input id="activation-pin" name="pin" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" required>
@@ -59,13 +55,13 @@
           <label for="activation-pin-confirm">Confirme o PIN</label>
           <input id="activation-pin-confirm" name="pin_confirm" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" required>
         </div>
-        <button class="btn btn-primary" type="submit" style="width:100%">Ativar acesso e entrar</button>
+        <button class="btn btn-primary" type="submit" style="width:100%">Criar PIN e entrar</button>
         <button id="change-phone-activation" class="btn btn-outline" type="button" style="width:100%;margin-top:10px">Usar outro telefone</button>
       </form>
     </section>
 
     <footer class="public-profile-footer"><strong>FS</strong> Fit</footer>
   </main>
-  <script type="module" src="/js/personal-publico.js?v=20260717-activation-code1"></script>
+  <script type="module" src="/js/personal-publico.js?v=20260719-first-access-pin2"></script>
 </body>
 </html>
