@@ -25,6 +25,54 @@ function formatElapsed(value) {
   return `${Math.floor(minutes / 60)}h ${minutes % 60}min`;
 }
 
+function youtubeEmbedUrl(url) {
+  try {
+    const parsed = new URL(String(url || '').trim());
+    const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+    let id = '';
+    if (host === 'youtu.be') id = parsed.pathname.split('/').filter(Boolean)[0] || '';
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      id = parsed.searchParams.get('v') || '';
+      if (!id && parsed.pathname.startsWith('/shorts/')) id = parsed.pathname.split('/')[2] || '';
+      if (!id && parsed.pathname.startsWith('/embed/')) id = parsed.pathname.split('/')[2] || '';
+      if (!id && parsed.pathname.startsWith('/live/')) id = parsed.pathname.split('/')[2] || '';
+    }
+    return id ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0` : null;
+  } catch {
+    return null;
+  }
+}
+
+function openExerciseDetail(id) {
+  const items = Array.isArray(sessionState?.exercicios) ? sessionState.exercicios : [];
+  const item = items.find(row => String(row.id || '') === String(id));
+  if (!item) return;
+
+  const ex = item.exercicios || item;
+  const modal = document.querySelector('#student-detail-modal');
+  const title = document.querySelector('#student-detail-title');
+  const body = document.querySelector('#student-detail-body');
+  if (!modal || !title || !body) return;
+
+  const embed = youtubeEmbedUrl(ex.video_url || item.video_url);
+  title.textContent = ex.nome || item.nome || 'Exercício';
+  body.innerHTML = `<div class="student-detail-grid">
+    <div><small>Séries</small><strong>${esc(String(item.series ?? ex.series ?? '—'))}</strong></div>
+    <div><small>Repetições</small><strong>${esc(item.repeticoes || ex.repeticoes || '—')}</strong></div>
+    <div><small>Carga</small><strong>${esc(item.carga || ex.carga || '—')}</strong></div>
+    <div><small>Descanso</small><strong>${item.descanso_segundos != null || ex.descanso_segundos != null ? `${esc(String(item.descanso_segundos ?? ex.descanso_segundos))}s` : '—'}</strong></div>
+    <div><small>Grupo muscular</small><strong>${esc(ex.grupo_muscular || item.grupo_muscular || '—')}</strong></div>
+  </div>
+  ${(ex.equipamento || item.equipamento) ? `<div class="student-detail-block"><small>Equipamento</small><p>${esc(ex.equipamento || item.equipamento)}</p></div>` : ''}
+  ${(ex.instrucoes || item.instrucoes) ? `<div class="student-detail-block"><small>Instruções</small><p>${esc(ex.instrucoes || item.instrucoes)}</p></div>` : ''}
+  ${(item.observacoes || ex.observacoes) ? `<div class="student-detail-block"><small>Observações</small><p>${esc(item.observacoes || ex.observacoes)}</p></div>` : ''}
+  ${embed ? `<div class="student-detail-video"><iframe src="${esc(embed)}" title="Vídeo demonstrativo" loading="lazy" allowfullscreen></iframe></div>` : ''}`;
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('student-detail-open');
+}
+
 async function rpc(name, params = {}) {
   const { data, error } = await supabase.rpc(name, params);
   if (error) throw error;
@@ -80,14 +128,18 @@ function render() {
     <div class="live-class-meta"><span>Iniciado há ${esc(formatElapsed(state.iniciado_at || state.checkin_at))}</span><strong>${done}/${total} exercícios</strong></div>
     <div class="live-progress"><span style="width:${percent}%"></span></div>
     <div class="live-exercise-list">
-      ${items.length ? items.map(item => `<label class="live-exercise ${item.concluido ? 'done' : ''}">
-        <input type="checkbox" data-session-exercise="${esc(item.id)}" ${item.concluido ? 'checked' : ''}>
-        <span><strong>${esc(item.nome || 'Exercício')}</strong><small>${esc([item.series ? `${item.series} séries` : '', item.repeticoes || '', item.carga || ''].filter(Boolean).join(' • '))}</small></span>
-      </label>`).join('') : '<p>Nenhum exercício programado para hoje.</p>'}
+      ${items.length ? items.map(item => `<div class="live-exercise ${item.concluido ? 'done' : ''}">
+        <input type="checkbox" aria-label="Marcar ${esc(item.nome || 'exercício')} como concluído" data-session-exercise="${esc(item.id)}" ${item.concluido ? 'checked' : ''}>
+        <button class="live-exercise-detail" type="button" data-live-exercise-detail="${esc(item.id)}" aria-label="Ver detalhes de ${esc(item.nome || 'exercício')}">
+          <span class="live-exercise-main"><strong>${esc(item.nome || 'Exercício')}</strong><small>${esc([item.series ? `${item.series} séries` : '', item.repeticoes || '', item.carga || ''].filter(Boolean).join(' • '))}</small></span>
+          <span class="live-exercise-arrow" aria-hidden="true">›</span>
+        </button>
+      </div>`).join('') : '<p>Nenhum exercício programado para hoje.</p>'}
     </div>
     <button id="finish-live-class" class="btn btn-secondary" type="button">Finalizar treino</button>`;
 
   box.querySelectorAll('[data-session-exercise]').forEach(input => input.addEventListener('change', toggleExercise));
+  box.querySelectorAll('[data-live-exercise-detail]').forEach(button => button.addEventListener('click', () => openExerciseDetail(button.dataset.liveExerciseDetail)));
   box.querySelector('#finish-live-class')?.addEventListener('click', finishSession);
 }
 
