@@ -21,6 +21,7 @@ const openPasswordModalButton = document.querySelector('#open-password-modal');
 const closePasswordModalButton = document.querySelector('#close-password-modal');
 const cancelPasswordChangeButton = document.querySelector('#cancel-password-change');
 const BUCKET = 'perfil-publico';
+const PUBLIC_SITE_ORIGIN = 'https://fsfit.com.br';
 let avatarUrl = '';
 let workplaceUrl = '';
 let gallery = [];
@@ -29,7 +30,7 @@ function digits(value = '') { return String(value).replace(/\D/g, '').slice(0, 1
 function slugify(value = '') {
   return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
 }
-function publicUrl(slug) { return `${window.location.origin}/p/${encodeURIComponent(slug)}`; }
+function publicUrl(slug) { return `${PUBLIC_SITE_ORIGIN}/p/${encodeURIComponent(slug)}`; }
 function renderPublicLink(slug, published = true) {
   if (!slug) { publicLinkBox.className = 'message'; publicLinkBox.textContent = ''; return; }
   const url = publicUrl(slug);
