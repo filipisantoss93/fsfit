@@ -55,9 +55,11 @@ function formatDateValue(date) {
 }
 
 function parseDateValue(value) {
-  if (!value) return new Date();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return new Date();
   const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, month - 1, day);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return new Date();
+  return date;
 }
 
 function formatFullDate(date) {
@@ -99,6 +101,15 @@ function normalizeEntries(workouts = []) {
   return entries;
 }
 
+function buildStudentRecordUrl(studentId, date) {
+  const params = new URLSearchParams({
+    id: studentId,
+    origem: 'agenda',
+    data: formatDateValue(date)
+  });
+  return `ficha-aluno.html?${params.toString()}`;
+}
+
 function renderAgendaForDate(date) {
   const dayNumber = date.getDay();
   const dayEntries = agendaEntries
@@ -118,7 +129,7 @@ function renderAgendaForDate(date) {
           : '—';
 
         return `
-          <a class="agenda-entry" href="ficha-aluno.html?id=${entry.id}">
+          <a class="agenda-entry" href="${buildStudentRecordUrl(entry.id, date)}">
             <div class="agenda-time">${timeLabel}</div>
             <div class="agenda-entry-main">
               <strong>${esc(entry.nome)}</strong>
@@ -146,8 +157,10 @@ function renderAgendaForDate(date) {
 }
 
 function selectDate(date) {
-  dateInput.value = formatDateValue(date);
+  const value = formatDateValue(date);
+  dateInput.value = value;
   renderAgendaForDate(date);
+  history.replaceState({}, '', `agenda.html?data=${encodeURIComponent(value)}`);
 }
 
 function shiftSelectedDate(days) {
@@ -172,7 +185,8 @@ async function loadAgenda() {
   }
 
   agendaEntries = normalizeEntries(data || []);
-  selectDate(new Date());
+  const requestedDate = new URLSearchParams(location.search).get('data');
+  selectDate(requestedDate ? parseDateValue(requestedDate) : new Date());
 
   const invalidTimes = agendaEntries.filter(entry => entry.horario_aula && !isHalfHourSlot(entry.horario_aula));
   if (invalidTimes.length) {
@@ -180,7 +194,7 @@ async function loadAgenda() {
   }
 }
 
-dateInput.addEventListener('change', () => renderAgendaForDate(parseDateValue(dateInput.value)));
+dateInput.addEventListener('change', () => selectDate(parseDateValue(dateInput.value)));
 prevDayButton.addEventListener('click', () => shiftSelectedDate(-1));
 nextDayButton.addEventListener('click', () => shiftSelectedDate(1));
 todayButton.addEventListener('click', () => selectDate(new Date()));
