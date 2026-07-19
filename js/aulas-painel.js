@@ -112,7 +112,7 @@ async function loadLiveStudents() {
           ${pending
             ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button><button class="btn btn-danger" type="button" data-cancel-checkin="${esc(row.sessao_id)}" data-student-name="${esc(row.aluno_nome)}">Cancelar check-in</button>`
             : `<button class="btn btn-secondary" type="button" data-open-session-chat="${esc(row.sessao_id)}">${chatOpen ? 'Fechar chat' : 'Abrir chat'}</button><button class="btn btn-danger" type="button" data-finish-session="${esc(row.sessao_id)}" data-student-name="${esc(row.aluno_nome)}">Encerrar treino</button>`}
-          <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
+          <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}&origem=aula">Abrir ficha</a>
         </div>
         ${pending ? '' : `<div class="live-chat-inline ${chatOpen ? '' : 'hidden'}" data-chat-host="${esc(row.sessao_id)}"></div>`}
       </article>`;
