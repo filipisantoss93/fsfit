@@ -29,6 +29,26 @@ async function confirmStart(sessionId, button) {
   await loadLiveStudents();
 }
 
+async function cancelCheckin(sessionId, studentName, button) {
+  if (!confirm(`Cancelar o check-in de ${studentName}?\n\nO aluno precisará fazer um novo check-in para solicitar o início da aula.`)) return;
+
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = 'Cancelando...';
+
+  try {
+    const { data, error } = await supabase.rpc('cancelar_checkin_personal', { p_sessao_id: sessionId });
+    if (error) throw error;
+    if (data !== true) throw new Error('O check-in não está mais aguardando confirmação ou não pertence a este personal.');
+    await loadLiveStudents();
+  } catch (error) {
+    console.error(error);
+    alert(error.message || 'Não foi possível cancelar o check-in.');
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
 async function finishSession(sessionId, studentName, button) {
   if (!confirm(`Encerrar o treino de ${studentName}?\n\nUse esta opção quando o aluno esquecer de finalizar o treino. A sessão será marcada como finalizada.`)) return;
 
@@ -90,7 +110,7 @@ async function loadLiveStudents() {
         </div>
         <div class="actions">
           ${pending
-            ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>`
+            ? `<button class="btn btn-primary" type="button" data-confirm-session="${esc(row.sessao_id)}">Confirmar início</button><button class="btn btn-danger" type="button" data-cancel-checkin="${esc(row.sessao_id)}" data-student-name="${esc(row.aluno_nome)}">Cancelar check-in</button>`
             : `<button class="btn btn-secondary" type="button" data-open-session-chat="${esc(row.sessao_id)}">${chatOpen ? 'Fechar chat' : 'Abrir chat'}</button><button class="btn btn-danger" type="button" data-finish-session="${esc(row.sessao_id)}" data-student-name="${esc(row.aluno_nome)}">Encerrar treino</button>`}
           <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}">Abrir ficha</a>
         </div>
@@ -113,6 +133,14 @@ async function loadLiveStudents() {
 
     container.querySelectorAll('[data-confirm-session]').forEach(button => {
       button.addEventListener('click', () => confirmStart(button.dataset.confirmSession, button));
+    });
+
+    container.querySelectorAll('[data-cancel-checkin]').forEach(button => {
+      button.addEventListener('click', () => cancelCheckin(
+        button.dataset.cancelCheckin,
+        button.dataset.studentName || 'este aluno',
+        button
+      ));
     });
 
     container.querySelectorAll('[data-finish-session]').forEach(button => {
