@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css?v=20260717-admin-cards3">
   <link rel="stylesheet" href="css/admin-users-compact.css?v=20260719-admin-users1">
+  <link rel="stylesheet" href="css/admin-attention.css?v=20260719-admin-attention1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -44,6 +45,16 @@
       <div class="card stat-card"><small>NOVOS ASSINANTES 30D</small><strong id="metric-new-subscribers">0</strong><span class="admin-stat-note">Primeiro pagamento no período</span></div>
       <div class="card stat-card"><small>CANCELAMENTOS 30D</small><strong id="metric-cancellations">0</strong><span class="admin-stat-note">Usuários com cancelamento no período</span></div>
       <div class="card stat-card"><small>CONVERSÃO TRIAL → PREMIUM</small><strong id="metric-conversion">0%</strong><span id="metric-revenue-per-customer" class="admin-stat-note">Receita média/cliente: R$ 0,00</span></div>
+    </section>
+
+    <section class="card admin-section-card admin-attention-section">
+      <div class="section-heading admin-attention-heading">
+        <div><small>GESTÃO OPERACIONAL</small><h2>Precisa de atenção</h2></div>
+        <span id="admin-attention-total" class="admin-attention-total" aria-label="Total de pendências">0</span>
+      </div>
+      <p class="admin-attention-intro">Pendências que podem afetar receita, renovação ou acesso dos usuários. Toque em um item para abrir a conta.</p>
+      <div id="admin-attention-summary" class="admin-attention-summary"></div>
+      <div id="admin-attention-list" class="admin-attention-list"><div class="admin-attention-loading">Carregando pendências...</div></div>
     </section>
 
     <section class="admin-grid">
@@ -82,7 +93,7 @@
       </div>
     </section>
 
-    <section class="card admin-section-card">
+    <section id="admin-users-section" class="card admin-section-card">
       <div class="section-heading">
         <div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div>
       </div>
@@ -140,5 +151,6 @@
 
   <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
   <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
+  <script type="module" src="js/admin-attention.js?v=20260719-admin-attention1"></script>
 </body>
 </html>
