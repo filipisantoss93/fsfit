@@ -70,7 +70,15 @@ function configureStudentRecordBackLink() {
   if (!backLink) return;
 
   const params = new URLSearchParams(window.location.search);
-  if (params.get('origem') !== 'agenda') return;
+  const origin = params.get('origem');
+
+  if (origin === 'aula') {
+    backLink.textContent = '← Voltar para aula';
+    backLink.href = 'painel.html#live-students-list';
+    return;
+  }
+
+  if (origin !== 'agenda') return;
 
   const date = params.get('data');
   backLink.textContent = '← Voltar para agenda';
