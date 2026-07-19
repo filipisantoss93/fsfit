@@ -42,6 +42,14 @@ async function loadSession() {
   render();
 }
 
+async function notifyPersonalCheckin() {
+  const { data, error } = await supabase.functions.invoke('chat-push', {
+    body: { action: 'notify_checkin', token }
+  });
+  if (error) throw error;
+  return data;
+}
+
 function render() {
   const state = sessionState;
   if (!state?.sessao_id) {
@@ -57,7 +65,9 @@ function render() {
     box.innerHTML = `
       <div class="live-class-header"><div><small>CHECK-IN REALIZADO</small><h2>Aguardando seu personal</h2></div><span class="live-status idle">AGUARDANDO CONFIRMAÇÃO</span></div>
       <p>Seu check-in foi enviado. O treino será liberado assim que o personal confirmar o início da aula.</p>
-      <div class="live-class-meta"><span>Check-in feito há ${esc(formatElapsed(state.checkin_at))}</span><strong>Aguardando liberação</strong></div>`;
+      <div class="live-class-meta"><span>Check-in feito há ${esc(formatElapsed(state.checkin_at))}</span><strong>Aguardando liberação</strong></div>
+      <div class="actions"><button id="cancel-live-checkin" class="btn btn-outline" type="button">Cancelar check-in</button></div>`;
+    box.querySelector('#cancel-live-checkin')?.addEventListener('click', cancelCheckin);
     return;
   }
 
@@ -86,11 +96,32 @@ async function startSession() {
   if (button) button.disabled = true;
   try {
     await rpc('iniciar_aluno_sessao_treino', { p_access_token: accessToken });
+    try {
+      await notifyPersonalCheckin();
+    } catch (pushError) {
+      console.warn('Check-in realizado, mas o Push do personal não pôde ser enviado:', pushError);
+    }
     await loadSession();
   } catch (error) {
     console.error(error);
     alert(error.message || 'Não foi possível realizar o check-in.');
     if (button) button.disabled = false;
+  }
+}
+
+async function cancelCheckin() {
+  if (!confirm('Cancelar seu check-in? Você poderá fazer um novo check-in depois.')) return;
+  const button = box.querySelector('#cancel-live-checkin');
+  if (button) button.disabled = true;
+  try {
+    const cancelled = await rpc('cancelar_checkin_aluno_sessao', { p_access_token: accessToken });
+    if (cancelled !== true) throw new Error('O check-in não está mais aguardando confirmação.');
+    sessionState = null;
+    render();
+  } catch (error) {
+    console.error(error);
+    await loadSession().catch(console.error);
+    alert(error.message || 'Não foi possível cancelar o check-in.');
   }
 }
 
