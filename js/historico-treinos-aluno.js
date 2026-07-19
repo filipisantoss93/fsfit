@@ -4,6 +4,7 @@ import { requireSession } from './layout.js';
 const alunoId = new URLSearchParams(location.search).get('id');
 const list = document.querySelector('#workout-history-list');
 const summary = document.querySelector('#workout-history-summary');
+const deleteStudentButton = document.querySelector('#delete-student');
 
 if (!alunoId || !list) {
   // A página pode ser carregada sem a aba de histórico em versões antigas.
@@ -30,6 +31,53 @@ if (!alunoId || !list) {
     const hours = Math.floor(minutes / 60);
     const rest = minutes % 60;
     return hours ? `${hours}h ${rest}min` : `${rest} min`;
+  }
+
+  async function deleteStudent() {
+    if (!deleteStudentButton) return;
+
+    const studentName = document.querySelector('#student-name')?.textContent?.trim() || 'este aluno';
+    const confirmed = window.confirm(
+      `Excluir ${studentName}?\n\nTodos os dados vinculados ao aluno serão removidos permanentemente. Esta ação não pode ser desfeita.`
+    );
+    if (!confirmed) return;
+
+    const originalText = deleteStudentButton.textContent;
+    deleteStudentButton.disabled = true;
+    deleteStudentButton.textContent = 'Excluindo...';
+
+    try {
+      const { data: mediaRows, error: mediaError } = await supabase
+        .from('aluno_midias')
+        .select('storage_path')
+        .eq('aluno_id', alunoId)
+        .eq('personal_id', session.user.id);
+
+      if (mediaError) console.warn('Não foi possível listar as mídias antes da exclusão:', mediaError);
+
+      const { data: deleted, error } = await supabase
+        .from('alunos')
+        .delete()
+        .eq('id', alunoId)
+        .eq('personal_id', session.user.id)
+        .select('id');
+
+      if (error) throw error;
+      if (!deleted?.length) throw new Error('Aluno não encontrado ou sem permissão para exclusão.');
+
+      const storagePaths = (mediaRows || []).map(item => item.storage_path).filter(Boolean);
+      if (storagePaths.length) {
+        const { error: storageError } = await supabase.storage.from('aluno-midias').remove(storagePaths);
+        if (storageError) console.warn('Aluno excluído, mas algumas mídias não puderam ser removidas do armazenamento:', storageError);
+      }
+
+      window.location.replace('alunos.html');
+    } catch (error) {
+      console.error('Erro ao excluir aluno:', error);
+      alert(error.message || 'Não foi possível excluir o aluno.');
+      deleteStudentButton.disabled = false;
+      deleteStudentButton.textContent = originalText;
+    }
   }
 
   async function loadWorkoutHistory() {
@@ -84,5 +132,6 @@ if (!alunoId || !list) {
     }).join('');
   }
 
+  deleteStudentButton?.addEventListener('click', deleteStudent);
   loadWorkoutHistory();
 }
