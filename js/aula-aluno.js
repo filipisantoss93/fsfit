@@ -1,8 +1,12 @@
 import { supabase } from './supabase.js';
+import { ensureStudentPortalMainTabs } from './portal-aluno-tabs.js';
 
 const token = localStorage.getItem('fsfit_aluno_token');
 const root = document.querySelector('#student-content');
 if (!token || !root) throw new Error('Sessão do aluno indisponível');
+
+const portalTabs = ensureStudentPortalMainTabs();
+const liveHost = portalTabs?.live || root;
 
 let accessToken = null;
 let sessionState = null;
@@ -10,7 +14,7 @@ let sessionState = null;
 const box = document.createElement('section');
 box.className = 'card live-class-card';
 box.innerHTML = '<div class="live-class-loading">Carregando status da aula...</div>';
-root.insertBefore(box, root.querySelector('.student-plan-tabs'));
+liveHost.appendChild(box);
 
 function esc(value = '') {
   const div = document.createElement('div');
