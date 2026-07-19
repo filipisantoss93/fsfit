@@ -152,4 +152,7 @@ if (currentPage() === 'ficha-aluno.html') {
   import('./ficha-treinos-salvos.js?v=20260718-workout-library1').catch(error => {
     console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error);
   });
+  import('./iniciar-treino-personal.js?v=20260719-start-workout1').catch(error => {
+    console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error);
+  });
 }
