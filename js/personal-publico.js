@@ -12,6 +12,25 @@ const activationForm = document.querySelector('#activation-form');
 let phone = '';
 
 function esc(value = '') { const div = document.createElement('div'); div.textContent = value ?? ''; return div.innerHTML; }
+function instagramHref(value = '') {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+
+  const withoutAt = raw.replace(/^@+/, '');
+  if (/^(?:https?:\/\/)?(?:www\.)?instagram\.com\//i.test(withoutAt)) {
+    const candidate = /^https?:\/\//i.test(withoutAt) ? withoutAt : `https://${withoutAt}`;
+    try {
+      const url = new URL(candidate);
+      const handle = url.pathname.split('/').filter(Boolean)[0] || '';
+      return handle ? `https://www.instagram.com/${encodeURIComponent(handle)}/` : 'https://www.instagram.com/';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  const handle = withoutAt.split(/[\/?#]/)[0].trim();
+  return handle ? `https://www.instagram.com/${encodeURIComponent(handle)}/` : '';
+}
 function digits(value = '', max = 11) { return String(value).replace(/\D/g, '').slice(0, max); }
 function show(text, type = 'error') { message.textContent = text; message.className = `message show ${type}`; }
 function clearMessage() { message.className = 'message'; message.textContent = ''; }
@@ -122,7 +141,8 @@ async function loadProfile() {
   localStorage.setItem('fsfit_personal_slug', slug);
   const avatar = data.foto_url ? `<img class="public-profile-avatar" src="${esc(data.foto_url)}" alt="Foto de ${esc(data.nome_publico)}">` : `<div class="public-profile-avatar public-profile-avatar-placeholder">${esc(data.nome_publico.charAt(0).toUpperCase())}</div>`;
   const location = [data.local_trabalho, data.cidade].filter(Boolean).map(esc).join(' · ');
-  const instagram = data.instagram ? `<div class="public-profile-info"><strong>Instagram</strong><span>${esc(data.instagram)}</span></div>` : '';
+  const instagramUrl = instagramHref(data.instagram);
+  const instagram = instagramUrl ? `<div class="public-profile-info"><strong>Instagram</strong><a href="${esc(instagramUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de ${esc(data.nome_publico)}">${esc(data.instagram)}</a></div>` : '';
   const workplace = data.foto_local_url ? `<section class="public-media-section"><h2>Onde eu trabalho</h2><button class="public-workplace-photo photo-open" type="button" data-photo="${esc(data.foto_local_url)}" aria-label="Ampliar foto do local de trabalho"><img src="${esc(data.foto_local_url)}" alt="Local de trabalho de ${esc(data.nome_publico)}"></button></section>` : '';
   const gallery = photos?.length ? `<section class="public-media-section"><h2>Meu dia a dia</h2><div class="public-photo-grid">${photos.map((item, index) => `<button class="public-photo-item photo-open" type="button" data-photo="${esc(item.foto_url)}" aria-label="Ampliar foto ${index + 1}"><img src="${esc(item.foto_url)}" alt="Dia a dia profissional de ${esc(data.nome_publico)}"></button>`).join('')}</div></section>` : '';
 
