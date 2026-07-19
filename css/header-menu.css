@@ -326,6 +326,7 @@
   .nav-menu a[data-page="alimentacao"]::before { content: "🍎"; }
   .nav-menu a[data-page="agenda"]::before { content: "▣"; }
   .nav-menu a[data-page="financeiro"]::before { content: "▤"; }
+  .nav-menu a[data-page="assinatura"]::before { content: "💳"; }
   .nav-menu a[data-page="perfil"]::before { content: "●"; }
   .nav-menu a[data-page="contato"]::before { content: "✉"; }
   .nav-menu a[data-page="admin"]::before { content: "⚙"; }
