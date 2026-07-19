@@ -39,12 +39,6 @@ function numberOrNull(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function isHalfHourSlot(value) {
-  if (!value) return true;
-  const [hour, minute] = String(value).slice(0, 5).split(':').map(Number);
-  return Number.isInteger(hour) && Number.isInteger(minute) && hour >= 0 && hour <= 23 && (minute === 0 || minute === 30);
-}
-
 function dbSexo(value) {
   return { Masculino: 'masculino', Feminino: 'feminino', Outro: 'outro', 'Prefiro não informar': 'nao_informado' }[value] || 'nao_informado';
 }
@@ -208,13 +202,6 @@ form.data_nascimento.addEventListener('blur', () => {
   }
 });
 form.whatsapp.addEventListener('input', () => { form.whatsapp.value = phone(form.whatsapp.value); });
-form.horario_aula.addEventListener('change', () => {
-  if (form.horario_aula.value && !isHalfHourSlot(form.horario_aula.value)) {
-    showMessage(message, 'Escolha um horário em intervalos de 30 minutos, como 08:00, 08:30, 09:00 ou 09:30.', 'error');
-    form.horario_aula.value = '';
-    form.horario_aula.focus();
-  }
-});
 document.querySelector('#cancel-edit').addEventListener('click', resetForm);
 toggleStudentForm?.addEventListener('click', () => {
   resetForm();
@@ -299,7 +286,6 @@ form.addEventListener('submit', async event => {
 
   if (payload.nome.length < 2) return showMessage(message, 'Informe o nome do aluno.', 'error');
   if (payload.telefone.length !== 11) return showMessage(message, 'O WhatsApp deve ter 11 números: DDD + número.', 'error');
-  if (!isHalfHourSlot(payload.horario_aula)) return showMessage(message, 'O horário deve estar em intervalos de 30 minutos.', 'error');
   if ((payload.periodo_aula || payload.horario_aula || payload.local_aula) && !(payload.periodo_aula && payload.horario_aula && payload.local_aula)) {
     return showMessage(message, 'Para programar a agenda, informe período, horário e local. Os dias são definidos pelo treino ativo.', 'error');
   }
