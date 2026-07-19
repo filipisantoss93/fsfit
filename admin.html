@@ -8,6 +8,7 @@
   <title>Administração — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css?v=20260717-admin-cards3">
+  <link rel="stylesheet" href="css/admin-users-compact.css?v=20260719-admin-users1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -91,8 +92,8 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Usuário</th><th>Plano</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="admin-users-list"><tr><td colspan="5">Carregando...</td></tr></tbody>
+          <thead><tr><th>Usuário</th><th>Vencimento</th><th aria-label="Abrir detalhes"></th></tr></thead>
+          <tbody id="admin-users-list"><tr><td colspan="3">Carregando...</td></tr></tbody>
         </table>
       </div>
       <div class="admin-pagination">
@@ -138,5 +139,6 @@
   </div>
 
   <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
+  <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
 </body>
 </html>
