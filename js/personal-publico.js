@@ -134,7 +134,6 @@ async function loadProfile() {
 
 phoneForm.telefone.addEventListener('input', () => { phoneForm.telefone.value = digits(phoneForm.telefone.value); });
 pinForm.pin.addEventListener('input', () => { pinForm.pin.value = digits(pinForm.pin.value, 4); });
-activationForm.codigo.addEventListener('input', () => { activationForm.codigo.value = digits(activationForm.codigo.value, 6); });
 activationForm.pin.addEventListener('input', () => { activationForm.pin.value = digits(activationForm.pin.value, 4); });
 activationForm.pin_confirm.addEventListener('input', () => { activationForm.pin_confirm.value = digits(activationForm.pin_confirm.value, 4); });
 document.querySelector('#change-phone').addEventListener('click', resetAccess);
@@ -149,7 +148,7 @@ phoneForm.addEventListener('submit', async event => {
     phoneForm.classList.add('hidden');
     if (result.next === 'activate') {
       activationForm.classList.remove('hidden');
-      show('Primeiro acesso: informe o código de ativação enviado pelo seu personal.', 'success');
+      show('Primeiro acesso: crie um PIN de 4 números para entrar.', 'success');
     } else {
       pinForm.classList.remove('hidden');
     }
@@ -166,20 +165,12 @@ pinForm.addEventListener('submit', async event => {
 
 activationForm.addEventListener('submit', async event => {
   event.preventDefault(); clearMessage();
-  const codigo = digits(activationForm.codigo.value, 6);
   const pin = digits(activationForm.pin.value, 4);
   const pinConfirm = digits(activationForm.pin_confirm.value, 4);
-  if (codigo.length !== 6) return show('Informe o código de ativação de 6 números recebido do seu personal.');
   if (pin.length !== 4 || pinConfirm.length !== 4) return show('Crie e confirme um PIN de 4 números.');
   if (pin !== pinConfirm) return show('Os PINs informados não coincidem.');
   const button = activationForm.querySelector('[type="submit"]'); button.disabled = true;
   try {
-    const { data: validado, error: validationError } = await supabase.rpc('fsfit_validar_codigo_ativacao_aluno', {
-      p_personal_slug: slug,
-      p_telefone: phone,
-      p_codigo: codigo
-    });
-    if (validationError || validado !== true) throw new Error('Código de ativação inválido ou expirado. Solicite um novo código ao seu personal.');
     const result = await invoke({ action: 'activate', telefone: phone, pin, personal_slug: slug });
     saveSession(result);
   } catch (error) { show(error.message); } finally { button.disabled = false; }
