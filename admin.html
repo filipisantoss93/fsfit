@@ -3,8 +3,8 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <title>Administração — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css?v=20260717-admin-cards3">
@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="css/admin-forecast.css?v=20260719-admin-forecast1">
   <link rel="stylesheet" href="css/admin-funnel.css?v=20260719-admin-funnel1">
   <link rel="stylesheet" href="css/admin-retention.css?v=20260719-admin-retention1">
+  <link rel="stylesheet" href="css/admin-tabs.css?v=20260719-admin-tabs1">
+  <link rel="stylesheet" href="css/admin-crm.css?v=20260719-admin-crm1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -32,62 +34,100 @@
 
     <div id="admin-message" class="message"></div>
 
-    <section class="admin-stats">
-      <div class="card stat-card"><small>CONTAS</small><strong id="stat-accounts">—</strong></div>
-      <div class="card stat-card"><small>ASSINANTES</small><strong id="stat-subscribers">—</strong></div>
-      <div class="card stat-card"><small>EM TRIAL</small><strong id="stat-trial">—</strong></div>
-      <div class="card stat-card"><small>INATIVAS</small><strong id="stat-inactive">—</strong></div>
-      <div class="card stat-card"><small>FATURAMENTO MÊS</small><strong id="stat-revenue-month">R$ 0,00</strong></div>
-      <div class="card stat-card"><small>FATURAMENTO TOTAL</small><strong id="stat-revenue-total">R$ 0,00</strong></div>
-    </section>
+    <nav class="admin-tabs-nav" role="tablist" aria-label="Seções do painel administrativo" data-allow-horizontal-scroll="true">
+      <button class="admin-tab-button active" type="button" role="tab" data-admin-tab="visao-geral" aria-selected="true">Visão geral</button>
+      <button class="admin-tab-button" type="button" role="tab" data-admin-tab="clientes" aria-selected="false">Clientes</button>
+      <button class="admin-tab-button" type="button" role="tab" data-admin-tab="financeiro" aria-selected="false">Financeiro</button>
+      <button class="admin-tab-button" type="button" role="tab" data-admin-tab="crescimento" aria-selected="false">Crescimento</button>
+    </nav>
 
-    <section class="admin-management-grid">
-      <div class="card stat-card"><small>RECEITA 30 DIAS</small><strong id="metric-revenue-30">R$ 0,00</strong><span id="metric-revenue-periods" class="admin-stat-note">7d: R$ 0,00 · 90d: R$ 0,00</span></div>
-      <div class="card stat-card"><small>MRR ESTIMADO</small><strong id="metric-mrr">R$ 0,00</strong><span class="admin-stat-note">Receita mensal recorrente normalizada</span></div>
-      <div class="card stat-card"><small>ASSINATURAS ATIVAS</small><strong id="metric-active-subscriptions">0</strong><span class="admin-stat-note">Com acesso vigente</span></div>
-      <div class="card stat-card"><small>NOVOS ASSINANTES 30D</small><strong id="metric-new-subscribers">0</strong><span class="admin-stat-note">Primeiro pagamento no período</span></div>
-      <div class="card stat-card"><small>CANCELAMENTOS 30D</small><strong id="metric-cancellations">0</strong><span class="admin-stat-note">Usuários com cancelamento no período</span></div>
-      <div class="card stat-card"><small>CONVERSÃO TRIAL → PREMIUM</small><strong id="metric-conversion">0%</strong><span id="metric-revenue-per-customer" class="admin-stat-note">Receita média/cliente: R$ 0,00</span></div>
-    </section>
+    <div class="admin-tab-panel" data-admin-tab-panel="visao-geral" role="tabpanel">
+      <section class="admin-stats">
+        <div class="card stat-card"><small>CONTAS</small><strong id="stat-accounts">—</strong></div>
+        <div class="card stat-card"><small>ASSINANTES</small><strong id="stat-subscribers">—</strong></div>
+        <div class="card stat-card"><small>EM TRIAL</small><strong id="stat-trial">—</strong></div>
+        <div class="card stat-card"><small>INATIVAS</small><strong id="stat-inactive">—</strong></div>
+        <div class="card stat-card"><small>FATURAMENTO MÊS</small><strong id="stat-revenue-month">R$ 0,00</strong></div>
+        <div class="card stat-card"><small>FATURAMENTO TOTAL</small><strong id="stat-revenue-total">R$ 0,00</strong></div>
+      </section>
 
-    <section class="card admin-section-card admin-attention-section">
-      <div class="section-heading admin-attention-heading">
-        <div><small>GESTÃO OPERACIONAL</small><h2>Precisa de atenção</h2></div>
-        <span id="admin-attention-total" class="admin-attention-total" aria-label="Total de pendências">0</span>
-      </div>
-      <p class="admin-attention-intro">Pendências que podem afetar receita, renovação ou acesso dos usuários. Toque em um item para abrir a conta.</p>
-      <div id="admin-attention-summary" class="admin-attention-summary"></div>
-      <div id="admin-attention-list" class="admin-attention-list"><div class="admin-attention-loading">Carregando pendências...</div></div>
-    </section>
+      <section class="admin-management-grid">
+        <div class="card stat-card"><small>RECEITA 30 DIAS</small><strong id="metric-revenue-30">R$ 0,00</strong><span id="metric-revenue-periods" class="admin-stat-note">7d: R$ 0,00 · 90d: R$ 0,00</span></div>
+        <div class="card stat-card"><small>MRR ESTIMADO</small><strong id="metric-mrr">R$ 0,00</strong><span class="admin-stat-note">Receita mensal recorrente normalizada</span></div>
+        <div class="card stat-card"><small>ASSINATURAS ATIVAS</small><strong id="metric-active-subscriptions">0</strong><span class="admin-stat-note">Com acesso vigente</span></div>
+        <div class="card stat-card"><small>NOVOS ASSINANTES 30D</small><strong id="metric-new-subscribers">0</strong><span class="admin-stat-note">Primeiro pagamento no período</span></div>
+        <div class="card stat-card"><small>CANCELAMENTOS 30D</small><strong id="metric-cancellations">0</strong><span class="admin-stat-note">Usuários com cancelamento no período</span></div>
+        <div class="card stat-card"><small>CONVERSÃO TRIAL → PREMIUM</small><strong id="metric-conversion">0%</strong><span id="metric-revenue-per-customer" class="admin-stat-note">Receita média/cliente: R$ 0,00</span></div>
+      </section>
 
-    <section class="card admin-section-card admin-forecast-section">
-      <div class="section-heading">
-        <div><small>PREVISÃO FINANCEIRA</small><h2>Fluxo do mês</h2></div>
-        <span id="forecast-period" class="hero-badge">—</span>
-      </div>
-      <div class="admin-forecast-grid">
-        <div class="admin-forecast-card"><span>Recebido no mês</span><strong id="forecast-received">R$ 0,00</strong><small>Pagamentos efetivamente confirmados.</small></div>
-        <div class="admin-forecast-card"><span>A receber</span><strong id="forecast-receivable">R$ 0,00</strong><small id="forecast-receivable-note">Cobranças e renovações previstas até o fim do mês.</small></div>
-        <div class="admin-forecast-card"><span>Receita prevista</span><strong id="forecast-projected">R$ 0,00</strong><small>Recebido + valores ainda esperados neste mês.</small></div>
-        <div class="admin-forecast-card"><span>Inadimplência atual</span><strong id="forecast-overdue">R$ 0,00</strong><small id="forecast-overdue-note">0 clientes · Taxa estimada: 0%</small></div>
-      </div>
-      <div class="admin-forecast-footer"><span>Próximas renovações:</span><span id="forecast-renewals-30d"><strong>0</strong> renovações previstas nos próximos 30 dias · <strong>R$ 0,00</strong></span></div>
-    </section>
+      <section class="card admin-section-card admin-attention-section">
+        <div class="section-heading admin-attention-heading">
+          <div><small>GESTÃO OPERACIONAL</small><h2>Precisa de atenção</h2></div>
+          <span id="admin-attention-total" class="admin-attention-total" aria-label="Total de pendências">0</span>
+        </div>
+        <p class="admin-attention-intro">Pendências que podem afetar receita, renovação ou acesso dos usuários. Toque em um item para abrir a conta.</p>
+        <div id="admin-attention-summary" class="admin-attention-summary"></div>
+        <div id="admin-attention-list" class="admin-attention-list"><div class="admin-attention-loading">Carregando pendências...</div></div>
+      </section>
 
-    <section class="card admin-section-card admin-funnel-section">
-      <div class="section-heading"><div><small>COMERCIAL</small><h2>Funil de aquisição e conversão</h2></div></div>
-      <p class="admin-funnel-intro">Acompanhe quantos usuários entram, iniciam o trial, fazem o primeiro pagamento e permanecem como assinantes pagos.</p>
-      <div id="admin-commercial-funnel" class="admin-funnel-loading">Carregando funil comercial...</div>
-    </section>
+      <section class="card admin-section-card">
+        <div class="section-heading"><div><small>ATALHOS</small><h2>Administração</h2></div><span class="admin-support-card-badge hidden" data-admin-support-badge aria-label="0 notificações de suporte">0</span></div>
+        <div class="admin-shortcuts">
+          <a class="btn btn-secondary" href="assinatura.html">Minha assinatura</a>
+          <a class="btn btn-secondary" href="admin-contatos.html">Suporte interno</a>
+          <button id="export-finance" class="btn btn-outline" type="button">Exportar financeiro CSV</button>
+        </div>
+      </section>
+    </div>
 
-    <section class="card admin-section-card admin-retention-section">
-      <div class="section-heading"><div><small>RETENÇÃO</small><h2>Retenção, churn e risco de receita</h2></div></div>
-      <p class="admin-retention-intro">Indicadores calculados apenas sobre clientes com pagamento confirmado, sem misturar acessos Premium concedidos manualmente.</p>
-      <div id="admin-retention-churn"><div class="admin-retention-empty">Carregando indicadores de retenção...</div></div>
-    </section>
+    <div class="admin-tab-panel" data-admin-tab-panel="clientes" role="tabpanel" hidden>
+      <section class="card admin-section-card admin-crm-section">
+        <div class="section-heading"><div><small>CRM</small><h2>Segmentação de clientes</h2></div></div>
+        <p class="admin-crm-intro">Identifique rapidamente quem acabou de assinar, quem está saudável, quem exige atenção e quem pode ser recuperado.</p>
+        <div id="admin-crm-overview" class="admin-crm-overview"></div>
+        <div class="admin-crm-toolbar">
+          <div class="form-group admin-crm-search"><label for="admin-crm-search">Buscar cliente</label><input id="admin-crm-search" placeholder="Nome, e-mail, telefone ou motivo"></div>
+          <div id="admin-crm-filters" class="admin-crm-filters" data-allow-horizontal-scroll="true"></div>
+        </div>
+        <div id="admin-crm-list" class="admin-crm-list"><div class="admin-crm-empty">Carregando segmentação...</div></div>
+      </section>
 
-    <section class="admin-grid">
-      <article class="card admin-section-card">
+      <section id="admin-users-section" class="card admin-section-card">
+        <div class="section-heading"><div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div></div>
+        <div class="admin-toolbar">
+          <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome, e-mail, empresa ou telefone"></div>
+          <div class="form-group"><label for="admin-plan-filter">Plano</label><select id="admin-plan-filter"><option value="">Todos</option><option value="trial">Trial</option><option value="free">Free</option><option value="premium">Premium</option></select></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Usuário</th><th>Vencimento</th><th aria-label="Abrir detalhes"></th></tr></thead>
+            <tbody id="admin-users-list"><tr><td colspan="3">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="admin-pagination">
+          <button id="admin-users-prev" class="btn btn-outline" type="button">Anterior</button>
+          <span id="admin-users-page-info">Página 1 de 1</span>
+          <button id="admin-users-next" class="btn btn-outline" type="button">Próxima</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="admin-tab-panel" data-admin-tab-panel="financeiro" role="tabpanel" hidden>
+      <section class="card admin-section-card admin-forecast-section">
+        <div class="section-heading">
+          <div><small>PREVISÃO FINANCEIRA</small><h2>Fluxo do mês</h2></div>
+          <span id="forecast-period" class="hero-badge">—</span>
+        </div>
+        <div class="admin-forecast-grid">
+          <div class="admin-forecast-card"><span>Recebido no mês</span><strong id="forecast-received">R$ 0,00</strong><small>Pagamentos efetivamente confirmados.</small></div>
+          <div class="admin-forecast-card"><span>A receber</span><strong id="forecast-receivable">R$ 0,00</strong><small id="forecast-receivable-note">Cobranças e renovações previstas até o fim do mês.</small></div>
+          <div class="admin-forecast-card"><span>Receita prevista</span><strong id="forecast-projected">R$ 0,00</strong><small>Recebido + valores ainda esperados neste mês.</small></div>
+          <div class="admin-forecast-card"><span>Inadimplência atual</span><strong id="forecast-overdue">R$ 0,00</strong><small id="forecast-overdue-note">0 clientes · Taxa estimada: 0%</small></div>
+        </div>
+        <div class="admin-forecast-footer"><span>Próximas renovações:</span><span id="forecast-renewals-30d"><strong>0</strong> renovações previstas nos próximos 30 dias · <strong>R$ 0,00</strong></span></div>
+      </section>
+
+      <section class="card admin-section-card">
         <div class="section-heading"><div><small>FINANCEIRO</small><h2>Resumo financeiro</h2></div></div>
         <div class="admin-financial-grid">
           <div><span>Pagamentos aprovados</span><strong id="finance-approved">0</strong></div>
@@ -96,62 +136,48 @@
           <div><span>Ticket médio</span><strong id="finance-ticket">R$ 0,00</strong></div>
         </div>
         <p id="finance-source-note" class="admin-note">Valores calculados a partir das cobranças PIX reais registradas e confirmadas pela integração Efí.</p>
-      </article>
+      </section>
 
-      <article class="card admin-section-card">
-        <div class="section-heading"><div><small>ATALHOS</small><h2>Administração</h2></div><span class="admin-support-card-badge hidden" data-admin-support-badge aria-label="0 notificações de suporte">0</span></div>
-        <div class="admin-shortcuts">
-          <a class="btn btn-secondary" href="assinatura.html">Minha assinatura</a>
-          <a class="btn btn-secondary" href="admin-contatos.html">Suporte interno</a>
-          <button id="export-finance" class="btn btn-outline" type="button">Exportar financeiro CSV</button>
+      <section class="card admin-section-card">
+        <div class="section-heading"><div><small>EVOLUÇÃO</small><h2>Receita dos últimos 6 meses</h2></div></div>
+        <div id="admin-revenue-trend" class="admin-revenue-trend" aria-label="Gráfico de receita mensal"><p class="admin-empty">Carregando evolução financeira...</p></div>
+      </section>
+
+      <section class="card admin-section-card">
+        <div class="section-heading"><div><small>HISTÓRICO</small><h2>Movimentações financeiras</h2></div></div>
+        <div class="admin-finance-toolbar">
+          <div class="form-group"><label for="admin-finance-search">Buscar</label><input id="admin-finance-search" placeholder="Usuário, e-mail, TXID ou E2E"></div>
+          <div class="form-group"><label for="admin-finance-status">Status</label><select id="admin-finance-status"><option value="">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="cancelado">Cancelado</option><option value="estornado">Estornado</option><option value="expirado">Expirado</option></select></div>
+          <div class="form-group"><label for="admin-finance-start">De</label><input id="admin-finance-start" type="date"></div>
+          <div class="form-group"><label for="admin-finance-end">Até</label><input id="admin-finance-end" type="date"></div>
         </div>
-      </article>
-    </section>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th><th>Transação</th></tr></thead>
+            <tbody id="admin-finance-list"><tr><td colspan="6">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="admin-pagination">
+          <button id="admin-finance-prev" class="btn btn-outline" type="button">Anterior</button>
+          <span id="admin-finance-page-info">Página 1 de 1</span>
+          <button id="admin-finance-next" class="btn btn-outline" type="button">Próxima</button>
+        </div>
+      </section>
+    </div>
 
-    <section class="card admin-section-card">
-      <div class="section-heading"><div><small>EVOLUÇÃO</small><h2>Receita dos últimos 6 meses</h2></div></div>
-      <div id="admin-revenue-trend" class="admin-revenue-trend" aria-label="Gráfico de receita mensal"><p class="admin-empty">Carregando evolução financeira...</p></div>
-    </section>
+    <div class="admin-tab-panel" data-admin-tab-panel="crescimento" role="tabpanel" hidden>
+      <section class="card admin-section-card admin-funnel-section">
+        <div class="section-heading"><div><small>COMERCIAL</small><h2>Funil de aquisição e conversão</h2></div></div>
+        <p class="admin-funnel-intro">Acompanhe quantos usuários entram, iniciam o trial, fazem o primeiro pagamento e permanecem como assinantes pagos.</p>
+        <div id="admin-commercial-funnel" class="admin-funnel-loading">Carregando funil comercial...</div>
+      </section>
 
-    <section id="admin-users-section" class="card admin-section-card">
-      <div class="section-heading"><div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div></div>
-      <div class="admin-toolbar">
-        <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome, e-mail, empresa ou telefone"></div>
-        <div class="form-group"><label for="admin-plan-filter">Plano</label><select id="admin-plan-filter"><option value="">Todos</option><option value="trial">Trial</option><option value="free">Free</option><option value="premium">Premium</option></select></div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Usuário</th><th>Vencimento</th><th aria-label="Abrir detalhes"></th></tr></thead>
-          <tbody id="admin-users-list"><tr><td colspan="3">Carregando...</td></tr></tbody>
-        </table>
-      </div>
-      <div class="admin-pagination">
-        <button id="admin-users-prev" class="btn btn-outline" type="button">Anterior</button>
-        <span id="admin-users-page-info">Página 1 de 1</span>
-        <button id="admin-users-next" class="btn btn-outline" type="button">Próxima</button>
-      </div>
-    </section>
-
-    <section class="card admin-section-card">
-      <div class="section-heading"><div><small>HISTÓRICO</small><h2>Movimentações financeiras</h2></div></div>
-      <div class="admin-finance-toolbar">
-        <div class="form-group"><label for="admin-finance-search">Buscar</label><input id="admin-finance-search" placeholder="Usuário, e-mail, TXID ou E2E"></div>
-        <div class="form-group"><label for="admin-finance-status">Status</label><select id="admin-finance-status"><option value="">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="cancelado">Cancelado</option><option value="estornado">Estornado</option><option value="expirado">Expirado</option></select></div>
-        <div class="form-group"><label for="admin-finance-start">De</label><input id="admin-finance-start" type="date"></div>
-        <div class="form-group"><label for="admin-finance-end">Até</label><input id="admin-finance-end" type="date"></div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th><th>Transação</th></tr></thead>
-          <tbody id="admin-finance-list"><tr><td colspan="6">Carregando...</td></tr></tbody>
-        </table>
-      </div>
-      <div class="admin-pagination">
-        <button id="admin-finance-prev" class="btn btn-outline" type="button">Anterior</button>
-        <span id="admin-finance-page-info">Página 1 de 1</span>
-        <button id="admin-finance-next" class="btn btn-outline" type="button">Próxima</button>
-      </div>
-    </section>
+      <section class="card admin-section-card admin-retention-section">
+        <div class="section-heading"><div><small>RETENÇÃO</small><h2>Retenção, churn e risco de receita</h2></div></div>
+        <p class="admin-retention-intro">Indicadores calculados apenas sobre clientes com pagamento confirmado, sem misturar acessos Premium concedidos manualmente.</p>
+        <div id="admin-retention-churn"><div class="admin-retention-empty">Carregando indicadores de retenção...</div></div>
+      </section>
+    </div>
   </main>
 
   <div id="admin-user-modal" class="admin-modal-backdrop hidden" role="presentation">
@@ -164,11 +190,13 @@
     </section>
   </div>
 
+  <script src="js/admin-tabs.js?v=20260719-admin-tabs1"></script>
   <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
   <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
   <script type="module" src="js/admin-attention.js?v=20260719-admin-attention1"></script>
   <script type="module" src="js/admin-forecast.js?v=20260719-admin-forecast1"></script>
   <script type="module" src="js/admin-funnel.js?v=20260719-admin-funnel1"></script>
   <script type="module" src="js/admin-retention.js?v=20260719-admin-retention1"></script>
+  <script type="module" src="js/admin-crm.js?v=20260719-admin-crm1"></script>
 </body>
 </html>
