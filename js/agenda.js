@@ -41,12 +41,6 @@ function formatTime(value) {
   return value ? String(value).slice(0, 5) : '—';
 }
 
-function isHalfHourSlot(value) {
-  if (!value) return false;
-  const [hour, minute] = String(value).slice(0, 5).split(':').map(Number);
-  return Number.isInteger(hour) && Number.isInteger(minute) && hour >= 0 && hour <= 23 && (minute === 0 || minute === 30);
-}
-
 function formatDateValue(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -123,10 +117,7 @@ function renderAgendaForDate(date) {
 
   const content = dayEntries.length
     ? dayEntries.map(entry => {
-        const validSlot = isHalfHourSlot(entry.horario_aula);
-        const timeLabel = entry.horario_aula
-          ? validSlot ? formatTime(entry.horario_aula) : `${formatTime(entry.horario_aula)} *`
-          : '—';
+        const timeLabel = formatTime(entry.horario_aula);
 
         return `
           <a class="agenda-entry" href="${buildStudentRecordUrl(entry.id, date)}">
@@ -187,11 +178,6 @@ async function loadAgenda() {
   agendaEntries = normalizeEntries(data || []);
   const requestedDate = new URLSearchParams(location.search).get('data');
   selectDate(requestedDate ? parseDateValue(requestedDate) : new Date());
-
-  const invalidTimes = agendaEntries.filter(entry => entry.horario_aula && !isHalfHourSlot(entry.horario_aula));
-  if (invalidTimes.length) {
-    showMessage(message, 'Alguns horários antigos não estão em intervalos de 30 minutos e foram marcados com *. Edite o cadastro do aluno para ajustar.', 'error');
-  }
 }
 
 dateInput.addEventListener('change', () => selectDate(parseDateValue(dateInput.value)));
