@@ -10,6 +10,8 @@ const phoneForm = document.querySelector('#phone-form');
 const pinForm = document.querySelector('#pin-form');
 const activationForm = document.querySelector('#activation-form');
 let phone = '';
+let hasActiveStudentSession = false;
+let activeStudentPersonalSlug = '';
 
 function esc(value = '') { const div = document.createElement('div'); div.textContent = value ?? ''; return div.innerHTML; }
 function instagramHref(value = '') {
@@ -60,6 +62,17 @@ function saveSession(result) {
   window.location.replace('/aluno.html');
 }
 
+function renderStudentPortalReturnButton() {
+  if (document.querySelector('#student-portal-return')) return;
+  const actions = document.createElement('div');
+  actions.id = 'student-portal-return';
+  actions.className = 'actions';
+  actions.style.justifyContent = 'center';
+  actions.style.marginBottom = '18px';
+  actions.innerHTML = '<a class="btn btn-primary" href="/aluno.html">Voltar ao portal do aluno</a>';
+  profileHost.parentNode.insertBefore(actions, profileHost);
+}
+
 async function renderOwnerReturnButton(personalId) {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.user?.id || session.user.id !== personalId) return;
@@ -91,17 +104,18 @@ async function invoke(body) {
   return data;
 }
 
-async function redirectStoredStudentSession() {
+async function prepareStoredStudentSession() {
   const stored = storedStudentSession();
   if (!stored) return false;
 
-  if (stored.personalSlug && slug && stored.personalSlug !== slug) return false;
-
   try {
     const result = await invoke({ action: 'me', token: stored.token });
-    const sessionSlug = String(result?.personal?.slug || stored.personalSlug || '').trim().toLowerCase();
-    if (!result?.success || !result?.aluno || (sessionSlug && slug && sessionSlug !== slug)) return false;
-    window.location.replace('/aluno.html');
+    if (!result?.success || !result?.aluno) return false;
+
+    hasActiveStudentSession = true;
+    activeStudentPersonalSlug = String(result?.personal?.slug || stored.personalSlug || '').trim().toLowerCase();
+    if (activeStudentPersonalSlug) localStorage.setItem('fsfit_personal_slug', activeStudentPersonalSlug);
+    renderStudentPortalReturnButton();
     return true;
   } catch (error) {
     const errorMessage = String(error?.message || '').toLowerCase();
@@ -138,7 +152,7 @@ async function loadProfile() {
   if (photosError) console.error(photosError);
 
   document.title = `${data.nome_publico} — FS Fit`;
-  localStorage.setItem('fsfit_personal_slug', slug);
+  if (!hasActiveStudentSession) localStorage.setItem('fsfit_personal_slug', slug);
   const avatar = data.foto_url ? `<img class="public-profile-avatar" src="${esc(data.foto_url)}" alt="Foto de ${esc(data.nome_publico)}">` : `<div class="public-profile-avatar public-profile-avatar-placeholder">${esc(data.nome_publico.charAt(0).toUpperCase())}</div>`;
   const location = [data.local_trabalho, data.cidade].filter(Boolean).map(esc).join(' · ');
   const instagramUrl = instagramHref(data.instagram);
@@ -149,7 +163,7 @@ async function loadProfile() {
   profileHost.innerHTML = `<div class="public-profile-top">${avatar}<div><span class="hero-badge">PERSONAL TRAINER</span><h1>${esc(data.nome_publico)}</h1>${location ? `<p class="public-profile-location">${location}</p>` : ''}</div></div>${data.bio ? `<p class="public-profile-bio">${esc(data.bio)}</p>` : ''}<div class="public-profile-details">${data.especialidades ? `<div class="public-profile-info"><strong>Especialidades</strong><span>${esc(data.especialidades)}</span></div>` : ''}${instagram}</div>${workplace}${gallery}`;
 
   profileHost.querySelectorAll('.photo-open').forEach(button => button.addEventListener('click', () => lightbox.open(button.dataset.photo, button.querySelector('img')?.alt)));
-  accessSection.classList.remove('hidden');
+  accessSection.classList.toggle('hidden', hasActiveStudentSession);
 }
 
 phoneForm.telefone.addEventListener('input', () => { phoneForm.telefone.value = digits(phoneForm.telefone.value); });
@@ -196,4 +210,5 @@ activationForm.addEventListener('submit', async event => {
   } catch (error) { show(error.message); } finally { button.disabled = false; }
 });
 
-if (!(await redirectStoredStudentSession())) await loadProfile();
+await prepareStoredStudentSession();
+await loadProfile();
