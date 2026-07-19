@@ -49,7 +49,6 @@ function normalizeHeaderLabels() {
 function ensureSubscriptionMenuLink(active = '') {
   const menu = document.querySelector('#nav-menu');
   if (!menu || menu.querySelector('[data-page="assinatura"]')) return;
-
   const divider = Array.from(menu.children).find(item => item.classList?.contains('nav-divider'));
   const item = document.createElement('li');
   const link = document.createElement('a');
@@ -64,11 +63,28 @@ function ensureSubscriptionMenuLink(active = '') {
   else menu.appendChild(item);
 }
 
+function configureStudentRecordBackLink() {
+  if (currentPage() !== 'ficha-aluno.html') return;
+
+  const backLink = document.querySelector('.record-back-link');
+  if (!backLink) return;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('origem') !== 'agenda') return;
+
+  const date = params.get('data');
+  backLink.textContent = '← Voltar para agenda';
+  backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || ''))
+    ? `agenda.html?data=${encodeURIComponent(date)}`
+    : 'agenda.html';
+}
+
 export function renderHeader(active = '') {
   core.renderHeader(active);
   ensureMobileOverflowGuard();
   ensureSubscriptionMenuLink(active);
   normalizeHeaderLabels();
+  configureStudentRecordBackLink();
 }
 
 export async function setGreeting(session) {
