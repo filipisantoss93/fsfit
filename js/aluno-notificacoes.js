@@ -8,7 +8,6 @@ const markAllButton = document.querySelector('#student-mark-all-notifications');
 const clearButton = document.querySelector('#student-clear-notifications');
 const settingsButton = document.querySelector('#student-settings-button');
 const settingsSheet = document.querySelector('#student-settings-sheet');
-const headerActions = document.querySelector('.student-header-actions');
 
 let refreshTimer = null;
 
@@ -54,17 +53,24 @@ function logoutStudent() {
 }
 
 function setupLogoutButton() {
-  if (!headerActions || document.querySelector('#student-logout-button')) return;
+  const personalActions = document.querySelector('#personal-page-button')?.closest('.student-settings-group')?.querySelector('.actions');
+  if (!personalActions || document.querySelector('#student-logout-button')) return;
+
   const button = document.createElement('button');
   button.id = 'student-logout-button';
-  button.className = 'btn btn-outline';
+  button.className = 'btn';
   button.type = 'button';
   button.textContent = 'SAIR';
   button.setAttribute('aria-label', 'Sair do portal do aluno');
-  button.style.padding = '8px 12px';
-  button.style.minHeight = '40px';
+  button.style.width = '100%';
+  button.style.marginTop = '4px';
+  button.style.background = '#e53935';
+  button.style.border = '1px solid #ff5c5c';
+  button.style.color = '#ffffff';
+  button.style.fontWeight = '800';
+  button.style.boxShadow = '0 8px 22px rgba(229,57,53,.18)';
   button.addEventListener('click', logoutStudent);
-  headerActions.appendChild(button);
+  personalActions.appendChild(button);
 }
 
 async function rpc(name, params = {}) {
