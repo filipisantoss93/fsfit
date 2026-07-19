@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/admin-attention.css?v=20260719-admin-attention1">
   <link rel="stylesheet" href="css/admin-forecast.css?v=20260719-admin-forecast1">
   <link rel="stylesheet" href="css/admin-funnel.css?v=20260719-admin-funnel1">
+  <link rel="stylesheet" href="css/admin-retention.css?v=20260719-admin-retention1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -65,46 +66,29 @@
         <span id="forecast-period" class="hero-badge">—</span>
       </div>
       <div class="admin-forecast-grid">
-        <div class="admin-forecast-card">
-          <span>Recebido no mês</span>
-          <strong id="forecast-received">R$ 0,00</strong>
-          <small>Pagamentos efetivamente confirmados.</small>
-        </div>
-        <div class="admin-forecast-card">
-          <span>A receber</span>
-          <strong id="forecast-receivable">R$ 0,00</strong>
-          <small id="forecast-receivable-note">Cobranças e renovações previstas até o fim do mês.</small>
-        </div>
-        <div class="admin-forecast-card">
-          <span>Receita prevista</span>
-          <strong id="forecast-projected">R$ 0,00</strong>
-          <small>Recebido + valores ainda esperados neste mês.</small>
-        </div>
-        <div class="admin-forecast-card">
-          <span>Inadimplência atual</span>
-          <strong id="forecast-overdue">R$ 0,00</strong>
-          <small id="forecast-overdue-note">0 clientes · Taxa estimada: 0%</small>
-        </div>
+        <div class="admin-forecast-card"><span>Recebido no mês</span><strong id="forecast-received">R$ 0,00</strong><small>Pagamentos efetivamente confirmados.</small></div>
+        <div class="admin-forecast-card"><span>A receber</span><strong id="forecast-receivable">R$ 0,00</strong><small id="forecast-receivable-note">Cobranças e renovações previstas até o fim do mês.</small></div>
+        <div class="admin-forecast-card"><span>Receita prevista</span><strong id="forecast-projected">R$ 0,00</strong><small>Recebido + valores ainda esperados neste mês.</small></div>
+        <div class="admin-forecast-card"><span>Inadimplência atual</span><strong id="forecast-overdue">R$ 0,00</strong><small id="forecast-overdue-note">0 clientes · Taxa estimada: 0%</small></div>
       </div>
-      <div class="admin-forecast-footer">
-        <span>Próximas renovações:</span>
-        <span id="forecast-renewals-30d"><strong>0</strong> renovações previstas nos próximos 30 dias · <strong>R$ 0,00</strong></span>
-      </div>
+      <div class="admin-forecast-footer"><span>Próximas renovações:</span><span id="forecast-renewals-30d"><strong>0</strong> renovações previstas nos próximos 30 dias · <strong>R$ 0,00</strong></span></div>
     </section>
 
     <section class="card admin-section-card admin-funnel-section">
-      <div class="section-heading">
-        <div><small>COMERCIAL</small><h2>Funil de aquisição e conversão</h2></div>
-      </div>
+      <div class="section-heading"><div><small>COMERCIAL</small><h2>Funil de aquisição e conversão</h2></div></div>
       <p class="admin-funnel-intro">Acompanhe quantos usuários entram, iniciam o trial, fazem o primeiro pagamento e permanecem como assinantes pagos.</p>
       <div id="admin-commercial-funnel" class="admin-funnel-loading">Carregando funil comercial...</div>
     </section>
 
+    <section class="card admin-section-card admin-retention-section">
+      <div class="section-heading"><div><small>RETENÇÃO</small><h2>Retenção, churn e risco de receita</h2></div></div>
+      <p class="admin-retention-intro">Indicadores calculados apenas sobre clientes com pagamento confirmado, sem misturar acessos Premium concedidos manualmente.</p>
+      <div id="admin-retention-churn"><div class="admin-retention-empty">Carregando indicadores de retenção...</div></div>
+    </section>
+
     <section class="admin-grid">
       <article class="card admin-section-card">
-        <div class="section-heading">
-          <div><small>FINANCEIRO</small><h2>Resumo financeiro</h2></div>
-        </div>
+        <div class="section-heading"><div><small>FINANCEIRO</small><h2>Resumo financeiro</h2></div></div>
         <div class="admin-financial-grid">
           <div><span>Pagamentos aprovados</span><strong id="finance-approved">0</strong></div>
           <div><span>Pendentes</span><strong id="finance-pending">0</strong></div>
@@ -115,10 +99,7 @@
       </article>
 
       <article class="card admin-section-card">
-        <div class="section-heading">
-          <div><small>ATALHOS</small><h2>Administração</h2></div>
-          <span class="admin-support-card-badge hidden" data-admin-support-badge aria-label="0 notificações de suporte">0</span>
-        </div>
+        <div class="section-heading"><div><small>ATALHOS</small><h2>Administração</h2></div><span class="admin-support-card-badge hidden" data-admin-support-badge aria-label="0 notificações de suporte">0</span></div>
         <div class="admin-shortcuts">
           <a class="btn btn-secondary" href="assinatura.html">Minha assinatura</a>
           <a class="btn btn-secondary" href="admin-contatos.html">Suporte interno</a>
@@ -128,18 +109,12 @@
     </section>
 
     <section class="card admin-section-card">
-      <div class="section-heading">
-        <div><small>EVOLUÇÃO</small><h2>Receita dos últimos 6 meses</h2></div>
-      </div>
-      <div id="admin-revenue-trend" class="admin-revenue-trend" aria-label="Gráfico de receita mensal">
-        <p class="admin-empty">Carregando evolução financeira...</p>
-      </div>
+      <div class="section-heading"><div><small>EVOLUÇÃO</small><h2>Receita dos últimos 6 meses</h2></div></div>
+      <div id="admin-revenue-trend" class="admin-revenue-trend" aria-label="Gráfico de receita mensal"><p class="admin-empty">Carregando evolução financeira...</p></div>
     </section>
 
     <section id="admin-users-section" class="card admin-section-card">
-      <div class="section-heading">
-        <div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div>
-      </div>
+      <div class="section-heading"><div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div></div>
       <div class="admin-toolbar">
         <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome, e-mail, empresa ou telefone"></div>
         <div class="form-group"><label for="admin-plan-filter">Plano</label><select id="admin-plan-filter"><option value="">Todos</option><option value="trial">Trial</option><option value="free">Free</option><option value="premium">Premium</option></select></div>
@@ -182,10 +157,7 @@
   <div id="admin-user-modal" class="admin-modal-backdrop hidden" role="presentation">
     <section class="admin-user-modal" role="dialog" aria-modal="true" aria-labelledby="admin-user-modal-title">
       <div class="admin-modal-header">
-        <div>
-          <small>CONTA DO USUÁRIO</small>
-          <h2 id="admin-user-modal-title">Detalhes do usuário</h2>
-        </div>
+        <div><small>CONTA DO USUÁRIO</small><h2 id="admin-user-modal-title">Detalhes do usuário</h2></div>
         <button id="admin-user-modal-close" class="admin-modal-close" type="button" aria-label="Fechar">×</button>
       </div>
       <div id="admin-user-modal-content"></div>
@@ -197,5 +169,6 @@
   <script type="module" src="js/admin-attention.js?v=20260719-admin-attention1"></script>
   <script type="module" src="js/admin-forecast.js?v=20260719-admin-forecast1"></script>
   <script type="module" src="js/admin-funnel.js?v=20260719-admin-funnel1"></script>
+  <script type="module" src="js/admin-retention.js?v=20260719-admin-retention1"></script>
 </body>
 </html>
