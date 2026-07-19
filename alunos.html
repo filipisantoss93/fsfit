@@ -7,7 +7,8 @@
 <meta name="theme-color" content="#0f1115">
   <title>Alunos — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/alunos.css">
+  <link rel="stylesheet" href="css/alunos.css?v=20260719-compact1">
+  <link rel="stylesheet" href="css/alunos-lista-compacta.css?v=20260719-compact1">
   <style>
     .student-actions-cell .actions > button { display: none; }
 
@@ -101,8 +102,8 @@
 
       <div class="table-wrap responsive-students">
         <table>
-          <thead><tr><th>Aluno</th><th>Idade</th><th>Dados físicos</th><th>Ações</th></tr></thead>
-          <tbody id="students-list"><tr><td colspan="4">Carregando...</td></tr></tbody>
+          <thead><tr><th>Aluno</th><th aria-label="Abrir ficha"></th></tr></thead>
+          <tbody id="students-list"><tr><td colspan="2">Carregando...</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -164,6 +165,7 @@
     </section>
   </main>
   <script type="module" src="js/alunos.js?v=20260718-birthdate1"></script>
+  <script type="module" src="js/alunos-lista-compacta.js?v=20260719-compact1"></script>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
