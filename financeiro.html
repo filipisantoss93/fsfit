@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
   <meta name="theme-color" content="#0f1115">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,6 +16,178 @@
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260717-icons-global2">
+  <style>
+    .finance-pix-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .finance-pix-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 20px;
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .finance-pix-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .finance-pix-summary::marker {
+      display: none;
+      content: '';
+    }
+
+    .finance-pix-summary-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .finance-pix-summary-copy > small {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--primary);
+      font-size: .7rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .finance-pix-summary-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .finance-pix-summary-title-row h2 {
+      margin: 0;
+    }
+
+    .finance-pix-status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--surface-light);
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .finance-pix-status-badge.is-configured {
+      background: rgba(50, 215, 75, .12);
+      color: var(--primary);
+    }
+
+    .finance-pix-status-badge.is-incomplete {
+      background: rgba(255, 193, 7, .13);
+      color: var(--warning);
+    }
+
+    .finance-pix-summary-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 14px;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .finance-pix-summary-meta span:empty {
+      display: none;
+    }
+
+    .finance-pix-summary-action {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--primary);
+      font-size: .78rem;
+      font-weight: 900;
+    }
+
+    .finance-pix-summary-chevron {
+      display: inline-block;
+      font-size: 1.15rem;
+      line-height: 1;
+      transition: transform .2s ease;
+    }
+
+    .finance-pix-card[open] .finance-pix-summary-chevron {
+      transform: rotate(180deg);
+    }
+
+    .finance-pix-card[open] .finance-pix-summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .finance-pix-content {
+      padding: 20px;
+    }
+
+    .finance-pix-intro {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .finance-pix-intro p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    @media (max-width: 680px) {
+      .finance-pix-summary {
+        align-items: flex-start;
+        padding: 18px 16px;
+      }
+
+      .finance-pix-summary-title-row {
+        display: grid;
+        gap: 8px;
+      }
+
+      .finance-pix-status-badge {
+        justify-self: start;
+      }
+
+      .finance-pix-summary-meta {
+        display: grid;
+        gap: 4px;
+      }
+
+      .finance-pix-summary-action-text {
+        display: none;
+      }
+
+      .finance-pix-summary-chevron {
+        margin-top: 4px;
+      }
+
+      .finance-pix-content {
+        padding: 18px 16px;
+      }
+
+      .finance-pix-intro {
+        display: grid;
+      }
+
+      .finance-pix-intro .finance-zero-fee-badge {
+        justify-self: start;
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="header-container"></div>
@@ -54,46 +226,6 @@
       </article>
     </section>
 
-    <section class="card finance-pix-card">
-      <div class="section-heading finance-section-heading">
-        <div>
-          <small>RECEBIMENTO DIRETO</small>
-          <h2>Configuração do Pix</h2>
-          <p>Os pagamentos vão direto da conta do aluno para a sua chave Pix. O FS Fit apenas gera o QR Code e o Pix Copia e Cola.</p>
-        </div>
-        <span class="finance-zero-fee-badge">Sem comissão do FS Fit</span>
-      </div>
-
-      <form id="pix-config-form" class="finance-pix-form">
-        <div class="form-group">
-          <label for="pix-tipo">Tipo de chave</label>
-          <select id="pix-tipo" name="pix_tipo">
-            <option value="">Selecione</option>
-            <option value="cpf">CPF</option>
-            <option value="cnpj">CNPJ</option>
-            <option value="email">E-mail</option>
-            <option value="telefone">Telefone</option>
-            <option value="aleatoria">Chave aleatória</option>
-          </select>
-        </div>
-        <div class="form-group finance-pix-key-field">
-          <label for="pix-chave">Chave Pix</label>
-          <input id="pix-chave" name="pix_chave" autocomplete="off" placeholder="Informe a chave que receberá os pagamentos">
-        </div>
-        <div class="form-group">
-          <label for="pix-nome">Nome do recebedor</label>
-          <input id="pix-nome" name="pix_nome_recebedor" maxlength="25" placeholder="Nome exibido no QR Code">
-        </div>
-        <div class="form-group">
-          <label for="pix-cidade">Cidade</label>
-          <input id="pix-cidade" name="pix_cidade" maxlength="15" placeholder="Ex.: SAO PAULO">
-        </div>
-        <div class="finance-pix-actions">
-          <button id="save-pix-button" class="btn btn-primary" type="submit">Salvar configuração Pix</button>
-        </div>
-      </form>
-    </section>
-
     <section id="payment-confirmations-card" class="card finance-confirmations-card hidden">
       <div class="section-heading finance-section-heading">
         <div>
@@ -129,6 +261,62 @@
         </table>
       </div>
     </section>
+
+    <details id="pix-config-details" class="card finance-pix-card">
+      <summary class="finance-pix-summary">
+        <div class="finance-pix-summary-copy">
+          <small>RECEBIMENTO DIRETO</small>
+          <div class="finance-pix-summary-title-row">
+            <h2>Configuração do Pix</h2>
+            <span id="pix-config-status" class="finance-pix-status-badge" aria-live="polite">Carregando configuração...</span>
+          </div>
+          <div class="finance-pix-summary-meta">
+            <span id="pix-summary-key">Verificando sua chave Pix...</span>
+            <span id="pix-summary-receiver"></span>
+          </div>
+        </div>
+        <span class="finance-pix-summary-action">
+          <span id="pix-summary-action-text" class="finance-pix-summary-action-text">Configurar Pix</span>
+          <span class="finance-pix-summary-chevron" aria-hidden="true">⌄</span>
+        </span>
+      </summary>
+
+      <div class="finance-pix-content">
+        <div class="finance-pix-intro">
+          <p>Os pagamentos vão direto da conta do aluno para a sua chave Pix. O FS Fit apenas gera o QR Code e o Pix Copia e Cola.</p>
+          <span class="finance-zero-fee-badge">Sem comissão do FS Fit</span>
+        </div>
+
+        <form id="pix-config-form" class="finance-pix-form">
+          <div class="form-group">
+            <label for="pix-tipo">Tipo de chave</label>
+            <select id="pix-tipo" name="pix_tipo">
+              <option value="">Selecione</option>
+              <option value="cpf">CPF</option>
+              <option value="cnpj">CNPJ</option>
+              <option value="email">E-mail</option>
+              <option value="telefone">Telefone</option>
+              <option value="aleatoria">Chave aleatória</option>
+            </select>
+          </div>
+          <div class="form-group finance-pix-key-field">
+            <label for="pix-chave">Chave Pix</label>
+            <input id="pix-chave" name="pix_chave" autocomplete="off" placeholder="Informe a chave que receberá os pagamentos">
+          </div>
+          <div class="form-group">
+            <label for="pix-nome">Nome do recebedor</label>
+            <input id="pix-nome" name="pix_nome_recebedor" maxlength="25" placeholder="Nome exibido no QR Code">
+          </div>
+          <div class="form-group">
+            <label for="pix-cidade">Cidade</label>
+            <input id="pix-cidade" name="pix_cidade" maxlength="15" placeholder="Ex.: SAO PAULO">
+          </div>
+          <div class="finance-pix-actions">
+            <button id="save-pix-button" class="btn btn-primary" type="submit">Salvar configuração Pix</button>
+          </div>
+        </form>
+      </div>
+    </details>
   </main>
 
   <div id="student-finance-modal" class="finance-modal hidden" role="dialog" aria-modal="true" aria-labelledby="student-finance-modal-title">
@@ -186,5 +374,85 @@
   </div>
 
   <script type="module" src="js/financeiro.js?v=20260718-financeiro2"></script>
+  <script>
+    (() => {
+      const details = document.querySelector('#pix-config-details');
+      const form = document.querySelector('#pix-config-form');
+      const status = document.querySelector('#pix-config-status');
+      const summaryKey = document.querySelector('#pix-summary-key');
+      const summaryReceiver = document.querySelector('#pix-summary-receiver');
+      const actionText = document.querySelector('#pix-summary-action-text');
+      const studentsList = document.querySelector('#finance-students-list');
+      const message = document.querySelector('#finance-message');
+
+      if (!details || !form || !status || !summaryKey || !summaryReceiver || !actionText) return;
+
+      const typeLabels = {
+        cpf: 'CPF',
+        cnpj: 'CNPJ',
+        email: 'E-mail',
+        telefone: 'Telefone',
+        aleatoria: 'Chave aleatória'
+      };
+
+      function maskPixKey(value) {
+        const key = String(value || '').trim();
+        if (!key) return '';
+        const visible = key.slice(-4);
+        return `••••••${visible}`;
+      }
+
+      function syncPixSummary() {
+        const pixTipo = String(form.pix_tipo?.value || '').trim();
+        const pixChave = String(form.pix_chave?.value || '').trim();
+        const pixNome = String(form.pix_nome_recebedor?.value || '').trim();
+        const pixCidade = String(form.pix_cidade?.value || '').trim();
+        const hasAnyValue = Boolean(pixTipo || pixChave || pixNome || pixCidade);
+        const configured = Boolean(pixTipo && pixChave && pixNome && pixCidade);
+
+        status.className = 'finance-pix-status-badge';
+        if (configured) {
+          status.textContent = '✓ Pix configurado';
+          status.classList.add('is-configured');
+        } else if (hasAnyValue) {
+          status.textContent = 'Configuração incompleta';
+          status.classList.add('is-incomplete');
+        } else {
+          status.textContent = 'Pix não configurado';
+        }
+
+        summaryKey.textContent = pixChave
+          ? `${typeLabels[pixTipo] || 'Chave Pix'} · ${maskPixKey(pixChave)}`
+          : 'Nenhuma chave Pix configurada';
+        summaryReceiver.textContent = pixNome ? `Recebedor: ${pixNome}` : '';
+        actionText.textContent = details.open
+          ? 'Fechar'
+          : (configured ? 'Editar configuração' : 'Configurar Pix');
+      }
+
+      form.addEventListener('input', syncPixSummary);
+      form.addEventListener('change', syncPixSummary);
+      details.addEventListener('toggle', syncPixSummary);
+
+      if (studentsList) {
+        const studentsObserver = new MutationObserver(() => {
+          syncPixSummary();
+          if (!studentsList.textContent.includes('Carregando alunos')) studentsObserver.disconnect();
+        });
+        studentsObserver.observe(studentsList, { childList: true, subtree: true });
+      }
+
+      if (message) {
+        const messageObserver = new MutationObserver(() => {
+          const text = String(message.textContent || '').trim();
+          if (text.startsWith('Configuração Pix salva') || text.startsWith('Configuração Pix removida')) {
+            details.open = false;
+            syncPixSummary();
+          }
+        });
+        messageObserver.observe(message, { childList: true, characterData: true, subtree: true });
+      }
+    })();
+  </script>
 </body>
 </html>
