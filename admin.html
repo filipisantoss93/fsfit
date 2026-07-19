@@ -15,6 +15,22 @@
   <link rel="stylesheet" href="css/admin-retention.css?v=20260719-admin-retention1">
   <link rel="stylesheet" href="css/admin-tabs.css?v=20260719-admin-tabs1">
   <link rel="stylesheet" href="css/admin-crm.css?v=20260719-admin-crm1">
+  <style>
+    .admin-search-field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .admin-search-clear {
+      min-height: 0;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .78rem;
+      line-height: 1.2;
+    }
+  </style>
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -95,7 +111,13 @@
       <section id="admin-users-section" class="card admin-section-card">
         <div class="section-heading"><div><small>CONTAS</small><h2>Usuários e assinaturas</h2></div></div>
         <div class="admin-toolbar">
-          <div class="form-group"><label for="admin-user-search">Buscar</label><input id="admin-user-search" placeholder="Nome, e-mail, empresa ou telefone"></div>
+          <div class="form-group">
+            <div class="admin-search-field-head">
+              <label for="admin-user-search">Buscar</label>
+              <button id="admin-user-search-clear" class="btn btn-outline admin-search-clear" type="button" hidden>Limpar</button>
+            </div>
+            <input id="admin-user-search" placeholder="Nome, e-mail, empresa ou telefone">
+          </div>
           <div class="form-group"><label for="admin-plan-filter">Plano</label><select id="admin-plan-filter"><option value="">Todos</option><option value="trial">Trial</option><option value="free">Free</option><option value="premium">Premium</option></select></div>
         </div>
         <div class="table-wrap">
@@ -190,6 +212,28 @@
     </section>
   </div>
 
+  <script>
+    (() => {
+      const input = document.querySelector('#admin-user-search');
+      const clearButton = document.querySelector('#admin-user-search-clear');
+      if (!input || !clearButton) return;
+
+      const syncClearButton = () => {
+        clearButton.hidden = !input.value;
+      };
+
+      clearButton.addEventListener('click', () => {
+        if (!input.value) return;
+        input.value = '';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+        syncClearButton();
+      });
+
+      input.addEventListener('input', syncClearButton);
+      syncClearButton();
+    })();
+  </script>
   <script src="js/admin-tabs.js?v=20260719-admin-tabs1"></script>
   <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
   <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
