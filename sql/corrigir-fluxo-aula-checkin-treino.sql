@@ -167,6 +167,10 @@ begin
 end;
 $$;
 
+revoke all on function public.fsfit_atualizar_sessao_ao_ativar_treino() from public;
+revoke all on function public.fsfit_atualizar_sessao_ao_ativar_treino() from anon;
+revoke all on function public.fsfit_atualizar_sessao_ao_ativar_treino() from authenticated;
+
 drop trigger if exists trg_fsfit_atualizar_sessao_ao_ativar_treino on public.treinos;
 create trigger trg_fsfit_atualizar_sessao_ao_ativar_treino
 after insert or update of status on public.treinos
