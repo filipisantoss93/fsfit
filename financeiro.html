@@ -147,6 +147,39 @@
       font-size: .86rem;
     }
 
+    .finance-students-toolbar {
+      margin: 4px 0 18px;
+    }
+
+    .finance-students-toolbar .form-group {
+      margin: 0;
+    }
+
+    .finance-students-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 16px;
+    }
+
+    .finance-students-pagination span {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .finance-students-pagination .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .finance-students-search-empty {
+      margin: 14px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: .86rem;
+    }
+
     @media (max-width: 680px) {
       .finance-pix-summary {
         align-items: flex-start;
@@ -185,6 +218,17 @@
 
       .finance-pix-intro .finance-zero-fee-badge {
         justify-self: start;
+      }
+
+      .finance-students-pagination {
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .finance-students-pagination span {
+        order: -1;
+        width: 100%;
+        text-align: center;
       }
     }
   </style>
@@ -247,6 +291,13 @@
         </div>
       </div>
 
+      <div class="finance-students-toolbar">
+        <div class="form-group">
+          <label for="finance-students-search">Pesquisar aluno</label>
+          <input id="finance-students-search" type="search" autocomplete="off" placeholder="Digite o nome do aluno">
+        </div>
+      </div>
+
       <div class="table-wrap finance-table-wrap">
         <table class="finance-table">
           <thead>
@@ -259,6 +310,14 @@
             <tr><td colspan="2">Carregando alunos...</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <p id="finance-students-search-empty" class="finance-students-search-empty hidden">Nenhum aluno encontrado para esta busca.</p>
+
+      <div class="finance-students-pagination" aria-label="Paginação da lista de alunos">
+        <button id="finance-students-prev" class="btn btn-secondary" type="button" disabled>Voltar</button>
+        <span id="finance-students-page-info" aria-live="polite">Carregando alunos...</span>
+        <button id="finance-students-next" class="btn btn-secondary" type="button" disabled>Avançar</button>
       </div>
     </section>
 
@@ -383,7 +442,14 @@
       const summaryReceiver = document.querySelector('#pix-summary-receiver');
       const actionText = document.querySelector('#pix-summary-action-text');
       const studentsList = document.querySelector('#finance-students-list');
+      const studentSearch = document.querySelector('#finance-students-search');
+      const studentPrev = document.querySelector('#finance-students-prev');
+      const studentNext = document.querySelector('#finance-students-next');
+      const studentPageInfo = document.querySelector('#finance-students-page-info');
+      const studentSearchEmpty = document.querySelector('#finance-students-search-empty');
       const message = document.querySelector('#finance-message');
+      const STUDENT_PAGE_SIZE = 10;
+      let studentPage = 1;
 
       if (!details || !form || !status || !summaryKey || !summaryReceiver || !actionText) return;
 
@@ -430,14 +496,79 @@
           : (configured ? 'Editar configuração' : 'Configurar Pix');
       }
 
+      function normalizeText(value) {
+        return String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .trim();
+      }
+
+      function syncStudentList() {
+        if (!studentsList || !studentPrev || !studentNext || !studentPageInfo || !studentSearchEmpty) return;
+
+        const rows = Array.from(studentsList.querySelectorAll('.finance-student-row'));
+        const isLoading = studentsList.textContent.includes('Carregando alunos');
+
+        if (!rows.length) {
+          studentPrev.disabled = true;
+          studentNext.disabled = true;
+          studentSearchEmpty.classList.add('hidden');
+          studentPageInfo.textContent = isLoading ? 'Carregando alunos...' : '0 alunos';
+          return;
+        }
+
+        const term = normalizeText(studentSearch?.value);
+        const filteredRows = rows.filter(row => {
+          const name = row.querySelector('.finance-student-name strong')?.textContent || row.textContent;
+          return !term || normalizeText(name).includes(term);
+        });
+
+        const total = filteredRows.length;
+        const pages = Math.max(1, Math.ceil(total / STUDENT_PAGE_SIZE));
+        studentPage = Math.min(Math.max(studentPage, 1), pages);
+
+        rows.forEach(row => {
+          row.hidden = true;
+        });
+
+        const start = (studentPage - 1) * STUDENT_PAGE_SIZE;
+        filteredRows.slice(start, start + STUDENT_PAGE_SIZE).forEach(row => {
+          row.hidden = false;
+        });
+
+        studentSearchEmpty.classList.toggle('hidden', total !== 0);
+        studentPageInfo.textContent = total
+          ? `Página ${studentPage} de ${pages} · ${total} ${total === 1 ? 'aluno' : 'alunos'}`
+          : 'Nenhum aluno encontrado';
+        studentPrev.disabled = studentPage <= 1 || total === 0;
+        studentNext.disabled = studentPage >= pages || total === 0;
+      }
+
       form.addEventListener('input', syncPixSummary);
       form.addEventListener('change', syncPixSummary);
       details.addEventListener('toggle', syncPixSummary);
 
+      studentSearch?.addEventListener('input', () => {
+        studentPage = 1;
+        syncStudentList();
+      });
+
+      studentPrev?.addEventListener('click', () => {
+        if (studentPage <= 1) return;
+        studentPage -= 1;
+        syncStudentList();
+      });
+
+      studentNext?.addEventListener('click', () => {
+        studentPage += 1;
+        syncStudentList();
+      });
+
       if (studentsList) {
         const studentsObserver = new MutationObserver(() => {
           syncPixSummary();
-          if (!studentsList.textContent.includes('Carregando alunos')) studentsObserver.disconnect();
+          syncStudentList();
         });
         studentsObserver.observe(studentsList, { childList: true, subtree: true });
       }
@@ -452,6 +583,9 @@
         });
         messageObserver.observe(message, { childList: true, characterData: true, subtree: true });
       }
+
+      syncPixSummary();
+      syncStudentList();
     })();
   </script>
 </body>
