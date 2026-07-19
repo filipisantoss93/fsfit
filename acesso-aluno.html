@@ -63,11 +63,7 @@
       </form>
 
       <form id="student-activation-form" class="hidden">
-        <p>Este é seu primeiro acesso. Informe o código de ativação recebido do seu personal e crie um PIN de 4 números.</p>
-        <div class="form-group">
-          <label for="student-activation-code">Código de ativação</label>
-          <input id="student-activation-code" name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 números" required>
-        </div>
+        <p>Este é seu primeiro acesso. Crie um PIN de 4 números para proteger sua área.</p>
         <div class="form-group">
           <label for="student-activation-pin">Crie um PIN de 4 números</label>
           <input id="student-activation-pin" name="pin" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" required>
@@ -77,14 +73,14 @@
           <input id="student-activation-pin-confirm" name="pin_confirm" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" required>
         </div>
         <div class="student-access-actions">
-          <button class="btn btn-primary" type="submit">Ativar acesso e entrar</button>
+          <button class="btn btn-primary" type="submit">Criar PIN e entrar</button>
           <button class="btn btn-secondary" type="button" data-change-student-access>Usar outro WhatsApp</button>
         </div>
       </form>
 
-      <p style="margin:18px 0 0;color:var(--muted);font-size:.84rem;text-align:center">No primeiro acesso, tenha em mãos o código de ativação fornecido pelo seu personal.</p>
+      <p style="margin:18px 0 0;color:var(--muted);font-size:.84rem;text-align:center">No primeiro acesso, basta confirmar seu WhatsApp e criar um PIN de 4 números.</p>
     </section>
   </main>
-  <script type="module" src="js/acesso-aluno.js?v=20260717-multi-personal1"></script>
+  <script type="module" src="js/acesso-aluno.js?v=20260719-first-access-pin1"></script>
 </body>
 </html>
