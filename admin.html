@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/admin-users-compact.css?v=20260719-admin-users1">
   <link rel="stylesheet" href="css/admin-attention.css?v=20260719-admin-attention1">
   <link rel="stylesheet" href="css/admin-forecast.css?v=20260719-admin-forecast1">
+  <link rel="stylesheet" href="css/admin-funnel.css?v=20260719-admin-funnel1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -89,6 +90,14 @@
         <span>Próximas renovações:</span>
         <span id="forecast-renewals-30d"><strong>0</strong> renovações previstas nos próximos 30 dias · <strong>R$ 0,00</strong></span>
       </div>
+    </section>
+
+    <section class="card admin-section-card admin-funnel-section">
+      <div class="section-heading">
+        <div><small>COMERCIAL</small><h2>Funil de aquisição e conversão</h2></div>
+      </div>
+      <p class="admin-funnel-intro">Acompanhe quantos usuários entram, iniciam o trial, fazem o primeiro pagamento e permanecem como assinantes pagos.</p>
+      <div id="admin-commercial-funnel" class="admin-funnel-loading">Carregando funil comercial...</div>
     </section>
 
     <section class="admin-grid">
@@ -187,5 +196,6 @@
   <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
   <script type="module" src="js/admin-attention.js?v=20260719-admin-attention1"></script>
   <script type="module" src="js/admin-forecast.js?v=20260719-admin-forecast1"></script>
+  <script type="module" src="js/admin-funnel.js?v=20260719-admin-funnel1"></script>
 </body>
 </html>
