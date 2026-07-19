@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/admin.css?v=20260717-admin-cards3">
   <link rel="stylesheet" href="css/admin-users-compact.css?v=20260719-admin-users1">
   <link rel="stylesheet" href="css/admin-attention.css?v=20260719-admin-attention1">
+  <link rel="stylesheet" href="css/admin-forecast.css?v=20260719-admin-forecast1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -55,6 +56,39 @@
       <p class="admin-attention-intro">Pendências que podem afetar receita, renovação ou acesso dos usuários. Toque em um item para abrir a conta.</p>
       <div id="admin-attention-summary" class="admin-attention-summary"></div>
       <div id="admin-attention-list" class="admin-attention-list"><div class="admin-attention-loading">Carregando pendências...</div></div>
+    </section>
+
+    <section class="card admin-section-card admin-forecast-section">
+      <div class="section-heading">
+        <div><small>PREVISÃO FINANCEIRA</small><h2>Fluxo do mês</h2></div>
+        <span id="forecast-period" class="hero-badge">—</span>
+      </div>
+      <div class="admin-forecast-grid">
+        <div class="admin-forecast-card">
+          <span>Recebido no mês</span>
+          <strong id="forecast-received">R$ 0,00</strong>
+          <small>Pagamentos efetivamente confirmados.</small>
+        </div>
+        <div class="admin-forecast-card">
+          <span>A receber</span>
+          <strong id="forecast-receivable">R$ 0,00</strong>
+          <small id="forecast-receivable-note">Cobranças e renovações previstas até o fim do mês.</small>
+        </div>
+        <div class="admin-forecast-card">
+          <span>Receita prevista</span>
+          <strong id="forecast-projected">R$ 0,00</strong>
+          <small>Recebido + valores ainda esperados neste mês.</small>
+        </div>
+        <div class="admin-forecast-card">
+          <span>Inadimplência atual</span>
+          <strong id="forecast-overdue">R$ 0,00</strong>
+          <small id="forecast-overdue-note">0 clientes · Taxa estimada: 0%</small>
+        </div>
+      </div>
+      <div class="admin-forecast-footer">
+        <span>Próximas renovações:</span>
+        <span id="forecast-renewals-30d"><strong>0</strong> renovações previstas nos próximos 30 dias · <strong>R$ 0,00</strong></span>
+      </div>
     </section>
 
     <section class="admin-grid">
@@ -152,5 +186,6 @@
   <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
   <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
   <script type="module" src="js/admin-attention.js?v=20260719-admin-attention1"></script>
+  <script type="module" src="js/admin-forecast.js?v=20260719-admin-forecast1"></script>
 </body>
 </html>
