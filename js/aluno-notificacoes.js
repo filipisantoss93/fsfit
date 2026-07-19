@@ -8,6 +8,7 @@ const markAllButton = document.querySelector('#student-mark-all-notifications');
 const clearButton = document.querySelector('#student-clear-notifications');
 const settingsButton = document.querySelector('#student-settings-button');
 const settingsSheet = document.querySelector('#student-settings-sheet');
+const headerActions = document.querySelector('.student-header-actions');
 
 let refreshTimer = null;
 
@@ -42,6 +43,28 @@ function safeLink(value) {
   } catch {
     return '';
   }
+}
+
+function logoutStudent() {
+  const personalSlug = String(localStorage.getItem('fsfit_personal_slug') || '').trim().toLowerCase();
+  localStorage.removeItem('fsfit_aluno_token');
+  localStorage.removeItem('fsfit_aluno_token_expira_em');
+  if (refreshTimer) clearInterval(refreshTimer);
+  window.location.replace(personalSlug ? `/p/${encodeURIComponent(personalSlug)}` : '/acesso-aluno.html');
+}
+
+function setupLogoutButton() {
+  if (!headerActions || document.querySelector('#student-logout-button')) return;
+  const button = document.createElement('button');
+  button.id = 'student-logout-button';
+  button.className = 'btn btn-outline';
+  button.type = 'button';
+  button.textContent = 'SAIR';
+  button.setAttribute('aria-label', 'Sair do portal do aluno');
+  button.style.padding = '8px 12px';
+  button.style.minHeight = '40px';
+  button.addEventListener('click', logoutStudent);
+  headerActions.appendChild(button);
 }
 
 async function rpc(name, params = {}) {
@@ -188,5 +211,6 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') loadNotifications();
 });
 
+setupLogoutButton();
 loadNotifications();
 scheduleRefresh();
