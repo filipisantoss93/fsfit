@@ -15,7 +15,7 @@ if (batchSelector && categorySelect && checkboxList) {
   const searchGroup = document.createElement('div');
   searchGroup.className = 'form-group';
   searchGroup.innerHTML = `
-    <label for="exercise-global-search">Pesquisar em todos os exercícios</label>
+    <label for="exercise-global-search">Pesquisar exercício</label>
     <input id="exercise-global-search" type="search" autocomplete="off" placeholder="Carregando exercícios..." disabled>
     <p class="workout-builder-help">Pesquise pelo nome do exercício sem precisar escolher uma categoria.</p>`;
   categoryGroup?.parentElement?.insertBefore(searchGroup, categoryGroup);
