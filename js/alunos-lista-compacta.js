@@ -93,6 +93,16 @@ function isNewStudent(student) {
   return created >= Date.now() - (30 * 24 * 60 * 60 * 1000);
 }
 
+function sortRowsAlphabetically(rows) {
+  const sorted = [...rows].sort((a, b) => String(a.dataset.studentName || '').localeCompare(String(b.dataset.studentName || ''), 'pt-BR', { sensitivity: 'base' }));
+  const currentIds = rows.map(row => row.dataset.studentId).join('|');
+  const sortedIds = sorted.map(row => row.dataset.studentId).join('|');
+  if (currentIds === sortedIds) return;
+  const fragment = document.createDocumentFragment();
+  sorted.forEach(row => fragment.appendChild(row));
+  list.appendChild(fragment);
+}
+
 function applyFilter() {
   if (!list) return;
   const rows = [...list.querySelectorAll('tr[data-student-id]')];
@@ -109,11 +119,7 @@ function applyFilter() {
     row.hidden = !visible;
   });
 
-  if (activeFilter === 'alphabetical') {
-    rows
-      .sort((a, b) => String(a.dataset.studentName || '').localeCompare(String(b.dataset.studentName || ''), 'pt-BR', { sensitivity: 'base' }))
-      .forEach(row => list.appendChild(row));
-  }
+  if (activeFilter === 'alphabetical') sortRowsAlphabetically(rows);
 
   const visibleRows = rows.filter(row => !row.hidden);
   let empty = list.querySelector('.student-filter-empty-row');
@@ -121,6 +127,7 @@ function applyFilter() {
     if (!empty) {
       empty = document.createElement('tr');
       empty.className = 'student-filter-empty-row';
+      empty.dataset.compactStudentReady = 'true';
       empty.innerHTML = '<td colspan="2" class="empty">Nenhum aluno neste filtro.</td>';
       list.appendChild(empty);
     }
