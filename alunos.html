@@ -133,7 +133,7 @@
           <p class="form-hint">Os dias da semana são definidos automaticamente pelo treino ativo do aluno. Aqui você programa apenas o horário e o local de atendimento.</p>
           <div class="grid grid-3 student-form-grid">
             <div class="form-group"><label>Período</label><select name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
-            <div class="form-group"><label>Horário</label><input name="horario_aula" type="time" step="1800"><small>Horários disponíveis de 30 em 30 minutos.</small></div>
+            <div class="form-group"><label>Horário</label><input name="horario_aula" type="time" step="60"></div>
             <div class="form-group"><label>Local da aula</label><input name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
           </div>
         </fieldset>
@@ -164,7 +164,7 @@
       </form>
     </section>
   </main>
-  <script type="module" src="js/alunos.js?v=20260718-birthdate1"></script>
+  <script type="module" src="js/alunos.js?v=20260719-agenda-minute1"></script>
   <script type="module" src="js/alunos-lista-compacta.js?v=20260719-compact1"></script>
   <script>
     (() => {
