@@ -23,7 +23,7 @@ if (session) {
     .maybeSingle();
 
   if (!publicProfileError && publicProfile?.slug) {
-    const url = `${window.location.origin}/p/${encodeURIComponent(publicProfile.slug)}`;
+    const url = `https://fsfit.com.br/p/${encodeURIComponent(publicProfile.slug)}`;
     linkText.textContent = url;
     linkText.title = url;
     openLink.href = url;
