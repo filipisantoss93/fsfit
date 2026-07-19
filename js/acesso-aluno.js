@@ -6,6 +6,7 @@ const pinForm = document.querySelector('#student-pin-form');
 const activationForm = document.querySelector('#student-activation-form');
 const selectedPersonalHost = document.querySelector('#selected-personal');
 const description = document.querySelector('#access-description');
+const changePersonalButtons = [...document.querySelectorAll('[data-change-personal]')];
 
 let phone = '';
 let personalSlug = '';
@@ -65,6 +66,11 @@ function clearPendingSelection() {
   sessionStorage.removeItem('fsfit_student_personals_pending');
 }
 
+function updateChangePersonalButtons() {
+  const hasMultiplePersonals = readPendingPersonals().length > 1;
+  changePersonalButtons.forEach(button => button.classList.toggle('hidden', !hasMultiplePersonals));
+}
+
 function renderSelectedPersonal(personal) {
   if (!selectedPersonalHost) return;
   const name = personal?.nome || 'Seu personal';
@@ -91,8 +97,21 @@ function resetAccess() {
   resolverForm?.reset();
   pinForm?.reset();
   activationForm?.reset();
+  updateChangePersonalButtons();
   if (description) description.textContent = 'Informe seu WhatsApp cadastrado. Se você tiver mais de um personal, poderá escolher qual acompanhamento deseja acessar.';
   history.replaceState({}, '', 'acesso-aluno.html');
+}
+
+function chooseAnotherPersonal() {
+  const pendingPhone = digits(sessionStorage.getItem('fsfit_student_phone_pending') || phone || '');
+  const personals = readPendingPersonals();
+  if (pendingPhone.length !== 11 || personals.length < 2) {
+    resetAccess();
+    return;
+  }
+
+  localStorage.removeItem('fsfit_personal_slug');
+  window.location.replace('selecionar-personal.html');
 }
 
 async function invoke(body) {
@@ -137,6 +156,7 @@ async function beginPersonalAccess(personal, telefone) {
   pinForm?.classList.add('hidden');
   activationForm?.classList.add('hidden');
   renderSelectedPersonal(personal);
+  updateChangePersonalButtons();
   if (description) description.textContent = 'Confirme seu acesso para abrir diretamente a sua área de treinos.';
 
   try {
@@ -188,6 +208,10 @@ activationForm?.pin_confirm?.addEventListener('input', () => {
 
 document.querySelectorAll('[data-change-student-access]').forEach(button => {
   button.addEventListener('click', resetAccess);
+});
+
+changePersonalButtons.forEach(button => {
+  button.addEventListener('click', chooseAnotherPersonal);
 });
 
 resolverForm?.addEventListener('submit', async event => {
@@ -284,6 +308,7 @@ async function init() {
     return;
   }
 
+  updateChangePersonalButtons();
   if (pendingPhone && resolverForm?.telefone) resolverForm.telefone.value = pendingPhone;
 }
 
