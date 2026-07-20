@@ -9,7 +9,6 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
   button.className = 'btn btn-outline';
   button.id = 'enable-personal-chat-notifications';
   button.textContent = 'Ativar notificações';
-  button.hidden = true;
   heading.appendChild(button);
 
   const urlBase64ToUint8Array = base64String => {
@@ -18,21 +17,28 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
     return Uint8Array.from([...atob(base64)].map(char => char.charCodeAt(0)));
   };
 
+  function showActivationButton() {
+    button.textContent = 'Ativar notificações';
+    button.disabled = false;
+    button.hidden = false;
+  }
+
+  function hideActivationButton() {
+    button.hidden = true;
+    button.disabled = true;
+  }
+
   async function refreshState() {
     const registration = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
     const notificationsActive = Boolean(subscription && Notification.permission === 'granted');
 
     if (notificationsActive) {
-      button.hidden = true;
-      button.disabled = true;
+      hideActivationButton();
       return;
     }
 
-    button.textContent = 'Ativar notificações';
-    button.disabled = false;
-    button.hidden = false;
+    showActivationButton();
   }
 
   button.addEventListener('click', async () => {
@@ -42,7 +48,6 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
       if (permission !== 'granted') throw new Error('Permissão de notificações não concedida.');
 
       const registration = await navigator.serviceWorker.register('/sw.js');
-      await navigator.serviceWorker.ready;
       const { data, error } = await supabase.functions.invoke('chat-push', { body: { action: 'config' } });
       if (error || !data?.public_key) throw error || new Error('Configuração push indisponível.');
 
@@ -59,19 +64,16 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
       });
       if (subscribeError) throw subscribeError;
 
-      button.hidden = true;
-      button.disabled = true;
+      hideActivationButton();
     } catch (error) {
       console.error(error);
-      button.textContent = 'Ativar notificações';
-      button.disabled = false;
-      button.hidden = false;
+      showActivationButton();
       alert(error?.message || 'Não foi possível ativar as notificações.');
     }
   });
 
   refreshState().catch(error => {
-    console.error(error);
-    button.hidden = false;
+    console.error('Erro ao verificar notificações:', error);
+    showActivationButton();
   });
 }
