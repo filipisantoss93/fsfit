@@ -230,7 +230,14 @@ async function finishSession(sessionId, studentName, button) {
   try {
     const { data, error } = await supabase.rpc('finalizar_sessao_personal', { p_sessao_id: sessionId });
     if (error) throw error;
-    if (data !== true) throw new Error('A sessão não está mais em andamento ou não pertence a este personal.');
+    if (data !== true) {
+      await loadLiveStudents();
+      if (!rowsById.has(sessionId)) {
+        closeModal();
+        return;
+      }
+      throw new Error('Não foi possível encerrar esta sessão agora. Atualize a página e tente novamente.');
+    }
     closeModal();
     await loadLiveStudents();
   } catch (error) {
@@ -364,5 +371,16 @@ modalActions?.addEventListener('click', event => {
 });
 
 chatForm?.addEventListener('submit', event => sendMessage(event).catch(console.error));
+
+const LIVE_REFRESH_INTERVAL_MS = 15000;
+
+function refreshLiveStudentsWhenVisible() {
+  if (document.visibilityState !== 'visible') return;
+  loadLiveStudents().catch(console.error);
+}
+
+setInterval(refreshLiveStudentsWhenVisible, LIVE_REFRESH_INTERVAL_MS);
+document.addEventListener('visibilitychange', refreshLiveStudentsWhenVisible);
+window.addEventListener('focus', refreshLiveStudentsWhenVisible);
 
 await loadLiveStudents();
