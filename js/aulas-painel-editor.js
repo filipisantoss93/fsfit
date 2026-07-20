@@ -25,9 +25,14 @@ function injectEditButton() {
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'btn btn-secondary';
+  button.className = 'btn btn-secondary btn-action-tile';
   button.dataset.liveEditWorkout = studentId;
-  button.textContent = 'Editar treino';
+  button.innerHTML = `
+    <span class="btn-action-icon" aria-hidden="true">✎</span>
+    <span class="btn-action-copy">
+      <span class="btn-action-title">Editar treino</span>
+      <span class="btn-action-description">Ajustar exercícios e dias</span>
+    </span>`;
   modalActions.prepend(button);
 }
 
