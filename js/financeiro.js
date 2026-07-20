@@ -7,6 +7,7 @@ const session = await requireSession();
 const message = document.querySelector('#finance-message');
 const pixForm = document.querySelector('#pix-config-form');
 const studentsList = document.querySelector('#finance-students-list');
+const studentsToolbar = document.querySelector('.finance-students-toolbar');
 const confirmationsCard = document.querySelector('#payment-confirmations-card');
 const confirmationsList = document.querySelector('#payment-confirmations-list');
 const confirmationsCount = document.querySelector('#payment-confirmations-count');
@@ -28,6 +29,7 @@ let students = [];
 let payments = [];
 let profile = null;
 let selectedStudentId = null;
+let studentStatusFilter = 'all';
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -92,15 +94,60 @@ function paymentForStudent(studentId, competence = currentCompetence()) {
   return payments.find(item => item.aluno_id === studentId && item.competencia === competence) || null;
 }
 
+function ensureStudentStatusFilter() {
+  if (!studentsToolbar || document.querySelector('#finance-students-status')) return;
+
+  studentsToolbar.classList.add('finance-students-toolbar-filtered');
+
+  const group = document.createElement('div');
+  group.className = 'form-group finance-status-filter-group';
+  group.innerHTML = `
+    <label for="finance-students-status">Filtrar por status</label>
+    <select id="finance-students-status" aria-label="Filtrar alunos pelo status da mensalidade">
+      <option value="all">Todos os status</option>
+      <option value="paid">Pago</option>
+      <option value="pending">Pendente</option>
+      <option value="overdue">Atrasado</option>
+      <option value="waiting">Aguardando confirmação</option>
+      <option value="not-configured">Não configurada</option>
+    </select>`;
+  studentsToolbar.appendChild(group);
+
+  if (!document.querySelector('#finance-students-status-filter-style')) {
+    const style = document.createElement('style');
+    style.id = 'finance-students-status-filter-style';
+    style.textContent = `
+      .finance-students-toolbar.finance-students-toolbar-filtered {
+        display:grid;
+        grid-template-columns:minmax(0,1fr) minmax(190px,240px);
+        gap:12px;
+        align-items:end;
+      }
+      .finance-status-filter-group select { width:100%; }
+      @media (max-width:680px) {
+        .finance-students-toolbar.finance-students-toolbar-filtered {
+          grid-template-columns:1fr;
+          gap:10px;
+        }
+      }`;
+    document.head.appendChild(style);
+  }
+
+  group.querySelector('select')?.addEventListener('change', event => {
+    studentStatusFilter = event.target.value || 'all';
+    renderStudents();
+  });
+}
+
 function statusInfo(payment, student) {
   if (!student.mensalidade_ativa || !student.mensalidade_valor || !student.mensalidade_dia_vencimento) {
-    return { label: 'Não configurada', className: '' };
+    return { key: 'not-configured', label: 'Não configurada', className: '' };
   }
-  if (!payment) return { label: 'Pendente', className: '' };
-  if (payment.status === 'pago') return { label: 'Pago', className: 'paid' };
-  if (payment.status === 'informado') return { label: 'Aguardando confirmação', className: 'waiting' };
-  if (payment.vencimento < todayIso()) return { label: 'Atrasado', className: 'overdue' };
-  return { label: 'Pendente', className: '' };
+  if (!payment) return { key: 'pending', label: 'Pendente', className: '' };
+  if (payment.status === 'pago') return { key: 'paid', label: 'Pago', className: 'paid' };
+  if (payment.status === 'informado') return { key: 'waiting', label: 'Aguardando confirmação', className: 'waiting' };
+  if (payment.vencimento < todayIso()) return { key: 'overdue', label: 'Atrasado', className: 'overdue' };
+  return { key: 'pending', label: 'Pendente', className: '' };
 }
 
 async function fetchPayments() {
@@ -182,11 +229,20 @@ function renderStudents() {
     return;
   }
 
-  studentsList.innerHTML = students.map(student => {
+  const filteredStudents = studentStatusFilter === 'all'
+    ? students
+    : students.filter(student => statusInfo(paymentForStudent(student.id), student).key === studentStatusFilter);
+
+  if (!filteredStudents.length) {
+    studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Nenhum aluno encontrado com este status.</td></tr>';
+    return;
+  }
+
+  studentsList.innerHTML = filteredStudents.map(student => {
     const payment = paymentForStudent(student.id);
     const status = statusInfo(payment, student);
 
-    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}">
+    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" data-finance-status="${esc(status.key)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}">
       <td><div class="finance-student-name"><strong>${esc(student.nome)}</strong></div></td>
       <td><div class="finance-student-status-cell"><span class="finance-status ${status.className}">${esc(status.label)}</span><span class="finance-student-open" aria-hidden="true">›</span></div></td>
     </tr>`;
@@ -340,6 +396,8 @@ async function load() {
   renderConfirmations();
   renderStudents();
 }
+
+ensureStudentStatusFilter();
 
 pixForm?.addEventListener('submit', async event => {
   event.preventDefault();
