@@ -9,6 +9,7 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
   button.className = 'btn btn-outline';
   button.id = 'enable-personal-chat-notifications';
   button.textContent = 'Ativar notificações';
+  button.hidden = true;
   heading.appendChild(button);
 
   const urlBase64ToUint8Array = base64String => {
@@ -21,10 +22,17 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
     const registration = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
-    if (subscription && Notification.permission === 'granted') {
-      button.textContent = 'Notificações ativas';
+    const notificationsActive = Boolean(subscription && Notification.permission === 'granted');
+
+    if (notificationsActive) {
+      button.hidden = true;
       button.disabled = true;
+      return;
     }
+
+    button.textContent = 'Ativar notificações';
+    button.disabled = false;
+    button.hidden = false;
   }
 
   button.addEventListener('click', async () => {
@@ -51,15 +59,19 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
       });
       if (subscribeError) throw subscribeError;
 
-      button.textContent = 'Notificações ativas';
+      button.hidden = true;
       button.disabled = true;
     } catch (error) {
       console.error(error);
       button.textContent = 'Ativar notificações';
       button.disabled = false;
+      button.hidden = false;
       alert(error?.message || 'Não foi possível ativar as notificações.');
     }
   });
 
-  refreshState().catch(console.error);
+  refreshState().catch(error => {
+    console.error(error);
+    button.hidden = false;
+  });
 }
