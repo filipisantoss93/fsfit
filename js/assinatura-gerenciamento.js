@@ -96,8 +96,8 @@ async function cancelCardSubscription(access, { removeCard = false, content = nu
     </div>
     <div id="subscription-cancel-error" class="subscription-error" hidden style="margin-top:12px"></div>
     <div class="subscription-modal-actions" style="margin-top:16px">
-      <button class="btn btn-secondary" type="button" data-close-subscription-modal>Voltar</button>
-      <button id="subscription-confirm-cancel" class="btn btn-outline" type="button">${removeCard ? 'Remover cartão e cancelar recorrência' : 'Confirmar cancelamento'}</button>
+      <button class="btn btn-neutral" type="button" data-close-subscription-modal>Voltar</button>
+      <button id="subscription-confirm-cancel" class="btn btn-danger" type="button">${removeCard ? 'Remover cartão e cancelar recorrência' : 'Confirmar cancelamento'}</button>
     </div>`;
 
   target.querySelector('[data-close-subscription-modal]')?.addEventListener('click', closeModal);
@@ -191,7 +191,7 @@ async function openCardForm({ access = null, plan = null, mode = 'subscribe' } =
         <div class="subscription-card-field"><label for="manage-billing-state">UF</label><input id="manage-billing-state" maxlength="2" placeholder="SP" required></div>
       </div>`}
       <div id="subscription-card-management-error" class="subscription-error" hidden></div>
-      <div class="subscription-modal-actions"><button class="btn btn-secondary" type="button" data-close-subscription-modal>Voltar</button><button id="subscription-card-management-submit" class="btn btn-primary" type="submit">${isReplace ? 'Atualizar cartão' : `Assinar por ${money(plan?.valor_centavos || 2990)}/mês`}</button></div>
+      <div class="subscription-modal-actions"><button class="btn btn-neutral" type="button" data-close-subscription-modal>Voltar</button><button id="subscription-card-management-submit" class="btn btn-primary" type="submit">${isReplace ? 'Atualizar cartão' : `Assinar por ${money(plan?.valor_centavos || 2990)}/mês`}</button></div>
     </form>`;
 
   content.querySelector('[data-close-subscription-modal]')?.addEventListener('click', closeModal);
@@ -279,7 +279,7 @@ async function createPix(plan, content, { cancelRecurringAfterPaid = false } = {
         <p>${cancelRecurringAfterPaid ? 'Após a confirmação do PIX, a renovação automática do cartão será cancelada.' : 'Após o pagamento, seu acesso será atualizado automaticamente.'}</p>
         ${charge.qr_code_url ? `<img src="${escapeHtml(charge.qr_code_url)}" alt="QR Code PIX">` : ''}
         <textarea id="subscription-pix-code" readonly>${escapeHtml(charge.pix_copia_cola || '')}</textarea>
-        <div class="subscription-modal-actions" style="justify-content:center;margin-top:12px"><button id="subscription-copy-pix" class="btn btn-secondary" type="button">Copiar código PIX</button><button id="subscription-check-pix" class="btn btn-outline" type="button">Já paguei, verificar</button></div>
+        <div class="subscription-modal-actions" style="justify-content:center;margin-top:12px"><button id="subscription-copy-pix" class="btn btn-primary" type="button">Copiar código PIX</button><button id="subscription-check-pix" class="btn btn-outline" type="button">Já paguei, verificar</button></div>
         <div id="subscription-pix-status" class="subscription-pix-status">Aguardando confirmação do pagamento...</div>
       </div>`;
     content.querySelector('#subscription-copy-pix')?.addEventListener('click', async event => {
@@ -392,8 +392,10 @@ function renderManagement(access) {
   host.innerHTML = '';
   actions.forEach(([title, description, buttonText, handler]) => {
     const article = document.createElement('article');
+    const destructive = /cancel|remov|exclu/i.test(`${title} ${buttonText}`);
+    const buttonClass = destructive ? 'btn btn-danger' : 'btn btn-outline';
     article.className = 'subscription-management-action';
-    article.innerHTML = `<div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(description)}</span></div><button class="btn btn-secondary" type="button">${escapeHtml(buttonText)}</button>`;
+    article.innerHTML = `<div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(description)}</span></div><button class="${buttonClass}" type="button">${escapeHtml(buttonText)}</button>`;
     article.querySelector('button')?.addEventListener('click', handler);
     host.appendChild(article);
   });

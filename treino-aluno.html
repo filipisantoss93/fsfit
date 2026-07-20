@@ -53,13 +53,13 @@
     <section class="workout-modal-card" role="dialog" aria-modal="true" aria-labelledby="workout-modal-title">
       <button class="workout-modal-close" type="button" data-close-workout-modal aria-label="Fechar">×</button>
       <div class="workout-modal-kicker">PLANO DE TREINO</div><h2 id="workout-modal-title">Plano de treino</h2>
-      <div id="workout-modal-view"><div id="workout-modal-body" class="workout-modal-body"></div><div class="workout-modal-actions"><button id="workout-modal-activate" class="btn btn-primary" type="button">Tornar ativo</button><button id="workout-modal-edit" class="btn btn-outline" type="button">Editar treino</button><button id="workout-modal-delete" class="btn btn-danger" type="button">Excluir treino</button><button class="btn btn-outline" type="button" data-close-workout-modal>Fechar</button></div></div>
+      <div id="workout-modal-view"><div id="workout-modal-body" class="workout-modal-body"></div><div class="workout-modal-actions"><button id="workout-modal-activate" class="btn btn-primary" type="button">Tornar ativo</button><button id="workout-modal-edit" class="btn btn-outline" type="button">Editar treino</button><button id="workout-modal-delete" class="btn btn-danger" type="button">Excluir treino</button><button class="btn btn-neutral" type="button" data-close-workout-modal>Fechar</button></div></div>
       <form id="workout-form" class="hidden">
         <div class="form-group"><label>Nome do treino *</label><input name="nome" maxlength="120" placeholder="Ex.: Hipertrofia A/B" required></div>
         <div class="form-group"><label>Descrição</label><textarea name="descricao" placeholder="Objetivo, orientações gerais e observações do ciclo."></textarea></div>
         <div class="grid grid-2"><div class="form-group"><label>Data de início</label><input name="data_inicio" type="date"></div><div class="form-group"><label>Data de término</label><input name="data_fim" type="date"></div></div>
         <div class="form-group"><label>Dias da semana</label><div class="workout-weekdays" id="weekday-options"><label><input type="checkbox" value="1"> Seg</label><label><input type="checkbox" value="2"> Ter</label><label><input type="checkbox" value="3"> Qua</label><label><input type="checkbox" value="4"> Qui</label><label><input type="checkbox" value="5"> Sex</label><label><input type="checkbox" value="6"> Sáb</label><label><input type="checkbox" value="7"> Dom</label></div></div>
-        <div class="workout-modal-actions"><button class="btn btn-primary" type="submit">Salvar treino</button><button id="cancel-workout-edit" class="btn btn-outline" type="button">Cancelar</button></div>
+        <div class="workout-modal-actions"><button class="btn btn-primary" type="submit">Salvar treino</button><button id="cancel-workout-edit" class="btn btn-neutral" type="button">Cancelar</button></div>
       </form>
     </section>
   </div>
@@ -88,7 +88,7 @@
           <input name="duracao_minutos" type="hidden"><input name="distancia_km" type="hidden"><input name="ordem" type="hidden" value="1">
           <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Cadência, técnica, progressão, intensidade..."></textarea></div>
         </div>
-        <div class="workout-modal-actions"><button id="save-exercise-batch" class="btn btn-primary" type="submit">Adicionar exercícios</button><button class="btn btn-outline" type="button" data-close-exercise-modal>Cancelar</button></div>
+        <div class="workout-modal-actions"><button id="save-exercise-batch" class="btn btn-primary" type="submit">Adicionar exercícios</button><button class="btn btn-neutral" type="button" data-close-exercise-modal>Cancelar</button></div>
       </form>
     </section>
   </div>
@@ -98,7 +98,7 @@
     <section class="workout-modal-card" role="dialog" aria-modal="true" aria-labelledby="exercise-detail-title">
       <button class="workout-modal-close" type="button" data-close-exercise-detail-modal aria-label="Fechar">×</button>
       <div class="workout-modal-kicker">DETALHES DO EXERCÍCIO</div><h2 id="exercise-detail-title">Exercício</h2><div id="exercise-detail-body" class="workout-modal-body"></div>
-      <div class="workout-modal-actions"><button id="exercise-detail-edit" class="btn btn-primary" type="button">Editar exercício</button><button id="exercise-detail-delete" class="btn btn-danger" type="button">Remover exercício</button><button class="btn btn-outline" type="button" data-close-exercise-detail-modal>Fechar</button></div>
+      <div class="workout-modal-actions"><button id="exercise-detail-edit" class="btn btn-outline" type="button">Editar exercício</button><button id="exercise-detail-delete" class="btn btn-danger" type="button">Remover exercício</button><button class="btn btn-neutral" type="button" data-close-exercise-detail-modal>Fechar</button></div>
     </section>
   </div>
   <script src="js/treino-aluno-retorno.js?v=20260719-return-live2"></script>

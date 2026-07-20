@@ -40,7 +40,7 @@
         <div class="actions">
           <a class="btn btn-outline" href="modelos-dieta.html">Modelos de dieta</a>
           <button id="open-food-category-modal" class="btn btn-outline" type="button">+ Nova categoria</button>
-          <button id="open-food-modal" class="btn btn-primary" type="button">+ Novo alimento</button>
+          <button id="open-food-modal" class="btn btn-outline" type="button">+ Novo alimento</button>
           <button id="open-meal-builder" class="btn btn-primary" type="button">+ Montar refeição</button>
         </div>
       </div>
@@ -83,7 +83,7 @@
           <div class="form-group"><label>Gorduras (g)</label><input name="gorduras_g" type="number" min="0" step="0.01"></div>
         </div>
         <div class="form-group"><label>Observações</label><textarea name="observacoes" placeholder="Informações adicionais sobre o alimento."></textarea></div>
-        <div class="library-modal-actions"><button id="food-submit" class="btn btn-primary" type="submit">Adicionar alimento</button><button id="cancel-food-edit" class="btn btn-outline" type="button">Cancelar</button></div>
+        <div class="library-modal-actions"><button id="food-submit" class="btn btn-primary" type="submit">Adicionar alimento</button><button id="cancel-food-edit" class="btn btn-neutral" type="button">Cancelar</button></div>
       </form>
     </section>
   </div>
@@ -96,7 +96,7 @@
       <h2 id="food-category-form-title">Nova categoria</h2>
       <form id="food-category-form">
         <div class="form-group"><label>Nome da categoria *</label><input name="nome" maxlength="80" placeholder="Ex.: Oleaginosas" required></div>
-        <div class="library-modal-actions"><button id="food-category-submit" class="btn btn-primary" type="submit">Criar categoria</button><button id="cancel-food-category-edit" class="btn btn-outline" type="button">Cancelar</button></div>
+        <div class="library-modal-actions"><button id="food-category-submit" class="btn btn-primary" type="submit">Criar categoria</button><button id="cancel-food-category-edit" class="btn btn-neutral" type="button">Cancelar</button></div>
       </form>
     </section>
   </div>
@@ -120,7 +120,7 @@
         <div id="meal-food-picker" class="meal-food-picker"></div>
         <div class="meal-selected-heading"><strong>Itens selecionados</strong><span id="meal-selected-count">0 itens</span></div>
         <div id="meal-selected-items" class="meal-selected-items"><p class="empty">Selecione alimentos acima.</p></div>
-        <div class="library-modal-actions"><button id="meal-submit" class="btn btn-primary" type="submit">Salvar refeição</button><button id="cancel-meal-builder" class="btn btn-outline" type="button">Cancelar</button></div>
+        <div class="library-modal-actions"><button id="meal-submit" class="btn btn-primary" type="submit">Salvar refeição</button><button id="cancel-meal-builder" class="btn btn-neutral" type="button">Cancelar</button></div>
       </form>
     </section>
   </div>

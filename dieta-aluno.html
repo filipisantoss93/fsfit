@@ -86,7 +86,7 @@
           <button id="plan-modal-activate" class="btn btn-primary" type="button">Tornar ativo</button>
           <button id="plan-modal-edit" class="btn btn-outline" type="button">Editar plano</button>
           <button id="plan-modal-delete" class="btn btn-danger" type="button">Excluir plano</button>
-          <button class="btn btn-outline" type="button" data-close-plan-modal>Fechar</button>
+          <button class="btn btn-neutral" type="button" data-close-plan-modal>Fechar</button>
         </div>
       </div>
       <form id="plan-form" class="hidden">
@@ -99,7 +99,7 @@
         <div class="form-group"><label>Orientações gerais</label><textarea name="orientacoes" placeholder="Ex.: Preferir alimentos in natura, ajustar porções conforme orientação profissional..."></textarea></div>
         <div class="diet-modal-actions">
           <button class="btn btn-primary" type="submit">Salvar plano</button>
-          <button id="cancel-plan-edit" class="btn btn-outline" type="button">Cancelar</button>
+          <button id="cancel-plan-edit" class="btn btn-neutral" type="button">Cancelar</button>
         </div>
       </form>
     </section>
@@ -133,7 +133,7 @@
         <div class="form-group"><label>Substituições</label><textarea name="substituicoes" placeholder="Ex.: Trocar banana por maçã; pão por tapioca..."></textarea></div>
         <div class="diet-modal-actions">
           <button class="btn btn-primary" type="submit">Adicionar refeição</button>
-          <button class="btn btn-outline" type="button" data-close-meal-form-modal>Cancelar</button>
+          <button class="btn btn-neutral" type="button" data-close-meal-form-modal>Cancelar</button>
         </div>
       </form>
     </section>
@@ -149,7 +149,7 @@
       <div id="library-meal-list" class="diet-library-meal-list"><p>Carregando refeições...</p></div>
       <div class="diet-modal-actions">
         <a class="btn btn-primary" href="biblioteca-alimentar.html">+ Criar nova refeição</a>
-        <button class="btn btn-outline" type="button" data-close-library-meal-modal>Fechar</button>
+        <button class="btn btn-neutral" type="button" data-close-library-meal-modal>Fechar</button>
       </div>
     </section>
   </div>
@@ -164,8 +164,8 @@
       <div class="form-group"><label>Buscar modelo</label><input id="diet-model-picker-search" type="search" placeholder="Ex.: Hipertrofia, emagrecimento..."></div>
       <div id="diet-model-picker-list" class="diet-library-meal-list"><p>Carregando modelos...</p></div>
       <div class="diet-modal-actions">
-        <a class="btn btn-primary" href="modelos-dieta.html">Gerenciar modelos</a>
-        <button class="btn btn-outline" type="button" data-close-diet-model-picker>Fechar</button>
+        <a class="btn btn-outline" href="modelos-dieta.html">Gerenciar modelos</a>
+        <button class="btn btn-neutral" type="button" data-close-diet-model-picker>Fechar</button>
       </div>
     </section>
   </div>
@@ -178,9 +178,9 @@
       <h2 id="meal-modal-title">Refeição</h2>
       <div id="meal-modal-body" class="diet-modal-body"></div>
       <div class="diet-modal-actions">
-        <button id="meal-modal-edit" class="btn btn-primary" type="button">Editar refeição</button>
+        <button id="meal-modal-edit" class="btn btn-outline" type="button">Editar refeição</button>
         <button id="meal-modal-delete" class="btn btn-danger" type="button">Excluir refeição</button>
-        <button class="btn btn-outline" type="button" data-close-meal-modal>Fechar</button>
+        <button class="btn btn-neutral" type="button" data-close-meal-modal>Fechar</button>
       </div>
     </section>
   </div>
