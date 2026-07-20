@@ -15,6 +15,8 @@ const editorClose = document.querySelector('#live-workout-editor-close');
 let currentSessionId = '';
 let currentStudent = '';
 let workoutsRequest = 0;
+let currentExerciseId = '';
+let currentExercises = new Map();
 
 const DAY_NAMES = {
   0: 'Domingo',
@@ -79,7 +81,9 @@ function injectStyles() {
     .live-session-workout-day{display:grid;gap:6px}
     .live-session-workout-day-title{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.66rem;font-weight:850;letter-spacing:.045em;text-transform:uppercase}
     .live-session-exercise-list{display:grid;gap:5px}
-    .live-session-exercise-row{display:grid;grid-template-columns:26px minmax(0,1fr);gap:9px;align-items:start;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:rgba(255,255,255,.02)}
+    .live-session-exercise-row{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:9px;align-items:center;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:rgba(255,255,255,.02);color:inherit;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease}
+    .live-session-exercise-row:hover,.live-session-exercise-row:focus-visible{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.35);outline:none}
+    .live-session-exercise-arrow{color:var(--secondary);font-size:1.2rem;line-height:1}
     .live-session-exercise-order{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:rgba(59,130,246,.1);color:var(--secondary);font-size:.68rem;font-weight:900}
     .live-session-exercise-copy{min-width:0}
     .live-session-exercise-copy strong{display:block;font-size:.78rem;line-height:1.3}
@@ -87,6 +91,13 @@ function injectStyles() {
     .live-session-exercise-empty{padding:10px;border:1px dashed rgba(255,255,255,.1);border-radius:7px;color:var(--muted);font-size:.72rem;text-align:center}
     .live-session-workout-empty{padding:18px 14px;border:1px dashed var(--border);border-radius:9px;color:var(--muted);font-size:.8rem;text-align:center}
     .live-session-edit-workout{width:100%;margin-bottom:4px}
+    .live-exercise-edit-modal{position:absolute;inset:0;z-index:8;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(4,7,10,.78);backdrop-filter:blur(5px)}
+    .live-exercise-edit-modal.open{display:flex}
+    .live-exercise-edit-dialog{width:min(430px,100%);padding:18px;border:1px solid var(--border);border-radius:10px;background:#171c22;box-shadow:0 20px 55px rgba(0,0,0,.45)}
+    .live-exercise-edit-dialog h3{margin:0 0 4px;font-size:1rem}
+    .live-exercise-edit-dialog p{margin:0 0 15px;color:var(--muted);font-size:.74rem}
+    .live-exercise-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .live-exercise-edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
     .live-session-tab-panel[data-live-tab-panel="chat"] .live-session-chat-title{margin-top:2px}
     @media(max-width:720px){
       .live-session-tabs{position:sticky;top:0;z-index:3;background:#151a1f}
@@ -116,11 +127,7 @@ function ensureTabbedLayout() {
     <div class="live-session-workouts-heading">
       <div><small>PLANEJAMENTO</small><strong>Treinos do aluno</strong><p>Veja planos, dias e exercícios e edite sem sair do acompanhamento.</p></div>
     </div>
-    <div id="live-session-workouts-list" class="live-session-workouts-list"><div class="live-session-workout-empty">Carregando treinos...</div></div>
-    <button id="live-session-edit-workout" class="btn btn-outline btn-action-tile live-session-edit-workout" type="button">
-      <span class="btn-action-icon" aria-hidden="true">✎</span>
-      <span class="btn-action-copy"><span class="btn-action-title">Editar treino</span><span class="btn-action-description">Ajustar planos, dias e exercícios deste aluno</span></span>
-    </button>`;
+    <div id="live-session-workouts-list" class="live-session-workouts-list"><div class="live-session-workout-empty">Carregando treino de hoje...</div></div>`;
 
   const chatPanel = document.createElement('section');
   chatPanel.className = 'live-session-tab-panel';
@@ -135,16 +142,125 @@ function ensureTabbedLayout() {
   if (chatThread) chatPanel.append(chatThread);
   if (chatForm) chatPanel.append(chatForm);
 
+  workoutsPanel.addEventListener('click', event => {
+    const exercise = event.target.closest('[data-live-exercise-id]');
+    if (exercise) openExerciseEditor(exercise.dataset.liveExerciseId);
+  });
+
   tabs.addEventListener('click', event => {
     const button = event.target.closest('[data-live-tab]');
     if (!button) return;
     setActiveTab(button.dataset.liveTab);
   });
 
-  document.querySelector('#live-session-edit-workout')?.addEventListener('click', () => {
-    const studentId = currentStudent || currentStudentId();
-    if (studentId) openEditor(studentId);
+  ensureExerciseEditor();
+  ensureEditActionButton();
+}
+
+
+function ensureEditActionButton() {
+  if (!modalActions || modalActions.querySelector('[data-live-edit-workout]')) return;
+  const recordLink = modalActions.querySelector('a[href*="ficha-aluno.html?id="]');
+  const studentId = currentStudent || currentStudentId();
+  if (!recordLink || !studentId) return;
+
+  const button = document.createElement('button');
+  button.className = 'btn btn-outline btn-action-tile';
+  button.type = 'button';
+  button.dataset.liveEditWorkout = studentId;
+  button.innerHTML = `
+    <span class="btn-action-icon" aria-hidden="true">✎</span>
+    <span class="btn-action-copy"><span class="btn-action-title">Editar treino</span><span class="btn-action-description">Ajustar planos, dias e exercícios</span></span>`;
+  recordLink.before(button);
+}
+
+function todayWorkoutDay() {
+  const day = new Date().getDay();
+  return day === 0 ? 7 : day;
+}
+
+function ensureExerciseEditor() {
+  if (!sessionModal || document.querySelector('#live-exercise-edit-modal')) return;
+  const modal = document.createElement('div');
+  modal.id = 'live-exercise-edit-modal';
+  modal.className = 'live-exercise-edit-modal';
+  modal.setAttribute('aria-hidden', 'true');
+  modal.innerHTML = `
+    <section class="live-exercise-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="live-exercise-edit-title">
+      <h3 id="live-exercise-edit-title">Ajustar exercício</h3>
+      <p id="live-exercise-edit-subtitle">Altere séries e repetições para este aluno.</p>
+      <form id="live-exercise-edit-form">
+        <div class="live-exercise-edit-grid">
+          <div class="form-group"><label for="live-exercise-series">Séries</label><input id="live-exercise-series" name="series" type="number" min="1" max="20" step="1"></div>
+          <div class="form-group"><label for="live-exercise-repetitions">Repetições</label><input id="live-exercise-repetitions" name="repeticoes" type="text" maxlength="50" placeholder="Ex.: 12 ou 15–20"></div>
+        </div>
+        <div class="live-exercise-edit-actions">
+          <button class="btn btn-neutral" type="button" data-close-live-exercise-edit>Cancelar</button>
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </section>`;
+  sessionModal.appendChild(modal);
+
+  modal.addEventListener('click', event => {
+    if (event.target === modal || event.target.closest('[data-close-live-exercise-edit]')) closeExerciseEditor();
   });
+  modal.querySelector('#live-exercise-edit-form')?.addEventListener('submit', saveExerciseAdjustments);
+}
+
+function openExerciseEditor(exerciseId) {
+  const row = currentExercises.get(exerciseId);
+  const modal = document.querySelector('#live-exercise-edit-modal');
+  if (!row || !modal) return;
+  currentExerciseId = exerciseId;
+  modal.querySelector('#live-exercise-edit-title').textContent = row.exercicios?.nome || 'Ajustar exercício';
+  modal.querySelector('#live-exercise-series').value = row.series ?? '';
+  modal.querySelector('#live-exercise-repetitions').value = row.repeticoes ?? '';
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeExerciseEditor() {
+  const modal = document.querySelector('#live-exercise-edit-modal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  currentExerciseId = '';
+}
+
+async function saveExerciseAdjustments(event) {
+  event.preventDefault();
+  const row = currentExercises.get(currentExerciseId);
+  const form = event.currentTarget;
+  const submit = form.querySelector('[type="submit"]');
+  if (!row || !currentExerciseId || !submit) return;
+
+  const seriesRaw = String(form.series.value || '').trim();
+  const repetitions = String(form.repeticoes.value || '').trim();
+  const series = seriesRaw ? Number(seriesRaw) : null;
+  if (series != null && (!Number.isInteger(series) || series < 1 || series > 20)) return;
+
+  submit.disabled = true;
+  const originalText = submit.textContent;
+  submit.textContent = 'Salvando...';
+  try {
+    const { error } = await supabase
+      .from('treino_exercicios')
+      .update({ series, repeticoes: repetitions || null })
+      .eq('id', currentExerciseId)
+      .eq('treino_id', row.treino_id);
+    if (error) throw error;
+    row.series = series;
+    row.repeticoes = repetitions || null;
+    closeExerciseEditor();
+    if (currentStudent) await loadStudentWorkouts(currentStudent);
+  } catch (error) {
+    console.error('Erro ao atualizar exercício no acompanhamento:', error);
+    alert('Não foi possível atualizar séries e repetições deste exercício.');
+  } finally {
+    submit.disabled = false;
+    submit.textContent = originalText;
+  }
 }
 
 function setActiveTab(tab = 'workouts') {
@@ -189,13 +305,14 @@ function renderWorkoutExercises(workout, exercises) {
           <div class="live-session-workout-day-title"><span>${escapeHtml(dayName)}</span><span>${rows.length} ${rows.length === 1 ? 'exercício' : 'exercícios'}</span></div>
           <div class="live-session-exercise-list">
             ${rows.map((row, index) => `
-              <div class="live-session-exercise-row">
+              <button class="live-session-exercise-row" type="button" data-live-exercise-id="${escapeHtml(row.id)}">
                 <span class="live-session-exercise-order">${escapeHtml(String(row.ordem || index + 1))}</span>
                 <span class="live-session-exercise-copy">
                   <strong>${escapeHtml(row.exercicios?.nome || 'Exercício')}</strong>
                   <span>${escapeHtml(exerciseMeta(row))}</span>
                 </span>
-              </div>`).join('')}
+                <span class="live-session-exercise-arrow" aria-hidden="true">›</span>
+              </button>`).join('')}
           </div>
         </section>`;
     }).join('');
@@ -242,17 +359,27 @@ async function loadStudentWorkouts(studentId) {
     if (exerciseError) throw exerciseError;
     if (requestId !== workoutsRequest || currentStudent !== studentId) return;
 
+    const todayDay = todayWorkoutDay();
+    const todayName = DAY_NAMES[todayDay] || 'Hoje';
+    currentExercises = new Map((exerciseData || []).map(row => [row.id, row]));
+
     const exercisesByWorkout = (exerciseData || []).reduce((acc, row) => {
-      (acc[row.treino_id] ||= []).push(row);
+      if (Number(row.dia_semana) === todayDay) (acc[row.treino_id] ||= []).push(row);
       return acc;
     }, {});
 
-    host.innerHTML = workouts.map(workout => {
-      const days = (workout.dias_semana || [])
-        .map(Number)
-        .map(day => DAY_NAMES[day])
-        .filter(Boolean)
-        .join(', ') || 'Dias não definidos';
+    let visibleWorkouts = workouts.filter(workout => workout.status === 'ativo' && (exercisesByWorkout[workout.id] || []).length);
+    if (!visibleWorkouts.length) {
+      visibleWorkouts = workouts.filter(workout => (exercisesByWorkout[workout.id] || []).length);
+    }
+
+    if (!visibleWorkouts.length) {
+      host.innerHTML = `<div class="live-session-workout-empty">Nenhum exercício agendado para hoje (${escapeHtml(todayName)}).</div>`;
+      ensureEditActionButton();
+      return;
+    }
+
+    host.innerHTML = visibleWorkouts.map(workout => {
       const start = formatDate(workout.data_inicio);
       const end = formatDate(workout.data_fim);
       const period = [start, end].filter(Boolean).join(' → ');
@@ -266,7 +393,7 @@ async function loadStudentWorkouts(studentId) {
                 <strong>${escapeHtml(workout.nome || 'Plano de treino')}</strong>
                 ${workout.status === 'ativo' ? '<span class="live-session-workout-badge">ATIVO</span>' : ''}
               </div>
-              <span class="live-session-workout-meta">${escapeHtml(days)}</span>
+              <span class="live-session-workout-meta">Hoje · ${escapeHtml(todayName)}</span>
               ${period ? `<span class="live-session-workout-period">${escapeHtml(period)}</span>` : ''}
             </div>
             <span class="live-session-workout-count">${workoutExercises.length} ${workoutExercises.length === 1 ? 'exercício' : 'exercícios'}</span>
@@ -274,6 +401,7 @@ async function loadStudentWorkouts(studentId) {
           <div class="live-session-workout-exercises">${renderWorkoutExercises(workout, workoutExercises)}</div>
         </article>`;
     }).join('');
+    ensureEditActionButton();
   } catch (error) {
     console.error('Erro ao carregar treinos no acompanhamento:', error);
     if (requestId === workoutsRequest) {
@@ -320,11 +448,18 @@ liveList?.addEventListener('click', event => {
 if (modalActions) {
   const observer = new MutationObserver(() => {
     if (!sessionModal?.classList.contains('open')) return;
+    ensureEditActionButton();
     const studentId = currentStudentId();
     if (studentId && studentId !== currentStudent) loadStudentWorkouts(studentId).catch(console.error);
   });
   observer.observe(modalActions, { childList: true });
 }
+
+modalActions?.addEventListener('click', event => {
+  const editButton = event.target.closest('[data-live-edit-workout]');
+  if (!editButton) return;
+  openEditor(editButton.dataset.liveEditWorkout || currentStudent || currentStudentId());
+});
 
 editorClose?.addEventListener('click', closeEditor);
 editorModal?.addEventListener('click', event => {
