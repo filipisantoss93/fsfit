@@ -13,6 +13,9 @@ const FREE_ALLOWED_PAGES = new Set([
   'admin-contatos.html'
 ]);
 
+const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
+const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
+
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
   return page || 'index.html';
@@ -75,6 +78,30 @@ function configureStudentRecordBackLink() {
   if (origin === 'aula') {
     backLink.textContent = '← Voltar para aula';
     backLink.href = 'painel.html#live-students-list';
+    return;
+  }
+
+  if (origin === 'painel') {
+    backLink.textContent = '← Voltar ao painel';
+    backLink.href = 'painel.html#today-list';
+    backLink.addEventListener('click', event => {
+      let canReturnToSavedPanel = false;
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(PANEL_RETURN_SCROLL_KEY) || 'null');
+        canReturnToSavedPanel = Boolean(
+          saved &&
+          Number.isFinite(Number(saved.y)) &&
+          Date.now() - Number(saved.savedAt || 0) < 2 * 60 * 60 * 1000
+        );
+      } catch {
+        canReturnToSavedPanel = false;
+      }
+
+      if (!canReturnToSavedPanel || window.history.length <= 1) return;
+      event.preventDefault();
+      sessionStorage.setItem(PANEL_RESTORE_SCROLL_KEY, '1');
+      window.history.back();
+    });
     return;
   }
 
