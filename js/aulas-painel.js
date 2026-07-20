@@ -67,17 +67,38 @@ function renderModalActions(row) {
 
   if (row.status === 'aguardando_confirmacao') {
     modalActions.innerHTML = `
-      <button class="btn btn-primary" type="button" data-modal-confirm-session="${esc(row.sessao_id)}">Confirmar início</button>
-      <button class="btn btn-danger" type="button" data-modal-cancel-checkin="${esc(row.sessao_id)}">Cancelar check-in</button>
-      <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}&origem=aula">Abrir ficha</a>
-      <button class="btn btn-secondary" type="button" data-modal-close-session>Fechar</button>`;
+      <button class="btn btn-primary btn-action-tile" type="button" data-modal-confirm-session="${esc(row.sessao_id)}">
+        <span class="btn-action-icon" aria-hidden="true">✓</span>
+        <span class="btn-action-copy"><span class="btn-action-title">Confirmar início</span><span class="btn-action-description">Liberar o aluno para começar a aula</span></span>
+      </button>
+      <button class="btn btn-danger btn-action-tile" type="button" data-modal-cancel-checkin="${esc(row.sessao_id)}">
+        <span class="btn-action-icon" aria-hidden="true">×</span>
+        <span class="btn-action-copy"><span class="btn-action-title">Cancelar check-in</span><span class="btn-action-description">Remover esta solicitação de início</span></span>
+      </button>
+      <a class="btn btn-outline btn-action-tile" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}&origem=aula">
+        <span class="btn-action-icon" aria-hidden="true">▣</span>
+        <span class="btn-action-copy"><span class="btn-action-title">Abrir ficha</span><span class="btn-action-description">Ver dados e histórico</span></span>
+      </a>
+      <button class="btn btn-neutral btn-action-tile" type="button" data-modal-close-session>
+        <span class="btn-action-icon" aria-hidden="true">×</span>
+        <span class="btn-action-copy"><span class="btn-action-title">Fechar</span><span class="btn-action-description">Voltar sem realizar alterações</span></span>
+      </button>`;
     return;
   }
 
   modalActions.innerHTML = `
-    <a class="btn btn-outline" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}&origem=aula">Abrir ficha</a>
-    <button class="btn btn-danger" type="button" data-modal-finish-session="${esc(row.sessao_id)}">Encerrar treino</button>
-    <button class="btn btn-secondary" type="button" data-modal-close-session>Fechar</button>`;
+    <a class="btn btn-outline btn-action-tile" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}&origem=aula">
+      <span class="btn-action-icon" aria-hidden="true">▣</span>
+      <span class="btn-action-copy"><span class="btn-action-title">Abrir ficha</span><span class="btn-action-description">Ver dados e histórico</span></span>
+    </a>
+    <button class="btn btn-danger btn-action-tile" type="button" data-modal-finish-session="${esc(row.sessao_id)}">
+      <span class="btn-action-icon" aria-hidden="true">■</span>
+      <span class="btn-action-copy"><span class="btn-action-title">Encerrar treino</span><span class="btn-action-description">Finalizar esta sessão do aluno</span></span>
+    </button>
+    <button class="btn btn-neutral btn-action-tile" type="button" data-modal-close-session>
+      <span class="btn-action-icon" aria-hidden="true">×</span>
+      <span class="btn-action-copy"><span class="btn-action-title">Fechar</span><span class="btn-action-description">Voltar sem realizar alterações</span></span>
+    </button>`;
 }
 
 function setChatAvailability(active) {
@@ -183,7 +204,7 @@ async function confirmStart(sessionId, button) {
 async function cancelCheckin(sessionId, studentName, button) {
   if (!confirm(`Cancelar o check-in de ${studentName}?\n\nO aluno precisará fazer um novo check-in para solicitar o início da aula.`)) return;
   button.disabled = true;
-  const originalText = button.textContent;
+  const originalHtml = button.innerHTML;
   button.textContent = 'Cancelando...';
 
   try {
@@ -196,14 +217,14 @@ async function cancelCheckin(sessionId, studentName, button) {
     console.error(error);
     alert(error.message || 'Não foi possível cancelar o check-in.');
     button.disabled = false;
-    button.textContent = originalText;
+    button.innerHTML = originalHtml;
   }
 }
 
 async function finishSession(sessionId, studentName, button) {
   if (!confirm(`Encerrar o treino de ${studentName}?\n\nUse esta opção quando o aluno esquecer de finalizar o treino. A sessão será marcada como finalizada.`)) return;
   button.disabled = true;
-  const originalText = button.textContent;
+  const originalHtml = button.innerHTML;
   button.textContent = 'Encerrando...';
 
   try {
@@ -216,7 +237,7 @@ async function finishSession(sessionId, studentName, button) {
     console.error(error);
     alert(error.message || 'Não foi possível encerrar o treino.');
     button.disabled = false;
-    button.textContent = originalText;
+    button.innerHTML = originalHtml;
   }
 }
 
@@ -345,7 +366,3 @@ modalActions?.addEventListener('click', event => {
 chatForm?.addEventListener('submit', event => sendMessage(event).catch(console.error));
 
 await loadLiveStudents();
-setInterval(loadLiveStudents, 10000);
-setInterval(() => {
-  if (currentSessionId && modal?.classList.contains('open')) loadChat(currentSessionId).catch(console.error);
-}, 5000);
