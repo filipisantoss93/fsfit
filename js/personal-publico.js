@@ -4,6 +4,7 @@ const params = new URLSearchParams(window.location.search);
 const pathMatch = window.location.pathname.match(/^\/p\/([^/]+)\/?$/i);
 const slug = String(pathMatch?.[1] || params.get('u') || '').trim().toLowerCase();
 const profileHost = document.querySelector('#public-profile');
+const profileDetailsHost = document.querySelector('#public-profile-details');
 const accessSection = document.querySelector('#student-access');
 const message = document.querySelector('#access-message');
 const phoneForm = document.querySelector('#phone-form');
@@ -32,6 +33,12 @@ function instagramHref(value = '') {
 
   const handle = withoutAt.split(/[\/?#]/)[0].trim();
   return handle ? `https://www.instagram.com/${encodeURIComponent(handle)}/` : '';
+}
+function whatsappHref(value = '') {
+  const number = String(value ?? '').replace(/\D/g, '');
+  if (number.length === 10 || number.length === 11) return `https://wa.me/55${number}`;
+  if (number.length >= 12 && number.length <= 15) return `https://wa.me/${number}`;
+  return '';
 }
 function digits(value = '', max = 11) { return String(value).replace(/\D/g, '').slice(0, max); }
 function show(text, type = 'error') { message.textContent = text; message.className = `message show ${type}`; }
@@ -62,15 +69,17 @@ function saveSession(result) {
   window.location.replace('/aluno.html');
 }
 
-function renderStudentPortalReturnButton() {
-  if (document.querySelector('#student-portal-return')) return;
+function insertReturnAction(id, href, label, className = 'btn btn-outline') {
+  if (document.querySelector(`#${id}`)) return;
   const actions = document.createElement('div');
-  actions.id = 'student-portal-return';
-  actions.className = 'actions';
-  actions.style.justifyContent = 'center';
-  actions.style.marginBottom = '18px';
-  actions.innerHTML = '<a class="btn btn-primary" href="/aluno.html">Voltar ao portal do aluno</a>';
+  actions.id = id;
+  actions.className = 'public-return-actions';
+  actions.innerHTML = `<a class="${className} public-return-button" href="${href}">← ${label}</a>`;
   profileHost.parentNode.insertBefore(actions, profileHost);
+}
+
+function renderStudentPortalReturnButton() {
+  insertReturnAction('student-portal-return', '/aluno.html', 'Voltar ao portal do aluno', 'btn btn-outline');
 }
 
 async function renderOwnerReturnButton(personalId) {
@@ -84,13 +93,7 @@ async function renderOwnerReturnButton(personalId) {
     .maybeSingle();
 
   if (profile?.tipo !== 'personal') return;
-
-  const actions = document.createElement('div');
-  actions.className = 'actions';
-  actions.style.justifyContent = 'center';
-  actions.style.marginBottom = '18px';
-  actions.innerHTML = '<a class="btn btn-secondary" href="/painel.html">Voltar ao painel</a>';
-  profileHost.parentNode.insertBefore(actions, profileHost);
+  insertReturnAction('owner-panel-return', '/painel.html', 'Voltar ao painel', 'btn btn-outline');
 }
 
 async function invoke(body) {
@@ -148,21 +151,36 @@ async function loadProfile() {
 
   await renderOwnerReturnButton(data.personal_id);
 
-  const { data: photos, error: photosError } = await supabase.from('perfil_fotos').select('id,foto_url,ordem').eq('personal_id', data.personal_id).order('ordem').limit(10);
+  const [{ data: photos, error: photosError }, { data: ownerProfile }] = await Promise.all([
+    supabase.from('perfil_fotos').select('id,foto_url,ordem').eq('personal_id', data.personal_id).order('ordem').limit(10),
+    supabase.from('perfis').select('telefone').eq('id', data.personal_id).maybeSingle()
+  ]);
   if (photosError) console.error(photosError);
 
   document.title = `${data.nome_publico} — FS Fit`;
   if (!hasActiveStudentSession) localStorage.setItem('fsfit_personal_slug', slug);
+
   const avatar = data.foto_url ? `<img class="public-profile-avatar" src="${esc(data.foto_url)}" alt="Foto de ${esc(data.nome_publico)}">` : `<div class="public-profile-avatar public-profile-avatar-placeholder">${esc(data.nome_publico.charAt(0).toUpperCase())}</div>`;
   const location = [data.local_trabalho, data.cidade].filter(Boolean).map(esc).join(' · ');
   const instagramUrl = instagramHref(data.instagram);
-  const instagram = instagramUrl ? `<div class="public-profile-info"><strong>Instagram</strong><a href="${esc(instagramUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram de ${esc(data.nome_publico)}">${esc(data.instagram)}</a></div>` : '';
+  const professionalWhatsappUrl = whatsappHref(ownerProfile?.telefone || '');
+  const quickActions = [
+    instagramUrl ? `<a class="btn btn-outline public-instagram-button" href="${esc(instagramUrl)}" target="_blank" rel="noopener noreferrer">Instagram</a>` : '',
+    professionalWhatsappUrl ? `<a class="btn btn-primary" href="${esc(professionalWhatsappUrl)}" target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>` : ''
+  ].filter(Boolean).join('');
+
+  profileHost.innerHTML = `<div class="public-profile-top">${avatar}<div class="public-profile-top-content"><span class="hero-badge">PERSONAL TRAINER</span><h1>${esc(data.nome_publico)}</h1>${location ? `<p class="public-profile-location">${location}</p>` : ''}${data.especialidades ? `<p class="public-profile-specialty-summary">${esc(data.especialidades)}</p>` : ''}</div></div>${quickActions ? `<div class="public-profile-quick-actions">${quickActions}</div>` : ''}`;
+
+  const about = data.bio || data.especialidades ? `<section class="public-about-section"><h2>Sobre mim</h2><div class="public-about-panel">${data.bio ? `<p class="public-profile-bio">${esc(data.bio)}</p>` : ''}${data.especialidades ? `<div class="public-specialties-block"><strong>Especialidades</strong><span>${esc(data.especialidades)}</span></div>` : ''}</div></section>` : '';
   const workplace = data.foto_local_url ? `<section class="public-media-section"><h2>Onde eu trabalho</h2><button class="public-workplace-photo photo-open" type="button" data-photo="${esc(data.foto_local_url)}" aria-label="Ampliar foto do local de trabalho"><img src="${esc(data.foto_local_url)}" alt="Local de trabalho de ${esc(data.nome_publico)}"></button></section>` : '';
   const gallery = photos?.length ? `<section class="public-media-section"><h2>Meu dia a dia</h2><div class="public-photo-grid">${photos.map((item, index) => `<button class="public-photo-item photo-open" type="button" data-photo="${esc(item.foto_url)}" aria-label="Ampliar foto ${index + 1}"><img src="${esc(item.foto_url)}" alt="Dia a dia profissional de ${esc(data.nome_publico)}"></button>`).join('')}</div></section>` : '';
 
-  profileHost.innerHTML = `<div class="public-profile-top">${avatar}<div><span class="hero-badge">PERSONAL TRAINER</span><h1>${esc(data.nome_publico)}</h1>${location ? `<p class="public-profile-location">${location}</p>` : ''}</div></div>${data.bio ? `<p class="public-profile-bio">${esc(data.bio)}</p>` : ''}<div class="public-profile-details">${data.especialidades ? `<div class="public-profile-info"><strong>Especialidades</strong><span>${esc(data.especialidades)}</span></div>` : ''}${instagram}</div>${workplace}${gallery}`;
+  if (profileDetailsHost) {
+    profileDetailsHost.innerHTML = `${about}${workplace}${gallery}`;
+    profileDetailsHost.classList.toggle('hidden', !(about || workplace || gallery));
+    profileDetailsHost.querySelectorAll('.photo-open').forEach(button => button.addEventListener('click', () => lightbox.open(button.dataset.photo, button.querySelector('img')?.alt)));
+  }
 
-  profileHost.querySelectorAll('.photo-open').forEach(button => button.addEventListener('click', () => lightbox.open(button.dataset.photo, button.querySelector('img')?.alt)));
   accessSection.classList.toggle('hidden', hasActiveStudentSession);
 }
 
