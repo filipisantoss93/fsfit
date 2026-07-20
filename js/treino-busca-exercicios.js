@@ -38,6 +38,35 @@ function applyCompactExerciseSelector() {
       .selected-exercise-config-grid{gap:8px}
       .selected-exercise-notes{margin-top:8px}
       #exercise-modal .workout-modal-actions{margin-top:12px}
+
+      #exercise-weekday-options input[type="checkbox"],
+      #exercise-checkbox-list input[type="checkbox"]{
+        appearance:none!important;
+        -webkit-appearance:none!important;
+        display:inline-block;
+        flex:0 0 auto;
+        margin:0;
+        border:2px solid #566170;
+        border-radius:6px;
+        background:#252c36;
+        background-position:center;
+        background-repeat:no-repeat;
+        background-size:70% 70%;
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);
+        cursor:pointer;
+      }
+      #exercise-weekday-options input[type="checkbox"]:checked,
+      #exercise-checkbox-list input[type="checkbox"]:checked{
+        border-color:var(--primary);
+        background-color:var(--primary);
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%230f1115' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round' d='M5 12.5l4.2 4.2L19 7'/%3E%3C/svg%3E");
+      }
+      #exercise-weekday-options input[type="checkbox"]:focus-visible,
+      #exercise-checkbox-list input[type="checkbox"]:focus-visible{
+        outline:2px solid rgba(50,215,75,.45);
+        outline-offset:2px;
+      }
+
       @media(max-width:640px){
         #exercise-modal .workout-exercise-builder-modal{width:calc(100vw - 12px);max-width:calc(100vw - 12px);padding:18px 14px;border-radius:18px 18px 12px 12px}
         #exercise-modal .workout-modal-close{top:10px;right:10px;width:38px;height:38px}
@@ -146,6 +175,11 @@ if (batchSelector && categorySelect && checkboxList) {
   }
 
   searchInput?.addEventListener('input', () => renderSearchResults(searchInput.value));
+
+  checkboxList.addEventListener('change', () => {
+    if (!searchInput?.value.trim()) return;
+    setTimeout(() => renderSearchResults(searchInput.value), 0);
+  });
 
   categorySelect.addEventListener('change', () => {
     if (searchInput && searchInput.value) searchInput.value = '';
