@@ -65,15 +65,26 @@ function injectStyles() {
     .live-session-workouts-heading small{display:block;margin-bottom:3px;color:var(--primary);font-size:.68rem;font-weight:850;letter-spacing:.08em}
     .live-session-workouts-heading strong{display:block;font-size:1rem}
     .live-session-workouts-heading p{margin:4px 0 0;color:var(--muted);font-size:.76rem}
-    .live-session-workouts-list{display:grid;gap:8px;margin:0 0 14px}
-    .live-session-workout-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 13px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.025)}
+    .live-session-workouts-list{display:grid;gap:10px;margin:0 0 14px}
+    .live-session-workout-card{display:block;padding:12px 13px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.025)}
     .live-session-workout-main{min-width:0}
+    .live-session-workout-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .live-session-workout-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .live-session-workout-title strong{font-size:.9rem}
     .live-session-workout-badge{display:inline-flex;align-items:center;min-height:22px;padding:0 7px;border:1px solid rgba(50,215,75,.3);border-radius:999px;background:rgba(50,215,75,.09);color:var(--primary);font-size:.6rem;font-weight:900;letter-spacing:.05em}
     .live-session-workout-meta{display:block;margin-top:5px;color:var(--muted);font-size:.72rem;line-height:1.4}
     .live-session-workout-period{display:block;margin-top:2px;color:#8d96a3;font-size:.68rem}
-    .live-session-workout-arrow{color:var(--muted);font-size:1.35rem}
+    .live-session-workout-count{flex:0 0 auto;color:var(--muted);font-size:.68rem;font-weight:800;white-space:nowrap}
+    .live-session-workout-exercises{display:grid;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+    .live-session-workout-day{display:grid;gap:6px}
+    .live-session-workout-day-title{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.66rem;font-weight:850;letter-spacing:.045em;text-transform:uppercase}
+    .live-session-exercise-list{display:grid;gap:5px}
+    .live-session-exercise-row{display:grid;grid-template-columns:26px minmax(0,1fr);gap:9px;align-items:start;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:rgba(255,255,255,.02)}
+    .live-session-exercise-order{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:rgba(59,130,246,.1);color:var(--secondary);font-size:.68rem;font-weight:900}
+    .live-session-exercise-copy{min-width:0}
+    .live-session-exercise-copy strong{display:block;font-size:.78rem;line-height:1.3}
+    .live-session-exercise-copy span{display:block;margin-top:2px;color:var(--muted);font-size:.67rem;line-height:1.35}
+    .live-session-exercise-empty{padding:10px;border:1px dashed rgba(255,255,255,.1);border-radius:7px;color:var(--muted);font-size:.72rem;text-align:center}
     .live-session-workout-empty{padding:18px 14px;border:1px dashed var(--border);border-radius:9px;color:var(--muted);font-size:.8rem;text-align:center}
     .live-session-edit-workout{width:100%;margin-bottom:4px}
     .live-session-tab-panel[data-live-tab-panel="chat"] .live-session-chat-title{margin-top:2px}
@@ -103,7 +114,7 @@ function ensureTabbedLayout() {
   workoutsPanel.dataset.liveTabPanel = 'workouts';
   workoutsPanel.innerHTML = `
     <div class="live-session-workouts-heading">
-      <div><small>PLANEJAMENTO</small><strong>Treinos do aluno</strong><p>Veja os planos agendados e edite sem sair do acompanhamento.</p></div>
+      <div><small>PLANEJAMENTO</small><strong>Treinos do aluno</strong><p>Veja planos, dias e exercícios e edite sem sair do acompanhamento.</p></div>
     </div>
     <div id="live-session-workouts-list" class="live-session-workouts-list"><div class="live-session-workout-empty">Carregando treinos...</div></div>
     <button id="live-session-edit-workout" class="btn btn-outline btn-action-tile live-session-edit-workout" type="button">
@@ -147,12 +158,55 @@ function setActiveTab(tab = 'workouts') {
   });
 }
 
+function exerciseMeta(row) {
+  return [
+    row.series ? `${row.series} séries` : null,
+    row.repeticoes ? `${row.repeticoes} rep.` : null,
+    row.carga || null,
+    row.descanso_segundos ? `${row.descanso_segundos}s descanso` : null
+  ].filter(Boolean).join(' • ') || 'Sem prescrição detalhada';
+}
+
+function renderWorkoutExercises(workout, exercises) {
+  if (!exercises.length) {
+    return '<div class="live-session-exercise-empty">Nenhum exercício cadastrado neste plano.</div>';
+  }
+
+  const groups = exercises.reduce((acc, row) => {
+    const day = Number(row.dia_semana) || 0;
+    (acc[day] ||= []).push(row);
+    return acc;
+  }, {});
+
+  return Object.keys(groups)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map(day => {
+      const rows = groups[day].sort((a, b) => Number(a.ordem || 0) - Number(b.ordem || 0));
+      const dayName = DAY_NAMES[day] || 'Dia não informado';
+      return `
+        <section class="live-session-workout-day">
+          <div class="live-session-workout-day-title"><span>${escapeHtml(dayName)}</span><span>${rows.length} ${rows.length === 1 ? 'exercício' : 'exercícios'}</span></div>
+          <div class="live-session-exercise-list">
+            ${rows.map((row, index) => `
+              <div class="live-session-exercise-row">
+                <span class="live-session-exercise-order">${escapeHtml(String(row.ordem || index + 1))}</span>
+                <span class="live-session-exercise-copy">
+                  <strong>${escapeHtml(row.exercicios?.nome || 'Exercício')}</strong>
+                  <span>${escapeHtml(exerciseMeta(row))}</span>
+                </span>
+              </div>`).join('')}
+          </div>
+        </section>`;
+    }).join('');
+}
+
 async function loadStudentWorkouts(studentId) {
   const host = document.querySelector('#live-session-workouts-list');
   if (!host || !studentId) return;
 
   currentStudent = studentId;
-  host.innerHTML = '<div class="live-session-workout-empty">Carregando treinos...</div>';
+  host.innerHTML = '<div class="live-session-workout-empty">Carregando treinos e exercícios...</div>';
   const requestId = ++workoutsRequest;
 
   try {
@@ -177,6 +231,22 @@ async function loadStudentWorkouts(studentId) {
       return;
     }
 
+    const workoutIds = workouts.map(workout => workout.id);
+    const { data: exerciseData, error: exerciseError } = await supabase
+      .from('treino_exercicios')
+      .select('id,treino_id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,exercicios(nome,grupo_muscular,equipamento)')
+      .in('treino_id', workoutIds)
+      .order('dia_semana')
+      .order('ordem');
+
+    if (exerciseError) throw exerciseError;
+    if (requestId !== workoutsRequest || currentStudent !== studentId) return;
+
+    const exercisesByWorkout = (exerciseData || []).reduce((acc, row) => {
+      (acc[row.treino_id] ||= []).push(row);
+      return acc;
+    }, {});
+
     host.innerHTML = workouts.map(workout => {
       const days = (workout.dias_semana || [])
         .map(Number)
@@ -186,23 +256,28 @@ async function loadStudentWorkouts(studentId) {
       const start = formatDate(workout.data_inicio);
       const end = formatDate(workout.data_fim);
       const period = [start, end].filter(Boolean).join(' → ');
+      const workoutExercises = exercisesByWorkout[workout.id] || [];
+
       return `
         <article class="live-session-workout-card">
-          <div class="live-session-workout-main">
-            <div class="live-session-workout-title">
-              <strong>${escapeHtml(workout.nome || 'Plano de treino')}</strong>
-              ${workout.status === 'ativo' ? '<span class="live-session-workout-badge">ATIVO</span>' : ''}
+          <div class="live-session-workout-header">
+            <div class="live-session-workout-main">
+              <div class="live-session-workout-title">
+                <strong>${escapeHtml(workout.nome || 'Plano de treino')}</strong>
+                ${workout.status === 'ativo' ? '<span class="live-session-workout-badge">ATIVO</span>' : ''}
+              </div>
+              <span class="live-session-workout-meta">${escapeHtml(days)}</span>
+              ${period ? `<span class="live-session-workout-period">${escapeHtml(period)}</span>` : ''}
             </div>
-            <span class="live-session-workout-meta">${escapeHtml(days)}</span>
-            ${period ? `<span class="live-session-workout-period">${escapeHtml(period)}</span>` : ''}
+            <span class="live-session-workout-count">${workoutExercises.length} ${workoutExercises.length === 1 ? 'exercício' : 'exercícios'}</span>
           </div>
-          <span class="live-session-workout-arrow" aria-hidden="true">›</span>
+          <div class="live-session-workout-exercises">${renderWorkoutExercises(workout, workoutExercises)}</div>
         </article>`;
     }).join('');
   } catch (error) {
     console.error('Erro ao carregar treinos no acompanhamento:', error);
     if (requestId === workoutsRequest) {
-      host.innerHTML = '<div class="live-session-workout-empty">Não foi possível carregar os treinos deste aluno agora.</div>';
+      host.innerHTML = '<div class="live-session-workout-empty">Não foi possível carregar os treinos e exercícios deste aluno agora.</div>';
     }
   }
 }
