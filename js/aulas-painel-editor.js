@@ -25,7 +25,7 @@ function injectEditButton() {
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'btn btn-secondary btn-action-tile';
+  button.className = 'btn btn-outline btn-action-tile';
   button.dataset.liveEditWorkout = studentId;
   button.innerHTML = `
     <span class="btn-action-icon" aria-hidden="true">✎</span>

@@ -72,6 +72,32 @@ if (session) {
   await loadTodayAgenda(freeMode);
 }
 
+function bindRecentStudentRows() {
+  const list = document.querySelector('#recent-list');
+  if (!list || list.dataset.rowNavigationBound === '1') return;
+  list.dataset.rowNavigationBound = '1';
+
+  const openRow = row => {
+    const href = row?.dataset.studentHref;
+    if (href) window.location.href = href;
+  };
+
+  list.addEventListener('click', event => {
+    const row = event.target.closest('[data-student-href]');
+    if (row) openRow(row);
+  });
+
+  list.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const row = event.target.closest('[data-student-href]');
+    if (!row) return;
+    event.preventDefault();
+    openRow(row);
+  });
+}
+
+bindRecentStudentRows();
+
 async function loadStudents(freeMode) {
   const list = document.querySelector('#recent-list');
 
@@ -88,15 +114,18 @@ async function loadStudents(freeMode) {
 
     if (list) {
       list.innerHTML = alunos.length
-        ? alunos.slice(0, 5).map(aluno => `
-            <tr>
-              <td>${escapeHtml(aluno.nome)}</td>
-              <td>${formatDate(aluno.created_at)}</td>
-              <td>${freeMode
-                ? '<span style="color:var(--muted);font-weight:700">Bloqueado</span>'
-                : `<a class="btn btn-outline" href="alunos.html?editar=${encodeURIComponent(aluno.id)}">Abrir</a>`}
-              </td>
-            </tr>`).join('')
+        ? alunos.slice(0, 5).map(aluno => {
+            const href = `ficha-aluno.html?id=${encodeURIComponent(aluno.id)}`;
+            const rowAttrs = freeMode
+              ? 'class="recent-student-row is-locked" aria-disabled="true" title="Disponível em um plano pago"'
+              : `class="recent-student-row" data-student-href="${href}" tabindex="0" role="link" aria-label="Abrir ficha de ${escapeHtml(aluno.nome)}"`;
+            return `
+              <tr ${rowAttrs}>
+                <td><span class="recent-student-person"><span class="recent-student-avatar" aria-hidden="true">${escapeHtml(initials(aluno.nome))}</span><strong>${escapeHtml(aluno.nome)}</strong></span></td>
+                <td>${formatDate(aluno.created_at)}</td>
+                <td class="recent-student-chevron" aria-hidden="true">${freeMode ? '·' : '›'}</td>
+              </tr>`;
+          }).join('')
         : '<tr><td colspan="3" class="empty">Nenhum aluno cadastrado.</td></tr>';
     }
 
@@ -227,6 +256,11 @@ function capitalize(value = '') {
 function formatDate(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('pt-BR');
+}
+
+function initials(value = '') {
+  const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
+  return (parts.slice(0, 2).map(part => part.charAt(0)).join('') || 'A').toUpperCase();
 }
 
 function setText(selector, value) {

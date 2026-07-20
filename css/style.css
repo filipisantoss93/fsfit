@@ -241,3 +241,44 @@ td small { color: var(--muted); }
   .dashboard-stats .stat { padding: 11px 14px 12px; }
   .quick-actions-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* FS Fit · refinamento visual moderno 2026-07-20 */
+:root { --radius: 14px; }
+.card { border-radius: 14px; box-shadow: 0 14px 42px rgba(0,0,0,.3); }
+.btn { min-height: 42px; padding-inline: 15px; border-radius: 10px; font-size: .84rem; }
+.btn[data-icon]::before { content: attr(data-icon); display: inline-grid; place-items: center; flex: 0 0 auto; min-width: 1.05em; font-size: 1.05em; line-height: 1; font-weight: 900; }
+.btn-action-tile { border-radius: 10px; }
+.page-header h1 { font-size: clamp(1.65rem, 3.8vw, 2.25rem); letter-spacing: -.035em; }
+.section-heading h2, .quick-actions h2, .card > h2 { font-size: 1.22rem; letter-spacing: -.02em; }
+.student-record-title h1 { font-size: clamp(1.7rem, 4vw, 2.25rem); }
+.metric-card, .sub-card { border-radius: 11px; }
+.record-tabs { border-radius: 11px; }
+.record-tab { border-radius: 8px; }
+.recent-students-card { overflow: hidden; }
+.recent-students-heading { margin: 0 0 8px !important; align-items: center; }
+.recent-students-heading h2 { font-size: 1.22rem; }
+.recent-students-table { table-layout: fixed; }
+.recent-students-table th:nth-child(1) { width: 54%; }
+.recent-students-table th:nth-child(2) { width: 36%; }
+.recent-students-table th:nth-child(3) { width: 10%; }
+.recent-student-row { cursor: pointer; transition: background .16s ease; }
+.recent-student-row:hover, .recent-student-row:focus-visible { background: rgba(255,255,255,.035); outline: none; }
+.recent-student-row.is-locked { cursor: not-allowed; opacity: .58; }
+.recent-student-person { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.recent-student-person strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; }
+.recent-student-avatar { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 50%; background: var(--surface-light); color: var(--text); font-size: .72rem; font-weight: 850; }
+.recent-student-chevron { padding-right: 4px; color: var(--muted); text-align: right; font-size: 1.5rem; line-height: 1; }
+@media (max-width: 620px) {
+  .hero h1 { font-size: 2.1rem; line-height: 1.06; }
+  .page-header h1 { font-size: 1.55rem; }
+  .page-header p { font-size: .84rem; }
+  .card { border-radius: 13px; }
+  .btn { min-height: 41px; border-radius: 9px; font-size: .82rem; }
+  .section-heading h2, .quick-actions h2, .card > h2 { font-size: 1.14rem; }
+  .student-record-title h1 { font-size: 1.62rem; }
+  .recent-students-card { padding: 15px; }
+  .recent-students-table th, .recent-students-table td { padding: 12px 6px; }
+  .recent-student-avatar { flex-basis: 31px; width: 31px; height: 31px; font-size: .68rem; }
+  .recent-student-person strong { font-size: .84rem; }
+  .recent-students-table td:nth-child(2) { font-size: .8rem; }
+}
