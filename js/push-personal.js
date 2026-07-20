@@ -6,10 +6,9 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
 } else {
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'btn btn-outline';
+  button.className = 'btn btn-outline hidden';
   button.id = 'enable-personal-chat-notifications';
   button.textContent = 'Ativar notificações';
-  button.hidden = true;
   heading.appendChild(button);
 
   const urlBase64ToUint8Array = base64String => {
@@ -21,11 +20,11 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
   function showButton() {
     button.textContent = 'Ativar notificações';
     button.disabled = false;
-    button.hidden = false;
+    button.classList.remove('hidden');
   }
 
   function hideButton() {
-    button.hidden = true;
+    button.classList.add('hidden');
     button.disabled = true;
   }
 
