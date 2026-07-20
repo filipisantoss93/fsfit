@@ -16,6 +16,13 @@
   <link rel="stylesheet" href="css/aulas-painel-compact.css?v=20260719-live-compact1">
   <style>
     .dashboard-user-greeting { margin:0 0 6px; color:var(--primary); font-size:.82rem; font-weight:850; letter-spacing:.02em; }
+    .dashboard-tabs { display:flex; align-items:center; gap:6px; width:max-content; max-width:100%; margin:0 0 20px; padding:5px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+    .dashboard-tab { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:10px 16px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:.84rem; font-weight:850; cursor:pointer; transition:background .2s ease,color .2s ease,transform .2s ease; }
+    .dashboard-tab:hover { color:var(--text); background:var(--surface-light); }
+    .dashboard-tab:active { transform:scale(.98); }
+    .dashboard-tab[aria-selected="true"] { background:var(--primary); color:#07120a; }
+    .dashboard-tab-count { display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:rgba(0,0,0,.18); color:inherit; font-size:.72rem; font-weight:900; }
+    .dashboard-tab-panel[hidden] { display:none !important; }
     .dashboard-main-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:18px; margin-bottom:22px; align-items:start; }
     .today-card { padding:0; overflow:hidden; }
     .today-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:22px 22px 16px; border-bottom:1px solid var(--border); }
@@ -48,6 +55,8 @@
     .premium-locked { opacity:.5 !important; cursor:not-allowed !important; pointer-events:none !important; }
     @media (max-width:860px) { .dashboard-main-grid { grid-template-columns:1fr; } }
     @media (max-width:620px) {
+      .dashboard-tabs { width:100%; margin-bottom:16px; }
+      .dashboard-tab { flex:1 1 0; min-width:0; padding:10px 12px; }
       .dashboard-main-grid { gap:14px; margin-bottom:16px; }
       .today-card-header { padding:18px 18px 14px; }
       .today-entry { grid-template-columns:52px minmax(0,1fr); padding:14px 18px; }
@@ -75,75 +84,82 @@
       <a id="new-student-button" class="btn btn-primary" href="alunos.html?novo=1" data-icon="＋" data-premium-link>Novo aluno</a>
     </section>
 
-    <section class="card live-students-card">
+    <nav class="dashboard-tabs" role="tablist" aria-label="Seções do painel">
+      <button id="dashboard-tab-overview" class="dashboard-tab" type="button" role="tab" aria-selected="true" aria-controls="dashboard-overview-panel" tabindex="0" data-dashboard-tab="overview">Visão geral</button>
+      <button id="dashboard-tab-live" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-live-panel" tabindex="-1" data-dashboard-tab="live">Em aula <span id="dashboard-live-tab-count" class="dashboard-tab-count">0</span></button>
+    </nav>
+
+    <section id="dashboard-live-panel" class="card live-students-card dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-live" hidden>
       <div class="live-students-heading"><div><small>ACOMPANHAMENTO AO VIVO</small></div><span id="live-students-count" class="live-students-count">0</span></div>
       <div id="live-students-list" class="live-students-list"><p class="empty">Carregando alunos em aula...</p></div>
     </section>
 
-    <section class="dashboard-main-grid">
-      <article class="card today-card">
-        <div class="today-card-header">
-          <div>
-            <small>AGENDA DE HOJE</small>
-            <h2 id="today-title">Seus atendimentos</h2>
-            <p id="today-date">Carregando agenda...</p>
+    <div id="dashboard-overview-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-overview">
+      <section class="dashboard-main-grid">
+        <article class="card today-card">
+          <div class="today-card-header">
+            <div>
+              <small>AGENDA DE HOJE</small>
+              <h2 id="today-title">Seus atendimentos</h2>
+              <p id="today-date">Carregando agenda...</p>
+            </div>
+            <span id="today-count" class="today-count">—</span>
           </div>
-          <span id="today-count" class="today-count">—</span>
-        </div>
-        <div id="today-list" class="today-list"><p class="dashboard-empty">Carregando alunos de hoje...</p></div>
-      </article>
-
-      <div class="dashboard-side-stack">
-        <article class="card attention-card">
-          <h2>Atenção</h2>
-          <p>Pontos que merecem uma ação rápida.</p>
-          <div class="attention-list">
-            <a class="attention-item" href="alunos.html" data-premium-link>
-              <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
-              <span id="attention-no-workout" class="attention-number warning">—</span>
-            </a>
-            <a class="attention-item" href="agenda.html" data-premium-link>
-              <div><strong>Atendimentos de hoje</strong><small>Abrir agenda completa</small></div>
-              <span id="attention-today" class="attention-number primary">—</span>
-            </a>
-          </div>
+          <div id="today-list" class="today-list"><p class="dashboard-empty">Carregando alunos de hoje...</p></div>
         </article>
-      </div>
-    </section>
 
-    <section id="public-link-card" class="card public-link-card">
-      <h2>Seu link público</h2>
-      <p id="public-link-description">Compartilhe este link nas suas redes sociais ou envie aos seus alunos.</p>
-      <div id="dashboard-public-link" class="dashboard-public-link"></div>
-      <div class="public-link-actions">
-        <button id="copy-dashboard-public-link" class="btn btn-outline" type="button" data-icon="⧉">Copiar link</button>
-        <a id="open-dashboard-public-link" class="btn btn-secondary" href="#" data-icon="↗">Ver minha página</a>
-        <a id="configure-dashboard-public-link" class="btn btn-secondary hidden" href="perfil.html" data-icon="⚙">Configurar página</a>
-      </div>
-    </section>
+        <div class="dashboard-side-stack">
+          <article class="card attention-card">
+            <h2>Atenção</h2>
+            <p>Pontos que merecem uma ação rápida.</p>
+            <div class="attention-list">
+              <a class="attention-item" href="alunos.html" data-premium-link>
+                <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
+                <span id="attention-no-workout" class="attention-number warning">—</span>
+              </a>
+              <a class="attention-item" href="agenda.html" data-premium-link>
+                <div><strong>Atendimentos de hoje</strong><small>Abrir agenda completa</small></div>
+                <span id="attention-today" class="attention-number primary">—</span>
+              </a>
+            </div>
+          </article>
+        </div>
+      </section>
 
-    <section class="quick-actions">
-      <h2>Atalhos rápidos</h2>
-      <div class="quick-actions-grid">
-        <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
-        <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda</strong><small>Consultar os treinos do dia</small></a>
-        <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades, vencimentos e confirmações</small></a>
-        <a class="card quick-action" href="assinatura.html"><strong>💳 Assinatura</strong><small>Plano, pagamentos e cancelamento</small></a>
-        <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
-        <a class="card quick-action" href="perfil.html"><strong>👤 Perfil</strong><small>Editar sua página pública</small></a>
-      </div>
-    </section>
+      <section id="public-link-card" class="card public-link-card">
+        <h2>Seu link público</h2>
+        <p id="public-link-description">Compartilhe este link nas suas redes sociais ou envie aos seus alunos.</p>
+        <div id="dashboard-public-link" class="dashboard-public-link"></div>
+        <div class="public-link-actions">
+          <button id="copy-dashboard-public-link" class="btn btn-outline" type="button" data-icon="⧉">Copiar link</button>
+          <a id="open-dashboard-public-link" class="btn btn-secondary" href="#" data-icon="↗">Ver minha página</a>
+          <a id="configure-dashboard-public-link" class="btn btn-secondary hidden" href="perfil.html" data-icon="⚙">Configurar página</a>
+        </div>
+      </section>
 
-    <section class="stats dashboard-stats">
-      <div class="card stat"><small>Total de alunos</small><strong id="total-alunos">—</strong></div>
-      <div class="card stat"><small>Alunos hoje</small><strong id="alunos-hoje">—</strong></div>
-      <div class="card stat"><small>Sem treino ativo</small><strong id="sem-treino">—</strong></div>
-    </section>
+      <section class="quick-actions">
+        <h2>Atalhos rápidos</h2>
+        <div class="quick-actions-grid">
+          <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
+          <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda</strong><small>Consultar os treinos do dia</small></a>
+          <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades, vencimentos e confirmações</small></a>
+          <a class="card quick-action" href="assinatura.html"><strong>💳 Assinatura</strong><small>Plano, pagamentos e cancelamento</small></a>
+          <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
+          <a class="card quick-action" href="perfil.html"><strong>👤 Perfil</strong><small>Editar sua página pública</small></a>
+        </div>
+      </section>
 
-    <section class="card recent-students-card">
-      <div class="page-header recent-students-heading" style="color:inherit;margin-top:0"><div><h2>Alunos recentes</h2></div><a id="view-all-students" class="btn btn-outline" href="alunos.html" data-icon="→" data-premium-link>Ver todos</a></div>
-      <div class="table-wrap"><table class="recent-students-table"><thead><tr><th>Aluno</th><th>Cadastro</th><th aria-label="Abrir aluno"></th></tr></thead><tbody id="recent-list"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
-    </section>
+      <section class="stats dashboard-stats">
+        <div class="card stat"><small>Total de alunos</small><strong id="total-alunos">—</strong></div>
+        <div class="card stat"><small>Alunos hoje</small><strong id="alunos-hoje">—</strong></div>
+        <div class="card stat"><small>Sem treino ativo</small><strong id="sem-treino">—</strong></div>
+      </section>
+
+      <section class="card recent-students-card">
+        <div class="page-header recent-students-heading" style="color:inherit;margin-top:0"><div><h2>Alunos recentes</h2></div><a id="view-all-students" class="btn btn-outline" href="alunos.html" data-icon="→" data-premium-link>Ver todos</a></div>
+        <div class="table-wrap"><table class="recent-students-table"><thead><tr><th>Aluno</th><th>Cadastro</th><th aria-label="Abrir aluno"></th></tr></thead><tbody id="recent-list"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
+      </section>
+    </div>
   </main>
 
   <div id="live-session-modal" class="live-session-modal" aria-hidden="true">
@@ -176,6 +192,56 @@
     </section>
   </div>
 
+  <script>
+    (() => {
+      const tabs = Array.from(document.querySelectorAll('[data-dashboard-tab]'));
+      const overviewPanel = document.getElementById('dashboard-overview-panel');
+      const livePanel = document.getElementById('dashboard-live-panel');
+      const liveCount = document.getElementById('live-students-count');
+      const liveTabCount = document.getElementById('dashboard-live-tab-count');
+
+      const panels = {
+        overview: overviewPanel,
+        live: livePanel
+      };
+
+      const activateTab = (name, shouldFocus = false) => {
+        tabs.forEach((tab) => {
+          const active = tab.dataset.dashboardTab === name;
+          tab.setAttribute('aria-selected', String(active));
+          tab.tabIndex = active ? 0 : -1;
+          if (active && shouldFocus) tab.focus();
+        });
+
+        Object.entries(panels).forEach(([panelName, panel]) => {
+          if (panel) panel.hidden = panelName !== name;
+        });
+      };
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateTab(tab.dataset.dashboardTab));
+        tab.addEventListener('keydown', (event) => {
+          let nextIndex = null;
+          if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+          if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+          if (event.key === 'Home') nextIndex = 0;
+          if (event.key === 'End') nextIndex = tabs.length - 1;
+          if (nextIndex === null) return;
+          event.preventDefault();
+          activateTab(tabs[nextIndex].dataset.dashboardTab, true);
+        });
+      });
+
+      const syncLiveCount = () => {
+        if (!liveCount || !liveTabCount) return;
+        liveTabCount.textContent = liveCount.textContent.trim() || '0';
+      };
+
+      syncLiveCount();
+      if (liveCount) new MutationObserver(syncLiveCount).observe(liveCount, { childList:true, subtree:true, characterData:true });
+      activateTab('overview');
+    })();
+  </script>
   <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
   <script src="https://cdn.jsdelivr.net/gh/efipay/js-payment-token-efi/dist/payment-token-efi-umd.min.js"></script>
   <script type="module" src="js/renovacao-plano.js?v=20260717-cartao1"></script>
