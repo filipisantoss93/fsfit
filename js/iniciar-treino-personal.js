@@ -3,20 +3,36 @@ import { supabase } from './supabase.js';
 const alunoId = new URLSearchParams(window.location.search).get('id');
 const actionHost = document.querySelector('.student-preview-action');
 const previewLink = document.querySelector('#student-preview-link');
+const profileActions = document.querySelector('.profile-card .actions');
+const deleteStudentButton = document.querySelector('#delete-student');
 const message = document.querySelector('#record-message');
 
 if (!alunoId || !actionHost) throw new Error('Aluno não informado para iniciar treino.');
 
 const style = document.createElement('style');
 style.textContent = `
-  .student-preview-action{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .student-preview-action .btn{min-height:46px}
-  @media(max-width:640px){.student-preview-action{grid-template-columns:1fr}}
+  .student-preview-action{display:grid;grid-template-columns:1fr;gap:10px}
+  .student-preview-action .btn{width:100%;min-height:46px}
+  .btn-workout-active{
+    color:#171100;
+    border-color:rgba(255,193,7,.78);
+    background:linear-gradient(180deg,#ffd43b 0%,#f2b900 100%);
+    box-shadow:0 10px 26px rgba(255,193,7,.18);
+  }
+  .btn-workout-active:hover{
+    color:#171100;
+    border-color:#ffd95a;
+    background:linear-gradient(180deg,#ffdc52 0%,#f9c515 100%);
+    box-shadow:0 12px 30px rgba(255,193,7,.24);
+  }
 `;
 document.head.appendChild(style);
 
-previewLink?.classList.remove('btn-primary');
-previewLink?.classList.add('btn-secondary');
+if (previewLink && profileActions) {
+  previewLink.className = 'btn btn-outline';
+  if (deleteStudentButton) profileActions.insertBefore(previewLink, deleteStudentButton);
+  else profileActions.appendChild(previewLink);
+}
 
 const startButton = document.createElement('button');
 startButton.id = 'start-workout-personal';
@@ -41,7 +57,7 @@ function applyState(status, sessionId = null) {
 
   if (status === 'em_aula') {
     startButton.textContent = 'Treino em andamento';
-    startButton.className = 'btn btn-secondary';
+    startButton.className = 'btn btn-workout-active';
     startButton.title = 'Abrir acompanhamento ao vivo no painel';
     return;
   }
