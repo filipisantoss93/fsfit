@@ -7,11 +7,43 @@
     '.record-tabs',
     '[data-allow-horizontal-scroll="true"]'
   ].join(',');
+  const MODAL_CANDIDATE_SELECTOR = [
+    '.live-session-modal.open',
+    '.live-workout-editor-modal.open',
+    '.password-modal.open',
+    '#student-form-card:not(.hidden)',
+    '.modal.open',
+    '.modal.show',
+    '.modal.active',
+    '.modal-overlay.open',
+    '.modal-overlay.show',
+    '[data-modal-root].open',
+    '[data-modal-root][aria-hidden="false"]',
+    '[role="dialog"][aria-modal="true"]'
+  ].join(',');
+  const MODAL_SCROLL_SELECTOR = [
+    '.live-session-modal-body',
+    '.live-session-dialog',
+    '.live-workout-editor-dialog',
+    '.password-modal-card',
+    '#student-form-card:not(.hidden)',
+    '.modal-body',
+    '.modal-content',
+    '.modal-dialog',
+    '[data-modal-scroll]',
+    '[role="dialog"][aria-modal="true"]'
+  ].join(',');
+
   let lastTouchEndAt = 0;
   let touchStartX = 0;
   let touchStartY = 0;
   let touchAxis = null;
   let allowHorizontalScroll = false;
+  let modalLocked = false;
+  let modalScrollY = 0;
+  let modalSyncScheduled = false;
+  let savedBodyStyles = null;
+  let savedRootStyles = null;
 
   function ensureFloatingNotificationStyles() {
     if (document.querySelector('style[data-fsfit-floating-notifications]')) return;
@@ -67,6 +99,97 @@
     document.head.appendChild(style);
   }
 
+  function ensureModalStyles() {
+    if (document.querySelector('style[data-fsfit-modal-behavior]')) return;
+
+    const style = document.createElement('style');
+    style.dataset.fsfitModalBehavior = 'true';
+    style.textContent = `
+      html.fsfit-modal-open,
+      body.fsfit-modal-open{
+        overscroll-behavior:none!important;
+      }
+
+      body.fsfit-modal-open{
+        overflow:hidden!important;
+      }
+
+      .live-session-modal,
+      .live-workout-editor-modal,
+      .password-modal,
+      .modal,
+      .modal-overlay,
+      [data-modal-root]{
+        overscroll-behavior:contain;
+      }
+
+      .live-session-modal-body,
+      .live-session-dialog,
+      .password-modal-card,
+      #student-form-card:not(.hidden),
+      .modal-body,
+      .modal-content,
+      .modal-dialog,
+      [data-modal-scroll],
+      [role="dialog"][aria-modal="true"]{
+        overscroll-behavior:contain;
+        -webkit-overflow-scrolling:touch;
+      }
+
+      .live-session-modal-body,
+      .password-modal-card,
+      #student-form-card:not(.hidden),
+      .modal-body,
+      [data-modal-scroll]{
+        touch-action:pan-y;
+      }
+
+      @media(max-width:720px){
+        .live-session-modal,
+        .live-workout-editor-modal{
+          box-sizing:border-box!important;
+          padding-top:env(safe-area-inset-top, 0px)!important;
+          padding-right:env(safe-area-inset-right, 0px)!important;
+          padding-bottom:env(safe-area-inset-bottom, 0px)!important;
+          padding-left:env(safe-area-inset-left, 0px)!important;
+        }
+
+        .live-session-dialog,
+        .live-workout-editor-dialog{
+          height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))!important;
+          max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))!important;
+        }
+
+        #student-form-card:not(.hidden){
+          box-sizing:border-box!important;
+          height:100dvh!important;
+          padding-top:calc(18px + env(safe-area-inset-top, 0px))!important;
+          padding-right:calc(14px + env(safe-area-inset-right, 0px))!important;
+          padding-bottom:calc(32px + env(safe-area-inset-bottom, 0px))!important;
+          padding-left:calc(14px + env(safe-area-inset-left, 0px))!important;
+        }
+
+        body.embed-edit #student-form-card:not(.hidden){
+          height:auto!important;
+          min-height:100dvh!important;
+        }
+
+        .password-modal{
+          box-sizing:border-box!important;
+          padding-top:calc(12px + env(safe-area-inset-top, 0px))!important;
+          padding-right:calc(12px + env(safe-area-inset-right, 0px))!important;
+          padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))!important;
+          padding-left:calc(12px + env(safe-area-inset-left, 0px))!important;
+        }
+
+        .password-modal-card{
+          max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px)!important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function applyViewportLock() {
     let viewport = document.querySelector('meta[name="viewport"]');
     if (!viewport) {
@@ -104,6 +227,11 @@
       element.style.overscrollBehaviorX = 'contain';
     });
 
+    document.querySelectorAll(MODAL_SCROLL_SELECTOR).forEach(element => {
+      element.style.webkitOverflowScrolling = 'touch';
+      element.style.overscrollBehaviorY = 'contain';
+    });
+
     keepHorizontalPositionLocked();
   }
 
@@ -118,6 +246,115 @@
     if (scrollingElement?.scrollLeft) scrollingElement.scrollLeft = 0;
     if (root.scrollLeft !== 0) root.scrollLeft = 0;
     if (document.body?.scrollLeft) document.body.scrollLeft = 0;
+  }
+
+  function isVisibleModalCandidate(element) {
+    if (!(element instanceof HTMLElement)) return false;
+    if (element.id === 'student-form-card' && document.body?.classList.contains('embed-edit')) return false;
+    if (element.hidden || element.classList.contains('hidden')) return false;
+    if (element.getAttribute('aria-hidden') === 'true') return false;
+
+    const style = window.getComputedStyle(element);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+
+    return element.getClientRects().length > 0;
+  }
+
+  function hasOpenModal() {
+    return Array.from(document.querySelectorAll(MODAL_CANDIDATE_SELECTOR)).some(isVisibleModalCandidate);
+  }
+
+  function lockPageForModal() {
+    if (modalLocked || !document.body) return;
+
+    const root = document.documentElement;
+    const body = document.body;
+    modalScrollY = window.scrollY || document.scrollingElement?.scrollTop || 0;
+
+    savedRootStyles = {
+      overflow: root.style.overflow,
+      overscrollBehavior: root.style.overscrollBehavior
+    };
+    savedBodyStyles = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+      overscrollBehavior: body.style.overscrollBehavior
+    };
+
+    root.classList.add('fsfit-modal-open');
+    body.classList.add('fsfit-modal-open');
+    root.style.overflow = 'hidden';
+    root.style.overscrollBehavior = 'none';
+    body.style.position = 'fixed';
+    body.style.top = `-${modalScrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    body.style.overscrollBehavior = 'none';
+    modalLocked = true;
+  }
+
+  function unlockPageForModal() {
+    if (!modalLocked || !document.body) return;
+
+    const root = document.documentElement;
+    const body = document.body;
+    root.classList.remove('fsfit-modal-open');
+    body.classList.remove('fsfit-modal-open');
+
+    if (savedRootStyles) {
+      root.style.overflow = savedRootStyles.overflow;
+      root.style.overscrollBehavior = savedRootStyles.overscrollBehavior;
+    }
+    if (savedBodyStyles) {
+      body.style.position = savedBodyStyles.position;
+      body.style.top = savedBodyStyles.top;
+      body.style.left = savedBodyStyles.left;
+      body.style.right = savedBodyStyles.right;
+      body.style.width = savedBodyStyles.width;
+      body.style.overflow = savedBodyStyles.overflow;
+      body.style.overscrollBehavior = savedBodyStyles.overscrollBehavior;
+    }
+
+    const restoreY = modalScrollY;
+    modalLocked = false;
+    savedRootStyles = null;
+    savedBodyStyles = null;
+    window.scrollTo(0, restoreY);
+    keepHorizontalPositionLocked();
+  }
+
+  function synchronizeModalState() {
+    modalSyncScheduled = false;
+    if (hasOpenModal()) lockPageForModal();
+    else unlockPageForModal();
+
+    document.querySelectorAll(MODAL_SCROLL_SELECTOR).forEach(element => {
+      element.style.webkitOverflowScrolling = 'touch';
+      element.style.overscrollBehaviorY = 'contain';
+    });
+  }
+
+  function scheduleModalStateSync() {
+    if (modalSyncScheduled) return;
+    modalSyncScheduled = true;
+    requestAnimationFrame(synchronizeModalState);
+  }
+
+  function observeModalState() {
+    const observer = new MutationObserver(scheduleModalStateSync);
+    observer.observe(document.documentElement, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class', 'style', 'hidden', 'aria-hidden']
+    });
+    scheduleModalStateSync();
   }
 
   function beginTouch(event) {
@@ -170,6 +407,7 @@
   }
 
   ensureFloatingNotificationStyles();
+  ensureModalStyles();
   applyViewportLock();
 
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(type => {
@@ -194,14 +432,20 @@
   window.addEventListener('scroll', keepHorizontalPositionLocked, { passive: true });
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyTouchLock, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTouchLock();
+      observeModalState();
+    }, { once: true });
   } else {
     applyTouchLock();
+    observeModalState();
   }
 
   window.addEventListener('pageshow', () => {
     ensureFloatingNotificationStyles();
+    ensureModalStyles();
     applyViewportLock();
     applyTouchLock();
+    scheduleModalStateSync();
   });
 })();
