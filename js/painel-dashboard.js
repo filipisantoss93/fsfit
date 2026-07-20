@@ -1,6 +1,39 @@
 import { supabase } from './supabase.js';
 import { renderHeader, requireSession, setGreeting } from './layout.js';
 
+const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
+const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
+
+function savePanelReturnPosition() {
+  try {
+    sessionStorage.setItem(PANEL_RETURN_SCROLL_KEY, JSON.stringify({
+      y: window.scrollY,
+      savedAt: Date.now()
+    }));
+  } catch {
+    // Ignora indisponibilidade do storage sem bloquear a navegação.
+  }
+}
+
+function restorePanelReturnPosition() {
+  try {
+    if (sessionStorage.getItem(PANEL_RESTORE_SCROLL_KEY) !== '1') return;
+    const saved = JSON.parse(sessionStorage.getItem(PANEL_RETURN_SCROLL_KEY) || 'null');
+    sessionStorage.removeItem(PANEL_RESTORE_SCROLL_KEY);
+    if (!saved || !Number.isFinite(Number(saved.y))) return;
+
+    const targetY = Number(saved.y);
+    [0, 60, 180].forEach(delay => {
+      setTimeout(() => window.scrollTo({ top: targetY, behavior: 'auto' }), delay);
+    });
+  } catch {
+    // Sem restauração explícita, o navegador ainda pode restaurar a rolagem pelo histórico.
+  }
+}
+
+window.addEventListener('pageshow', restorePanelReturnPosition);
+restorePanelReturnPosition();
+
 renderHeader('painel');
 const session = await requireSession();
 
@@ -96,7 +129,18 @@ function bindRecentStudentRows() {
   });
 }
 
+function bindTodayAgendaReturn() {
+  const list = document.querySelector('#today-list');
+  if (!list || list.dataset.panelReturnBound === '1') return;
+  list.dataset.panelReturnBound = '1';
+  list.addEventListener('click', event => {
+    const link = event.target.closest('a.today-entry[data-panel-return]');
+    if (link) savePanelReturnPosition();
+  });
+}
+
 bindRecentStudentRows();
+bindTodayAgendaReturn();
 
 async function loadStudents(freeMode) {
   const list = document.querySelector('#recent-list');
@@ -234,7 +278,7 @@ async function loadTodayAgenda(freeMode) {
 
       return freeMode
         ? `<div class="today-entry locked" aria-disabled="true" title="Disponível em um plano pago">${content}</div>`
-        : `<a class="today-entry" href="ficha-aluno.html?id=${encodeURIComponent(entry.id)}">${content}</a>`;
+        : `<a class="today-entry" data-panel-return href="ficha-aluno.html?id=${encodeURIComponent(entry.id)}&origem=painel">${content}</a>`;
     }).join('');
   } catch (error) {
     console.error('Erro ao carregar agenda de hoje:', error);
