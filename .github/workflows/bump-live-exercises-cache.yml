@@ -1,0 +1,29 @@
+name: Atualizar cache do acompanhamento com exercicios
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bump-live-exercises-cache.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Atualizar versao do script
+        run: python .github/scripts/bump_live_exercises_cache.py
+      - name: Publicar ajuste e limpar arquivos temporarios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/scripts/bump_live_exercises_cache.py .github/workflows/bump-live-exercises-cache.yml
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteracao pendente."
+            exit 0
+          fi
+          git commit -m "Atualizar cache dos exercicios no acompanhamento"
+          git push
