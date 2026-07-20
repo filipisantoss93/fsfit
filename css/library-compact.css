@@ -1,5 +1,5 @@
 .exercise-library-list{gap:8px!important}
-.exercise-library-item{padding:12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important}
+.exercise-library-item{padding:12px 48px 12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important;position:relative}
 .exercise-library-item-title{gap:6px!important}
 .exercise-library-item-title h3{margin:0!important;font-size:1rem!important;line-height:1.25}
 .exercise-library-item p{margin:3px 0 0!important;font-size:.84rem!important;line-height:1.35}
@@ -7,7 +7,7 @@
 .library-badge{min-height:22px!important;padding:3px 7px!important;font-size:.6rem!important}
 .library-item-actions{gap:6px!important}
 .library-item-actions .btn{min-height:38px!important;padding:0 12px!important;font-size:.8rem!important}
-.food-library-item{padding:12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important}
+.food-library-item{padding:12px 48px 12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important;position:relative}
 .food-library-item>div:first-child{min-width:0}
 .food-library-item h3{margin:0 0 4px!important;font-size:1rem!important;line-height:1.25}
 .food-library-item p{margin:3px 0!important;font-size:.84rem!important;line-height:1.35}
@@ -15,6 +15,13 @@
 .food-macro-chip{padding:3px 6px!important;font-size:.68rem!important}
 .food-library-item>.actions{gap:6px!important}
 .food-library-item>.actions .btn{min-height:38px!important;padding:0 12px!important;font-size:.8rem!important}
+.exercise-library-item [data-edit-exercise],.food-library-item [data-edit-food]{display:none!important}
+.library-clickable-row{cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .12s ease}
+.library-clickable-row::after{content:'›';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:2rem;line-height:1;color:#4f91ff;font-weight:500;pointer-events:none}
+.library-clickable-row:hover{border-color:rgba(79,145,255,.6)!important;background:rgba(79,145,255,.035)!important}
+.library-clickable-row:active{transform:scale(.995)}
+.library-clickable-row:focus-visible{outline:2px solid #4f91ff;outline-offset:2px}
+.library-clickable-row .actions:has([data-delete-exercise]),.library-clickable-row .actions:has([data-delete-food]){margin-right:12px}
 @media(max-width:760px){
   .exercise-library-item{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important}
   .library-item-actions,.library-item-actions.single-action{display:flex!important;flex-direction:column!important;width:auto!important;min-width:0!important;gap:6px!important}
@@ -24,7 +31,8 @@
   .food-library-item>.actions .btn{width:auto!important;min-width:76px!important}
 }
 @media(max-width:420px){
-  .exercise-library-item,.food-library-item{padding:11px 12px!important;gap:9px!important}
+  .exercise-library-item,.food-library-item{padding:11px 44px 11px 12px!important;gap:9px!important}
   .exercise-library-item-title h3,.food-library-item h3{font-size:.95rem!important}
   .library-item-actions .btn,.food-library-item>.actions .btn{min-width:70px!important;padding:0 10px!important;font-size:.76rem!important}
+  .library-clickable-row::after{right:14px;font-size:1.8rem}
 }
