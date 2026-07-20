@@ -146,15 +146,12 @@ const lightbox = createLightbox();
 async function loadProfile() {
   if (!slug) { profileHost.innerHTML = '<div class="public-profile-error"><h1>Link inválido</h1><p>O endereço do personal não foi informado.</p></div>'; return; }
 
-  const { data, error } = await supabase.from('perfis_publicos').select('personal_id,slug,nome_publico,foto_url,foto_local_url,local_trabalho,cidade,bio,especialidades,instagram').eq('slug', slug).eq('publicado', true).maybeSingle();
+  const { data, error } = await supabase.from('perfis_publicos').select('personal_id,slug,nome_publico,foto_url,foto_local_url,local_trabalho,cidade,bio,especialidades,instagram,whatsapp').eq('slug', slug).eq('publicado', true).maybeSingle();
   if (error || !data) { profileHost.innerHTML = '<div class="public-profile-error"><h1>Página indisponível</h1><p>Este perfil não existe ou não está publicado.</p></div>'; return; }
 
   await renderOwnerReturnButton(data.personal_id);
 
-  const [{ data: photos, error: photosError }, { data: ownerProfile }] = await Promise.all([
-    supabase.from('perfil_fotos').select('id,foto_url,ordem').eq('personal_id', data.personal_id).order('ordem').limit(10),
-    supabase.from('perfis').select('telefone').eq('id', data.personal_id).maybeSingle()
-  ]);
+  const { data: photos, error: photosError } = await supabase.from('perfil_fotos').select('id,foto_url,ordem').eq('personal_id', data.personal_id).order('ordem').limit(10);
   if (photosError) console.error(photosError);
 
   document.title = `${data.nome_publico} — FS Fit`;
@@ -163,7 +160,7 @@ async function loadProfile() {
   const avatar = data.foto_url ? `<img class="public-profile-avatar" src="${esc(data.foto_url)}" alt="Foto de ${esc(data.nome_publico)}">` : `<div class="public-profile-avatar public-profile-avatar-placeholder">${esc(data.nome_publico.charAt(0).toUpperCase())}</div>`;
   const location = [data.local_trabalho, data.cidade].filter(Boolean).map(esc).join(' · ');
   const instagramUrl = instagramHref(data.instagram);
-  const professionalWhatsappUrl = whatsappHref(ownerProfile?.telefone || '');
+  const professionalWhatsappUrl = whatsappHref(data.whatsapp || '');
   const quickActions = [
     instagramUrl ? `<a class="btn btn-outline public-instagram-button" href="${esc(instagramUrl)}" target="_blank" rel="noopener noreferrer">Instagram</a>` : '',
     professionalWhatsappUrl ? `<a class="btn btn-primary" href="${esc(professionalWhatsappUrl)}" target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>` : ''
