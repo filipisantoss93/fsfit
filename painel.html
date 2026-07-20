@@ -23,6 +23,7 @@
     .dashboard-tab[aria-selected="true"] { background:var(--primary); color:#07120a; }
     .dashboard-tab-count { display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:rgba(0,0,0,.18); color:inherit; font-size:.72rem; font-weight:900; }
     .dashboard-tab-panel[hidden] { display:none !important; }
+    .dashboard-overview-stack { display:grid; gap:18px; margin-bottom:22px; }
     .dashboard-main-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:18px; margin-bottom:22px; align-items:start; }
     .today-card { padding:0; overflow:hidden; }
     .today-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:22px 22px 16px; border-bottom:1px solid var(--border); }
@@ -55,8 +56,10 @@
     .premium-locked { opacity:.5 !important; cursor:not-allowed !important; pointer-events:none !important; }
     @media (max-width:860px) { .dashboard-main-grid { grid-template-columns:1fr; } }
     @media (max-width:620px) {
-      .dashboard-tabs { width:100%; margin-bottom:16px; }
-      .dashboard-tab { flex:1 1 0; min-width:0; padding:10px 12px; }
+      .dashboard-tabs { width:100%; gap:4px; margin-bottom:16px; padding:4px; }
+      .dashboard-tab { flex:1 1 0; min-width:0; gap:5px; padding:9px 6px; font-size:.78rem; }
+      .dashboard-tab-count { min-width:20px; height:20px; padding:0 5px; font-size:.68rem; }
+      .dashboard-overview-stack { gap:14px; margin-bottom:16px; }
       .dashboard-main-grid { gap:14px; margin-bottom:16px; }
       .today-card-header { padding:18px 18px 14px; }
       .today-entry { grid-template-columns:52px minmax(0,1fr); padding:14px 18px; }
@@ -86,8 +89,23 @@
 
     <nav class="dashboard-tabs" role="tablist" aria-label="Seções do painel">
       <button id="dashboard-tab-overview" class="dashboard-tab" type="button" role="tab" aria-selected="true" aria-controls="dashboard-overview-panel" tabindex="0" data-dashboard-tab="overview">Visão geral</button>
+      <button id="dashboard-tab-agenda" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-agenda-panel" tabindex="-1" data-dashboard-tab="agenda">Agenda de hoje <span id="dashboard-agenda-tab-count" class="dashboard-tab-count">—</span></button>
       <button id="dashboard-tab-live" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-live-panel" tabindex="-1" data-dashboard-tab="live">Em aula <span id="dashboard-live-tab-count" class="dashboard-tab-count">0</span></button>
     </nav>
+
+    <section id="dashboard-agenda-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-agenda" hidden>
+      <article class="card today-card">
+        <div class="today-card-header">
+          <div>
+            <small>AGENDA DE HOJE</small>
+            <h2 id="today-title">Seus atendimentos</h2>
+            <p id="today-date">Carregando agenda...</p>
+          </div>
+          <span id="today-count" class="today-count">—</span>
+        </div>
+        <div id="today-list" class="today-list"><p class="dashboard-empty">Carregando alunos de hoje...</p></div>
+      </article>
+    </section>
 
     <section id="dashboard-live-panel" class="card live-students-card dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-live" hidden>
       <div class="live-students-heading"><div><small>ACOMPANHAMENTO AO VIVO</small></div><span id="live-students-count" class="live-students-count">0</span></div>
@@ -95,35 +113,21 @@
     </section>
 
     <div id="dashboard-overview-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-overview">
-      <section class="dashboard-main-grid">
-        <article class="card today-card">
-          <div class="today-card-header">
-            <div>
-              <small>AGENDA DE HOJE</small>
-              <h2 id="today-title">Seus atendimentos</h2>
-              <p id="today-date">Carregando agenda...</p>
-            </div>
-            <span id="today-count" class="today-count">—</span>
+      <section class="dashboard-overview-stack">
+        <article class="card attention-card">
+          <h2>Atenção</h2>
+          <p>Pontos que merecem uma ação rápida.</p>
+          <div class="attention-list">
+            <a class="attention-item" href="alunos.html" data-premium-link>
+              <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
+              <span id="attention-no-workout" class="attention-number warning">—</span>
+            </a>
+            <a class="attention-item" href="agenda.html" data-premium-link>
+              <div><strong>Atendimentos de hoje</strong><small>Abrir agenda completa</small></div>
+              <span id="attention-today" class="attention-number primary">—</span>
+            </a>
           </div>
-          <div id="today-list" class="today-list"><p class="dashboard-empty">Carregando alunos de hoje...</p></div>
         </article>
-
-        <div class="dashboard-side-stack">
-          <article class="card attention-card">
-            <h2>Atenção</h2>
-            <p>Pontos que merecem uma ação rápida.</p>
-            <div class="attention-list">
-              <a class="attention-item" href="alunos.html" data-premium-link>
-                <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
-                <span id="attention-no-workout" class="attention-number warning">—</span>
-              </a>
-              <a class="attention-item" href="agenda.html" data-premium-link>
-                <div><strong>Atendimentos de hoje</strong><small>Abrir agenda completa</small></div>
-                <span id="attention-today" class="attention-number primary">—</span>
-              </a>
-            </div>
-          </article>
-        </div>
       </section>
 
       <section id="public-link-card" class="card public-link-card">
@@ -196,12 +200,16 @@
     (() => {
       const tabs = Array.from(document.querySelectorAll('[data-dashboard-tab]'));
       const overviewPanel = document.getElementById('dashboard-overview-panel');
+      const agendaPanel = document.getElementById('dashboard-agenda-panel');
       const livePanel = document.getElementById('dashboard-live-panel');
+      const todayCount = document.getElementById('today-count');
+      const agendaTabCount = document.getElementById('dashboard-agenda-tab-count');
       const liveCount = document.getElementById('live-students-count');
       const liveTabCount = document.getElementById('dashboard-live-tab-count');
 
       const panels = {
         overview: overviewPanel,
+        agenda: agendaPanel,
         live: livePanel
       };
 
@@ -232,12 +240,19 @@
         });
       });
 
+      const syncAgendaCount = () => {
+        if (!todayCount || !agendaTabCount) return;
+        agendaTabCount.textContent = todayCount.textContent.trim() || '—';
+      };
+
       const syncLiveCount = () => {
         if (!liveCount || !liveTabCount) return;
         liveTabCount.textContent = liveCount.textContent.trim() || '0';
       };
 
+      syncAgendaCount();
       syncLiveCount();
+      if (todayCount) new MutationObserver(syncAgendaCount).observe(todayCount, { childList:true, subtree:true, characterData:true });
       if (liveCount) new MutationObserver(syncLiveCount).observe(liveCount, { childList:true, subtree:true, characterData:true });
       activateTab('overview');
     })();
