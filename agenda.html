@@ -3,11 +3,11 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <title>Agenda — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/agenda.css">
+  <link rel="stylesheet" href="css/agenda.css?v=20260720-compact2">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260717-icons-global2" sizes="any">
@@ -20,19 +20,21 @@
     <section class="page-header agenda-header">
       <div>
         <h1>Agenda</h1>
-        <p>Consulte os alunos programados para cada dia sem sobrecarregar a visualização.</p>
+        <p>Consulte seus atendimentos do dia.</p>
       </div>
-      <a class="btn btn-secondary" href="alunos.html">Gerenciar alunos</a>
+      <a class="btn btn-outline agenda-manage-link" href="alunos.html">Gerenciar alunos →</a>
     </section>
 
     <section class="card agenda-toolbar" aria-label="Selecionar dia da agenda">
       <button id="agenda-prev-day" class="btn btn-neutral agenda-nav-btn" type="button" aria-label="Dia anterior">←</button>
-      <label class="agenda-date-field" for="agenda-date">
-        <span>Dia da agenda</span>
-        <input id="agenda-date" type="date">
-      </label>
+      <div class="agenda-date-picker-wrap">
+        <button id="agenda-date-display" class="agenda-date-display" type="button" aria-label="Escolher data da agenda">Selecionar data</button>
+        <input id="agenda-date" class="agenda-date-input" type="date" aria-label="Data da agenda">
+      </div>
       <button id="agenda-next-day" class="btn btn-neutral agenda-nav-btn" type="button" aria-label="Próximo dia">→</button>
-      <button id="agenda-today" class="btn btn-outline" type="button">Hoje</button>
+      <div id="agenda-today-row" class="agenda-today-row" hidden>
+        <button id="agenda-today" class="btn btn-outline" type="button">Voltar para hoje</button>
+      </div>
     </section>
 
     <div id="agenda-message" class="message"></div>
@@ -40,6 +42,6 @@
       <article class="card"><p>Carregando agenda...</p></article>
     </section>
   </main>
-  <script type="module" src="js/agenda.js?v=20260719-agenda-minute1"></script>
+  <script type="module" src="js/agenda.js?v=20260720-compact2"></script>
 </body>
 </html>
