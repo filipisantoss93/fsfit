@@ -23,8 +23,15 @@
     .dashboard-tab[aria-selected="true"] { background:var(--primary); color:#07120a; }
     .dashboard-tab-count { display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:rgba(0,0,0,.18); color:inherit; font-size:.72rem; font-weight:900; }
     .dashboard-tab-panel[hidden] { display:none !important; }
-    .dashboard-overview-stack { display:grid; gap:18px; margin-bottom:22px; }
-    .dashboard-main-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:18px; margin-bottom:22px; align-items:start; }
+
+    .dashboard-overview-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+    .dashboard-summary-card { min-width:0; padding:18px; }
+    .dashboard-summary-card small { display:block; margin-bottom:8px; color:var(--muted); font-size:.72rem; font-weight:800; line-height:1.25; }
+    .dashboard-summary-card strong { display:block; overflow:hidden; color:var(--text); font-size:1.45rem; font-weight:900; line-height:1.1; text-overflow:ellipsis; white-space:nowrap; }
+    .dashboard-summary-card:nth-child(1) { border-top:4px solid var(--primary); }
+    .dashboard-summary-card:nth-child(2) { border-top:4px solid var(--secondary); }
+    .dashboard-summary-card:nth-child(3) { border-top:4px solid var(--warning); }
+
     .today-card { padding:0; overflow:hidden; }
     .today-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:22px 22px 16px; border-bottom:1px solid var(--border); }
     .today-card-header small { display:block; margin-bottom:5px; color:var(--primary); font-size:.72rem; font-weight:800; letter-spacing:.08em; }
@@ -42,29 +49,62 @@
     .today-entry-main span { margin-top:3px; color:var(--muted); font-size:.82rem; }
     .today-entry-main small { margin-top:3px; color:#8d96a3; font-size:.74rem; }
     .today-open { color:var(--secondary); font-size:.8rem; font-weight:800; }
-    .dashboard-side-stack { display:grid; gap:18px; }
+
+    .attention-card { margin-bottom:18px; }
     .attention-card h2 { margin-bottom:7px; }
     .attention-card > p { margin:0 0 16px; font-size:.86rem; }
     .attention-list { display:grid; gap:10px; }
     .attention-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 13px; border:1px solid var(--border); border-radius:12px; background:var(--surface-light); }
+    .attention-item[hidden] { display:none !important; }
     .attention-item strong { display:block; font-size:.87rem; }
     .attention-item small { display:block; margin-top:3px; color:var(--muted); font-size:.72rem; }
     .attention-number { flex:0 0 auto; font-size:1.2rem; font-weight:900; }
     .attention-number.warning { color:var(--warning); }
     .attention-number.primary { color:var(--primary); }
+    .attention-number.danger { color:#ff5f67; }
+    .attention-status { margin:0; padding:8px 2px; color:var(--muted); font-size:.82rem; }
+    .attention-status[hidden] { display:none !important; }
+
+    .dashboard-public-link-compact { margin-bottom:22px; }
+    .dashboard-public-link-compact h2 { margin-bottom:5px; }
+    .dashboard-public-link-compact > p { margin:0 0 12px; font-size:.8rem; }
+    .dashboard-public-link-compact .dashboard-public-link { margin-bottom:12px; font-size:.86rem; }
+
+    .dashboard-activity-card { margin-top:22px; padding:0; overflow:hidden; }
+    .dashboard-activity-heading { padding:20px 22px 14px; border-bottom:1px solid var(--border); }
+    .dashboard-activity-heading h2 { margin:0 0 4px; }
+    .dashboard-activity-heading p { margin:0; font-size:.8rem; }
+    .dashboard-activity-list { display:grid; }
+    .dashboard-activity-item { display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:12px; align-items:center; padding:14px 22px; border-bottom:1px solid var(--border); }
+    .dashboard-activity-item:last-child { border-bottom:0; }
+    .dashboard-activity-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; background:var(--surface-light); font-size:.9rem; font-weight:900; }
+    .dashboard-activity-copy { min-width:0; }
+    .dashboard-activity-copy strong, .dashboard-activity-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .dashboard-activity-copy strong { font-size:.85rem; }
+    .dashboard-activity-copy span { margin-top:3px; color:var(--muted); font-size:.74rem; }
+    .dashboard-activity-item time { color:var(--muted); font-size:.7rem; font-weight:800; white-space:nowrap; }
+
     .dashboard-empty { padding:28px 22px; color:var(--muted); text-align:center; }
     .premium-locked { opacity:.5 !important; cursor:not-allowed !important; pointer-events:none !important; }
-    @media (max-width:860px) { .dashboard-main-grid { grid-template-columns:1fr; } }
+
     @media (max-width:620px) {
       .dashboard-tabs { width:100%; gap:4px; margin-bottom:16px; padding:4px; }
       .dashboard-tab { flex:1 1 0; min-width:0; gap:5px; padding:9px 6px; font-size:.78rem; }
       .dashboard-tab-count { min-width:20px; height:20px; padding:0 5px; font-size:.68rem; }
-      .dashboard-overview-stack { gap:14px; margin-bottom:16px; }
-      .dashboard-main-grid { gap:14px; margin-bottom:16px; }
+      .dashboard-overview-summary { gap:8px; margin-bottom:14px; }
+      .dashboard-summary-card { padding:14px 10px; }
+      .dashboard-summary-card small { min-height:30px; margin-bottom:6px; font-size:.64rem; }
+      .dashboard-summary-card strong { font-size:1.12rem; }
+      .attention-card { margin-bottom:14px; }
       .today-card-header { padding:18px 18px 14px; }
       .today-entry { grid-template-columns:52px minmax(0,1fr); padding:14px 18px; }
       .today-open { display:none; }
       .today-time { font-size:.95rem; }
+      .dashboard-public-link-compact { margin-bottom:18px; }
+      .dashboard-activity-card { margin-top:18px; }
+      .dashboard-activity-heading { padding:18px 18px 13px; }
+      .dashboard-activity-item { grid-template-columns:34px minmax(0,1fr) auto; gap:10px; padding:13px 18px; }
+      .dashboard-activity-icon { width:34px; height:34px; border-radius:10px; }
     }
   </style>
   <meta name="apple-mobile-web-app-title" content="FS Fit">
@@ -113,55 +153,80 @@
     </section>
 
     <div id="dashboard-overview-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-overview">
-      <section class="dashboard-overview-stack">
-        <article class="card attention-card">
-          <h2>Atenção</h2>
-          <p>Pontos que merecem uma ação rápida.</p>
-          <div class="attention-list">
-            <a class="attention-item" href="alunos.html" data-premium-link>
-              <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
-              <span id="attention-no-workout" class="attention-number warning">—</span>
-            </a>
-            <a class="attention-item" href="agenda.html" data-premium-link>
-              <div><strong>Atendimentos de hoje</strong><small>Abrir agenda completa</small></div>
-              <span id="attention-today" class="attention-number primary">—</span>
-            </a>
-          </div>
+      <section class="dashboard-overview-summary" aria-label="Resumo da consultoria">
+        <article class="card dashboard-summary-card">
+          <small>Alunos ativos</small>
+          <strong id="summary-active-students">—</strong>
+        </article>
+        <article class="card dashboard-summary-card">
+          <small>Recebido no mês</small>
+          <strong id="summary-month-received">—</strong>
+        </article>
+        <article class="card dashboard-summary-card">
+          <small>Pendências financeiras</small>
+          <strong id="summary-finance-pending">—</strong>
         </article>
       </section>
 
-      <section id="public-link-card" class="card public-link-card">
-        <h2>Seu link público</h2>
-        <p id="public-link-description">Compartilhe este link nas suas redes sociais ou envie aos seus alunos.</p>
-        <div id="dashboard-public-link" class="dashboard-public-link"></div>
-        <div class="public-link-actions">
-          <button id="copy-dashboard-public-link" class="btn btn-outline" type="button" data-icon="⧉">Copiar link</button>
-          <a id="open-dashboard-public-link" class="btn btn-secondary" href="#" data-icon="↗">Ver minha página</a>
-          <a id="configure-dashboard-public-link" class="btn btn-secondary hidden" href="perfil.html" data-icon="⚙">Configurar página</a>
+      <article class="card attention-card">
+        <h2>Atenção</h2>
+        <p>Somente o que precisa de uma ação sua.</p>
+        <div class="attention-list">
+          <p id="attention-loading" class="attention-status">Carregando pendências...</p>
+          <p id="attention-empty" class="attention-status" hidden>Tudo em dia. Nenhuma ação pendente agora.</p>
+
+          <a id="attention-no-workout-item" class="attention-item" href="alunos.html" data-attention-item data-premium-link hidden>
+            <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
+            <span id="attention-no-workout" class="attention-number warning">—</span>
+          </a>
+
+          <a id="attention-overdue-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
+            <div><strong>Mensalidades vencidas</strong><small>Pagamentos atrasados para revisar</small></div>
+            <span id="attention-overdue" class="attention-number danger">—</span>
+          </a>
+
+          <a id="attention-waiting-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
+            <div><strong>Pagamentos para confirmar</strong><small>Alunos informaram pagamento</small></div>
+            <span id="attention-waiting" class="attention-number primary">—</span>
+          </a>
+
+          <a id="attention-due-today-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
+            <div><strong>Mensalidades vencendo hoje</strong><small>Acompanhar os recebimentos do dia</small></div>
+            <span id="attention-due-today" class="attention-number warning">—</span>
+          </a>
         </div>
-      </section>
+      </article>
 
       <section class="quick-actions">
         <h2>Atalhos rápidos</h2>
         <div class="quick-actions-grid">
           <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
-          <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda</strong><small>Consultar os treinos do dia</small></a>
-          <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades, vencimentos e confirmações</small></a>
-          <a class="card quick-action" href="assinatura.html"><strong>💳 Assinatura</strong><small>Plano, pagamentos e cancelamento</small></a>
+          <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades e recebimentos</small></a>
           <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
+          <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda completa</strong><small>Consultar todos os atendimentos</small></a>
           <a class="card quick-action" href="perfil.html"><strong>👤 Perfil</strong><small>Editar sua página pública</small></a>
         </div>
       </section>
 
-      <section class="stats dashboard-stats">
-        <div class="card stat"><small>Total de alunos</small><strong id="total-alunos">—</strong></div>
-        <div class="card stat"><small>Alunos hoje</small><strong id="alunos-hoje">—</strong></div>
-        <div class="card stat"><small>Sem treino ativo</small><strong id="sem-treino">—</strong></div>
+      <section id="public-link-card" class="card public-link-card dashboard-public-link-compact">
+        <h2>Sua página pública</h2>
+        <p id="public-link-description">Página pública configurada e pronta para compartilhar.</p>
+        <div id="dashboard-public-link" class="dashboard-public-link"></div>
+        <div class="public-link-actions">
+          <button id="copy-dashboard-public-link" class="btn btn-outline" type="button" data-icon="⧉">Copiar link</button>
+          <a id="open-dashboard-public-link" class="btn btn-secondary" href="#" data-icon="↗">Abrir página</a>
+          <a id="configure-dashboard-public-link" class="btn btn-secondary hidden" href="perfil.html" data-icon="⚙">Configurar página</a>
+        </div>
       </section>
 
-      <section class="card recent-students-card">
-        <div class="page-header recent-students-heading" style="color:inherit;margin-top:0"><div><h2>Alunos recentes</h2></div><a id="view-all-students" class="btn btn-outline" href="alunos.html" data-icon="→" data-premium-link>Ver todos</a></div>
-        <div class="table-wrap"><table class="recent-students-table"><thead><tr><th>Aluno</th><th>Cadastro</th><th aria-label="Abrir aluno"></th></tr></thead><tbody id="recent-list"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
+      <section class="card dashboard-activity-card">
+        <div class="dashboard-activity-heading">
+          <h2>Atividade recente</h2>
+          <p>Novos alunos e movimentações financeiras recentes.</p>
+        </div>
+        <div id="dashboard-activity-list" class="dashboard-activity-list">
+          <p class="dashboard-empty">Carregando atividade recente...</p>
+        </div>
       </section>
     </div>
   </main>
@@ -258,6 +323,7 @@
     })();
   </script>
   <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
+  <script type="module" src="js/painel-visao-geral.js?v=20260720-overview1"></script>
   <script src="https://cdn.jsdelivr.net/gh/efipay/js-payment-token-efi/dist/payment-token-efi-umd.min.js"></script>
   <script type="module" src="js/renovacao-plano.js?v=20260717-cartao1"></script>
   <script type="module" src="js/assinatura-cartao-status.js?v=20260717-cartao1"></script>
