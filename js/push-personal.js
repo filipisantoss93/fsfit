@@ -9,6 +9,7 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
   button.className = 'btn btn-outline';
   button.id = 'enable-personal-chat-notifications';
   button.textContent = 'Ativar notificações';
+  button.hidden = true;
   heading.appendChild(button);
 
   const urlBase64ToUint8Array = base64String => {
@@ -17,48 +18,70 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
     return Uint8Array.from([...atob(base64)].map(char => char.charCodeAt(0)));
   };
 
+  function showButton() {
+    button.textContent = 'Ativar notificações';
+    button.disabled = false;
+    button.hidden = false;
+  }
+
+  function hideButton() {
+    button.hidden = true;
+    button.disabled = true;
+  }
+
   async function hasActiveServerSubscription() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return false;
 
-      const { count, error } = await supabase
+      const { data, error } = await supabase
         .from('dispositivos_push')
-        .select('id', { count: 'exact', head: true })
+        .select('id')
         .eq('auth_user_id', session.user.id)
         .eq('ativo', true)
-        .eq('user_agent', navigator.userAgent);
+        .limit(1);
 
       if (error) {
         console.warn('Não foi possível consultar o estado das notificações no servidor:', error);
         return false;
       }
 
-      return Number(count || 0) > 0;
+      return Array.isArray(data) && data.length > 0;
     } catch (error) {
       console.warn('Falha ao verificar assinatura push no servidor:', error);
       return false;
     }
   }
 
+  async function hasActiveLocalSubscription() {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      return Boolean(subscription && Notification.permission === 'granted');
+    } catch (error) {
+      console.warn('Falha ao verificar assinatura push local:', error);
+      return false;
+    }
+  }
+
   async function refreshState() {
-    const registration = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
-
-    const subscription = await registration.pushManager.getSubscription();
-    const hasLocalSubscription = Boolean(subscription);
+    // Uma assinatura ativa registrada para a conta já significa que o personal
+    // possui notificações configuradas. Isso evita falso negativo no Safari/iOS,
+    // onde getSubscription() pode retornar null após reabrir o PWA.
     const hasServerSubscription = await hasActiveServerSubscription();
-    const notificationsActive = Notification.permission === 'granted' && (hasLocalSubscription || hasServerSubscription);
-
-    if (notificationsActive) {
-      button.hidden = true;
-      button.disabled = true;
+    if (hasServerSubscription) {
+      hideButton();
       return;
     }
 
-    button.textContent = 'Ativar notificações';
-    button.disabled = false;
-    button.hidden = false;
+    const hasLocalSubscription = await hasActiveLocalSubscription();
+    if (hasLocalSubscription) {
+      hideButton();
+      return;
+    }
+
+    showButton();
   }
 
   button.addEventListener('click', async () => {
@@ -85,19 +108,16 @@ if (!heading || !('serviceWorker' in navigator) || !('PushManager' in window) ||
       });
       if (subscribeError) throw subscribeError;
 
-      await refreshState();
+      hideButton();
     } catch (error) {
       console.error(error);
-      button.textContent = 'Ativar notificações';
-      button.disabled = false;
-      button.hidden = false;
+      showButton();
       alert(error?.message || 'Não foi possível ativar as notificações.');
     }
   });
 
   refreshState().catch(error => {
     console.error(error);
-    button.hidden = false;
-    button.disabled = false;
+    showButton();
   });
 }
