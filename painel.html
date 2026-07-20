@@ -13,6 +13,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260717-icons2">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/aulas.css?v=20260716-live2">
+  <link rel="stylesheet" href="css/aulas-painel-compact.css?v=20260719-live-compact1">
   <style>
     .dashboard-user-greeting { margin:0 0 6px; color:var(--primary); font-size:.82rem; font-weight:850; letter-spacing:.02em; }
     .dashboard-main-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:18px; margin-bottom:22px; align-items:start; }
@@ -144,12 +145,43 @@
       <div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Cadastro</th><th>Ação</th></tr></thead><tbody id="recent-list"><tr><td colspan="3">Carregando...</td></tr></tbody></table></div>
     </section>
   </main>
+
+  <div id="live-session-modal" class="live-session-modal" aria-hidden="true">
+    <section class="live-session-dialog" role="dialog" aria-modal="true" aria-labelledby="live-session-modal-name">
+      <div class="live-session-modal-header">
+        <div>
+          <small>EM AULA</small>
+          <h2 id="live-session-modal-name">Aluno</h2>
+          <p id="live-session-modal-meta">Carregando sessão...</p>
+        </div>
+        <button id="live-session-modal-close" class="live-session-modal-close" type="button" aria-label="Fechar">×</button>
+      </div>
+      <div class="live-session-modal-body">
+        <div class="live-session-progress-label"><span>Progresso do treino</span><strong id="live-session-modal-progress">0/0 concluídos</strong></div>
+        <h3 class="live-session-chat-title">Chat com o aluno</h3>
+        <div id="live-session-chat-thread" class="live-chat-thread"><p class="empty">Carregando chat...</p></div>
+        <form id="live-session-chat-form" class="live-chat-form">
+          <textarea name="mensagem" maxlength="3000" placeholder="Escreva uma orientação para o aluno" required></textarea>
+          <button class="btn btn-primary" type="submit">Enviar</button>
+        </form>
+        <div id="live-session-modal-actions" class="live-session-modal-actions"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="live-workout-editor-modal" class="live-workout-editor-modal" aria-hidden="true">
+    <section class="live-workout-editor-dialog" role="dialog" aria-modal="true" aria-label="Editar treino do aluno">
+      <button id="live-workout-editor-close" class="live-workout-editor-close" type="button" aria-label="Fechar edição do treino">×</button>
+      <iframe id="live-workout-editor-frame" class="live-workout-editor-frame" title="Editar treino do aluno"></iframe>
+    </section>
+  </div>
+
   <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
   <script src="https://cdn.jsdelivr.net/gh/efipay/js-payment-token-efi/dist/payment-token-efi-umd.min.js"></script>
   <script type="module" src="js/renovacao-plano.js?v=20260717-cartao1"></script>
   <script type="module" src="js/assinatura-cartao-status.js?v=20260717-cartao1"></script>
-  <script type="module" src="js/aulas-painel.js?v=20260719-live6"></script>
-  <script type="module" src="js/chat-aula-painel.js?v=20260717-live5"></script>
+  <script type="module" src="js/aulas-painel.js?v=20260719-live-modal1"></script>
+  <script type="module" src="js/aulas-painel-editor.js?v=20260719-live-editor1"></script>
   <script type="module" src="js/push-personal.js?v=20260716-live3"></script>
   <script type="module" src="js/pwa-install.js"></script>
 </body>
