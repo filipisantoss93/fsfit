@@ -37,7 +37,7 @@ function getVisibleExercises() {
   return exercises.filter(item => !(item.global && customizedGlobalIds.has(item.id)));
 }
 function populateCategorySelect(selectedId = '') {
-  form.categoria_id.innerHTML = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${category.id}">${esc(category.nome)}${category.global ? ' · FS Fit' : ''}</option>`).join('');
+  form.categoria_id.innerHTML = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${category.id}">${esc(category.nome)}</option>`).join('');
   form.categoria_id.value = selectedId || '';
 }
 function resetExerciseForm() { editingId = null; editingGlobalId = null; form.reset(); populateCategorySelect(activeCategoryId || ''); form.tipo_prescricao.value = 'repeticoes'; formTitle.textContent = 'Novo exercício'; submitButton.textContent = 'Adicionar exercício'; }
