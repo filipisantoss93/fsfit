@@ -34,51 +34,105 @@ function subscriptionStatus(access) {
   return access?.assinatura_status || 'Sem assinatura ativa';
 }
 
+function statusClass(access) {
+  if (access?.assinatura_status === 'inadimplente' || access?.assinatura_status === 'cancelada') return 'failed';
+  if (access?.assinatura_status === 'pendente' || access?.tipo_acesso === 'trial') return 'pending';
+  if (access?.tipo_acesso === 'pago' || access?.acesso_premium) return 'paid';
+  return '';
+}
+
 function planLabel(access) {
-  if (access?.admin) return 'Administrador';
-  if (access?.tipo_acesso === 'trial') return 'Trial de 7 dias';
-  if (access?.tipo_acesso === 'free') return 'Free';
-  if (access?.preco_contratado_centavos) return `Premium · ${money(access.preco_contratado_centavos)}`;
-  if (access?.tipo_acesso === 'pago') return 'Premium';
-  return '—';
+  if (access?.tipo_acesso === 'trial') return 'FS Fit · 7 dias grátis';
+  if (access?.tipo_acesso === 'free') return 'FS Fit Free';
+  if (access?.tipo_acesso === 'pago') return 'FS Fit';
+  return 'FS Fit';
+}
+
+function priceLabel(access) {
+  if (!access?.preco_contratado_centavos) return '';
+  const suffix = access?.meio_pagamento === 'cartao' ? '/mês' : '';
+  return `${money(access.preco_contratado_centavos)}${suffix}`;
 }
 
 function validityLabel(access) {
-  if (access?.admin) return 'Sem vencimento';
-  if (access?.acesso_valido_ate) return `Até ${formatDate(access.acesso_valido_ate)}`;
+  if (access?.acesso_valido_ate) return formatDate(access.acesso_valido_ate);
+  if (access?.tipo_acesso === 'free') return 'Sem vencimento';
   return 'Sem período ativo';
 }
 
 function renewalLabel(access) {
-  if (access?.meio_pagamento !== 'cartao') return paymentLabel(access?.meio_pagamento);
-  if (access?.renovacao_automatica) {
-    const nextDate = access?.proxima_cobranca_em || access?.acesso_valido_ate;
-    return `Cartão · próxima cobrança ${formatDate(nextDate)}`;
+  if (access?.meio_pagamento === 'cartao') {
+    if (access?.renovacao_automatica) return 'Automática';
+    if (access?.acesso_premium) return 'Cancelada';
+    return 'Desativada';
   }
-  if (access?.acesso_premium) return 'Cartão · renovação cancelada';
-  return 'Cartão · sem renovação';
+  if (access?.meio_pagamento === 'pix') return 'Manual via PIX';
+  return '—';
+}
+
+function nextChargeLabel(access) {
+  if (access?.meio_pagamento !== 'cartao' || !access?.renovacao_automatica) return null;
+  const nextDate = access?.proxima_cobranca_em || access?.acesso_valido_ate;
+  return nextDate ? formatDate(nextDate) : 'A definir';
+}
+
+function setAdminLayout() {
+  const title = document.querySelector('#subscription-page-title');
+  const description = document.querySelector('#subscription-page-description');
+  const overviewTitle = document.querySelector('#subscription-overview-title');
+  const management = document.querySelector('#subscription-management-section');
+  const history = document.querySelector('#subscription-history-section');
+  const help = document.querySelector('#subscription-help-section');
+
+  if (title) title.textContent = 'Minha conta';
+  if (description) description.textContent = 'Consulte as informações do seu acesso ao FS Fit.';
+  if (overviewTitle) overviewTitle.textContent = 'Acesso administrativo';
+  if (management) management.hidden = true;
+  if (history) history.hidden = true;
+  if (help) help.hidden = true;
 }
 
 function renderSummary(access) {
-  const grid = document.querySelector('#subscription-summary-grid');
-  if (!grid) return;
+  const host = document.querySelector('#subscription-summary-grid');
+  if (!host) return;
 
-  grid.innerHTML = `
-    <div class="subscription-summary-item">
-      <small>Status</small>
-      <strong>${subscriptionStatus(access)}</strong>
-    </div>
-    <div class="subscription-summary-item">
-      <small>Plano</small>
-      <strong>${planLabel(access)}</strong>
-    </div>
-    <div class="subscription-summary-item">
-      <small>Pagamento</small>
-      <strong>${renewalLabel(access)}</strong>
-    </div>
-    <div class="subscription-summary-item">
-      <small>Validade</small>
-      <strong>${validityLabel(access)}</strong>
+  if (access?.admin) {
+    setAdminLayout();
+    host.innerHTML = `
+      <div class="subscription-admin-card">
+        <div class="subscription-admin-icon" aria-hidden="true">✓</div>
+        <div>
+          <h2>Conta administrativa</h2>
+          <p>Acesso permanente ao FS Fit, sem cobrança e sem vencimento.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const status = subscriptionStatus(access);
+  const statusTone = statusClass(access);
+  const price = priceLabel(access);
+  const nextCharge = nextChargeLabel(access);
+  const cardInfo = access?.meio_pagamento === 'cartao' && access?.cartao_mascara
+    ? ` · ${access.cartao_mascara}`
+    : '';
+
+  host.innerHTML = `
+    <div class="subscription-overview-card">
+      <div class="subscription-overview-top">
+        <div>
+          <span class="subscription-plan-kicker">Plano</span>
+          <h3 class="subscription-plan-title">${planLabel(access)}</h3>
+          ${price ? `<div class="subscription-plan-price">${price}</div>` : ''}
+        </div>
+        <span class="subscription-status-badge ${statusTone}">${status}</span>
+      </div>
+      <div class="subscription-overview-rows">
+        <div class="subscription-overview-row"><span>Pagamento</span><strong>${paymentLabel(access?.meio_pagamento)}${cardInfo}</strong></div>
+        <div class="subscription-overview-row"><span>Validade do acesso</span><strong>${validityLabel(access)}</strong></div>
+        <div class="subscription-overview-row"><span>Renovação</span><strong>${renewalLabel(access)}</strong></div>
+        ${nextCharge ? `<div class="subscription-overview-row"><span>Próxima cobrança</span><strong>${nextCharge}</strong></div>` : ''}
+      </div>
     </div>`;
 }
 
@@ -97,29 +151,30 @@ function normalizeStatus(status) {
 }
 
 function renderHistory(items) {
-  const body = document.querySelector('#subscription-history-body');
-  if (!body) return;
+  const host = document.querySelector('#subscription-history-list');
+  if (!host) return;
 
   if (!items.length) {
-    body.innerHTML = '<tr><td colspan="4" class="subscription-empty">Nenhuma cobrança registrada ainda.</td></tr>';
+    host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
     return;
   }
 
-  body.innerHTML = items.map(item => {
+  host.innerHTML = items.map(item => {
     const status = normalizeStatus(item.status);
     const date = item.pago_em || item.created_at;
+    const method = item.method === 'cartao' ? 'Cartão de crédito' : 'PIX';
     return `
-      <tr>
-        <td><strong>${item.method === 'cartao' ? '💳 Cartão de crédito' : '⚡ PIX'}</strong></td>
-        <td>${formatDate(date, true)}</td>
-        <td>${money(item.valor_centavos)}</td>
-        <td><span class="subscription-status-badge ${status.className}">${status.label}</span></td>
-      </tr>`;
+      <article class="subscription-history-item">
+        <div class="subscription-history-main"><strong>${method}</strong><span>${formatDate(date, true)}</span></div>
+        <div class="subscription-history-date">${formatDate(date)}</div>
+        <div class="subscription-history-value">${money(item.valor_centavos)}</div>
+        <span class="subscription-status-badge ${status.className}">${status.label}</span>
+      </article>`;
   }).join('');
 }
 
 async function loadHistory(userId) {
-  const body = document.querySelector('#subscription-history-body');
+  const host = document.querySelector('#subscription-history-list');
 
   try {
     const [cardResult, pixResult] = await Promise.all([
@@ -149,7 +204,7 @@ async function loadHistory(userId) {
     renderHistory(items);
   } catch (error) {
     console.error('Não foi possível carregar o histórico de cobranças:', error);
-    if (body) body.innerHTML = '<tr><td colspan="4" class="subscription-empty">Não foi possível carregar o histórico agora.</td></tr>';
+    if (host) host.innerHTML = '<div class="subscription-empty">Não foi possível carregar o histórico agora.</div>';
   }
 }
 
@@ -185,11 +240,11 @@ async function init() {
     session.fsfitAccess = access;
     await setGreeting(session);
     renderSummary(access);
-    await loadHistory(session.user.id);
+    if (!access?.admin) await loadHistory(session.user.id);
   } catch (loadError) {
     console.error('Não foi possível carregar a página de assinatura:', loadError);
-    const grid = document.querySelector('#subscription-summary-grid');
-    if (grid) grid.innerHTML = '<div class="subscription-summary-item" style="grid-column:1/-1"><small>Erro</small><strong>Não foi possível carregar os dados da assinatura. Atualize a página e tente novamente.</strong></div>';
+    const host = document.querySelector('#subscription-summary-grid');
+    if (host) host.innerHTML = '<div class="subscription-overview-card"><strong>Não foi possível carregar os dados da assinatura. Atualize a página e tente novamente.</strong></div>';
   }
 }
 
