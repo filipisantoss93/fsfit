@@ -5,6 +5,8 @@ const usersList = document.querySelector('#admin-users-list');
 const userModalContent = document.querySelector('#admin-user-modal-content');
 const message = document.querySelector('#admin-message');
 const searchInput = document.querySelector('#admin-user-search');
+const studentCountCache = new Map();
+let studentCountTimer = null;
 
 function parsePtDate(value = '') {
   const match = String(value).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
@@ -15,6 +17,101 @@ function currentExpiryText() {
   const item = [...(userModalContent?.querySelectorAll('.admin-detail-item') || [])]
     .find(node => node.querySelector('span')?.textContent?.trim() === 'Vencimento');
   return item?.querySelector('strong')?.textContent?.trim() || '';
+}
+
+function studentCountLabel(total) {
+  const value = Number(total || 0);
+  return `${value} ${value === 1 ? 'aluno' : 'alunos'}`;
+}
+
+async function loadStudentCounts(userIds = []) {
+  const ids = [...new Set(userIds.filter(Boolean))];
+  const missingIds = ids.filter(id => !studentCountCache.has(id));
+  if (!missingIds.length) return;
+
+  const { data, error } = await supabase.rpc('fsfit_admin_contar_alunos_usuarios', {
+    p_user_ids: missingIds
+  });
+
+  if (error) {
+    console.warn('Não foi possível carregar a quantidade de alunos dos usuários:', error);
+    return;
+  }
+
+  Object.entries(data || {}).forEach(([userId, total]) => {
+    studentCountCache.set(userId, Number(total || 0));
+  });
+
+  missingIds.forEach(userId => {
+    if (!studentCountCache.has(userId)) studentCountCache.set(userId, 0);
+  });
+}
+
+function visibleUserIds() {
+  if (!usersList) return [];
+  return [...usersList.querySelectorAll('tr')]
+    .map(row => row.dataset.adminUserId || row.querySelector('[data-open-user]')?.dataset.openUser || '')
+    .filter(Boolean);
+}
+
+function applyStudentCountsToRows() {
+  if (!usersList) return;
+
+  usersList.querySelectorAll('tr[data-admin-user-id]').forEach(row => {
+    const userId = row.dataset.adminUserId;
+    if (!userId || !studentCountCache.has(userId)) return;
+
+    const userMeta = row.querySelector('.admin-user-meta');
+    if (!userMeta) return;
+
+    let count = userMeta.querySelector('.admin-user-student-count');
+    if (!count) {
+      count = document.createElement('small');
+      count.className = 'admin-user-student-count';
+      userMeta.appendChild(count);
+    }
+
+    const nextText = studentCountLabel(studentCountCache.get(userId));
+    if (count.textContent !== nextText) count.textContent = nextText;
+  });
+}
+
+async function refreshVisibleStudentCounts() {
+  const ids = visibleUserIds();
+  if (!ids.length) return;
+  await loadStudentCounts(ids);
+  applyStudentCountsToRows();
+}
+
+function scheduleStudentCounts() {
+  clearTimeout(studentCountTimer);
+  studentCountTimer = setTimeout(() => {
+    refreshVisibleStudentCounts().catch(error => {
+      console.warn('Não foi possível atualizar a quantidade de alunos:', error);
+    });
+  }, 0);
+}
+
+async function enhanceStudentCountInModal(userId) {
+  if (!userId || !userModalContent) return;
+  await loadStudentCounts([userId]);
+  if (!studentCountCache.has(userId)) return;
+
+  const registrationSection = userModalContent.querySelector('.admin-detail-section');
+  const detailList = registrationSection?.querySelector('.admin-detail-list');
+  if (!detailList) return;
+
+  let item = detailList.querySelector('[data-admin-student-count-detail]');
+  if (!item) {
+    item = document.createElement('div');
+    item.className = 'admin-detail-item';
+    item.dataset.adminStudentCountDetail = 'true';
+    item.innerHTML = '<span>Alunos cadastrados</span><strong></strong>';
+    detailList.appendChild(item);
+  }
+
+  const strong = item.querySelector('strong');
+  if (strong) strong.textContent = String(studentCountCache.get(userId));
 }
 
 function compactUsersTable() {
@@ -90,6 +187,9 @@ function compactUsersTable() {
       detailsButton.click();
     });
   });
+
+  applyStudentCountsToRows();
+  scheduleStudentCounts();
 }
 
 function enhanceUserModal() {
@@ -99,6 +199,10 @@ function enhanceUserModal() {
   if (!planSelect || !adminSection) return;
 
   const userId = planSelect.dataset.planUser;
+  enhanceStudentCountInModal(userId).catch(error => {
+    console.warn('Não foi possível exibir a quantidade de alunos no modal:', error);
+  });
+
   if (adminSection.querySelector(`[data-expiry-editor-user="${CSS.escape(userId)}"]`)) return;
 
   const savedPlan = String(planSelect.value || '').toLowerCase();
