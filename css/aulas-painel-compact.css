@@ -1,7 +1,199 @@
-.live-students-card{margin:18px 0;padding:0;overflow:hidden}.live-students-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 22px 14px;border-bottom:1px solid var(--border)}.live-students-heading small{display:block;margin-bottom:4px;color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.08em}.live-students-heading h2{margin:0}.live-students-list{display:grid;gap:0;margin-top:0}.live-student-row{width:100%;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(150px,.42fr) auto;align-items:center!important;gap:14px!important;padding:14px 20px!important;border:0!important;border-bottom:1px solid var(--border)!important;border-radius:0!important;background:transparent!important;color:inherit;text-align:left;cursor:pointer;transition:background .18s ease}.live-student-row:last-child{border-bottom:0!important}.live-student-row:hover,.live-student-row:focus-visible{background:rgba(255,255,255,.035)!important}.live-student-main{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important}.live-student-main>div{display:grid;gap:3px;min-width:0}.live-student-main strong,.live-student-main small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-student-main strong{font-size:.98rem}.live-student-main small{color:var(--muted);font-size:.78rem}.live-student-progress{display:grid!important;gap:6px!important;min-width:0!important}.live-student-progress>span{font-size:.8rem;font-weight:750;white-space:nowrap}.live-student-progress .live-progress{width:100%;height:6px}.live-student-arrow{color:var(--muted);font-size:1.75rem;line-height:1}.live-student-row.pending .live-dot{background:#f4b740;box-shadow:0 0 0 5px rgba(244,183,64,.12)}
+.live-students-card {
+  margin: 18px 0;
+  padding: 0;
+  overflow: hidden;
+}
 
-.live-session-modal,.live-workout-editor-modal{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(4,7,10,.82);backdrop-filter:blur(6px)}.live-session-modal.open,.live-workout-editor-modal.open{display:flex}.live-session-dialog{width:min(680px,100%);max-height:min(92dvh,900px);display:flex;flex-direction:column;overflow:hidden;background:#151a1f;border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.45)}.live-session-modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 20px 14px;border-bottom:1px solid var(--border)}.live-session-modal-header small{display:block;color:var(--primary);font-size:.7rem;font-weight:850;letter-spacing:.08em;margin-bottom:5px}.live-session-modal-header h2{margin:0 0 5px}.live-session-modal-header p{margin:0;color:var(--muted);font-size:.82rem}.live-session-modal-close,.live-workout-editor-close{flex:0 0 auto;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:#232a33;color:#fff;font-size:26px;line-height:1;cursor:pointer}.live-session-modal-body{overflow-y:auto;padding:16px 20px 20px}.live-session-progress-label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.035)}.live-session-progress-label span{color:var(--muted);font-size:.78rem}.live-session-progress-label strong{font-size:.9rem}.live-session-chat-title{margin:4px 0 10px;font-size:.86rem;font-weight:850;letter-spacing:.04em}.live-session-modal .live-chat-thread{max-height:320px;min-height:160px}.live-session-modal .live-chat-form.hidden{display:none}.live-session-modal-actions{display:grid;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}.live-session-modal-actions .btn{width:100%;justify-content:center;box-sizing:border-box}.live-session-modal-actions [data-live-edit-workout]{order:-1}.live-session-modal-open{overflow:hidden}
+.live-students-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid var(--border);
+}
 
-.live-workout-editor-modal{z-index:1700;padding:14px}.live-workout-editor-dialog{position:relative;width:min(1080px,100%);height:min(94dvh,1050px);overflow:hidden;background:#151a1f;border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.5)}.live-workout-editor-close{position:absolute;top:12px;right:12px;z-index:3}.live-workout-editor-frame{width:100%;height:100%;border:0;background:#151a1f}
+.live-students-heading small {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
 
-@media(max-width:720px){.live-students-heading{padding:17px 18px 13px}.live-student-row{grid-template-columns:minmax(0,1fr) auto!important;gap:8px 12px!important;padding:13px 18px!important}.live-student-progress{grid-column:1;margin-left:22px}.live-student-arrow{grid-column:2;grid-row:1/3;align-self:center}.live-student-progress .live-progress{display:none}.live-session-modal,.live-workout-editor-modal{padding:0}.live-session-dialog,.live-workout-editor-dialog{width:100%;height:100dvh;max-height:none;border-radius:0;border:0}.live-session-modal-header{padding:16px 18px 13px}.live-session-modal-body{padding:14px 18px 20px}.live-session-modal .live-chat-thread{max-height:46dvh;min-height:220px}.live-session-modal .live-chat-form{grid-template-columns:1fr}.live-workout-editor-close{top:10px;right:10px}}
+.live-students-heading h2 { margin: 0; }
+.live-students-list { display: grid; gap: 0; margin-top: 0; }
+
+.live-student-row {
+  width: 100%;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) minmax(150px,.42fr) auto;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 14px 20px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .18s ease;
+}
+
+.live-student-row:last-child { border-bottom: 0 !important; }
+.live-student-row:hover,
+.live-student-row:focus-visible { background: rgba(255,255,255,.035) !important; }
+.live-student-main { display: flex !important; align-items: center !important; gap: 12px !important; min-width: 0 !important; }
+.live-student-main > div { display: grid; gap: 3px; min-width: 0; }
+.live-student-main strong,
+.live-student-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.live-student-main strong { font-size: .94rem; }
+.live-student-main small { color: var(--muted); font-size: .75rem; }
+.live-student-progress { display: grid !important; gap: 6px !important; min-width: 0 !important; }
+.live-student-progress > span { font-size: .77rem; font-weight: 750; white-space: nowrap; }
+.live-student-progress .live-progress { width: 100%; height: 6px; }
+.live-student-arrow { color: var(--muted); font-size: 1.75rem; line-height: 1; }
+.live-student-row.pending .live-dot { background: #f4b740; box-shadow: 0 0 0 5px rgba(244,183,64,.12); }
+
+.live-session-modal,
+.live-workout-editor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(4,7,10,.82);
+  backdrop-filter: blur(6px);
+}
+
+.live-session-modal.open,
+.live-workout-editor-modal.open { display: flex; }
+
+.live-session-dialog {
+  width: min(680px,100%);
+  max-height: min(92dvh,900px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #151a1f;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.45);
+}
+
+.live-session-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.live-session-modal-header small {
+  display: block;
+  color: var(--primary);
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  margin-bottom: 5px;
+}
+
+.live-session-modal-header h2 { margin: 0 0 5px; font-size: 1.55rem; }
+.live-session-modal-header p { margin: 0; color: var(--muted); font-size: .8rem; }
+.live-session-modal-close,
+.live-workout-editor-close {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #232a33;
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.live-session-modal-body { overflow-y: auto; padding: 16px 20px 20px; }
+.live-session-progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+}
+.live-session-progress-label span { color: var(--muted); font-size: .75rem; }
+.live-session-progress-label strong { font-size: .86rem; }
+.live-session-chat-title { margin: 4px 0 10px; font-size: .83rem; font-weight: 850; letter-spacing: .04em; }
+.live-session-modal .live-chat-thread { max-height: 320px; min-height: 160px; }
+.live-session-modal .live-chat-form.hidden { display: none; }
+
+/* Hierarquia das ações: principal > secundárias > destrutiva > neutra */
+.live-session-modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.live-session-modal-actions .btn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.live-session-modal-actions [data-modal-confirm-session],
+.live-session-modal-actions [data-modal-cancel-checkin],
+.live-session-modal-actions [data-modal-finish-session],
+.live-session-modal-actions [data-modal-close-session] {
+  grid-column: 1 / -1;
+}
+
+.live-session-modal-actions [data-live-edit-workout] { order: -1; }
+.live-session-modal-actions [data-modal-confirm-session] { order: -2; }
+.live-session-modal-actions [data-modal-cancel-checkin],
+.live-session-modal-actions [data-modal-finish-session] { margin-top: 2px; }
+.live-session-modal-actions [data-modal-close-session] { margin-top: 2px; }
+.live-session-modal-open { overflow: hidden; }
+
+.live-workout-editor-modal { z-index: 1700; padding: 14px; }
+.live-workout-editor-dialog {
+  position: relative;
+  width: min(1080px,100%);
+  height: min(94dvh,1050px);
+  overflow: hidden;
+  background: #151a1f;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.5);
+}
+.live-workout-editor-close { position: absolute; top: 12px; right: 12px; z-index: 3; }
+.live-workout-editor-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
+
+@media (max-width: 720px) {
+  .live-students-heading { padding: 17px 18px 13px; }
+  .live-student-row { grid-template-columns: minmax(0,1fr) auto !important; gap: 8px 12px !important; padding: 13px 18px !important; }
+  .live-student-progress { grid-column: 1; margin-left: 22px; }
+  .live-student-arrow { grid-column: 2; grid-row: 1/3; align-self: center; }
+  .live-student-progress .live-progress { display: none; }
+  .live-session-modal,
+  .live-workout-editor-modal { padding: 0; }
+  .live-session-dialog,
+  .live-workout-editor-dialog { width: 100%; height: 100dvh; max-height: none; border-radius: 0; border: 0; }
+  .live-session-modal-header { padding: 16px 18px 13px; }
+  .live-session-modal-header h2 { font-size: 1.45rem; }
+  .live-session-modal-body { padding: 14px 18px 20px; }
+  .live-session-modal .live-chat-thread { max-height: 46dvh; min-height: 220px; }
+  .live-session-modal .live-chat-form { grid-template-columns: 1fr; }
+  .live-session-modal-actions { gap: 9px; }
+  .live-workout-editor-close { top: 10px; right: 10px; }
+}
