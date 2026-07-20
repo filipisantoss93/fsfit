@@ -1,0 +1,33 @@
+name: Revisar hierarquia de botoes
+
+on:
+  push:
+    paths:
+      - '.github/workflows/revisar-hierarquia-botoes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  revisar-botoes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Aplicar revisão individual
+        run: python .github/scripts/revisar_hierarquia_botoes.py
+
+      - name: Publicar ajustes
+        run: |
+          if git diff --quiet; then
+            echo "Nenhuma alteração pendente."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add acesso-aluno.html alunos.html painel.html treino-aluno.html ficha-aluno.html biblioteca-exercicios.html perfil.html financeiro.html dieta-aluno.html lembretes-aluno.html biblioteca-alimentar.html modelos-dieta.html aluno.html js/assinatura-gerenciamento.js
+          git commit -m "Revisar hierarquia de botões página por página"
+          git push
