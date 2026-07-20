@@ -111,7 +111,8 @@ async function enhanceStudentCountInModal(userId) {
   }
 
   const strong = item.querySelector('strong');
-  if (strong) strong.textContent = String(studentCountCache.get(userId));
+  const nextText = String(studentCountCache.get(userId));
+  if (strong && strong.textContent !== nextText) strong.textContent = nextText;
 }
 
 function compactUsersTable() {
@@ -199,9 +200,11 @@ function enhanceUserModal() {
   if (!planSelect || !adminSection) return;
 
   const userId = planSelect.dataset.planUser;
-  enhanceStudentCountInModal(userId).catch(error => {
-    console.warn('Não foi possível exibir a quantidade de alunos no modal:', error);
-  });
+  if (!userModalContent.querySelector('[data-admin-student-count-detail]')) {
+    enhanceStudentCountInModal(userId).catch(error => {
+      console.warn('Não foi possível exibir a quantidade de alunos no modal:', error);
+    });
+  }
 
   if (adminSection.querySelector(`[data-expiry-editor-user="${CSS.escape(userId)}"]`)) return;
 
