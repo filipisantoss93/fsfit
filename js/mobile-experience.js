@@ -5,6 +5,7 @@ const MAIN_ROUTES = ['painel.html', 'alunos.html', 'agenda.html', 'financeiro.ht
 let installPrompt = null;
 let badgeChannel = null;
 let refreshBadgesTimer = null;
+let workoutStateObserver = null;
 
 function currentPage() {
   return window.location.pathname.split('/').pop() || 'index.html';
@@ -113,7 +114,7 @@ function setupSkeletons() {
   syncLoadingPlaceholders();
   const observer = new MutationObserver(records => {
     records.forEach(record => {
-      if (record.target instanceof Element) syncLoadingPlaceholders(record.target.closest('body') ? record.target : document);
+      if (record.target instanceof Element) syncLoadingPlaceholders(record.target);
       record.addedNodes.forEach(node => {
         if (node instanceof Element) syncLoadingPlaceholders(node);
       });
@@ -141,7 +142,7 @@ function setupBusyButtons() {
   document.addEventListener('submit', event => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
-    const button = form.querySelector('button[type="submit"],input[type="submit"]');
+    const button = form.querySelector('button[type="submit"]');
     if (!(button instanceof HTMLButtonElement)) return;
     button.classList.add('fsfit-button-busy');
     button.setAttribute('aria-busy', 'true');
@@ -150,7 +151,7 @@ function setupBusyButtons() {
         button.classList.remove('fsfit-button-busy');
         button.removeAttribute('aria-busy');
       }
-    }, 9000);
+    }, 500);
   }, true);
 }
 
@@ -261,18 +262,23 @@ function ensureStudentQuickActions() {
   const workoutProxy = actions.querySelector('[data-student-quick="workout"]');
   const whatsapp = actions.querySelector('[data-student-quick="whatsapp"]');
 
-  const bindWorkout = () => {
-    const original = document.querySelector('#start-workout-personal');
-    if (!original) return false;
+  const syncWorkoutState = original => {
+    if (!original || !workoutProxy) return;
     original.classList.add('fsfit-original-workout-action');
     workoutProxy.disabled = original.disabled;
     workoutProxy.title = original.title || '';
     const text = original.textContent?.toLowerCase() || '';
     workoutProxy.querySelector('span').textContent = text.includes('andamento') ? 'Em aula' : 'Treino';
     workoutProxy.onclick = () => original.click();
+  };
 
-    const observer = new MutationObserver(bindWorkout);
-    observer.observe(original, { attributes: true, childList: true, subtree: true, characterData: true });
+  const bindWorkout = () => {
+    const original = document.querySelector('#start-workout-personal');
+    if (!original) return false;
+    syncWorkoutState(original);
+    workoutStateObserver?.disconnect();
+    workoutStateObserver = new MutationObserver(() => syncWorkoutState(original));
+    workoutStateObserver.observe(original, { attributes: true, childList: true, subtree: true, characterData: true });
     return true;
   };
 
@@ -386,7 +392,11 @@ function setupInstallPrompt() {
 
 function setupDomWatcher() {
   const observer = new MutationObserver(() => {
-    if (document.querySelector('.fsfit-bottom-nav')) scheduleBadgeRefresh();
+    const nav = document.querySelector('.fsfit-bottom-nav');
+    if (nav && nav.dataset.mobileExperienceReady !== '1') {
+      nav.dataset.mobileExperienceReady = '1';
+      scheduleBadgeRefresh();
+    }
     if (installPrompt) injectInstallAction();
     if (currentPage() === 'ficha-aluno.html') ensureStudentQuickActions();
   });
