@@ -128,3 +128,7 @@ compactWorkoutPage();
 import('./exercicio-drag-order-structured-sync.js?v=20260720-dnd-sync1').catch(error => {
   console.error('Falha ao sincronizar ordem do editor estruturado:', error);
 });
+
+import('./treino-sticky-exercise-save.js?v=20260720-sticky-save1').catch(error => {
+  console.error('Falha ao carregar botão fixo de adicionar exercícios:', error);
+});
