@@ -13,6 +13,7 @@ if (!exerciseSection) {
   let templates = [];
   let templateItems = [];
   let exercises = [];
+  let categories = [];
   let editingTemplateId = null;
   let editingItemIndex = null;
   let draftItems = [];
@@ -36,12 +37,13 @@ if (!exerciseSection) {
     .saved-workout-modal.open{display:flex}.saved-workout-dialog{width:min(820px,100%);max-height:92dvh;overflow:auto;padding:20px;border:1px solid var(--border);border-radius:22px;background:#171b21;box-shadow:0 28px 80px rgba(0,0,0,.58)}
     .saved-workout-modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}.saved-workout-modal-head h2{margin:0}.saved-workout-close{width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:var(--surface-light);color:var(--text);font-size:1.4rem}
     .saved-workout-days{display:flex;gap:7px;flex-wrap:wrap}.saved-workout-days label{margin:0}.saved-workout-days input{position:absolute;opacity:0;pointer-events:none}.saved-workout-days span{display:inline-grid;place-items:center;min-width:46px;min-height:38px;padding:0 9px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:.78rem;font-weight:800}.saved-workout-days input:checked+span{border-color:var(--primary);color:var(--primary);background:rgba(50,215,75,.1)}
+    .saved-workout-days-note{margin:9px 0 0;color:var(--muted);font-size:.76rem;line-height:1.4}
     .saved-workout-item-form{margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:15px;background:rgba(255,255,255,.025)}
-    .saved-workout-item-grid{display:grid;grid-template-columns:1fr 2fr repeat(4,minmax(95px,1fr));gap:10px}.saved-workout-item-grid .form-group{margin:0}.saved-workout-item-grid .wide{grid-column:1/-1}
+    .saved-workout-item-grid{display:grid;grid-template-columns:repeat(4,minmax(95px,1fr));gap:10px}.saved-workout-item-grid .form-group{margin:0}.saved-workout-item-grid .exercise-search-field,.saved-workout-item-grid .category-field{grid-column:span 2}.saved-workout-item-grid .exercise-field,.saved-workout-item-grid .wide{grid-column:1/-1}
     .saved-workout-draft{display:grid;gap:8px;margin-top:14px}.saved-workout-draft-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light)}
     .saved-workout-draft-row>span{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:rgba(50,215,75,.1);color:var(--primary);font-size:.72rem;font-weight:900}.saved-workout-draft-row strong{display:block;font-size:.9rem}.saved-workout-draft-row small{display:block;margin-top:3px;color:var(--muted);font-size:.72rem}.saved-workout-draft-actions{display:flex;gap:6px}.saved-workout-draft-actions button{min-height:34px;padding:0 9px;font-size:.72rem}
     .saved-workout-modal-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
-    @media(max-width:720px){.workout-library-tabs{position:sticky;top:calc(82px + var(--safe-area-top));z-index:18}.saved-workout-card{grid-template-columns:1fr}.saved-workout-actions{width:100%}.saved-workout-actions .btn{flex:1}.saved-workout-item-grid{grid-template-columns:1fr 1fr}.saved-workout-item-grid .exercise-field,.saved-workout-item-grid .wide{grid-column:1/-1}.saved-workout-dialog{padding:16px}.saved-workout-modal{padding:8px}.saved-workout-draft-row{grid-template-columns:38px minmax(0,1fr)}.saved-workout-draft-actions{grid-column:1/-1}.saved-workout-draft-actions button{flex:1}}
+    @media(max-width:720px){.workout-library-tabs{position:sticky;top:calc(82px + var(--safe-area-top));z-index:18}.saved-workout-card{grid-template-columns:1fr}.saved-workout-actions{width:100%}.saved-workout-actions .btn{flex:1}.saved-workout-item-grid{grid-template-columns:1fr 1fr}.saved-workout-item-grid .exercise-search-field,.saved-workout-item-grid .category-field,.saved-workout-item-grid .exercise-field,.saved-workout-item-grid .wide{grid-column:1/-1}.saved-workout-dialog{padding:16px}.saved-workout-modal{padding:8px}.saved-workout-draft-row{grid-template-columns:38px minmax(0,1fr)}.saved-workout-draft-actions{grid-column:1/-1}.saved-workout-draft-actions button{flex:1}}
   `;
   document.head.appendChild(style);
 
@@ -74,10 +76,11 @@ if (!exerciseSection) {
           <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" required placeholder="Ex.: Treino A — Hipertrofia"></div>
           <div class="form-group"><label>Descrição</label><input name="descricao" maxlength="240" placeholder="Ex.: Peito, ombro e tríceps"></div>
         </div>
-        <div class="form-group"><label>Dias do treino *</label><div class="saved-workout-days">${[1,2,3,4,5,6,7].map(day => `<label><input type="checkbox" name="dias" value="${day}"><span>${dayNames[day]}</span></label>`).join('')}</div></div>
+        <div class="form-group"><label>Dias do treino *</label><div class="saved-workout-days">${[1,2,3,4,5,6,7].map(day => `<label><input type="checkbox" name="dias" value="${day}"><span>${dayNames[day]}</span></label>`).join('')}</div><p class="saved-workout-days-note">Os exercícios abaixo serão aplicados automaticamente a todos os dias selecionados.</p></div>
         <section class="saved-workout-item-form">
           <div class="saved-workout-item-grid">
-            <div class="form-group"><label>Dia</label><select id="saved-item-day"></select></div>
+            <div class="form-group exercise-search-field"><label>Buscar exercício</label><input id="saved-item-search" type="search" placeholder="Digite nome, categoria ou equipamento"></div>
+            <div class="form-group category-field"><label>Categoria</label><select id="saved-item-category"><option value="">Todas as categorias</option></select></div>
             <div class="form-group exercise-field"><label>Exercício</label><select id="saved-item-exercise"></select></div>
             <div class="form-group"><label>Séries</label><input id="saved-item-series" type="number" min="1" max="20"></div>
             <div class="form-group"><label>Repetições</label><input id="saved-item-reps" maxlength="30" placeholder="10-12"></div>
@@ -96,7 +99,8 @@ if (!exerciseSection) {
   const form = modal.querySelector('#saved-workout-form');
   const title = modal.querySelector('#saved-workout-title');
   const saveButton = modal.querySelector('#save-saved-workout');
-  const daySelect = modal.querySelector('#saved-item-day');
+  const exerciseSearch = modal.querySelector('#saved-item-search');
+  const exerciseCategory = modal.querySelector('#saved-item-category');
   const exerciseSelect = modal.querySelector('#saved-item-exercise');
   const seriesInput = modal.querySelector('#saved-item-series');
   const repsInput = modal.querySelector('#saved-item-reps');
@@ -108,6 +112,7 @@ if (!exerciseSection) {
   const draft = modal.querySelector('#saved-workout-draft');
 
   function esc(value = '') { const div = document.createElement('div'); div.textContent = value ?? ''; return div.innerHTML; }
+  function normalize(value = '') { return String(value || '').trim().toLocaleLowerCase('pt-BR'); }
 
   function setView(view, { focus = false } = {}) {
     const templatesActive = view === 'templates';
@@ -126,17 +131,63 @@ if (!exerciseSection) {
     return [...form.querySelectorAll('input[name="dias"]:checked')].map(input => Number(input.value));
   }
 
-  function updateDaySelect() {
-    const days = selectedDays();
-    const current = Number(daySelect.value);
-    daySelect.innerHTML = days.length ? days.map(day => `<option value="${day}">${dayNames[day]}</option>`).join('') : '<option value="">Selecione os dias acima</option>';
-    daySelect.disabled = !days.length;
-    if (days.includes(current)) daySelect.value = String(current);
+  function categoryNameFor(exercise) {
+    return categories.find(category => category.id === exercise?.categoria_id)?.nome || exercise?.grupo_muscular || 'Outros';
+  }
+
+  function visibleExercises() {
+    const customizedGlobalIds = new Set(
+      exercises
+        .filter(item => !item.global && item.personal_id === userId && item.origem_global_id)
+        .map(item => item.origem_global_id)
+    );
+    return exercises.filter(item => !(item.global && customizedGlobalIds.has(item.id)));
+  }
+
+  function populateExerciseCategories(selectedId = '') {
+    exerciseCategory.innerHTML = '<option value="">Todas as categorias</option>' + categories.map(category => `<option value="${category.id}">${esc(category.nome)}</option>`).join('');
+    exerciseCategory.value = selectedId || '';
+  }
+
+  function renderExerciseOptions(selectedId = '') {
+    const term = normalize(exerciseSearch.value);
+    const categoryId = exerciseCategory.value;
+    const filtered = visibleExercises().filter(item => {
+      if (categoryId && item.categoria_id !== categoryId) return false;
+      if (!term) return true;
+      return [item.nome, item.equipamento, item.grupo_muscular, categoryNameFor(item)]
+        .filter(Boolean)
+        .some(value => normalize(value).includes(term));
+    });
+
+    if (!filtered.length) {
+      exerciseSelect.innerHTML = '<option value="">Nenhum exercício encontrado</option>';
+      exerciseSelect.disabled = true;
+      return;
+    }
+
+    const grouped = new Map();
+    filtered.forEach(item => {
+      const categoryName = categoryNameFor(item);
+      if (!grouped.has(categoryName)) grouped.set(categoryName, []);
+      grouped.get(categoryName).push(item);
+    });
+
+    const groups = [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+    exerciseSelect.disabled = false;
+    exerciseSelect.innerHTML = '<option value="">Selecione um exercício</option>' + groups.map(([categoryName, items]) => `
+      <optgroup label="${esc(categoryName)}">
+        ${items.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })).map(item => `<option value="${item.id}">${esc(item.nome)}${item.equipamento ? ` · ${esc(item.equipamento)}` : ''}</option>`).join('')}
+      </optgroup>`).join('');
+
+    if (selectedId && filtered.some(item => item.id === selectedId)) exerciseSelect.value = selectedId;
   }
 
   function resetItemEditor() {
     editingItemIndex = null;
-    exerciseSelect.value = '';
+    exerciseSearch.value = '';
+    exerciseCategory.value = '';
+    renderExerciseOptions();
     seriesInput.value = '';
     repsInput.value = '';
     loadInput.value = '';
@@ -151,9 +202,10 @@ if (!exerciseSection) {
       draft.innerHTML = '<p class="empty">Adicione os exercícios que compõem este treino.</p>';
       return;
     }
+    const daysLabel = selectedDays().map(day => dayNames[day]).join(', ');
     draft.innerHTML = draftItems.map((item, index) => {
-      const detail = [item.series ? `${item.series} séries` : null, item.repeticoes, item.carga, item.descanso_segundos ? `${item.descanso_segundos}s` : null].filter(Boolean).join(' • ');
-      return `<div class="saved-workout-draft-row"><span>${dayNames[item.dia_semana]}</span><div><strong>${esc(item.exercicio_nome)}</strong><small>${esc(detail || 'Sem prescrição detalhada')}</small></div><div class="saved-workout-draft-actions"><button class="btn btn-outline" type="button" data-edit-saved-item="${index}">Editar</button><button class="btn btn-danger" type="button" data-remove-saved-item="${index}">Remover</button></div></div>`;
+      const detail = [item.categoria_nome, item.series ? `${item.series} séries` : null, item.repeticoes, item.carga, item.descanso_segundos ? `${item.descanso_segundos}s` : null, daysLabel ? `Dias: ${daysLabel}` : null].filter(Boolean).join(' • ');
+      return `<div class="saved-workout-draft-row"><span>${index + 1}</span><div><strong>${esc(item.exercicio_nome)}</strong><small>${esc(detail || 'Sem prescrição detalhada')}</small></div><div class="saved-workout-draft-actions"><button class="btn btn-outline" type="button" data-edit-saved-item="${index}">Editar</button><button class="btn btn-danger" type="button" data-remove-saved-item="${index}">Remover</button></div></div>`;
     }).join('');
   }
 
@@ -172,21 +224,36 @@ if (!exerciseSection) {
       form.descricao.value = template.descricao || '';
       const days = (template.dias_semana || []).map(Number);
       form.querySelectorAll('input[name="dias"]').forEach(input => { input.checked = days.includes(Number(input.value)); });
-      draftItems = templateItems.filter(item => item.treino_id === templateId).map(item => ({
-        exercicio_id: item.exercicio_id,
-        exercicio_nome: item.exercicios?.nome || 'Exercício',
-        dia_semana: Number(item.dia_semana),
-        series: item.series ?? '',
-        repeticoes: item.repeticoes || '',
-        carga: item.carga || '',
-        descanso_segundos: item.descanso_segundos ?? '',
-        observacoes: item.observacoes || '',
-        duracao_minutos: item.duracao_minutos ?? '',
-        distancia_km: item.distancia_km ?? ''
-      }));
+
+      const seenItems = new Set();
+      draftItems = templateItems
+        .filter(item => item.treino_id === templateId)
+        .map(item => {
+          const exercise = exercises.find(ex => ex.id === item.exercicio_id);
+          return {
+            exercicio_id: item.exercicio_id,
+            exercicio_nome: item.exercicios?.nome || exercise?.nome || 'Exercício',
+            categoria_nome: categoryNameFor(exercise || item.exercicios),
+            ordem: Number(item.ordem) || 0,
+            series: item.series ?? '',
+            repeticoes: item.repeticoes || '',
+            carga: item.carga || '',
+            descanso_segundos: item.descanso_segundos ?? '',
+            observacoes: item.observacoes || '',
+            duracao_minutos: item.duracao_minutos ?? '',
+            distancia_km: item.distancia_km ?? ''
+          };
+        })
+        .sort((a, b) => a.ordem - b.ordem)
+        .filter(item => {
+          const key = [item.exercicio_id, item.ordem, item.series, item.repeticoes, item.carga, item.descanso_segundos, item.observacoes, item.duracao_minutos, item.distancia_km].join('|');
+          if (seenItems.has(key)) return false;
+          seenItems.add(key);
+          return true;
+        })
+        .map(({ ordem, ...item }) => item);
     }
 
-    updateDaySelect();
     resetItemEditor();
     renderDraft();
     modal.classList.add('open');
@@ -203,10 +270,15 @@ if (!exerciseSection) {
   }
 
   async function loadExercises() {
-    const { data, error } = await supabase.from('exercicios').select('id,nome,grupo_muscular,equipamento').or(`global.eq.true,personal_id.eq.${userId}`).order('nome');
-    if (error) throw error;
-    exercises = data || [];
-    exerciseSelect.innerHTML = '<option value="">Selecione</option>' + exercises.map(item => `<option value="${item.id}">${esc(item.nome)}${item.grupo_muscular ? ` — ${esc(item.grupo_muscular)}` : ''}</option>`).join('');
+    const [{ data: categoryData, error: categoryError }, { data: exerciseData, error: exerciseError }] = await Promise.all([
+      supabase.from('categorias_exercicios').select('id,nome,global,personal_id').or(`global.eq.true,personal_id.eq.${userId}`),
+      supabase.from('exercicios').select('id,nome,grupo_muscular,equipamento,categoria_id,global,personal_id,origem_global_id').or(`global.eq.true,personal_id.eq.${userId}`).order('nome')
+    ]);
+    if (categoryError || exerciseError) throw categoryError || exerciseError;
+    categories = (categoryData || []).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+    exercises = exerciseData || [];
+    populateExerciseCategories();
+    renderExerciseOptions();
   }
 
   async function loadTemplates() {
@@ -216,7 +288,7 @@ if (!exerciseSection) {
     templates = data || [];
     const ids = templates.map(item => item.id);
     if (ids.length) {
-      const { data: items, error: itemsError } = await supabase.from('treino_exercicios').select('id,treino_id,exercicio_id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,duracao_minutos,distancia_km,exercicios(nome,grupo_muscular,equipamento)').in('treino_id', ids).order('dia_semana').order('ordem');
+      const { data: items, error: itemsError } = await supabase.from('treino_exercicios').select('id,treino_id,exercicio_id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,duracao_minutos,distancia_km,exercicios(nome,grupo_muscular,equipamento,categoria_id)').in('treino_id', ids).order('dia_semana').order('ordem');
       if (itemsError) throw itemsError;
       templateItems = items || [];
     } else {
@@ -234,8 +306,9 @@ if (!exerciseSection) {
     }
     savedList.innerHTML = templates.map(template => {
       const items = templateItems.filter(item => item.treino_id === template.id);
+      const uniqueExercises = new Set(items.map(item => item.exercicio_id)).size;
       const days = (template.dias_semana || []).map(Number).map(day => dayNames[day]).filter(Boolean).join(', ');
-      return `<article class="saved-workout-card"><div><h3>${esc(template.nome)}</h3><p>${esc(template.descricao || 'Sem descrição')}</p><div class="saved-workout-meta"><span>${items.length} ${items.length === 1 ? 'exercício' : 'exercícios'}</span><span>${esc(days || 'Dias não definidos')}</span></div></div><div class="saved-workout-actions"><button class="btn btn-outline" type="button" data-edit-saved-workout="${template.id}">Editar</button><button class="btn btn-danger" type="button" data-delete-saved-workout="${template.id}" data-name="${esc(template.nome)}">Excluir</button></div></article>`;
+      return `<article class="saved-workout-card"><div><h3>${esc(template.nome)}</h3><p>${esc(template.descricao || 'Sem descrição')}</p><div class="saved-workout-meta"><span>${uniqueExercises} ${uniqueExercises === 1 ? 'exercício' : 'exercícios'}</span><span>${esc(days || 'Dias não definidos')}</span></div></div><div class="saved-workout-actions"><button class="btn btn-outline" type="button" data-edit-saved-workout="${template.id}">Editar</button><button class="btn btn-danger" type="button" data-delete-saved-workout="${template.id}" data-name="${esc(template.nome)}">Excluir</button></div></article>`;
     }).join('');
   }
 
@@ -244,17 +317,20 @@ if (!exerciseSection) {
     if (button) setView(button.dataset.workoutLibraryView, { focus: true });
   });
 
-  form.querySelectorAll('input[name="dias"]').forEach(input => input.addEventListener('change', updateDaySelect));
+  form.querySelectorAll('input[name="dias"]').forEach(input => input.addEventListener('change', renderDraft));
+  exerciseSearch.addEventListener('input', () => renderExerciseOptions());
+  exerciseCategory.addEventListener('change', () => renderExerciseOptions());
 
   addItemButton.addEventListener('click', () => {
+    const days = selectedDays();
+    if (!days.length) return showMessage(message, 'Selecione pelo menos um dia do treino.', 'error');
     const exerciseId = exerciseSelect.value;
-    const day = Number(daySelect.value);
     const exercise = exercises.find(item => item.id === exerciseId);
-    if (!exerciseId || !day || !exercise) return showMessage(message, 'Selecione o dia e o exercício.', 'error');
+    if (!exerciseId || !exercise) return showMessage(message, 'Selecione um exercício.', 'error');
     const item = {
       exercicio_id: exerciseId,
       exercicio_nome: exercise.nome,
-      dia_semana: day,
+      categoria_nome: categoryNameFor(exercise),
       series: seriesInput.value ? Number(seriesInput.value) : '',
       repeticoes: repsInput.value.trim(),
       carga: loadInput.value.trim(),
@@ -279,15 +355,11 @@ if (!exerciseSection) {
     if (!name) return showMessage(message, 'Informe o nome do treino.', 'error');
     if (!days.length) return showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
     if (!draftItems.length) return showMessage(message, 'Adicione pelo menos um exercício ao treino.', 'error');
-    if (draftItems.some(item => !days.includes(Number(item.dia_semana)))) return showMessage(message, 'Há exercícios vinculados a dias que foram desmarcados.', 'error');
 
-    const counters = {};
-    const items = draftItems.map(item => {
-      const day = Number(item.dia_semana);
-      counters[day] = (counters[day] || 0) + 1;
-      const { exercicio_nome, ...payloadItem } = item;
-      return { ...payloadItem, ordem: counters[day] };
-    });
+    const items = days.flatMap(day => draftItems.map((item, index) => {
+      const { exercicio_nome, categoria_nome, ...payloadItem } = item;
+      return { ...payloadItem, dia_semana: day, ordem: index + 1 };
+    }));
 
     saveButton.disabled = true;
     const { error } = await supabase.rpc('fsfit_salvar_modelo_treino', {
@@ -315,8 +387,10 @@ if (!exerciseSection) {
       const item = draftItems[index];
       if (!item) return;
       editingItemIndex = index;
-      daySelect.value = String(item.dia_semana);
-      exerciseSelect.value = item.exercicio_id;
+      const exercise = exercises.find(entry => entry.id === item.exercicio_id);
+      exerciseSearch.value = '';
+      exerciseCategory.value = exercise?.categoria_id || '';
+      renderExerciseOptions(item.exercicio_id);
       seriesInput.value = item.series ?? '';
       repsInput.value = item.repeticoes || '';
       loadInput.value = item.carga || '';
