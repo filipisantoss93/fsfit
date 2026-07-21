@@ -28,9 +28,9 @@ function injectStyles() {
     .live-exercise-completion-copy small{display:block;margin-top:3px;color:var(--muted);font-size:.68rem;line-height:1.35}
     .live-session-exercise-row.is-completed{border-color:rgba(50,215,75,.34);background:rgba(50,215,75,.055)}
     .live-session-exercise-row.is-completed .live-session-exercise-order{background:rgba(50,215,75,.13);color:var(--primary)}
-    .live-session-exercise-title-line{display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap}
+    .live-session-exercise-copy .live-session-exercise-title-line{display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap;margin-top:0;color:inherit;font-size:inherit;line-height:normal}
     .live-session-exercise-title-line strong{min-width:0}
-    .live-exercise-completed-badge{display:inline-flex;align-items:center;min-height:19px;padding:0 6px;border:1px solid rgba(50,215,75,.35);border-radius:999px;background:rgba(50,215,75,.08);color:var(--primary);font-size:.52rem!important;font-weight:900;letter-spacing:.045em;line-height:1}
+    .live-session-exercise-copy .live-exercise-completed-badge{display:inline-flex;align-items:center;min-height:19px;margin-top:0;padding:0 6px;border:1px solid rgba(50,215,75,.35);border-radius:999px;background:rgba(50,215,75,.08);color:var(--primary);font-size:.52rem!important;font-weight:900;letter-spacing:.045em;line-height:1}
     @media(max-width:520px){.live-exercise-completion{padding:11px 12px}.live-exercise-rest-field{grid-column:1/-1}}
   `;
   document.head.appendChild(style);
