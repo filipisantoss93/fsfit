@@ -167,4 +167,7 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
   import('./painel-compact-enhancements.js?v=20260720-dashboard-compact2').catch(error => {
     console.error('Falha ao carregar melhorias compactas do painel:', error);
   });
+  import('./aulas-painel-exercise-controls.js?v=20260720-live-exercise-controls1').catch(error => {
+    console.error('Falha ao carregar controles de exercício em aula:', error);
+  });
 }
