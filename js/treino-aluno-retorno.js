@@ -81,3 +81,7 @@ function compactWorkoutPage() {
 }
 
 compactWorkoutPage();
+
+import('./exercicio-drag-order-structured-sync.js?v=20260720-dnd-sync1').catch(error => {
+  console.error('Falha ao sincronizar ordem do editor estruturado:', error);
+});
