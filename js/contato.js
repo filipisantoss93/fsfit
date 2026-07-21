@@ -17,11 +17,12 @@ const categoryLabels = {
   financeiro: 'Financeiro',
   outro: 'Outro'
 };
-const statusLabels = {
-  novo: 'Novo',
-  em_atendimento: 'Em atendimento',
-  respondido: 'Respondido',
-  resolvido: 'Resolvido'
+
+const supportVisualStatus = {
+  novo: { label: 'Enviado', className: 'enviado' },
+  em_atendimento: { label: 'Enviado', className: 'enviado' },
+  respondido: { label: 'Respondido', className: 'respondido' },
+  resolvido: { label: 'Fechado', className: 'fechado' }
 };
 
 function prefillFromUrl() {
@@ -92,6 +93,10 @@ function getFriendlySupportError(error) {
   return 'Não foi possível enviar sua mensagem. Tente novamente em instantes.';
 }
 
+function getVisualStatus(status) {
+  return supportVisualStatus[status] || { label: 'Enviado', className: 'enviado' };
+}
+
 async function loadTickets() {
   const { data: tickets, error } = await supabase
     .from('contatos_suporte')
@@ -121,27 +126,63 @@ async function loadTickets() {
     return acc;
   }, {});
 
-  list.innerHTML = tickets.map(ticket => {
-    const thread = grouped[ticket.id] || [];
-    const canReply = ticket.status !== 'resolvido';
-    return `<article class="support-ticket">
-      <div class="support-ticket-head">
-        <div>
-          <h3>${esc(ticket.assunto)}</h3>
-          <div class="support-ticket-meta">${esc(categoryLabels[ticket.categoria] || ticket.categoria)} · ${formatDate(ticket.created_at)}</div>
-        </div>
-        <span class="support-status ${ticket.status}">${esc(statusLabels[ticket.status] || ticket.status)}</span>
-      </div>
-      <div class="support-thread">
-        <div class="support-reply"><small>Você · ${formatDate(ticket.created_at)}</small>${esc(ticket.mensagem)}</div>
-        ${thread.map(reply => `<div class="support-reply ${reply.autor_tipo === 'admin' ? 'admin' : ''}"><small>${reply.autor_tipo === 'admin' ? 'Equipe FS Fit' : 'Você'} · ${formatDate(reply.created_at)}</small>${esc(reply.mensagem)}</div>`).join('')}
-      </div>
-      ${canReply ? `<form class="support-followup" data-followup="${ticket.id}">
-        <div class="form-group"><textarea name="mensagem" maxlength="5000" placeholder="Adicionar uma nova mensagem ao atendimento" required></textarea></div>
-        <button class="btn btn-outline" type="submit">Enviar complemento</button>
-      </form>` : ''}
-    </article>`;
-  }).join('');
+  list.innerHTML = `
+    <div class="support-list-summary">${tickets.length} ${tickets.length === 1 ? 'atendimento' : 'atendimentos'}</div>
+    <div class="support-ticket-list">
+      ${tickets.map(ticket => {
+        const thread = grouped[ticket.id] || [];
+        const canReply = ticket.status !== 'resolvido';
+        const visualStatus = getVisualStatus(ticket.status);
+        const detailsId = `support-details-${ticket.id}`;
+
+        return `<article class="support-ticket" data-ticket="${ticket.id}">
+          <button class="support-ticket-row" type="button" data-ticket-toggle="${ticket.id}" aria-expanded="false" aria-controls="${detailsId}">
+            <span class="support-ticket-main">
+              <strong>${esc(ticket.assunto)}</strong>
+              <small>${esc(categoryLabels[ticket.categoria] || ticket.categoria)} · ${formatDate(ticket.created_at)}</small>
+            </span>
+            <span class="support-status ${visualStatus.className}">${visualStatus.label}</span>
+            <span class="support-ticket-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="support-ticket-details" id="${detailsId}" hidden>
+            <div class="support-thread">
+              <div class="support-reply"><small>Você · ${formatDate(ticket.created_at)}</small>${esc(ticket.mensagem)}</div>
+              ${thread.map(reply => `<div class="support-reply ${reply.autor_tipo === 'admin' ? 'admin' : ''}"><small>${reply.autor_tipo === 'admin' ? 'Equipe FS Fit' : 'Você'} · ${formatDate(reply.created_at)}</small>${esc(reply.mensagem)}</div>`).join('')}
+            </div>
+            ${canReply ? `<form class="support-followup" data-followup="${ticket.id}">
+              <div class="form-group"><textarea name="mensagem" maxlength="5000" placeholder="Adicionar uma nova mensagem ao atendimento" required></textarea></div>
+              <button class="btn btn-outline" type="submit">Enviar complemento</button>
+            </form>` : '<p class="support-closed-note">Este atendimento foi fechado.</p>'}
+          </div>
+        </article>`;
+      }).join('')}
+    </div>`;
+}
+
+function toggleTicket(button) {
+  const ticketId = button.dataset.ticketToggle;
+  const ticket = button.closest('.support-ticket');
+  const details = ticket?.querySelector('.support-ticket-details');
+  if (!ticket || !details) return;
+
+  const willOpen = button.getAttribute('aria-expanded') !== 'true';
+
+  document.querySelectorAll('.support-ticket.is-open').forEach(openTicket => {
+    if (openTicket === ticket) return;
+    openTicket.classList.remove('is-open');
+    const openButton = openTicket.querySelector('[data-ticket-toggle]');
+    const openDetails = openTicket.querySelector('.support-ticket-details');
+    openButton?.setAttribute('aria-expanded', 'false');
+    if (openDetails) openDetails.hidden = true;
+  });
+
+  ticket.classList.toggle('is-open', willOpen);
+  button.setAttribute('aria-expanded', String(willOpen));
+  details.hidden = !willOpen;
+
+  if (willOpen && ticketId) {
+    requestAnimationFrame(() => ticket.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
+  }
 }
 
 form.addEventListener('submit', async event => {
@@ -164,6 +205,12 @@ form.addEventListener('submit', async event => {
   } finally {
     button.disabled = false;
   }
+});
+
+document.addEventListener('click', event => {
+  const ticketButton = event.target.closest('[data-ticket-toggle]');
+  if (!ticketButton) return;
+  toggleTicket(ticketButton);
 });
 
 document.addEventListener('submit', async event => {
