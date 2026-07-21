@@ -132,3 +132,7 @@ import('./exercicio-drag-order-structured-sync.js?v=20260720-dnd-sync1').catch(e
 import('./treino-sticky-exercise-save.js?v=20260720-sticky-save1').catch(error => {
   console.error('Falha ao carregar botão fixo de adicionar exercícios:', error);
 });
+
+import('./treino-exercise-picker-sheet.js?v=20260721-picker-sheet1').catch(error => {
+  console.error('Falha ao carregar seletor de exercícios do treino estruturado:', error);
+});
