@@ -10,24 +10,24 @@ function injectStyles() {
     .student-main-tabs {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin: 18px 0 16px;
-      padding: 8px;
+      gap: 6px;
+      margin: 12px 0 12px;
+      padding: 5px;
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       background: rgba(255,255,255,.025);
     }
     .student-main-tab {
       min-width: 0;
-      min-height: 52px;
-      padding: 10px 8px;
+      min-height: 44px;
+      padding: 8px 6px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 10px;
       background: transparent;
       color: var(--muted);
       font: inherit;
       font-weight: 850;
-      font-size: .92rem;
+      font-size: .86rem;
       cursor: pointer;
       transition: .2s ease;
     }
@@ -51,8 +51,8 @@ function injectStyles() {
     }
     .student-main-empty p { margin: 0; }
     @media (max-width: 520px) {
-      .student-main-tabs { gap: 6px; padding: 6px; }
-      .student-main-tab { min-height: 48px; font-size: .84rem; padding: 8px 5px; }
+      .student-main-tabs { gap: 5px; padding: 5px; margin: 10px 0 10px; }
+      .student-main-tab { min-height: 42px; font-size: .8rem; padding: 7px 4px; }
     }
   `;
   document.head.appendChild(style);
