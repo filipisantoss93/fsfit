@@ -1,0 +1,227 @@
+name: Substituir todos os ícones FS Fit v2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/replace-fsfit-icons-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  replace-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Reconstruir fonte e substituir pacote completo
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode assets/icons-source-v2/fsfit-icon-source.webp.b64 > /tmp/fsfit-icon-source.webp
+          echo "69a3ff894b3cc59838fa6b41298152f898e4d29fd2dc9b33143b2a4e76f0f32b  /tmp/fsfit-icon-source.webp" | sha256sum -c -
+
+          python <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          import json, shutil, re
+
+          SRC = Path('/tmp/fsfit-icon-source.webp')
+          OUT = Path('assets/icons')
+          VERSION = '20260721-icons-v2'
+          DARK_BG = (15, 17, 21, 255)
+
+          img = Image.open(SRC).convert('RGBA')
+          cache = {}
+
+          def resized(size):
+              if size not in cache:
+                  cache[size] = img.resize((size, size), Image.Resampling.LANCZOS)
+              return cache[size]
+
+          def save_rgba(size, path):
+              path.parent.mkdir(parents=True, exist_ok=True)
+              resized(size).save(path, 'PNG')
+
+          def save_rgb(size, path, bg=(15,17,21)):
+              path.parent.mkdir(parents=True, exist_ok=True)
+              canvas = Image.new('RGBA', (size, size), bg + (255,))
+              canvas.alpha_composite(resized(size))
+              canvas.convert('RGB').save(path, 'PNG')
+
+          # Remove todo o pacote antigo para garantir substituição integral.
+          if OUT.exists():
+              shutil.rmtree(OUT)
+          OUT.mkdir(parents=True, exist_ok=True)
+
+          # 00-master
+          for s in [1024, 2048]:
+              save_rgba(s, OUT / '00-master' / f'fs-fit-master-{s}.png')
+
+          # 01-web-favicon
+          for s in [16, 32, 48, 64, 96, 128, 256, 512]:
+              save_rgba(s, OUT / '01-web-favicon' / f'favicon-{s}x{s}.png')
+          resized(256).save(
+              OUT / '01-web-favicon' / 'favicon.ico',
+              format='ICO',
+              sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)]
+          )
+          save_rgb(180, OUT / '01-web-favicon' / 'apple-touch-icon.png')
+          save_rgba(192, OUT / '01-web-favicon' / 'android-chrome-192x192.png')
+          save_rgba(512, OUT / '01-web-favicon' / 'android-chrome-512x512.png')
+
+          # 02-pwa
+          for s in [72, 96, 128, 144, 152, 192, 384, 512]:
+              save_rgba(s, OUT / '02-pwa' / f'icon-{s}x{s}.png')
+          for s in [192, 512]:
+              save_rgb(s, OUT / '02-pwa' / f'icon-maskable-{s}x{s}.png')
+          manifest_example = {
+              'name': 'FS Fit',
+              'short_name': 'FS Fit',
+              'icons': [
+                  *[
+                      {'src': f'/assets/icons/02-pwa/icon-{s}x{s}.png?v={VERSION}', 'sizes': f'{s}x{s}', 'type': 'image/png', 'purpose': 'any'}
+                      for s in [72,96,128,144,152,192,384,512]
+                  ],
+                  {'src': f'/assets/icons/02-pwa/icon-maskable-192x192.png?v={VERSION}', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'maskable'},
+                  {'src': f'/assets/icons/02-pwa/icon-maskable-512x512.png?v={VERSION}', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}
+              ]
+          }
+          (OUT / '02-pwa' / 'manifest-icons-example.json').write_text(
+              json.dumps(manifest_example, indent=2, ensure_ascii=False) + '\n', encoding='utf-8'
+          )
+
+          # 03-android
+          legacy = {
+              'mipmap-mdpi':48,
+              'mipmap-hdpi':72,
+              'mipmap-xhdpi':96,
+              'mipmap-xxhdpi':144,
+              'mipmap-xxxhdpi':192
+          }
+          for folder, s in legacy.items():
+              save_rgb(s, OUT / '03-android' / 'res' / folder / 'ic_launcher.png')
+              save_rgb(s, OUT / '03-android' / 'res' / folder / 'ic_launcher_round.png')
+
+          adaptive = {
+              'mipmap-mdpi':108,
+              'mipmap-hdpi':162,
+              'mipmap-xhdpi':216,
+              'mipmap-xxhdpi':324,
+              'mipmap-xxxhdpi':432
+          }
+          for folder, s in adaptive.items():
+              save_rgba(s, OUT / '03-android' / 'adaptive-foreground' / folder / 'ic_launcher_foreground.png')
+          save_rgb(512, OUT / '03-android' / 'play-store-icon-512x512.png')
+
+          # 04-ios
+          ios_dir = OUT / '04-ios' / 'AppIcon.appiconset'
+          ios_specs = [
+              ('AppIcon-20@1x.png',20,'20x20','1x','ipad'),
+              ('AppIcon-20@2x.png',40,'20x20','2x','iphone'),
+              ('AppIcon-20@3x.png',60,'20x20','3x','iphone'),
+              ('AppIcon-29@1x.png',29,'29x29','1x','ipad'),
+              ('AppIcon-29@2x.png',58,'29x29','2x','iphone'),
+              ('AppIcon-29@3x.png',87,'29x29','3x','iphone'),
+              ('AppIcon-40@1x.png',40,'40x40','1x','ipad'),
+              ('AppIcon-40@2x.png',80,'40x40','2x','iphone'),
+              ('AppIcon-40@3x.png',120,'40x40','3x','iphone'),
+              ('AppIcon-60@2x.png',120,'60x60','2x','iphone'),
+              ('AppIcon-60@3x.png',180,'60x60','3x','iphone'),
+              ('AppIcon-76@1x.png',76,'76x76','1x','ipad'),
+              ('AppIcon-76@2x.png',152,'76x76','2x','ipad'),
+              ('AppIcon-83.5@2x.png',167,'83.5x83.5','2x','ipad'),
+              ('AppIcon-1024.png',1024,'1024x1024','1x','ios-marketing')
+          ]
+          contents = {'images': [], 'info': {'author':'xcode','version':1}}
+          for filename, pixels, logical_size, scale, idiom in ios_specs:
+              save_rgb(pixels, ios_dir / filename)
+              contents['images'].append({
+                  'filename': filename,
+                  'idiom': idiom,
+                  'scale': scale,
+                  'size': logical_size
+              })
+          (ios_dir / 'Contents.json').write_text(json.dumps(contents, indent=2) + '\n', encoding='utf-8')
+
+          # 05-windows-tiles
+          for name, s in [
+              ('mstile-70x70.png',70),
+              ('mstile-150x150.png',150),
+              ('mstile-310x310.png',310)
+          ]:
+              save_rgb(s, OUT / '05-windows-tiles' / name)
+          wide = Image.new('RGB', (310,150), (15,17,21))
+          tmp = resized(120).convert('RGB')
+          wide.paste(tmp, ((310-120)//2, (150-120)//2))
+          wide.save(OUT / '05-windows-tiles' / 'mstile-310x150.png', 'PNG')
+
+          # 06-extra-common-sizes
+          for s in [36,48,72,96,128,144,180,192,256,384,512,1024]:
+              save_rgba(s, OUT / '06-extra-common-sizes' / f'fs-fit-icon-{s}x{s}.png')
+
+          (OUT / 'README.md').write_text(
+              '# FS Fit — Pacote oficial de ícones v2\n\nPacote regenerado com o novo ícone oficial sem borda branca.\n',
+              encoding='utf-8'
+          )
+
+          # Atualiza os manifests para forçar os aparelhos a buscar os novos binários.
+          for manifest_path in [Path('manifest.webmanifest'), Path('manifest-personal.webmanifest')]:
+              if not manifest_path.exists():
+                  continue
+              data = json.loads(manifest_path.read_text(encoding='utf-8'))
+              for icon in data.get('icons', []):
+                  src = icon.get('src', '').split('?')[0]
+                  icon['src'] = f'{src}?v={VERSION}'
+              manifest_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+
+          # Atualiza favicon, Apple Touch Icon e links de manifest em todas as páginas HTML.
+          icon_re = re.compile(r'(?P<path>/?assets/icons/01-web-favicon/(?:favicon\.ico|favicon-32x32\.png|apple-touch-icon\.png))(?:\?v=[^\"\']+)?')
+          manifest_re = re.compile(r'(?P<path>(?:manifest|manifest-personal)\.webmanifest)(?:\?v=[^\"\']+)?')
+          for path in Path('.').rglob('*.html'):
+              if any(part in {'.git', 'node_modules'} for part in path.parts):
+                  continue
+              text = path.read_text(encoding='utf-8')
+              updated = icon_re.sub(lambda m: f"{m.group('path')}?v={VERSION}", text)
+              updated = manifest_re.sub(lambda m: f"{m.group('path')}?v={VERSION}", updated)
+              if updated != text:
+                  path.write_text(updated, encoding='utf-8')
+
+          # Fonte temporária não fica no repositório final.
+          shutil.rmtree(Path('assets/icons-source-v2'), ignore_errors=True)
+
+          count = sum(1 for p in OUT.rglob('*') if p.is_file())
+          print(f'Arquivos no novo pacote: {count}')
+          if count != 74:
+              raise SystemExit(f'Quantidade inesperada de arquivos: {count}')
+          PY
+
+      - name: Commitar substituição completa dos ícones
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração para commitar.'
+            exit 0
+          fi
+          git commit -m 'fix: substituir todos os ícones FS Fit pela versão sem borda branca'
+          git pull --rebase origin main
+          git push origin main
