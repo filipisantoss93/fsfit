@@ -67,6 +67,142 @@ function ensureModernUiStyles() {
     }
     .fsfit-bottom-nav{display:none}
 
+    body.fsfit-dashboard-modern .page-header{
+      margin-bottom:18px;
+    }
+    body.fsfit-dashboard-modern .page-header h1{
+      letter-spacing:-.045em;
+    }
+    body.fsfit-dashboard-modern .dashboard-tabs{
+      margin-bottom:18px;
+      border-color:rgba(255,255,255,.09);
+      background:rgba(26,29,35,.72);
+      box-shadow:0 8px 24px rgba(0,0,0,.16);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    body.fsfit-dashboard-modern .dashboard-tab-icon{
+      display:inline-grid;
+      place-items:center;
+      min-width:18px;
+      color:inherit;
+      font-size:.9rem;
+      line-height:1;
+    }
+    body.fsfit-dashboard-modern .dashboard-overview-summary{
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:18px;
+    }
+    body.fsfit-dashboard-modern .dashboard-summary-card{
+      position:relative;
+      overflow:hidden;
+      min-height:108px;
+      padding:17px;
+      border-top-width:1px!important;
+      box-shadow:none;
+    }
+    body.fsfit-dashboard-modern .dashboard-summary-card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:var(--summary-accent,var(--primary));
+    }
+    body.fsfit-dashboard-modern .dashboard-summary-card.is-students{--summary-accent:var(--primary)}
+    body.fsfit-dashboard-modern .dashboard-summary-card.is-today{--summary-accent:var(--secondary)}
+    body.fsfit-dashboard-modern .dashboard-summary-card.is-revenue{--summary-accent:#7ddc8d}
+    body.fsfit-dashboard-modern .dashboard-summary-card.is-pending{--summary-accent:var(--warning)}
+    body.fsfit-dashboard-modern .dashboard-summary-card small{
+      min-height:0;
+      margin-bottom:10px;
+      font-size:.69rem;
+      letter-spacing:.01em;
+    }
+    body.fsfit-dashboard-modern .dashboard-summary-card strong{
+      font-size:1.35rem;
+    }
+    body.fsfit-dashboard-modern .attention-card{
+      position:relative;
+      margin-bottom:16px;
+      padding:20px;
+      overflow:hidden;
+      border-color:rgba(255,193,7,.2);
+      background:linear-gradient(135deg,rgba(255,193,7,.055),rgba(26,29,35,.96) 42%);
+      box-shadow:0 14px 38px rgba(0,0,0,.22);
+    }
+    body.fsfit-dashboard-modern .attention-card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      bottom:0;
+      width:3px;
+      background:var(--warning);
+    }
+    body.fsfit-dashboard-modern .attention-card h2{
+      margin-bottom:4px;
+    }
+    body.fsfit-dashboard-modern .attention-list{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    body.fsfit-dashboard-modern .attention-item{
+      min-height:66px;
+      background:rgba(37,42,51,.72);
+      transition:border-color .18s ease,background .18s ease,transform .18s ease;
+    }
+    body.fsfit-dashboard-modern a.attention-item:hover{
+      transform:translateY(-1px);
+      border-color:rgba(255,255,255,.18);
+      background:rgba(43,49,59,.92);
+    }
+    body.fsfit-dashboard-modern .quick-actions{
+      margin:18px 0;
+    }
+    body.fsfit-dashboard-modern .quick-actions h2{
+      margin-bottom:10px;
+    }
+    body.fsfit-dashboard-modern .quick-actions-grid{
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:9px;
+    }
+    body.fsfit-dashboard-modern .quick-action{
+      position:relative;
+      min-height:84px;
+      justify-content:center;
+      padding:14px 34px 14px 14px;
+      border-color:rgba(255,255,255,.08);
+      background:rgba(26,29,35,.74);
+    }
+    body.fsfit-dashboard-modern .quick-action::after{
+      content:'›';
+      position:absolute;
+      right:13px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#667080;
+      font-size:1.35rem;
+      line-height:1;
+    }
+    body.fsfit-dashboard-modern .quick-action:hover{
+      transform:translateY(-1px);
+      border-color:rgba(59,130,246,.42);
+      background:rgba(37,42,51,.85);
+    }
+    body.fsfit-dashboard-modern .quick-action strong{
+      font-size:.86rem;
+    }
+    body.fsfit-dashboard-modern .quick-action small{
+      font-size:.69rem;
+    }
+    body.fsfit-dashboard-modern .dashboard-public-link-compact,
+    body.fsfit-dashboard-modern .dashboard-activity-card{
+      box-shadow:none;
+      border-color:rgba(255,255,255,.08);
+    }
+
     @media(max-width:860px){
       body{
         padding-bottom:calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom,0px) + 12px);
@@ -134,6 +270,54 @@ function ensureModernUiStyles() {
       .main-header{
         backdrop-filter:blur(18px);
         -webkit-backdrop-filter:blur(18px);
+      }
+      body.fsfit-dashboard-modern .dashboard-overview-summary{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+      body.fsfit-dashboard-modern .attention-list{
+        grid-template-columns:1fr;
+      }
+      body.fsfit-dashboard-modern .quick-actions-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
+    @media(max-width:620px){
+      body.fsfit-dashboard-modern .page-header{
+        align-items:stretch;
+        gap:14px;
+      }
+      body.fsfit-dashboard-modern #new-student-button{
+        width:100%;
+      }
+      body.fsfit-dashboard-modern .dashboard-tabs{
+        position:sticky;
+        top:calc(8px + env(safe-area-inset-top,0px));
+        z-index:35;
+      }
+      body.fsfit-dashboard-modern .dashboard-summary-card{
+        min-height:96px;
+        padding:14px 12px;
+      }
+      body.fsfit-dashboard-modern .dashboard-summary-card strong{
+        font-size:1.18rem;
+      }
+      body.fsfit-dashboard-modern .attention-card{
+        padding:17px;
+      }
+      body.fsfit-dashboard-modern .quick-actions-grid{
+        grid-template-columns:1fr;
+        gap:8px;
+      }
+      body.fsfit-dashboard-modern .quick-action{
+        min-height:68px;
+        padding:12px 38px 12px 14px;
+      }
+      body.fsfit-dashboard-modern .quick-action strong{
+        font-size:.88rem;
+      }
+      body.fsfit-dashboard-modern .quick-action small{
+        font-size:.7rem;
       }
     }
   `;
@@ -209,6 +393,62 @@ function ensureMobileBottomNav(active = '') {
   document.body.appendChild(nav);
 }
 
+function enhanceDashboard() {
+  if (currentPage() !== 'painel.html' || document.body.classList.contains('fsfit-dashboard-modern')) return;
+  document.body.classList.add('fsfit-dashboard-modern');
+
+  const overviewPanel = document.getElementById('dashboard-overview-panel');
+  const summary = overviewPanel?.querySelector('.dashboard-overview-summary');
+  const attention = overviewPanel?.querySelector('.attention-card');
+
+  if (overviewPanel && summary && attention) {
+    overviewPanel.insertBefore(attention, summary);
+  }
+
+  if (summary) {
+    const cards = Array.from(summary.querySelectorAll('.dashboard-summary-card'));
+    cards[0]?.classList.add('is-students');
+    cards[1]?.classList.add('is-revenue');
+    cards[2]?.classList.add('is-pending');
+
+    if (!document.getElementById('summary-today-sessions')) {
+      const todayCard = document.createElement('article');
+      todayCard.className = 'card dashboard-summary-card is-today';
+      todayCard.innerHTML = '<small>Atendimentos hoje</small><strong id="summary-today-sessions">—</strong>';
+      if (cards[0]?.nextSibling) summary.insertBefore(todayCard, cards[0].nextSibling);
+      else summary.appendChild(todayCard);
+    }
+  }
+
+  const todayCount = document.getElementById('today-count');
+  const todaySummary = document.getElementById('summary-today-sessions');
+  const syncTodaySummary = () => {
+    if (!todaySummary || !todayCount) return;
+    todaySummary.textContent = todayCount.textContent.trim() || '—';
+  };
+  syncTodaySummary();
+  if (todayCount && todaySummary) {
+    new MutationObserver(syncTodaySummary).observe(todayCount, { childList:true, subtree:true, characterData:true });
+  }
+
+  const quickActionsTitle = overviewPanel?.querySelector('.quick-actions h2');
+  if (quickActionsTitle) quickActionsTitle.textContent = 'Acesso rápido';
+
+  const tabIcons = {
+    overview: '⌂',
+    agenda: '▦',
+    live: '●'
+  };
+  document.querySelectorAll('[data-dashboard-tab]').forEach(tab => {
+    if (tab.querySelector('.dashboard-tab-icon')) return;
+    const icon = document.createElement('span');
+    icon.className = 'dashboard-tab-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = tabIcons[tab.dataset.dashboardTab] || '•';
+    tab.prepend(icon);
+  });
+}
+
 function configureStudentRecordBackLink() {
   if (currentPage() !== 'ficha-aluno.html') return;
 
@@ -264,6 +504,7 @@ export function renderHeader(active = '') {
   ensureSubscriptionMenuLink(active);
   normalizeHeaderLabels();
   ensureMobileBottomNav(active);
+  enhanceDashboard();
   configureStudentRecordBackLink();
 }
 
