@@ -106,13 +106,13 @@ function enhanceTodayAgenda() {
     const sessionId = liveSessionIdFromRow(row);
     if (!sessionId) return;
 
+    const liveRow = document.querySelector(`[data-open-live-session="${sessionId}"]`);
+    if (!liveRow) return;
+
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-
-    document.dispatchEvent(new CustomEvent('fsfit-open-live-session', {
-      detail: { sessionId }
-    }));
+    liveRow.click();
   }, true);
 
   applyTodayAgenda();
