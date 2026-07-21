@@ -50,6 +50,48 @@ function formatDate(value) {
   return new Date(value).toLocaleString('pt-BR');
 }
 
+function validateSupportForm() {
+  const assunto = form.assunto.value.trim();
+  const mensagemTexto = form.mensagem.value.trim();
+
+  if (assunto.length < 3) {
+    form.assunto.focus();
+    showMessage(message, 'O assunto deve ter pelo menos 3 caracteres.', 'error');
+    return null;
+  }
+
+  if (mensagemTexto.length < 5) {
+    form.mensagem.focus();
+    showMessage(message, 'A mensagem deve ter pelo menos 5 caracteres.', 'error');
+    return null;
+  }
+
+  return {
+    user_id: session.user.id,
+    categoria: form.categoria.value,
+    assunto,
+    mensagem: mensagemTexto
+  };
+}
+
+function getFriendlySupportError(error) {
+  const raw = String(error?.message || '');
+
+  if (raw.includes('contatos_suporte_mensagem_check')) {
+    return 'A mensagem deve ter entre 5 e 5000 caracteres.';
+  }
+
+  if (raw.includes('contatos_suporte_assunto_check')) {
+    return 'O assunto deve ter entre 3 e 160 caracteres.';
+  }
+
+  if (raw.includes('contatos_suporte_categoria_check')) {
+    return 'Selecione uma categoria válida.';
+  }
+
+  return 'Não foi possível enviar sua mensagem. Tente novamente em instantes.';
+}
+
 async function loadTickets() {
   const { data: tickets, error } = await supabase
     .from('contatos_suporte')
@@ -104,15 +146,12 @@ async function loadTickets() {
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
+  const payload = validateSupportForm();
+  if (!payload) return;
+
   const button = form.querySelector('[type=submit]');
   button.disabled = true;
   try {
-    const payload = {
-      user_id: session.user.id,
-      categoria: form.categoria.value,
-      assunto: form.assunto.value.trim(),
-      mensagem: form.mensagem.value.trim()
-    };
     const { error } = await supabase.from('contatos_suporte').insert(payload);
     if (error) throw error;
     form.reset();
@@ -121,7 +160,7 @@ form.addEventListener('submit', async event => {
     await loadTickets();
   } catch (error) {
     console.error(error);
-    showMessage(message, error.message || 'Não foi possível enviar sua mensagem.', 'error');
+    showMessage(message, getFriendlySupportError(error), 'error');
   } finally {
     button.disabled = false;
   }
@@ -131,6 +170,14 @@ document.addEventListener('submit', async event => {
   const followup = event.target.closest('[data-followup]');
   if (!followup) return;
   event.preventDefault();
+
+  const mensagemTexto = followup.mensagem.value.trim();
+  if (!mensagemTexto) {
+    followup.mensagem.focus();
+    showMessage(message, 'Digite uma mensagem antes de enviar o complemento.', 'error');
+    return;
+  }
+
   const button = followup.querySelector('[type=submit]');
   button.disabled = true;
   try {
@@ -138,7 +185,7 @@ document.addEventListener('submit', async event => {
       contato_id: followup.dataset.followup,
       autor_id: session.user.id,
       autor_tipo: 'usuario',
-      mensagem: followup.mensagem.value.trim()
+      mensagem: mensagemTexto
     });
     if (error) throw error;
     followup.reset();
@@ -146,7 +193,7 @@ document.addEventListener('submit', async event => {
     await loadTickets();
   } catch (error) {
     console.error(error);
-    showMessage(message, error.message || 'Não foi possível enviar a mensagem.', 'error');
+    showMessage(message, 'Não foi possível enviar o complemento. Tente novamente em instantes.', 'error');
   } finally {
     button.disabled = false;
   }
