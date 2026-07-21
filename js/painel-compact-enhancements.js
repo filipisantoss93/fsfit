@@ -6,6 +6,8 @@ const LIVE_STATUS_REFRESH_MS = 15000;
 
 let liveStudentIds = new Set();
 let liveStudentNames = new Set();
+let liveSessionByStudentId = new Map();
+let liveSessionByStudentName = new Map();
 let applyingTodayAgenda = false;
 
 if (todayList || liveList) {
@@ -56,10 +58,21 @@ function studentIdFromRow(row) {
   }
 }
 
+function studentNameFromRow(row) {
+  const main = row?.querySelector?.('.today-entry-main');
+  return main?.dataset?.studentName || main?.querySelector?.('strong')?.textContent?.trim() || '';
+}
+
 function isStudentInClass(row, name) {
   const studentId = studentIdFromRow(row);
   if (studentId && liveStudentIds.has(studentId)) return true;
   return liveStudentNames.has(normalizeName(name));
+}
+
+function liveSessionIdFromRow(row) {
+  const studentId = studentIdFromRow(row);
+  if (studentId && liveSessionByStudentId.has(studentId)) return liveSessionByStudentId.get(studentId);
+  return liveSessionByStudentName.get(normalizeName(studentNameFromRow(row))) || '';
 }
 
 async function refreshLiveStudentStatus() {
@@ -74,11 +87,33 @@ async function refreshLiveStudentStatus() {
   const activeRows = (Array.isArray(data) ? data : []).filter(row => row.status === 'em_aula');
   liveStudentIds = new Set(activeRows.map(row => String(row.aluno_id || '')).filter(Boolean));
   liveStudentNames = new Set(activeRows.map(row => normalizeName(row.aluno_nome)).filter(Boolean));
+  liveSessionByStudentId = new Map(activeRows
+    .filter(row => row.aluno_id && row.sessao_id)
+    .map(row => [String(row.aluno_id), String(row.sessao_id)]));
+  liveSessionByStudentName = new Map(activeRows
+    .filter(row => row.aluno_nome && row.sessao_id)
+    .map(row => [normalizeName(row.aluno_nome), String(row.sessao_id)]));
   applyTodayAgenda();
 }
 
 function enhanceTodayAgenda() {
   if (!todayList) return;
+
+  todayList.addEventListener('click', event => {
+    const row = event.target.closest('.today-entry');
+    if (!row || !row.classList.contains('is-in-class')) return;
+
+    const sessionId = liveSessionIdFromRow(row);
+    if (!sessionId) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    document.dispatchEvent(new CustomEvent('fsfit-open-live-session', {
+      detail: { sessionId }
+    }));
+  }, true);
 
   applyTodayAgenda();
   const observer = new MutationObserver(() => applyTodayAgenda());
@@ -125,6 +160,7 @@ function applyTodayAgenda() {
       row.classList.toggle('is-in-class', inClass);
       row.classList.toggle('is-now', isNow);
       row.classList.toggle('is-next', isNext);
+      row.setAttribute('aria-label', inClass ? `Abrir aula de ${name}` : `Abrir ficha de ${name}`);
 
       const badge = inClass
         ? '<span class="today-status in-class">EM AULA</span>'
