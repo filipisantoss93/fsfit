@@ -201,13 +201,15 @@ function renderRecentActivity(students, payments) {
 }
 
 function finalizeAttention() {
+  const card = document.querySelector('.attention-card');
   const loading = document.querySelector('#attention-loading');
   const empty = document.querySelector('#attention-empty');
   const items = Array.from(document.querySelectorAll('[data-attention-item]'));
   const hasVisibleItems = items.some(item => !item.hidden);
 
   if (loading) loading.hidden = true;
-  if (empty) empty.hidden = hasVisibleItems;
+  if (empty) empty.hidden = true;
+  if (card) card.hidden = !hasVisibleItems;
 }
 
 function toggleAttentionItem(selector, visible) {
