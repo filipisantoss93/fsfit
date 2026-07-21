@@ -3,7 +3,7 @@ const pageActions = document.querySelector('.exercise-library-page .page-header 
 const savedToolbar = document.querySelector('.saved-workout-toolbar');
 
 if (workoutButton && pageActions) {
-  workoutButton.textContent = '+ Novo treino';
+  workoutButton.textContent = '+ Treino';
   pageActions.appendChild(workoutButton);
 }
 
