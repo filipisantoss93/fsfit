@@ -195,6 +195,27 @@ html.fsfit-sheet-open body {
     display: none !important;
   }
 
+  .fsfit-bottom-nav {
+    isolation: isolate;
+    background: #15181e !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 -10px 30px rgba(0,0,0,.34) !important;
+  }
+
+  .fsfit-bottom-nav::before {
+    content: '';
+    position: fixed;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(104px + env(safe-area-inset-bottom, 0px));
+    background: #0f1115;
+    box-shadow: 0 -16px 28px rgba(15,17,21,.96);
+    pointer-events: none;
+  }
+
   .fsfit-bottom-nav button.is-open {
     background: rgba(50,215,75,.11);
     color: var(--primary);
