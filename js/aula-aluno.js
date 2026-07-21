@@ -102,6 +102,15 @@ async function notifyPersonalCheckin() {
   return data;
 }
 
+function exerciseSummary(item) {
+  const parts = [];
+  if (item.series) parts.push(`${item.series} séries`);
+  if (item.repeticoes) parts.push(`${item.repeticoes} rep.`);
+  if (item.descanso_segundos != null) parts.push(`${item.descanso_segundos}s descanso`);
+  if (item.carga) parts.push(item.carga);
+  return parts.join(' · ') || 'Ver detalhes';
+}
+
 function render() {
   const state = sessionState;
   if (!state?.sessao_id) {
@@ -127,18 +136,47 @@ function render() {
   const done = items.filter(item => item.concluido).length;
   const total = items.length;
   const percent = total ? Math.round((done / total) * 100) : 0;
+  const remaining = items.filter(item => !item.concluido);
+  const currentId = remaining[0]?.id ? String(remaining[0].id) : '';
+  const nextId = remaining[1]?.id ? String(remaining[1].id) : '';
+  const completed = total > 0 && done === total;
+
   box.innerHTML = `
-    <div class="live-class-header"><div><small>EM AULA</small><h2>${esc(state.treino_nome || 'Treino em andamento')}</h2></div><span class="live-status active">EM AULA</span></div>
-    <div class="live-class-meta"><span>Iniciado há ${esc(formatElapsed(state.iniciado_at || state.checkin_at))}</span><strong>${done}/${total} exercícios</strong></div>
-    <div class="live-progress"><span style="width:${percent}%"></span></div>
+    <div class="live-class-header live-class-header-compact">
+      <div>
+        <small>EM AULA</small>
+        <h2>${esc(state.treino_nome || 'Treino em andamento')}</h2>
+        <p>Iniciado há ${esc(formatElapsed(state.iniciado_at || state.checkin_at))}</p>
+      </div>
+    </div>
+    <div class="live-progress-summary">
+      <strong>${done} de ${total} concluídos</strong>
+      <span>${percent}%</span>
+    </div>
+    <div class="live-progress" aria-label="Progresso do treino"><span style="width:${percent}%"></span></div>
+    ${completed ? '<div class="live-complete-message">Treino concluído 🎉</div>' : ''}
     <div class="live-exercise-list">
-      ${items.length ? items.map(item => `<div class="live-exercise ${item.concluido ? 'done' : ''}">
-        <input type="checkbox" aria-label="Marcar ${esc(item.nome || 'exercício')} como concluído" data-session-exercise="${esc(item.id)}" ${item.concluido ? 'checked' : ''}>
-        <button class="live-exercise-detail" type="button" data-live-exercise-detail="${esc(item.id)}" aria-label="Ver detalhes de ${esc(item.nome || 'exercício')}">
-          <span class="live-exercise-main"><strong>${esc(item.nome || 'Exercício')}</strong><small>${esc([item.series ? `${item.series} séries` : '', item.repeticoes || '', item.carga || ''].filter(Boolean).join(' • '))}</small></span>
-          <span class="live-exercise-arrow" aria-hidden="true">›</span>
-        </button>
-      </div>`).join('') : '<p>Nenhum exercício programado para hoje.</p>'}
+      ${items.length ? items.map(item => {
+        const id = String(item.id || '');
+        const isCurrent = !item.concluido && id === currentId;
+        const isNext = !item.concluido && id === nextId;
+        const rowClass = ['live-exercise', item.concluido ? 'done' : '', isCurrent ? 'current' : '', isNext ? 'next' : ''].filter(Boolean).join(' ');
+        const badge = isCurrent
+          ? '<span class="live-exercise-status current">AGORA</span>'
+          : isNext
+            ? '<span class="live-exercise-status next">PRÓXIMO</span>'
+            : '';
+        return `<div class="${rowClass}">
+          <input type="checkbox" aria-label="Marcar ${esc(item.nome || 'exercício')} como concluído" data-session-exercise="${esc(item.id)}" ${item.concluido ? 'checked' : ''}>
+          <button class="live-exercise-detail" type="button" data-live-exercise-detail="${esc(item.id)}" aria-label="Ver detalhes de ${esc(item.nome || 'exercício')}">
+            <span class="live-exercise-main">
+              <span class="live-exercise-title-row"><strong>${esc(item.nome || 'Exercício')}</strong>${badge}</span>
+              <small>${esc(exerciseSummary(item))}</small>
+            </span>
+            <span class="live-exercise-arrow" aria-hidden="true">›</span>
+          </button>
+        </div>`;
+      }).join('') : '<p>Nenhum exercício programado para hoje.</p>'}
     </div>
     <button id="finish-live-class" class="btn btn-secondary" type="button">Finalizar treino</button>`;
 
