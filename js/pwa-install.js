@@ -162,3 +162,9 @@ injectStyles();
 if (isIos()) {
   window.setTimeout(showModal, 900);
 }
+
+if (document.querySelector('#today-list') || document.querySelector('#live-students-list')) {
+  import('./painel-compact-enhancements.js?v=20260720-dashboard-compact1').catch(error => {
+    console.error('Falha ao carregar melhorias compactas do painel:', error);
+  });
+}
