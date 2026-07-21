@@ -182,6 +182,14 @@ html.fsfit-sheet-open body {
 }
 
 @media (max-width: 860px) {
+  html {
+    scroll-padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body {
+    padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
   #header-container .menu-mobile-btn,
   .menu-mobile-btn {
     display: none !important;
