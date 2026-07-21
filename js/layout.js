@@ -41,6 +41,105 @@ function ensureMobileOverflowGuard() {
   document.head.appendChild(style);
 }
 
+function ensureModernUiStyles() {
+  if (document.querySelector('style[data-fsfit-modern-ui]')) return;
+  const style = document.createElement('style');
+  style.dataset.fsfitModernUi = 'true';
+  style.textContent = `
+    :root{
+      --fsfit-nav-height:68px;
+      --fsfit-glass:rgba(20,23,29,.9);
+    }
+    .card{
+      transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+    }
+    .btn{
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn-primary{
+      box-shadow:0 10px 26px rgba(50,215,75,.14);
+    }
+    .btn-primary:active,.btn-secondary:active,.btn-outline:active,.btn-neutral:active{
+      transform:scale(.985);
+    }
+    .nav-menu a,.nav-menu button{
+      transition:background .18s ease,color .18s ease,border-color .18s ease;
+    }
+    .fsfit-bottom-nav{display:none}
+
+    @media(max-width:860px){
+      body{
+        padding-bottom:calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom,0px) + 12px);
+      }
+      .fsfit-bottom-nav{
+        position:fixed;
+        z-index:140;
+        left:10px;
+        right:10px;
+        bottom:calc(8px + env(safe-area-inset-bottom,0px));
+        display:grid;
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        min-height:var(--fsfit-nav-height);
+        padding:7px;
+        border:1px solid rgba(255,255,255,.1);
+        border-radius:18px;
+        background:var(--fsfit-glass);
+        box-shadow:0 18px 50px rgba(0,0,0,.45);
+        backdrop-filter:blur(18px) saturate(1.25);
+        -webkit-backdrop-filter:blur(18px) saturate(1.25);
+      }
+      .fsfit-bottom-nav a,.fsfit-bottom-nav button{
+        position:relative;
+        display:flex;
+        min-width:0;
+        min-height:52px;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:3px;
+        padding:5px 2px;
+        border:0;
+        border-radius:12px;
+        background:transparent;
+        color:#8f99a8;
+        font:inherit;
+        font-size:.63rem;
+        font-weight:800;
+        line-height:1.05;
+        cursor:pointer;
+        -webkit-tap-highlight-color:transparent;
+      }
+      .fsfit-bottom-nav a span,.fsfit-bottom-nav button span{
+        display:grid;
+        place-items:center;
+        min-height:20px;
+        color:inherit;
+        font-size:1.12rem;
+        font-weight:900;
+        line-height:1;
+      }
+      .fsfit-bottom-nav a.active,.fsfit-bottom-nav button.active{
+        background:rgba(50,215,75,.11);
+        color:var(--primary);
+      }
+      .fsfit-bottom-nav a.active::after,.fsfit-bottom-nav button.active::after{
+        content:'';
+        position:absolute;
+        top:3px;
+        width:18px;
+        height:2px;
+        border-radius:999px;
+        background:var(--primary);
+      }
+      .main-header{
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function normalizeHeaderLabels() {
   const profileLink = document.querySelector('#nav-menu [data-page="perfil"]');
   if (profileLink) profileLink.textContent = 'Perfil';
@@ -64,6 +163,50 @@ function ensureSubscriptionMenuLink(active = '') {
 
   if (divider) menu.insertBefore(item, divider);
   else menu.appendChild(item);
+}
+
+function ensureMobileBottomNav(active = '') {
+  document.querySelector('.fsfit-bottom-nav')?.remove();
+
+  const page = currentPage();
+  const inferredActive = active || page.replace(/\.html$/i, '');
+  const primaryPages = new Set(['painel', 'alunos', 'agenda', 'financeiro']);
+  const nav = document.createElement('nav');
+  nav.className = 'fsfit-bottom-nav';
+  nav.setAttribute('aria-label', 'Navegação principal');
+
+  const items = [
+    { key: 'painel', href: 'painel.html', icon: '⌂', label: 'Início' },
+    { key: 'alunos', href: 'alunos.html', icon: '◎', label: 'Alunos' },
+    { key: 'agenda', href: 'agenda.html', icon: '▦', label: 'Agenda' },
+    { key: 'financeiro', href: 'financeiro.html', icon: '$', label: 'Financeiro' }
+  ];
+
+  items.forEach(item => {
+    const link = document.createElement('a');
+    link.href = item.href;
+    link.dataset.bottomPage = item.key;
+    link.innerHTML = `<span aria-hidden="true">${item.icon}</span>${item.label}`;
+    if (inferredActive === item.key || page === item.href) link.classList.add('active');
+    nav.appendChild(link);
+  });
+
+  const moreButton = document.createElement('button');
+  moreButton.type = 'button';
+  moreButton.dataset.bottomPage = 'mais';
+  moreButton.innerHTML = '<span aria-hidden="true">•••</span>Mais';
+  moreButton.setAttribute('aria-label', 'Abrir mais opções');
+  moreButton.setAttribute('aria-expanded', 'false');
+  if (!primaryPages.has(inferredActive)) moreButton.classList.add('active');
+  moreButton.addEventListener('click', () => {
+    const menu = document.querySelector('#nav-menu');
+    if (!menu) return;
+    const isOpen = menu.classList.toggle('active');
+    moreButton.setAttribute('aria-expanded', String(isOpen));
+  });
+  nav.appendChild(moreButton);
+
+  document.body.appendChild(nav);
 }
 
 function configureStudentRecordBackLink() {
@@ -117,8 +260,10 @@ function configureStudentRecordBackLink() {
 export function renderHeader(active = '') {
   core.renderHeader(active);
   ensureMobileOverflowGuard();
+  ensureModernUiStyles();
   ensureSubscriptionMenuLink(active);
   normalizeHeaderLabels();
+  ensureMobileBottomNav(active);
   configureStudentRecordBackLink();
 }
 
