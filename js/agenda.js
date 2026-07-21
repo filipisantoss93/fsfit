@@ -26,6 +26,22 @@ const dayLabels = {
 };
 
 let agendaEntries = [];
+let workoutRecords = [];
+let manualAppointments = [];
+let cancelledStudentIds = new Set();
+let liveStudentIds = new Set();
+let studentRecords = [];
+
+const scheduleUi = ensureScheduleUi();
+const scheduleModal = scheduleUi.modal;
+const scheduleForm = scheduleUi.form;
+const scheduleStudent = scheduleForm.querySelector('[name="aluno_id"]');
+const scheduleWorkout = scheduleForm.querySelector('[name="treino_id"]');
+const scheduleDate = scheduleForm.querySelector('[name="data"]');
+const scheduleTime = scheduleForm.querySelector('[name="horario"]');
+const scheduleLocation = scheduleForm.querySelector('[name="local"]');
+const scheduleTitle = scheduleForm.querySelector('[name="titulo"]');
+const scheduleSubmit = scheduleForm.querySelector('#schedule-submit');
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -102,12 +118,29 @@ function normalizeEntries(workouts = []) {
         periodo_aula: student.periodo_aula,
         horario_aula: student.horario_aula,
         local_aula: student.local_aula,
-        treino_nome: workout.nome
+        treino_id: workout.id,
+        treino_nome: workout.nome,
+        manual: false
       });
     });
   });
 
   return entries;
+}
+
+function normalizeManualAppointment(row) {
+  return {
+    day: parseDateValue(row.data).getDay(),
+    id: row.aluno_id,
+    nome: row.alunos?.nome || 'Aluno',
+    periodo_aula: null,
+    horario_aula: row.horario,
+    local_aula: row.local,
+    treino_id: row.treino_id,
+    treino_nome: row.titulo || row.treinos?.nome || 'Agendamento',
+    manual: true,
+    appointment_id: row.id
+  };
 }
 
 function buildStudentRecordUrl(studentId, date) {
@@ -138,33 +171,48 @@ function getStatusIndexes(entries, date) {
   return { nowIndex, nextIndex };
 }
 
-function renderAgendaForDate(date) {
+function combinedEntriesForDate(date) {
   const dayNumber = date.getDay();
-  const dayEntries = agendaEntries
-    .filter(entry => entry.day === dayNumber)
+  const manualStudentIds = new Set(manualAppointments.map(entry => String(entry.id)));
+
+  const recurring = agendaEntries.filter(entry =>
+    entry.day === dayNumber &&
+    !cancelledStudentIds.has(String(entry.id)) &&
+    !manualStudentIds.has(String(entry.id))
+  );
+
+  return [...recurring, ...manualAppointments]
     .sort((a, b) => {
       if (!a.horario_aula && !b.horario_aula) return String(a.nome).localeCompare(String(b.nome), 'pt-BR');
       if (!a.horario_aula) return 1;
       if (!b.horario_aula) return -1;
-      return String(a.horario_aula).localeCompare(String(b.horario_aula));
+      const timeCompare = String(a.horario_aula).localeCompare(String(b.horario_aula));
+      return timeCompare || String(a.nome).localeCompare(String(b.nome), 'pt-BR');
     });
+}
 
+function renderAgendaForDate(date) {
+  const dayEntries = combinedEntriesForDate(date);
   const { nowIndex, nextIndex } = getStatusIndexes(dayEntries, date);
+  const today = isSameDate(date, new Date());
 
   const content = dayEntries.length
     ? dayEntries.map((entry, index) => {
         const timeLabel = formatTime(entry.horario_aula);
-        const isNow = index === nowIndex;
-        const isNext = index === nextIndex;
-        const status = isNow
-          ? '<span class="agenda-status now">AGORA</span>'
-          : isNext
-            ? '<span class="agenda-status next">PRÓXIMO</span>'
-            : '';
+        const inClass = today && liveStudentIds.has(String(entry.id));
+        const isNow = !inClass && index === nowIndex;
+        const isNext = !inClass && index === nextIndex;
+        const status = inClass
+          ? '<span class="agenda-status in-class">EM AULA</span>'
+          : isNow
+            ? '<span class="agenda-status now">AGORA</span>'
+            : isNext
+              ? '<span class="agenda-status next">PRÓXIMO</span>'
+              : '';
         const detail = [entry.local_aula || 'Local não informado', entry.treino_nome || 'Treino ativo'].filter(Boolean).join(' · ');
 
         return `
-          <a class="agenda-entry${isNow ? ' is-now' : ''}${isNext ? ' is-next' : ''}" href="${buildStudentRecordUrl(entry.id, date)}" aria-label="Abrir ficha de ${esc(entry.nome)}">
+          <a class="agenda-entry${inClass ? ' is-in-class' : ''}${isNow ? ' is-now' : ''}${isNext ? ' is-next' : ''}" href="${buildStudentRecordUrl(entry.id, date)}" aria-label="Abrir ficha de ${esc(entry.nome)}">
             <div class="agenda-time">${timeLabel}</div>
             <div class="agenda-entry-main">
               <div class="agenda-entry-title-row"><strong>${esc(entry.nome)}</strong>${status}</div>
@@ -191,10 +239,34 @@ function updateDateControls(date) {
   todayRow.hidden = isToday;
 }
 
-function selectDate(date) {
+async function loadDateSpecificData(date) {
+  const value = formatDateValue(date);
+  const [appointmentsResult, cancellationsResult] = await Promise.all([
+    supabase
+      .from('agenda_agendamentos')
+      .select('id,aluno_id,treino_id,data,horario,local,titulo,alunos(id,nome),treinos(id,nome)')
+      .eq('personal_id', session.user.id)
+      .eq('data', value)
+      .order('horario'),
+    supabase
+      .from('agenda_cancelamentos')
+      .select('aluno_id')
+      .eq('personal_id', session.user.id)
+      .eq('data', value)
+  ]);
+
+  if (appointmentsResult.error) console.error('Erro ao carregar agendamentos manuais:', appointmentsResult.error);
+  if (cancellationsResult.error) console.error('Erro ao carregar cancelamentos da agenda:', cancellationsResult.error);
+
+  manualAppointments = (appointmentsResult.data || []).map(normalizeManualAppointment);
+  cancelledStudentIds = new Set((cancellationsResult.data || []).map(row => String(row.aluno_id || '')).filter(Boolean));
+}
+
+async function selectDate(date) {
   const value = formatDateValue(date);
   dateInput.value = value;
   updateDateControls(date);
+  await loadDateSpecificData(date);
   renderAgendaForDate(date);
   history.replaceState({}, '', `agenda.html?data=${encodeURIComponent(value)}`);
 }
@@ -202,7 +274,101 @@ function selectDate(date) {
 function shiftSelectedDate(days) {
   const date = parseDateValue(dateInput.value);
   date.setDate(date.getDate() + days);
-  selectDate(date);
+  selectDate(date).catch(console.error);
+}
+
+async function loadLiveStudents() {
+  const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
+  if (error) {
+    console.error('Não foi possível carregar alunos em aula:', error);
+    return;
+  }
+  liveStudentIds = new Set(
+    (Array.isArray(data) ? data : [])
+      .filter(row => row.status === 'em_aula')
+      .map(row => String(row.aluno_id || ''))
+      .filter(Boolean)
+  );
+  if (dateInput.value) renderAgendaForDate(parseDateValue(dateInput.value));
+}
+
+async function loadStudents() {
+  const { data, error } = await supabase
+    .from('alunos')
+    .select('id,nome,horario_aula,local_aula')
+    .eq('personal_id', session.user.id)
+    .order('nome');
+
+  if (error) {
+    console.error('Erro ao carregar alunos para agendamento:', error);
+    return;
+  }
+
+  studentRecords = data || [];
+  scheduleStudent.innerHTML = '<option value="">Selecione um aluno</option>' + studentRecords
+    .map(student => `<option value="${esc(student.id)}">${esc(student.nome)}</option>`)
+    .join('');
+}
+
+function updateWorkoutOptions(studentId) {
+  const workouts = workoutRecords.filter(workout => String(workout.alunos?.id || '') === String(studentId));
+  scheduleWorkout.innerHTML = '<option value="">Usar treino ativo do aluno</option>' + workouts
+    .map(workout => `<option value="${esc(workout.id)}">${esc(workout.nome || 'Treino ativo')}</option>`)
+    .join('');
+}
+
+function openScheduleModal() {
+  const selectedDate = dateInput.value || formatDateValue(new Date());
+  scheduleForm.reset();
+  scheduleDate.value = selectedDate;
+  scheduleWorkout.innerHTML = '<option value="">Usar treino ativo do aluno</option>';
+  scheduleModal.classList.add('open');
+  scheduleModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('agenda-modal-open');
+}
+
+function closeScheduleModal() {
+  scheduleModal.classList.remove('open');
+  scheduleModal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('agenda-modal-open');
+}
+
+async function saveAppointment(event) {
+  event.preventDefault();
+  const studentId = scheduleStudent.value;
+  if (!studentId) return;
+
+  scheduleSubmit.disabled = true;
+  const originalText = scheduleSubmit.textContent;
+  scheduleSubmit.textContent = 'Salvando...';
+
+  try {
+    const payload = {
+      personal_id: session.user.id,
+      aluno_id: studentId,
+      treino_id: scheduleWorkout.value || null,
+      data: scheduleDate.value,
+      horario: scheduleTime.value || null,
+      local: scheduleLocation.value.trim() || null,
+      titulo: scheduleTitle.value.trim() || null
+    };
+
+    const { error } = await supabase.from('agenda_agendamentos').insert(payload);
+    if (error) throw error;
+
+    closeScheduleModal();
+    showMessage(message, 'Aluno agendado com sucesso.');
+
+    if (dateInput.value === payload.data) {
+      await selectDate(parseDateValue(payload.data));
+    }
+  } catch (error) {
+    console.error('Erro ao agendar aluno:', error);
+    showMessage(message, error.message || 'Não foi possível salvar o agendamento.', 'error');
+  } finally {
+    scheduleSubmit.disabled = false;
+    scheduleSubmit.textContent = originalText;
+  }
 }
 
 async function loadAgenda() {
@@ -220,10 +386,82 @@ async function loadAgenda() {
     return;
   }
 
-  agendaEntries = normalizeEntries(data || []);
+  workoutRecords = data || [];
+  agendaEntries = normalizeEntries(workoutRecords);
+  await Promise.all([loadStudents(), loadLiveStudents()]);
+
   const requestedDate = new URLSearchParams(location.search).get('data');
-  selectDate(requestedDate ? parseDateValue(requestedDate) : new Date());
+  await selectDate(requestedDate ? parseDateValue(requestedDate) : new Date());
 }
+
+function ensureScheduleUi() {
+  const header = document.querySelector('.agenda-header');
+  const manageLink = document.querySelector('.agenda-manage-link');
+  let actions = document.querySelector('.agenda-header-actions');
+
+  if (!actions && header && manageLink) {
+    actions = document.createElement('div');
+    actions.className = 'agenda-header-actions';
+    header.insertBefore(actions, manageLink);
+    actions.appendChild(manageLink);
+  }
+
+  let openButton = document.querySelector('#open-schedule-modal');
+  if (!openButton && actions) {
+    openButton = document.createElement('button');
+    openButton.id = 'open-schedule-modal';
+    openButton.className = 'btn btn-primary agenda-schedule-button';
+    openButton.type = 'button';
+    openButton.textContent = '+ Agendar aluno';
+    actions.insertBefore(openButton, actions.firstChild);
+  }
+
+  let modal = document.querySelector('#schedule-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'schedule-modal';
+    modal.className = 'agenda-modal';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="agenda-modal-backdrop" data-close-schedule-modal></div>
+      <section class="agenda-modal-card" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
+        <button class="agenda-modal-close" type="button" data-close-schedule-modal aria-label="Fechar">×</button>
+        <div class="agenda-modal-kicker">AGENDA</div>
+        <h2 id="schedule-modal-title">Agendar aluno</h2>
+        <form id="schedule-form">
+          <div class="form-group"><label>Aluno *</label><select name="aluno_id" required><option value="">Selecione um aluno</option></select></div>
+          <div class="form-group"><label>Treino</label><select name="treino_id"><option value="">Usar treino ativo do aluno</option></select></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Data *</label><input name="data" type="date" required></div>
+            <div class="form-group"><label>Horário *</label><input name="horario" type="time" required></div>
+          </div>
+          <div class="form-group"><label>Local</label><input name="local" maxlength="140" placeholder="Ex.: Academia Central"></div>
+          <div class="form-group"><label>Descrição</label><input name="titulo" maxlength="140" placeholder="Ex.: Avaliação, funcional, preparação 5K..."></div>
+          <div class="agenda-modal-actions">
+            <button class="btn btn-neutral" type="button" data-close-schedule-modal>Cancelar</button>
+            <button id="schedule-submit" class="btn btn-primary" type="submit">Salvar agendamento</button>
+          </div>
+        </form>
+      </section>`;
+    document.body.appendChild(modal);
+  }
+
+  const form = modal.querySelector('#schedule-form');
+  openButton?.addEventListener('click', openScheduleModal);
+  modal.querySelectorAll('[data-close-schedule-modal]').forEach(button => button.addEventListener('click', closeScheduleModal));
+  form?.addEventListener('submit', saveAppointment);
+
+  return { modal, form };
+}
+
+scheduleStudent.addEventListener('change', () => {
+  const student = studentRecords.find(item => String(item.id) === String(scheduleStudent.value));
+  updateWorkoutOptions(scheduleStudent.value);
+  if (student) {
+    if (!scheduleTime.value && student.horario_aula) scheduleTime.value = formatTime(student.horario_aula);
+    if (!scheduleLocation.value && student.local_aula) scheduleLocation.value = student.local_aula;
+  }
+});
 
 dateDisplayButton.addEventListener('click', () => {
   try {
@@ -235,13 +473,25 @@ dateDisplayButton.addEventListener('click', () => {
   }
 });
 
-dateInput.addEventListener('change', () => selectDate(parseDateValue(dateInput.value)));
+dateInput.addEventListener('change', () => selectDate(parseDateValue(dateInput.value)).catch(console.error));
 prevDayButton.addEventListener('click', () => shiftSelectedDate(-1));
 nextDayButton.addEventListener('click', () => shiftSelectedDate(1));
-todayButton.addEventListener('click', () => selectDate(new Date()));
+todayButton.addEventListener('click', () => selectDate(new Date()).catch(console.error));
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && scheduleModal.classList.contains('open')) closeScheduleModal();
+});
 
 setInterval(() => {
   if (dateInput.value) renderAgendaForDate(parseDateValue(dateInput.value));
 }, 60000);
+
+setInterval(() => {
+  if (document.visibilityState === 'visible') loadLiveStudents().catch(console.error);
+}, 15000);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') loadLiveStudents().catch(console.error);
+});
 
 await loadAgenda();
