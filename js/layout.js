@@ -21,6 +21,15 @@ function currentPage() {
   return page || 'index.html';
 }
 
+function ensureMobileNavigationStylesheet() {
+  if (document.querySelector('link[data-fsfit-mobile-navigation]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'css/mobile-navigation.css?v=20260721-more-sheet1';
+  link.dataset.fsfitMobileNavigation = 'true';
+  document.head.appendChild(link);
+}
+
 function ensureMobileOverflowGuard() {
   if (document.querySelector('style[data-fsfit-mobile-overflow-guard]')) return;
   const style = document.createElement('style');
@@ -66,6 +75,150 @@ function ensureSubscriptionMenuLink(active = '') {
   else menu.appendChild(item);
 }
 
+function ensureMobileMoreSheet(trigger) {
+  document.querySelector('.fsfit-more-sheet')?.remove();
+
+  const sheet = document.createElement('div');
+  sheet.className = 'fsfit-more-sheet';
+  sheet.setAttribute('aria-hidden', 'true');
+  sheet.innerHTML = `
+    <button class="fsfit-more-backdrop" type="button" aria-label="Fechar menu"></button>
+    <section class="fsfit-more-panel" role="dialog" aria-modal="true" aria-labelledby="fsfit-more-title">
+      <div class="fsfit-more-handle" aria-hidden="true"></div>
+      <header class="fsfit-more-heading">
+        <div>
+          <small>FS FIT</small>
+          <h2 id="fsfit-more-title">Mais opções</h2>
+        </div>
+        <button class="fsfit-more-close" type="button" aria-label="Fechar">×</button>
+      </header>
+      <nav class="fsfit-more-list" aria-label="Mais opções do FS Fit">
+        <a class="fsfit-more-item" href="perfil.html">
+          <span class="fsfit-more-item-icon" aria-hidden="true">PF</span>
+          <span class="fsfit-more-item-copy"><strong>Perfil</strong><small>Dados profissionais e configurações</small></span>
+          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+        </a>
+        <a class="fsfit-more-item" href="biblioteca-exercicios.html">
+          <span class="fsfit-more-item-icon" aria-hidden="true">EX</span>
+          <span class="fsfit-more-item-copy"><strong>Biblioteca de exercícios</strong><small>Gerencie exercícios e categorias</small></span>
+          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+        </a>
+        <button class="fsfit-more-item" type="button" data-fsfit-public-page>
+          <span class="fsfit-more-item-icon" aria-hidden="true">↗</span>
+          <span class="fsfit-more-item-copy"><strong>Página pública</strong><small>Veja sua página como seus alunos veem</small></span>
+          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+        </button>
+        <a class="fsfit-more-item" href="assinatura.html">
+          <span class="fsfit-more-item-icon" aria-hidden="true">AS</span>
+          <span class="fsfit-more-item-copy"><strong>Assinatura</strong><small>Plano, cobrança e renovação</small></span>
+          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+        </a>
+        <a class="fsfit-more-item" href="contato.html">
+          <span class="fsfit-more-item-icon" aria-hidden="true">?</span>
+          <span class="fsfit-more-item-copy"><strong>Contato</strong><small>Suporte e canais de atendimento</small></span>
+          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+        </a>
+        <button class="fsfit-more-item is-danger" type="button" data-fsfit-logout>
+          <span class="fsfit-more-item-icon" aria-hidden="true">SA</span>
+          <span class="fsfit-more-item-copy"><strong>Sair</strong><small>Encerrar sua sessão no FS Fit</small></span>
+          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+        </button>
+      </nav>
+    </section>
+  `;
+
+  document.body.appendChild(sheet);
+
+  const closeButton = sheet.querySelector('.fsfit-more-close');
+  const backdrop = sheet.querySelector('.fsfit-more-backdrop');
+  const publicPageButton = sheet.querySelector('[data-fsfit-public-page]');
+  const logoutButton = sheet.querySelector('[data-fsfit-logout]');
+  let previousFocus = null;
+
+  const closeSheet = () => {
+    if (!sheet.classList.contains('is-open')) return;
+    sheet.classList.remove('is-open');
+    sheet.setAttribute('aria-hidden', 'true');
+    trigger.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
+    document.documentElement.classList.remove('fsfit-sheet-open');
+    previousFocus?.focus?.();
+  };
+
+  const openSheet = () => {
+    previousFocus = document.activeElement;
+    sheet.classList.add('is-open');
+    sheet.setAttribute('aria-hidden', 'false');
+    trigger.classList.add('is-open');
+    trigger.setAttribute('aria-expanded', 'true');
+    document.documentElement.classList.add('fsfit-sheet-open');
+    requestAnimationFrame(() => closeButton?.focus());
+  };
+
+  backdrop?.addEventListener('click', closeSheet);
+  closeButton?.addEventListener('click', closeSheet);
+
+  sheet.querySelectorAll('a.fsfit-more-item').forEach(link => {
+    link.addEventListener('click', () => {
+      sheet.classList.remove('is-open');
+      document.documentElement.classList.remove('fsfit-sheet-open');
+    });
+  });
+
+  publicPageButton?.addEventListener('click', async () => {
+    publicPageButton.disabled = true;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.assign('perfil.html');
+        return;
+      }
+
+      const { data: publicProfile, error } = await supabase
+        .from('perfis_publicos')
+        .select('slug')
+        .eq('personal_id', session.user.id)
+        .maybeSingle();
+
+      if (!error && publicProfile?.slug) {
+        window.location.assign(`/p/${encodeURIComponent(publicProfile.slug)}`);
+        return;
+      }
+
+      window.location.assign('perfil.html');
+    } catch (error) {
+      console.error('Não foi possível abrir a página pública:', error);
+      window.location.assign('perfil.html');
+    } finally {
+      publicPageButton.disabled = false;
+    }
+  });
+
+  logoutButton?.addEventListener('click', async () => {
+    closeSheet();
+    const existingLogout = document.querySelector('#nav-menu .logout, #nav-menu [data-action="logout"], #logout-button');
+    if (existingLogout instanceof HTMLElement) {
+      existingLogout.click();
+      return;
+    }
+
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      localStorage.clear();
+      window.location.replace('index.html');
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && sheet.classList.contains('is-open')) closeSheet();
+  });
+
+  trigger.addEventListener('click', openSheet);
+
+  return { openSheet, closeSheet };
+}
+
 function ensureMobileBottomNav(active = '') {
   document.querySelector('.fsfit-bottom-nav')?.remove();
 
@@ -98,16 +251,12 @@ function ensureMobileBottomNav(active = '') {
   moreButton.innerHTML = '<span aria-hidden="true">•••</span>Mais';
   moreButton.setAttribute('aria-label', 'Abrir mais opções');
   moreButton.setAttribute('aria-expanded', 'false');
+  moreButton.setAttribute('aria-haspopup', 'dialog');
   if (!primaryPages.has(inferredActive)) moreButton.classList.add('active');
-  moreButton.addEventListener('click', () => {
-    const menu = document.querySelector('#nav-menu');
-    if (!menu) return;
-    const isOpen = menu.classList.toggle('active');
-    moreButton.setAttribute('aria-expanded', String(isOpen));
-  });
   nav.appendChild(moreButton);
 
   document.body.appendChild(nav);
+  ensureMobileMoreSheet(moreButton);
 }
 
 function enhanceDashboard() {
@@ -215,6 +364,7 @@ function configureStudentRecordBackLink() {
 }
 
 export function renderHeader(active = '') {
+  ensureMobileNavigationStylesheet();
   core.renderHeader(active);
   ensureMobileOverflowGuard();
   ensureSubscriptionMenuLink(active);
