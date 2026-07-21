@@ -173,4 +173,7 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
   import('./exercicio-drag-order.js?v=20260720-dnd1').catch(error => {
     console.error('Falha ao carregar reordenação de exercícios em aula:', error);
   });
+  import('./painel-agenda-modal.js?v=20260721-agenda-dashboard1').catch(error => {
+    console.error('Falha ao carregar dashboard da agenda de hoje:', error);
+  });
 }
