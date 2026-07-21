@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js';
 import * as core from './layout-core.js';
 import './checkout-endereco.js';
+import './mobile-more-swipe.js?v=20260721-more-swipe1';
 
 export * from './layout-core.js';
 
