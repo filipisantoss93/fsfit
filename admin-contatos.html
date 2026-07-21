@@ -3,11 +3,11 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <title>Suporte interno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/admin-contatos.css">
+  <link rel="stylesheet" href="css/admin-contatos.css?v=20260721-modal1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260721-icons-v3" sizes="any">
@@ -16,44 +16,71 @@
 </head>
 <body>
   <div id="header-container"></div>
+
   <main class="container admin-support-page">
-    <section class="page-header">
+    <section class="page-header admin-support-header">
       <div>
         <h1>Suporte interno</h1>
-        <p>Acompanhe, responda e finalize os contatos enviados pelos usuários da plataforma.</p>
+        <p>Acompanhe, responda e finalize os contatos enviados pelos usuários.</p>
       </div>
       <span class="hero-badge">ADMIN</span>
     </section>
 
     <div id="admin-support-message" class="message"></div>
 
-    <section class="admin-stats" id="support-stats">
-      <div class="card stat-card"><small>NOVOS</small><strong id="stat-new">0</strong></div>
-      <div class="card stat-card"><small>EM ATENDIMENTO</small><strong id="stat-progress">0</strong></div>
-      <div class="card stat-card"><small>RESPONDIDOS</small><strong id="stat-answered">0</strong></div>
-      <div class="card stat-card"><small>RESOLVIDOS</small><strong id="stat-resolved">0</strong></div>
+    <section class="admin-stats" id="support-stats" aria-label="Resumo dos atendimentos">
+      <div class="card stat-card stat-new"><small>Novos</small><strong id="stat-new">0</strong></div>
+      <div class="card stat-card stat-progress"><small>Em atendimento</small><strong id="stat-progress">0</strong></div>
+      <div class="card stat-card stat-answered"><small>Respondidos</small><strong id="stat-answered">0</strong></div>
+      <div class="card stat-card stat-resolved"><small>Fechados</small><strong id="stat-resolved">0</strong></div>
     </section>
 
-    <section class="card admin-support-toolbar">
-      <div class="grid grid-2">
-        <div class="form-group"><label>Buscar</label><input id="admin-support-search" placeholder="Nome, assunto ou mensagem"></div>
-        <div class="form-group"><label>Status</label><select id="admin-support-filter"><option value="">Todos</option><option value="novo">Novos</option><option value="em_atendimento">Em atendimento</option><option value="respondido">Respondidos</option><option value="resolvido">Resolvidos</option></select></div>
+    <section class="card admin-support-toolbar" aria-label="Filtros de suporte">
+      <div class="admin-support-filters">
+        <div class="form-group">
+          <label for="admin-support-search">Buscar</label>
+          <input id="admin-support-search" placeholder="Nome, assunto ou mensagem" autocomplete="off">
+        </div>
+        <div class="form-group admin-status-filter">
+          <label for="admin-support-filter">Status</label>
+          <select id="admin-support-filter">
+            <option value="">Todos</option>
+            <option value="novo">Novos</option>
+            <option value="em_atendimento">Em atendimento</option>
+            <option value="respondido">Respondidos</option>
+            <option value="resolvido">Fechados</option>
+          </select>
+        </div>
       </div>
     </section>
 
-    <section class="admin-support-layout">
-      <article class="card admin-ticket-list-card">
-        <div class="section-heading"><div><small>CAIXA DE ENTRADA</small><h2>Contatos</h2></div></div>
-        <div id="admin-ticket-list"><p>Carregando...</p></div>
-      </article>
-
-      <article class="card admin-ticket-detail-card">
-        <div id="admin-ticket-detail" class="admin-empty-detail">
-          <p>Selecione um contato para abrir o atendimento.</p>
-        </div>
-      </article>
+    <section class="card admin-ticket-list-card">
+      <div class="section-heading admin-list-heading">
+        <div><small>CAIXA DE ENTRADA</small><h2>Atendimentos</h2></div>
+        <span id="admin-ticket-count" class="admin-ticket-count">0</span>
+      </div>
+      <div id="admin-ticket-list"><p>Carregando...</p></div>
     </section>
   </main>
-  <script type="module" src="js/admin-contatos.js?v=20260717-support2"></script>
+
+  <div id="admin-ticket-modal" class="admin-ticket-modal hidden" aria-hidden="true">
+    <button class="admin-ticket-modal-backdrop" type="button" aria-label="Fechar atendimento" data-close-ticket-modal></button>
+    <section class="admin-ticket-modal-panel" role="dialog" aria-modal="true" aria-labelledby="admin-ticket-modal-title">
+      <div class="admin-ticket-modal-handle" aria-hidden="true"></div>
+      <header class="admin-ticket-modal-header">
+        <div class="admin-ticket-modal-title-wrap">
+          <small id="admin-ticket-modal-category">ATENDIMENTO</small>
+          <h2 id="admin-ticket-modal-title">Suporte</h2>
+          <p id="admin-ticket-modal-meta"></p>
+        </div>
+        <button class="admin-ticket-modal-close" type="button" aria-label="Fechar" data-close-ticket-modal>×</button>
+      </header>
+      <div id="admin-ticket-detail" class="admin-ticket-modal-content">
+        <p class="admin-empty-detail">Carregando atendimento...</p>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="js/admin-contatos.js?v=20260721-modal1"></script>
 </body>
 </html>
