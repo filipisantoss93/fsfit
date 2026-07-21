@@ -8,7 +8,7 @@
   <title>Biblioteca alimentar — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-prescricao1">
-  <link rel="stylesheet" href="css/biblioteca-alimentar.css?v=20260718-actions-grid1">
+  <link rel="stylesheet" href="css/biblioteca-alimentar.css?v=20260720-action-bar1">
   <link rel="stylesheet" href="css/library-compact.css?v=20260720-row1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
@@ -30,20 +30,11 @@
 
     <div id="food-library-message" class="message"></div>
 
-    <section class="card library-create-card">
-      <div class="library-create-heading">
-        <div>
-          <small>BIBLIOTECA</small>
-          <h2>Alimentos e refeições</h2>
-          <p>Use os alimentos padrão do FS Fit ou cadastre itens próprios para montar refeições.</p>
-        </div>
-        <div class="actions">
-          <a class="btn btn-outline" href="modelos-dieta.html">Modelos de dieta</a>
-          <button id="open-food-category-modal" class="btn btn-outline" type="button">+ Nova categoria</button>
-          <button id="open-food-modal" class="btn btn-outline" type="button">+ Novo alimento</button>
-          <button id="open-meal-builder" class="btn btn-primary" type="button">+ Montar refeição</button>
-        </div>
-      </div>
+    <section class="food-action-bar" aria-label="Ações da biblioteca alimentar">
+      <a class="btn btn-outline food-action-button" href="modelos-dieta.html">Dietas</a>
+      <button id="open-food-category-modal" class="btn btn-outline food-action-button" type="button">+ Categoria</button>
+      <button id="open-food-modal" class="btn btn-outline food-action-button" type="button">+ Alimento</button>
+      <button id="open-meal-builder" class="btn btn-primary food-action-button" type="button">+ Refeição</button>
     </section>
 
     <section class="card library-list-card">
