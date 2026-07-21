@@ -11,7 +11,46 @@ if (embedded && window.parent !== window && backLink) {
   });
 }
 
+function injectStructuredWorkoutActionBarStyles() {
+  if (document.querySelector('#structured-workout-action-bar-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'structured-workout-action-bar-styles';
+  style.textContent = `
+    .workout-active-summary-compact .workout-active-compact-heading #active-workout-details{display:none!important}
+    .workout-active-summary-compact .workout-compact-actions{
+      display:grid!important;
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      gap:8px!important;
+      margin-top:12px!important;
+    }
+    .workout-active-summary-compact .workout-compact-actions .btn{
+      width:100%!important;
+      min-width:0!important;
+      min-height:42px!important;
+      padding:9px 8px!important;
+      margin:0!important;
+      white-space:nowrap;
+      font-size:.82rem;
+    }
+    @media(max-width:640px){
+      .workout-active-summary-compact .workout-compact-actions{
+        grid-template-columns:repeat(3,minmax(0,1fr))!important;
+        gap:6px!important;
+        margin-top:9px!important;
+      }
+      .workout-active-summary-compact .workout-compact-actions .btn{
+        min-height:38px!important;
+        padding:8px 5px!important;
+        font-size:.72rem!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function compactWorkoutPage() {
+  injectStructuredWorkoutActionBarStyles();
+
   if (!document.querySelector('link[data-fsfit-workout-compact]')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
