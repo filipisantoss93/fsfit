@@ -1,10 +1,26 @@
+import { supabase } from './supabase.js';
+
 const todayList = document.querySelector('#today-list');
 const liveList = document.querySelector('#live-students-list');
+const LIVE_STATUS_REFRESH_MS = 15000;
+
+let liveStudentIds = new Set();
+let liveStudentNames = new Set();
+let applyingTodayAgenda = false;
 
 if (todayList || liveList) {
   injectCompactDashboardStyles();
   enhanceTodayAgenda();
   compactLiveStudents();
+  refreshLiveStudentStatus().catch(console.error);
+
+  window.setInterval(() => {
+    if (document.visibilityState === 'visible') refreshLiveStudentStatus().catch(console.error);
+  }, LIVE_STATUS_REFRESH_MS);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') refreshLiveStudentStatus().catch(console.error);
+  });
 }
 
 function escapeHtml(value = '') {
@@ -16,6 +32,10 @@ function escapeHtml(value = '') {
     .replaceAll("'", '&#039;');
 }
 
+function normalizeName(value = '') {
+  return String(value || '').trim().toLocaleLowerCase('pt-BR');
+}
+
 function timeToMinutes(value = '') {
   const match = String(value).trim().match(/^(\d{1,2}):(\d{2})$/);
   if (!match) return null;
@@ -25,13 +45,55 @@ function timeToMinutes(value = '') {
   return hours * 60 + minutes;
 }
 
+function studentIdFromRow(row) {
+  if (row?.dataset?.studentId) return row.dataset.studentId;
+  const href = row?.getAttribute?.('href');
+  if (!href) return '';
+  try {
+    return new URL(href, window.location.href).searchParams.get('id') || '';
+  } catch {
+    return '';
+  }
+}
+
+function isStudentInClass(row, name) {
+  const studentId = studentIdFromRow(row);
+  if (studentId && liveStudentIds.has(studentId)) return true;
+  return liveStudentNames.has(normalizeName(name));
+}
+
+async function refreshLiveStudentStatus() {
+  if (!todayList) return;
+
+  const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
+  if (error) {
+    console.error('Não foi possível sincronizar o status Em aula na agenda de hoje:', error);
+    return;
+  }
+
+  const activeRows = (Array.isArray(data) ? data : []).filter(row => row.status === 'em_aula');
+  liveStudentIds = new Set(activeRows.map(row => String(row.aluno_id || '')).filter(Boolean));
+  liveStudentNames = new Set(activeRows.map(row => normalizeName(row.aluno_nome)).filter(Boolean));
+  applyTodayAgenda();
+}
+
 function enhanceTodayAgenda() {
   if (!todayList) return;
 
-  const apply = () => {
-    const rows = [...todayList.querySelectorAll('.today-entry')];
-    if (!rows.length) return;
+  applyTodayAgenda();
+  const observer = new MutationObserver(() => applyTodayAgenda());
+  observer.observe(todayList, { childList: true });
+  window.setInterval(applyTodayAgenda, 60000);
+}
 
+function applyTodayAgenda() {
+  if (!todayList || applyingTodayAgenda) return;
+
+  const rows = [...todayList.querySelectorAll('.today-entry')];
+  if (!rows.length) return;
+
+  applyingTodayAgenda = true;
+  try {
     const now = new Date();
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
     let nowIndex = -1;
@@ -45,25 +107,32 @@ function enhanceTodayAgenda() {
     });
 
     rows.forEach((row, index) => {
-      row.classList.toggle('is-now', index === nowIndex);
-      row.classList.toggle('is-next', index === nextIndex);
-
       const main = row.querySelector('.today-entry-main');
       if (!main) return;
 
-      const name = main.querySelector('strong')?.textContent?.trim() || 'Aluno';
-      const workout = main.querySelector('span')?.textContent?.trim() || main.dataset.workout || 'Treino ativo';
-      const rawDetails = main.querySelector('small')?.textContent?.trim() || main.dataset.details || '';
+      const name = main.querySelector('strong')?.textContent?.trim() || main.dataset.studentName || 'Aluno';
+      const workout = main.dataset.workout || main.querySelector(':scope > span:not(.today-status)')?.textContent?.trim() || 'Treino ativo';
+      const rawDetails = main.dataset.details || main.querySelector(':scope > small')?.textContent?.trim() || '';
       const local = rawDetails.includes('·') ? rawDetails.split('·').pop().trim() : rawDetails;
+      const inClass = isStudentInClass(row, name);
+      const isNow = !inClass && index === nowIndex;
+      const isNext = !inClass && index === nextIndex;
 
+      main.dataset.studentName = name;
       main.dataset.workout = workout;
       main.dataset.details = rawDetails;
 
-      const badge = index === nowIndex
-        ? '<span class="today-status now">AGORA</span>'
-        : index === nextIndex
-          ? '<span class="today-status next">PRÓXIMO</span>'
-          : '';
+      row.classList.toggle('is-in-class', inClass);
+      row.classList.toggle('is-now', isNow);
+      row.classList.toggle('is-next', isNext);
+
+      const badge = inClass
+        ? '<span class="today-status in-class">EM AULA</span>'
+        : isNow
+          ? '<span class="today-status now">AGORA</span>'
+          : isNext
+            ? '<span class="today-status next">PRÓXIMO</span>'
+            : '';
       const compactDetail = [local || 'Local não informado', workout].filter(Boolean).join(' · ');
 
       main.innerHTML = `
@@ -80,12 +149,9 @@ function enhanceTodayAgenda() {
         open.setAttribute('aria-hidden', 'true');
       }
     });
-  };
-
-  apply();
-  const observer = new MutationObserver(apply);
-  observer.observe(todayList, { childList: true });
-  window.setInterval(apply, 60000);
+  } finally {
+    applyingTodayAgenda = false;
+  }
 }
 
 function compactLiveStudents() {
@@ -104,6 +170,7 @@ function injectCompactDashboardStyles() {
     .today-count{min-width:36px!important;height:36px!important;border-radius:10px!important}
     .today-entry{grid-template-columns:52px minmax(0,1fr) 20px!important;gap:10px!important;min-height:58px!important;padding:9px 12px!important;border-radius:0!important;background:transparent!important}
     .today-entry:hover,.today-entry:focus-visible{background:rgba(255,255,255,.035)!important}
+    .today-entry.is-in-class{background:rgba(255,204,51,.07)!important}
     .today-entry.is-now{background:rgba(50,215,75,.065)!important}
     .today-entry.is-next{background:rgba(79,145,255,.04)!important}
     .today-time{font-size:.96rem!important;font-variant-numeric:tabular-nums}
@@ -112,6 +179,7 @@ function injectCompactDashboardStyles() {
     .today-entry-title-row strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.94rem!important}
     .today-entry-main small{margin-top:0!important;color:var(--muted)!important;font-size:.74rem!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .today-status{flex:0 0 auto;padding:2px 6px;border-radius:999px;border:1px solid var(--border);font-size:.54rem;font-weight:900;letter-spacing:.05em;line-height:1.25}
+    .today-status.in-class{border-color:rgba(255,204,51,.72);background:rgba(255,204,51,.1);color:var(--warning,#ffcc33)}
     .today-status.now{border-color:var(--primary);background:rgba(50,215,75,.08);color:var(--primary)}
     .today-status.next{border-color:rgba(79,145,255,.55);background:rgba(79,145,255,.07);color:#8bb7ff}
     .today-open.today-arrow{display:block!important;color:var(--muted)!important;font-size:1.45rem!important;font-weight:400!important;line-height:1;text-align:right}
