@@ -1,3 +1,4 @@
+# trigger: 2026-07-21-icons-v2
 name: Substituir todos os ícones FS Fit v2
 
 on:
@@ -44,7 +45,6 @@ jobs:
           SRC = Path('/tmp/fsfit-icon-source.webp')
           OUT = Path('assets/icons')
           VERSION = '20260721-icons-v2'
-          DARK_BG = (15, 17, 21, 255)
 
           img = Image.open(SRC).convert('RGBA')
           cache = {}
@@ -64,16 +64,13 @@ jobs:
               canvas.alpha_composite(resized(size))
               canvas.convert('RGB').save(path, 'PNG')
 
-          # Remove todo o pacote antigo para garantir substituição integral.
           if OUT.exists():
               shutil.rmtree(OUT)
           OUT.mkdir(parents=True, exist_ok=True)
 
-          # 00-master
           for s in [1024, 2048]:
               save_rgba(s, OUT / '00-master' / f'fs-fit-master-{s}.png')
 
-          # 01-web-favicon
           for s in [16, 32, 48, 64, 96, 128, 256, 512]:
               save_rgba(s, OUT / '01-web-favicon' / f'favicon-{s}x{s}.png')
           resized(256).save(
@@ -85,7 +82,6 @@ jobs:
           save_rgba(192, OUT / '01-web-favicon' / 'android-chrome-192x192.png')
           save_rgba(512, OUT / '01-web-favicon' / 'android-chrome-512x512.png')
 
-          # 02-pwa
           for s in [72, 96, 128, 144, 152, 192, 384, 512]:
               save_rgba(s, OUT / '02-pwa' / f'icon-{s}x{s}.png')
           for s in [192, 512]:
@@ -106,7 +102,6 @@ jobs:
               json.dumps(manifest_example, indent=2, ensure_ascii=False) + '\n', encoding='utf-8'
           )
 
-          # 03-android
           legacy = {
               'mipmap-mdpi':48,
               'mipmap-hdpi':72,
@@ -129,7 +124,6 @@ jobs:
               save_rgba(s, OUT / '03-android' / 'adaptive-foreground' / folder / 'ic_launcher_foreground.png')
           save_rgb(512, OUT / '03-android' / 'play-store-icon-512x512.png')
 
-          # 04-ios
           ios_dir = OUT / '04-ios' / 'AppIcon.appiconset'
           ios_specs = [
               ('AppIcon-20@1x.png',20,'20x20','1x','ipad'),
@@ -159,7 +153,6 @@ jobs:
               })
           (ios_dir / 'Contents.json').write_text(json.dumps(contents, indent=2) + '\n', encoding='utf-8')
 
-          # 05-windows-tiles
           for name, s in [
               ('mstile-70x70.png',70),
               ('mstile-150x150.png',150),
@@ -171,7 +164,6 @@ jobs:
           wide.paste(tmp, ((310-120)//2, (150-120)//2))
           wide.save(OUT / '05-windows-tiles' / 'mstile-310x150.png', 'PNG')
 
-          # 06-extra-common-sizes
           for s in [36,48,72,96,128,144,180,192,256,384,512,1024]:
               save_rgba(s, OUT / '06-extra-common-sizes' / f'fs-fit-icon-{s}x{s}.png')
 
@@ -180,7 +172,6 @@ jobs:
               encoding='utf-8'
           )
 
-          # Atualiza os manifests para forçar os aparelhos a buscar os novos binários.
           for manifest_path in [Path('manifest.webmanifest'), Path('manifest-personal.webmanifest')]:
               if not manifest_path.exists():
                   continue
@@ -190,7 +181,6 @@ jobs:
                   icon['src'] = f'{src}?v={VERSION}'
               manifest_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 
-          # Atualiza favicon, Apple Touch Icon e links de manifest em todas as páginas HTML.
           icon_re = re.compile(r'(?P<path>/?assets/icons/01-web-favicon/(?:favicon\.ico|favicon-32x32\.png|apple-touch-icon\.png))(?:\?v=[^\"\']+)?')
           manifest_re = re.compile(r'(?P<path>(?:manifest|manifest-personal)\.webmanifest)(?:\?v=[^\"\']+)?')
           for path in Path('.').rglob('*.html'):
@@ -202,7 +192,6 @@ jobs:
               if updated != text:
                   path.write_text(updated, encoding='utf-8')
 
-          # Fonte temporária não fica no repositório final.
           shutil.rmtree(Path('assets/icons-source-v2'), ignore_errors=True)
 
           count = sum(1 for p in OUT.rglob('*') if p.is_file())
