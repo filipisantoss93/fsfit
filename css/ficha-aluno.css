@@ -154,10 +154,13 @@
   .media-form { padding: 15px; }
 
   .record-tabs.record-tabs-compact {
+    top: var(--safe-area-top) !important;
+    z-index: 90;
     display: grid !important;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 4px !important;
     overflow: visible !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
   }
   .record-tabs.record-tabs-compact .record-tab {
     min-width: 0 !important;
