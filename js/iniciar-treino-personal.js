@@ -44,6 +44,7 @@ actionHost.prepend(startButton);
 let currentSessionId = null;
 let currentStatus = null;
 let loading = false;
+let stateChecked = false;
 
 function showLocalMessage(text, type = 'success') {
   if (!message) return;
@@ -70,8 +71,12 @@ function applyState(status, sessionId = null) {
 }
 
 async function refreshSessionState() {
+  if (stateChecked) return;
+  stateChecked = true;
+
   const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
   if (error) {
+    stateChecked = false;
     console.warn('Não foi possível consultar o estado da sessão:', error);
     return;
   }
@@ -82,6 +87,10 @@ async function refreshSessionState() {
 
 startButton.addEventListener('click', async () => {
   if (loading) return;
+
+  if (!stateChecked) {
+    await refreshSessionState();
+  }
 
   if (currentStatus === 'em_aula') {
     window.location.href = 'painel.html#live-students-list';
@@ -108,6 +117,7 @@ startButton.addEventListener('click', async () => {
     if (!data) throw new Error('Não foi possível iniciar a sessão de treino.');
 
     applyState('em_aula', data);
+    stateChecked = true;
     showLocalMessage(`Treino de ${studentName} iniciado. O aluno já aparece em “Em aula” no painel.`);
   } catch (error) {
     console.error(error);
@@ -120,4 +130,13 @@ startButton.addEventListener('click', async () => {
   }
 });
 
-await refreshSessionState();
+const scheduleStateRefresh = () => {
+  const run = () => void refreshSessionState();
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(run, { timeout: 1800 });
+  } else {
+    window.setTimeout(run, 350);
+  }
+};
+
+scheduleStateRefresh();
