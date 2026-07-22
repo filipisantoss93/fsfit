@@ -7,6 +7,7 @@ const modalClose = document.querySelector('#live-session-modal-close');
 const modalName = document.querySelector('#live-session-modal-name');
 const modalMeta = document.querySelector('#live-session-modal-meta');
 const modalProgress = document.querySelector('#live-session-modal-progress');
+const modalStatus = modal?.querySelector('.live-session-modal-header small');
 const chatThread = document.querySelector('#live-session-chat-thread');
 const chatForm = document.querySelector('#live-session-chat-form');
 const chatInput = chatForm?.querySelector('textarea[name="mensagem"]');
@@ -49,10 +50,35 @@ function progressText(row) {
   return `${done}/${total} concluídos`;
 }
 
+function modalProgressText(row) {
+  const total = Number(row.total_exercicios || 0);
+  const done = Number(row.exercicios_concluidos || 0);
+  return `${done}/${total} exercícios`;
+}
+
 function progressPercent(row) {
   const total = Number(row.total_exercicios || 0);
   const done = Number(row.exercicios_concluidos || 0);
   return total ? Math.min(100, Math.round((done / total) * 100)) : 0;
+}
+
+function syncModalContext(row) {
+  if (!modal || !row) return;
+  const total = Number(row.total_exercicios || 0);
+  const done = Number(row.exercicios_concluidos || 0);
+  const status = row.status === 'aguardando_confirmacao' ? 'AGUARDANDO CONFIRMAÇÃO' : 'EM AULA';
+
+  if (modalName) modalName.textContent = row.aluno_nome || 'Aluno';
+  if (modalMeta) modalMeta.textContent = sessionMeta(row);
+  if (modalProgress) modalProgress.textContent = modalProgressText(row);
+  if (modalStatus) modalStatus.textContent = status;
+
+  modal.dataset.progressDone = String(done);
+  modal.dataset.progressTotal = String(total);
+  modal.dataset.sessionStatus = row.status || '';
+  modal.dispatchEvent(new CustomEvent('fsfit-live-session-updated', {
+    detail: { sessionId: row.sessao_id, done, total, status: row.status || '' }
+  }));
 }
 
 async function notifyAluno(sessionId) {
@@ -78,11 +104,7 @@ function renderModalActions(row) {
       <a class="btn btn-outline btn-action-tile" href="ficha-aluno.html?id=${encodeURIComponent(row.aluno_id)}&origem=aula">
         <span class="btn-action-icon" aria-hidden="true">▣</span>
         <span class="btn-action-copy"><span class="btn-action-title">Abrir ficha</span><span class="btn-action-description">Ver dados e histórico</span></span>
-      </a>
-      <button class="btn btn-neutral btn-action-tile" type="button" data-modal-close-session>
-        <span class="btn-action-icon" aria-hidden="true">×</span>
-        <span class="btn-action-copy"><span class="btn-action-title">Fechar</span><span class="btn-action-description">Voltar sem realizar alterações</span></span>
-      </button>`;
+      </a>`;
     return;
   }
 
@@ -93,11 +115,7 @@ function renderModalActions(row) {
     </a>
     <button class="btn btn-danger btn-action-tile" type="button" data-modal-finish-session="${esc(row.sessao_id)}">
       <span class="btn-action-icon" aria-hidden="true">■</span>
-      <span class="btn-action-copy"><span class="btn-action-title">Encerrar treino</span><span class="btn-action-description">Finalizar esta sessão do aluno</span></span>
-    </button>
-    <button class="btn btn-neutral btn-action-tile" type="button" data-modal-close-session>
-      <span class="btn-action-icon" aria-hidden="true">×</span>
-      <span class="btn-action-copy"><span class="btn-action-title">Fechar</span><span class="btn-action-description">Voltar sem realizar alterações</span></span>
+      <span class="btn-action-copy"><span class="btn-action-title">Encerrar aula</span><span class="btn-action-description">Finalizar esta sessão do aluno</span></span>
     </button>`;
 }
 
@@ -153,9 +171,7 @@ function openModal(sessionId) {
   if (!row || !modal) return;
 
   currentSessionId = sessionId;
-  modalName.textContent = row.aluno_nome || 'Aluno';
-  modalMeta.textContent = sessionMeta(row);
-  modalProgress.textContent = progressText(row);
+  syncModalContext(row);
   renderModalActions(row);
 
   if (chatThread) {
@@ -222,7 +238,7 @@ async function cancelCheckin(sessionId, studentName, button) {
 }
 
 async function finishSession(sessionId, studentName, button) {
-  if (!confirm(`Encerrar o treino de ${studentName}?\n\nUse esta opção quando o aluno esquecer de finalizar o treino. A sessão será marcada como finalizada.`)) return;
+  if (!confirm(`Encerrar a aula de ${studentName}?\n\nUse esta opção quando o aluno esquecer de finalizar o treino. A sessão será marcada como finalizada.`)) return;
   button.disabled = true;
   const originalHtml = button.innerHTML;
   button.textContent = 'Encerrando...';
@@ -242,7 +258,7 @@ async function finishSession(sessionId, studentName, button) {
     await loadLiveStudents();
   } catch (error) {
     console.error(error);
-    alert(error.message || 'Não foi possível encerrar o treino.');
+    alert(error.message || 'Não foi possível encerrar a aula.');
     button.disabled = false;
     button.innerHTML = originalHtml;
   }
@@ -323,9 +339,7 @@ async function loadLiveStudents() {
       if (!currentRow) {
         closeModal();
       } else if (modal?.classList.contains('open')) {
-        modalName.textContent = currentRow.aluno_nome || 'Aluno';
-        modalMeta.textContent = sessionMeta(currentRow);
-        modalProgress.textContent = progressText(currentRow);
+        syncModalContext(currentRow);
         renderModalActions(currentRow);
         setChatAvailability(currentRow.status === 'em_aula');
       }
