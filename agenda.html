@@ -6,8 +6,22 @@
   <meta charset="UTF-8">
   <meta name="theme-color" content="#0f1115">
   <title>Agenda — FS Fit</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://jjpijncxlkwutbnkpsaw.supabase.co" crossorigin>
+  <link rel="modulepreload" href="js/supabase.js">
+  <link rel="modulepreload" href="js/layout-core.js">
+  <link rel="modulepreload" href="js/layout.js">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/header-menu.css?v=20260717-support2" data-fsfit-header-styles>
+  <link rel="stylesheet" href="css/mobile-navigation.css?v=20260722-shell1" data-fsfit-mobile-navigation>
   <link rel="stylesheet" href="css/agenda.css?v=20260722-student-search2">
+  <style>
+    .agenda-loading-card{display:grid;gap:11px;overflow:hidden}
+    .agenda-loading-line{height:12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.055) 20%,rgba(255,255,255,.11) 40%,rgba(255,255,255,.055) 60%);background-size:220% 100%;animation:agendaSkeleton 1.25s ease-in-out infinite}
+    .agenda-loading-line:first-child{width:42%;height:16px}.agenda-loading-line:nth-child(2){width:68%}.agenda-loading-line:nth-child(3){width:54%}
+    @keyframes agendaSkeleton{0%{background-position:100% 0}100%{background-position:-100% 0}}
+    @media(prefers-reduced-motion:reduce){.agenda-loading-line{animation:none}}
+  </style>
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260721-icons-v3" sizes="any">
@@ -15,7 +29,16 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260721-icons-v3">
 </head>
 <body>
-  <div id="header-container"></div>
+  <div id="header-container">
+    <header class="main-header" data-fsfit-shell-placeholder aria-hidden="true">
+      <nav class="nav-container">
+        <a class="logo-nav" href="painel.html" tabindex="-1"><strong>FS</strong><span>Fit</span></a>
+        <div class="nav-header-actions">
+          <button class="notification-button" type="button" tabindex="-1" aria-hidden="true"><span class="notification-bell">🔔</span></button>
+        </div>
+      </nav>
+    </header>
+  </div>
   <main class="container agenda-page">
     <section class="page-header agenda-header">
       <div>
@@ -39,9 +62,22 @@
 
     <div id="agenda-message" class="message"></div>
     <section id="agenda-grid" class="agenda-grid" aria-live="polite">
-      <article class="card"><p>Carregando agenda...</p></article>
+      <article class="card agenda-loading-card" aria-label="Carregando agenda">
+        <span class="agenda-loading-line"></span>
+        <span class="agenda-loading-line"></span>
+        <span class="agenda-loading-line"></span>
+      </article>
     </section>
   </main>
+
+  <nav class="fsfit-bottom-nav" data-fsfit-shell-placeholder aria-hidden="true">
+    <a href="painel.html" tabindex="-1"><span aria-hidden="true">⌂</span>Início</a>
+    <a href="alunos.html" tabindex="-1"><span aria-hidden="true">◎</span>Alunos</a>
+    <a class="active" href="agenda.html" tabindex="-1"><span aria-hidden="true">▦</span>Agenda</a>
+    <a href="financeiro.html" tabindex="-1"><span aria-hidden="true">$</span>Financeiro</a>
+    <button type="button" tabindex="-1" disabled><span aria-hidden="true">•••</span>Mais</button>
+  </nav>
+
   <script type="module" src="js/agenda.js?v=20260721-schedule1"></script>
   <script type="module" src="js/agenda-student-search.js?v=20260722-student-search2"></script>
 </body>
