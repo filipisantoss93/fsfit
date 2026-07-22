@@ -8,11 +8,21 @@
   align-items: end;
   pointer-events: none;
   visibility: hidden;
+  opacity: 0;
+  contain: layout style paint;
+  transition: opacity .18s ease, visibility 0s linear .28s;
+}
+
+.fsfit-more-sheet[aria-hidden="true"] {
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 .fsfit-more-sheet.is-open {
   pointer-events: auto;
   visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
 }
 
 .fsfit-more-backdrop {
@@ -45,6 +55,7 @@
   box-shadow: 0 -24px 70px rgba(0,0,0,.5);
   transform: translateY(105%);
   transition: transform .28s cubic-bezier(.22,.75,.22,1);
+  will-change: transform;
 }
 
 .fsfit-more-sheet.is-open .fsfit-more-panel {
@@ -201,6 +212,7 @@ html.fsfit-sheet-open body {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 -10px 30px rgba(0,0,0,.34) !important;
+    transform: translateZ(0);
   }
 
   .fsfit-bottom-nav::before {
@@ -225,5 +237,14 @@ html.fsfit-sheet-open body {
 @media (min-width: 861px) {
   .fsfit-more-sheet {
     display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fsfit-more-sheet,
+  .fsfit-more-backdrop,
+  .fsfit-more-panel,
+  .fsfit-more-item {
+    transition: none !important;
   }
 }
