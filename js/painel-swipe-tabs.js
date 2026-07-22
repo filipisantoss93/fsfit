@@ -28,8 +28,16 @@ if (tabs.length > 1 && surface) {
 
   function activateIndex(index) {
     if (index < 0 || index >= tabs.length) return false;
+
+    // O clique sintético usado para trocar a aba passava pelo bloqueio de
+    // "ghost click" do próprio gesto e era cancelado. Libera apenas este
+    // clique programático e restaura a proteção logo em seguida.
+    const previousSuppressUntil = suppressClickUntil;
+    suppressClickUntil = 0;
     tabs[index].click();
-    return true;
+    suppressClickUntil = Math.max(previousSuppressUntil, performance.now() + 350);
+
+    return tabs[index].getAttribute('aria-selected') === 'true';
   }
 
   function clearPanelMotion(panel) {
@@ -84,7 +92,21 @@ if (tabs.length > 1 && surface) {
 
     window.setTimeout(() => {
       clearPanelMotion(currentPanel);
-      activateIndex(nextIndex);
+      const changed = activateIndex(nextIndex);
+
+      if (!changed) {
+        // Fallback: caso outro listener impeça o clique, sincroniza a aba e
+        // o painel diretamente para não deixar o gesto sem efeito.
+        tabs.forEach((tab, index) => {
+          const active = index === nextIndex;
+          tab.setAttribute('aria-selected', String(active));
+          tab.tabIndex = active ? 0 : -1;
+        });
+        panels.forEach(panel => {
+          const selectedTab = tabs[nextIndex];
+          panel.hidden = panel.id !== selectedTab?.getAttribute('aria-controls');
+        });
+      }
 
       const nextPanel = activePanel();
       if (!nextPanel) return;
@@ -172,8 +194,8 @@ if (tabs.length > 1 && surface) {
     const current = activeIndex();
     const next = deltaX < 0 ? current + 1 : current - 1;
     const validDestination = next >= 0 && next < tabs.length;
-    const enoughDistance = Math.abs(deltaX) >= 52 && Math.abs(deltaX) > Math.abs(deltaY) * 1.08;
-    const enoughVelocity = velocity >= .16 || Math.abs(deltaX) >= 88;
+    const enoughDistance = Math.abs(deltaX) >= 44 && Math.abs(deltaX) > Math.abs(deltaY) * 1.02;
+    const enoughVelocity = velocity >= .13 || Math.abs(deltaX) >= 72;
 
     if (movedHorizontally) suppressClickUntil = performance.now() + 420;
 
