@@ -6,6 +6,7 @@ const slug = String(pathMatch?.[1] || params.get('u') || '').trim().toLowerCase(
 const profileHost = document.querySelector('#public-profile');
 const profileDetailsHost = document.querySelector('#public-profile-details');
 const accessSection = document.querySelector('#student-access');
+const identityHost = document.querySelector('#student-access-identity');
 const message = document.querySelector('#access-message');
 const phoneForm = document.querySelector('#phone-form');
 const pinForm = document.querySelector('#pin-form');
@@ -43,7 +44,33 @@ function whatsappHref(value = '') {
 function digits(value = '', max = 11) { return String(value).replace(/\D/g, '').slice(0, max); }
 function show(text, type = 'error') { message.textContent = text; message.className = `message show ${type}`; }
 function clearMessage() { message.className = 'message'; message.textContent = ''; }
-function resetAccess() { phone = ''; phoneForm.classList.remove('hidden'); pinForm.classList.add('hidden'); activationForm.classList.add('hidden'); phoneForm.reset(); pinForm.reset(); activationForm.reset(); clearMessage(); }
+function clearIdentity() {
+  if (!identityHost) return;
+  identityHost.innerHTML = '';
+  identityHost.classList.add('hidden');
+}
+function renderStudentIdentity(aluno) {
+  if (!identityHost) return;
+  const name = String(aluno?.nome || '').trim();
+  if (!name) return clearIdentity();
+  const photo = String(aluno?.foto_perfil_url || '').trim();
+  const avatar = photo
+    ? `<img class="student-access-identity-avatar" src="${esc(photo)}" alt="Foto de ${esc(name)}">`
+    : `<div class="student-access-identity-avatar student-access-identity-placeholder">${esc(name.charAt(0).toUpperCase())}</div>`;
+  identityHost.innerHTML = `${avatar}<div><small>ACESSO IDENTIFICADO</small><strong>Olá, ${esc(name)} 👋</strong><span>Você está acessando a sua área de aluno no FS Fit.</span></div>`;
+  identityHost.classList.remove('hidden');
+}
+function resetAccess() {
+  phone = '';
+  phoneForm.classList.remove('hidden');
+  pinForm.classList.add('hidden');
+  activationForm.classList.add('hidden');
+  phoneForm.reset();
+  pinForm.reset();
+  activationForm.reset();
+  clearIdentity();
+  clearMessage();
+}
 function clearStoredStudentSession() {
   localStorage.removeItem('fsfit_aluno_token');
   localStorage.removeItem('fsfit_aluno_token_expira_em');
@@ -183,46 +210,78 @@ async function loadProfile() {
 
 phoneForm.telefone.addEventListener('input', () => { phoneForm.telefone.value = digits(phoneForm.telefone.value); });
 pinForm.pin.addEventListener('input', () => { pinForm.pin.value = digits(pinForm.pin.value, 4); });
+activationForm.activation_code.addEventListener('input', () => { activationForm.activation_code.value = digits(activationForm.activation_code.value, 6); });
 activationForm.pin.addEventListener('input', () => { activationForm.pin.value = digits(activationForm.pin.value, 4); });
 activationForm.pin_confirm.addEventListener('input', () => { activationForm.pin_confirm.value = digits(activationForm.pin_confirm.value, 4); });
 document.querySelector('#change-phone').addEventListener('click', resetAccess);
 document.querySelector('#change-phone-activation').addEventListener('click', resetAccess);
 
 phoneForm.addEventListener('submit', async event => {
-  event.preventDefault(); clearMessage(); phone = digits(phoneForm.telefone.value);
+  event.preventDefault();
+  clearMessage();
+  clearIdentity();
+  phone = digits(phoneForm.telefone.value);
   if (phone.length !== 11) return show('Informe seu WhatsApp com DDD e número, totalizando 11 dígitos.');
-  const button = phoneForm.querySelector('[type="submit"]'); button.disabled = true;
+  const button = phoneForm.querySelector('[type="submit"]');
+  button.disabled = true;
   try {
     const result = await invoke({ action: 'lookup', telefone: phone, personal_slug: slug });
     phoneForm.classList.add('hidden');
+    renderStudentIdentity(result.aluno);
     if (result.next === 'activate') {
       activationForm.classList.remove('hidden');
-      show('Primeiro acesso: crie um PIN de 4 números para entrar.', 'success');
+      if (result.activation_ready) {
+        show('Primeiro acesso: informe o código de 6 números fornecido pelo seu personal e crie seu PIN.', 'success');
+      } else {
+        show('Seu personal ainda precisa gerar seu código de ativação. Solicite o código antes de concluir o primeiro acesso.');
+      }
     } else {
       pinForm.classList.remove('hidden');
+      show('Cadastro identificado. Informe seu PIN de 4 números para continuar.', 'success');
     }
-  } catch (error) { show(error.message); } finally { button.disabled = false; }
+  } catch (error) {
+    show(error.message);
+  } finally {
+    button.disabled = false;
+  }
 });
 
 pinForm.addEventListener('submit', async event => {
-  event.preventDefault(); clearMessage(); const pin = digits(pinForm.pin.value, 4);
+  event.preventDefault();
+  clearMessage();
+  const pin = digits(pinForm.pin.value, 4);
   if (pin.length !== 4) return show('Informe seu PIN de 4 números.');
-  const button = pinForm.querySelector('[type="submit"]'); button.disabled = true;
-  try { const result = await invoke({ action: 'login', telefone: phone, pin, personal_slug: slug }); saveSession(result); }
-  catch (error) { show(error.message); } finally { button.disabled = false; }
+  const button = pinForm.querySelector('[type="submit"]');
+  button.disabled = true;
+  try {
+    const result = await invoke({ action: 'login', telefone: phone, pin, personal_slug: slug });
+    saveSession(result);
+  } catch (error) {
+    show(error.message);
+  } finally {
+    button.disabled = false;
+  }
 });
 
 activationForm.addEventListener('submit', async event => {
-  event.preventDefault(); clearMessage();
+  event.preventDefault();
+  clearMessage();
+  const activationCode = digits(activationForm.activation_code.value, 6);
   const pin = digits(activationForm.pin.value, 4);
   const pinConfirm = digits(activationForm.pin_confirm.value, 4);
+  if (activationCode.length !== 6) return show('Informe o código de ativação de 6 números fornecido pelo seu personal.');
   if (pin.length !== 4 || pinConfirm.length !== 4) return show('Crie e confirme um PIN de 4 números.');
   if (pin !== pinConfirm) return show('Os PINs informados não coincidem.');
-  const button = activationForm.querySelector('[type="submit"]'); button.disabled = true;
+  const button = activationForm.querySelector('[type="submit"]');
+  button.disabled = true;
   try {
-    const result = await invoke({ action: 'activate', telefone: phone, pin, personal_slug: slug });
+    const result = await invoke({ action: 'activate', telefone: phone, activation_code: activationCode, pin, personal_slug: slug });
     saveSession(result);
-  } catch (error) { show(error.message); } finally { button.disabled = false; }
+  } catch (error) {
+    show(error.message);
+  } finally {
+    button.disabled = false;
+  }
 });
 
 await prepareStoredStudentSession();
