@@ -10,6 +10,8 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 const enc = new TextEncoder();
 const hex = (bytes: Uint8Array) => Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
 const sha256 = async (value: string) => hex(new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(value))));
+const PROFILE_BUCKET = "aluno-perfil";
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
 
 async function verifyPin(pin: string, stored: string) {
   const parts = stored.split("$");
@@ -49,6 +51,28 @@ async function resolvePersonal(admin: any, slug: string) {
     .eq("publicado", true)
     .maybeSingle();
   return data || null;
+}
+
+async function resolveStudentSession(admin: any, token: string) {
+  if (!/^[a-f0-9]{64}$/.test(token)) return null;
+  const tokenHash = await sha256(token);
+  const { data: sessao } = await admin
+    .from("aluno_sessoes")
+    .select("id,aluno_id,expira_em,revogada_em")
+    .eq("token_hash", tokenHash)
+    .maybeSingle();
+
+  if (!sessao || sessao.revogada_em || new Date(sessao.expira_em) < new Date()) return null;
+
+  await admin.from("aluno_sessoes").update({ ultimo_uso_em: new Date().toISOString() }).eq("id", sessao.id);
+  const { data: aluno, error } = await admin
+    .from("alunos")
+    .select("id,nome,nome_exibicao,foto_perfil_url,foto_perfil_path,telefone,sexo,data_nascimento,altura_cm,objetivo,personal_id,status")
+    .eq("id", sessao.aluno_id)
+    .maybeSingle();
+
+  if (error || !aluno || aluno.status !== "ativo") return null;
+  return { sessao, aluno };
 }
 
 async function registerFailedAttempt(admin: any, aluno: any, message: string) {
@@ -108,17 +132,18 @@ Deno.serve(async (req) => {
       const phoneCandidates = [telefone, `55${telefone}`, `+55${telefone}`];
       const { data: aluno } = await admin
         .from("alunos")
-        .select("id,nome,pin_hash,pin_tentativas,pin_bloqueado_ate,primeiro_acesso_concluido,status,codigo_ativacao_hash,codigo_ativacao_expira_em")
+        .select("id,nome,nome_exibicao,foto_perfil_url,pin_hash,pin_tentativas,pin_bloqueado_ate,primeiro_acesso_concluido,status,codigo_ativacao_hash,codigo_ativacao_expira_em")
         .eq("personal_id", personal.personal_id)
         .in("telefone", phoneCandidates)
         .maybeSingle();
 
       if (!aluno || aluno.status !== "ativo") return json({ error: "Aluno não encontrado para este personal." }, 404);
+      const studentName = aluno.nome_exibicao || aluno.nome;
 
       if (action === "lookup") {
         return json({
           success: true,
-          aluno: { id: aluno.id, nome: aluno.nome },
+          aluno: { id: aluno.id, nome: studentName, foto_perfil_url: aluno.foto_perfil_url || null },
           next: aluno.primeiro_acesso_concluido && aluno.pin_hash ? "login" : "activate",
           activation_ready: Boolean(aluno.codigo_ativacao_hash && aluno.codigo_ativacao_expira_em && new Date(aluno.codigo_ativacao_expira_em) > new Date()),
         });
@@ -144,9 +169,7 @@ Deno.serve(async (req) => {
 
         const now = new Date().toISOString();
         const validationWindow = new Date(Date.now() + 60 * 1000).toISOString();
-        const { error: validationError } = await admin.from("alunos").update({
-          ativacao_validada_ate: validationWindow,
-        }).eq("id", aluno.id);
+        const { error: validationError } = await admin.from("alunos").update({ ativacao_validada_ate: validationWindow }).eq("id", aluno.id);
         if (validationError) throw validationError;
 
         const pinHash = await hashPin(pin);
@@ -164,7 +187,7 @@ Deno.serve(async (req) => {
         if (error) throw error;
 
         const session = await createSession(admin, aluno.id, req.headers.get("user-agent"));
-        return json({ success: true, aluno: { id: aluno.id, nome: aluno.nome }, personal, ...session });
+        return json({ success: true, aluno: { id: aluno.id, nome: studentName }, personal, ...session });
       }
 
       if (!/^\d{4}$/.test(pin)) return json({ error: "Informe seu PIN de 4 números." }, 400);
@@ -176,19 +199,97 @@ Deno.serve(async (req) => {
       const now = new Date().toISOString();
       await admin.from("alunos").update({ pin_tentativas: 0, pin_bloqueado_ate: null, ultimo_acesso_em: now }).eq("id", aluno.id);
       const session = await createSession(admin, aluno.id, req.headers.get("user-agent"));
-      return json({ success: true, aluno: { id: aluno.id, nome: aluno.nome }, personal, ...session });
+      return json({ success: true, aluno: { id: aluno.id, nome: studentName }, personal, ...session });
     }
 
-    if (action === "me") {
+    if (action === "me" || action === "profile_upload_url" || action === "update_profile") {
       const token = String(body.token || "");
-      if (!/^[a-f0-9]{64}$/.test(token)) return json({ error: "Sessão inválida." }, 401);
-      const tokenHash = await sha256(token);
-      const { data: sessao } = await admin.from("aluno_sessoes").select("id,aluno_id,expira_em,revogada_em").eq("token_hash", tokenHash).maybeSingle();
-      if (!sessao || sessao.revogada_em || new Date(sessao.expira_em) < new Date()) return json({ error: "Sessão expirada." }, 401);
-      await admin.from("aluno_sessoes").update({ ultimo_uso_em: new Date().toISOString() }).eq("id", sessao.id);
-      const { data: aluno } = await admin.from("alunos").select("id,nome,telefone,sexo,data_nascimento,altura_cm,objetivo,personal_id").eq("id", sessao.aluno_id).single();
-      const { data: personal } = await admin.from("perfis_publicos").select("slug,nome_publico,foto_url,local_trabalho,cidade").eq("personal_id", aluno.personal_id).maybeSingle();
-      return json({ success: true, aluno, personal });
+      const resolved = await resolveStudentSession(admin, token);
+      if (!resolved) return json({ error: "Sessão expirada." }, 401);
+      const { aluno } = resolved;
+
+      if (action === "me") {
+        const { data: personal } = await admin
+          .from("perfis_publicos")
+          .select("slug,nome_publico,foto_url,local_trabalho,cidade")
+          .eq("personal_id", aluno.personal_id)
+          .maybeSingle();
+        return json({
+          success: true,
+          aluno: {
+            ...aluno,
+            nome_perfil: aluno.nome_exibicao || aluno.nome,
+          },
+          personal,
+        });
+      }
+
+      if (action === "profile_upload_url") {
+        const mimeType = String(body.mime_type || "").toLowerCase();
+        const sizeBytes = Number(body.size_bytes || 0);
+        const extensions: Record<string, string> = {
+          "image/jpeg": "jpg",
+          "image/png": "png",
+          "image/webp": "webp",
+        };
+        const extension = extensions[mimeType];
+        if (!extension) return json({ error: "Formato de imagem não permitido. Use JPG, PNG ou WebP." }, 400);
+        if (!Number.isFinite(sizeBytes) || sizeBytes <= 0 || sizeBytes > MAX_PROFILE_IMAGE_SIZE) {
+          return json({ error: "A foto deve ter no máximo 5 MB." }, 400);
+        }
+
+        const path = `${aluno.id}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+        const { data, error } = await admin.storage.from(PROFILE_BUCKET).createSignedUploadUrl(path);
+        if (error || !data?.token) throw error || new Error("Não foi possível preparar o envio da foto.");
+        return json({ success: true, path, upload_token: data.token });
+      }
+
+      const displayName = String(body.nome_exibicao || "").trim();
+      if (displayName.length < 2 || displayName.length > 80) {
+        return json({ error: "O nome do perfil deve ter entre 2 e 80 caracteres." }, 400);
+      }
+
+      const requestedPath = String(body.foto_perfil_path || "").trim();
+      let photoPath = aluno.foto_perfil_path || null;
+      let photoUrl = aluno.foto_perfil_url || null;
+
+      if (requestedPath) {
+        const expectedPrefix = `${aluno.id}/`;
+        if (!requestedPath.startsWith(expectedPrefix) || !/\.(jpg|jpeg|png|webp)$/i.test(requestedPath)) {
+          return json({ error: "Foto de perfil inválida." }, 400);
+        }
+
+        const filename = requestedPath.slice(expectedPrefix.length);
+        const { data: files, error: listError } = await admin.storage.from(PROFILE_BUCKET).list(aluno.id, { search: filename, limit: 10 });
+        if (listError) throw listError;
+        if (!(files || []).some((file: any) => file.name === filename)) return json({ error: "A foto enviada não foi encontrada." }, 400);
+
+        const { data: publicData } = admin.storage.from(PROFILE_BUCKET).getPublicUrl(requestedPath);
+        if (!publicData?.publicUrl) return json({ error: "Não foi possível publicar a foto de perfil." }, 500);
+        photoPath = requestedPath;
+        photoUrl = publicData.publicUrl;
+      }
+
+      const previousPath = aluno.foto_perfil_path || null;
+      const { data: updated, error: updateError } = await admin
+        .from("alunos")
+        .update({ nome_exibicao: displayName, foto_perfil_path: photoPath, foto_perfil_url: photoUrl })
+        .eq("id", aluno.id)
+        .select("id,nome,nome_exibicao,foto_perfil_url,foto_perfil_path")
+        .single();
+      if (updateError) throw updateError;
+
+      if (requestedPath && previousPath && previousPath !== requestedPath) {
+        await admin.storage.from(PROFILE_BUCKET).remove([previousPath]).catch(() => undefined);
+      }
+
+      return json({
+        success: true,
+        aluno: {
+          ...updated,
+          nome_perfil: updated.nome_exibicao || updated.nome,
+        },
+      });
     }
 
     return json({ error: "Ação inválida." }, 400);
