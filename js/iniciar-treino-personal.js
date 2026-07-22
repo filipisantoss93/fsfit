@@ -129,14 +129,3 @@ startButton.addEventListener('click', async () => {
     if (startButton.textContent === 'Iniciando...') startButton.textContent = originalText;
   }
 });
-
-const scheduleStateRefresh = () => {
-  const run = () => void refreshSessionState();
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(run, { timeout: 1800 });
-  } else {
-    window.setTimeout(run, 350);
-  }
-};
-
-scheduleStateRefresh();
