@@ -5,6 +5,7 @@ const resolverForm = document.querySelector('#student-resolver-form');
 const pinForm = document.querySelector('#student-pin-form');
 const activationForm = document.querySelector('#student-activation-form');
 const selectedPersonalHost = document.querySelector('#selected-personal');
+const studentIdentityHost = document.querySelector('#student-identity');
 const description = document.querySelector('#access-description');
 const changePersonalButtons = [...document.querySelectorAll('[data-change-personal]')];
 
@@ -83,6 +84,18 @@ function renderSelectedPersonal(personal) {
   selectedPersonalHost.classList.remove('hidden');
 }
 
+function renderStudentIdentity(aluno) {
+  if (!studentIdentityHost) return;
+  const name = String(aluno?.nome || '').trim();
+  if (!name) {
+    studentIdentityHost.classList.add('hidden');
+    studentIdentityHost.innerHTML = '';
+    return;
+  }
+  studentIdentityHost.innerHTML = `<small>ACESSO IDENTIFICADO</small><strong>Olá, ${esc(name)} 👋</strong><span>Você está acessando a sua área de aluno no FS Fit.</span>`;
+  studentIdentityHost.classList.remove('hidden');
+}
+
 function resetAccess() {
   phone = '';
   personalSlug = '';
@@ -91,6 +104,8 @@ function resetAccess() {
   localStorage.removeItem('fsfit_personal_slug');
   clearMessage();
   selectedPersonalHost?.classList.add('hidden');
+  studentIdentityHost?.classList.add('hidden');
+  if (studentIdentityHost) studentIdentityHost.innerHTML = '';
   resolverForm?.classList.remove('hidden');
   pinForm?.classList.add('hidden');
   activationForm?.classList.add('hidden');
@@ -155,12 +170,14 @@ async function beginPersonalAccess(personal, telefone) {
   resolverForm?.classList.add('hidden');
   pinForm?.classList.add('hidden');
   activationForm?.classList.add('hidden');
+  studentIdentityHost?.classList.add('hidden');
   renderSelectedPersonal(personal);
   updateChangePersonalButtons();
-  if (description) description.textContent = 'Confirme seu acesso para abrir diretamente a sua área de treinos.';
+  if (description) description.textContent = 'Confirme sua identidade e continue para abrir a sua área de treinos.';
 
   try {
     const result = await invoke({ action: 'lookup', telefone: phone, personal_slug: personalSlug });
+    renderStudentIdentity(result.aluno);
     if (result.next === 'activate') {
       activationForm?.classList.remove('hidden');
       if (result.activation_ready) {
