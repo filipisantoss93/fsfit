@@ -47,10 +47,10 @@ function createAvatar(student, size = 'md') {
 }
 
 function syncAvatar(target, student, size = 'md', placement = 'prepend') {
-  if (!target || !student) return;
+  if (!target || !student) return null;
   const existing = target.querySelector(':scope > .fsfit-personal-student-avatar');
   const expectedUrl = student.foto_perfil_url || '';
-  if (existing?.dataset.avatarUrl === expectedUrl && existing?.dataset.studentAvatarId === student.id) return;
+  if (existing?.dataset.avatarUrl === expectedUrl && existing?.dataset.studentAvatarId === student.id) return existing;
 
   const avatar = createAvatar(student, size);
   if (existing) existing.replaceWith(avatar);
@@ -61,6 +61,7 @@ function syncAvatar(target, student, size = 'md', placement = 'prepend') {
   } else {
     target.prepend(avatar);
   }
+  return avatar;
 }
 
 async function loadStudents(force = false) {
@@ -176,7 +177,8 @@ function syncAgenda(map) {
     const student = map.get(String(studentIdFromHref(entry)));
     const main = entry.querySelector('.agenda-entry-main');
     if (!student || !main) return;
-    syncAvatar(entry, student, 'md', 'before-copy');
+    const avatar = syncAvatar(entry, student, 'md');
+    if (avatar && avatar.nextElementSibling !== main) entry.insertBefore(avatar, main);
     entry.classList.add('fsfit-has-student-avatar');
   });
 }
@@ -186,7 +188,8 @@ function syncToday(map) {
     const student = map.get(String(studentIdFromHref(entry)));
     const main = entry.querySelector('.today-entry-main');
     if (!student || !main) return;
-    syncAvatar(entry, student, 'md', 'before-copy');
+    const avatar = syncAvatar(entry, student, 'md');
+    if (avatar && avatar.nextElementSibling !== main) entry.insertBefore(avatar, main);
     entry.classList.add('fsfit-has-student-avatar');
   });
 }
