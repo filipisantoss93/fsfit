@@ -240,38 +240,61 @@
   .live-session-modal-actions { gap: 9px; }
   .live-workout-editor-close { top: 10px; right: 10px; }
 
-  /* Mantém o sticky nativo isolado e sem a camada fixed que afetava o viewport no iOS. */
   body.fsfit-dashboard-modern main.container { overflow: visible !important; }
 
+  /* Estado normal: as abas continuam no fluxo abaixo do cabeçalho. */
   body.fsfit-dashboard-modern .dashboard-tabs,
   .dashboard-tabs {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: var(--safe-area-top) !important;
-    z-index: 130 !important;
+    position: relative !important;
+    top: auto !important;
+    z-index: 1 !important;
     width: 100% !important;
-    isolation: isolate;
     background: #1a1d23 !important;
-    box-shadow: 0 10px 28px rgba(0,0,0,.38) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
-  .dashboard-tabs::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: calc(-1 * var(--safe-area-top));
-    left: calc(50% - 50vw);
-    width: 100vw;
-    height: calc(100% + var(--safe-area-top));
-    background: #0f1115;
-    pointer-events: none;
+  .dashboard-tabs::before { content: none !important; }
+
+  /* O JS já detecta quando a posição original das abas alcança o topo.
+     No iOS usamos esse estado como fallback para fixação real no viewport. */
+  body:has(.dashboard-tabs-safe-cover.is-visible) .dashboard-tabs {
+    position: fixed !important;
+    top: 0 !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 180 !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding-top: calc(var(--safe-area-top) + 4px) !important;
+    border-top: 0 !important;
+    border-radius: 0 0 14px 14px !important;
+    background: #1a1d23 !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.42) !important;
   }
 
-  .dashboard-tabs-safe-cover { display: none !important; }
+  /* Compensa o espaço removido do fluxo quando a barra passa a ser fixed. */
+  body:has(.dashboard-tabs-safe-cover.is-visible) .dashboard-tab-panel {
+    padding-top: calc(66px + var(--safe-area-top));
+  }
 
-  /* A barra principal deve permanecer sempre presa ao rodapé do viewport. */
+  .dashboard-tabs-safe-cover {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 179;
+    height: calc(var(--safe-area-top) + 1px) !important;
+    pointer-events: none;
+    background: #1a1d23;
+    opacity: 0;
+    transition: opacity .12s ease;
+  }
+
+  .dashboard-tabs-safe-cover.is-visible { opacity: 1; }
+
+  /* Defesa extra para o shell principal no iOS. */
   body.fsfit-dashboard-modern .fsfit-bottom-nav,
   .fsfit-bottom-nav {
     position: fixed !important;
@@ -281,5 +304,7 @@
     left: 10px !important;
     margin: 0 !important;
     z-index: 140 !important;
+    transform: none !important;
+    will-change: auto !important;
   }
 }
