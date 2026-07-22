@@ -46,6 +46,86 @@ let currentStatus = null;
 let loading = false;
 let stateChecked = false;
 
+function setupRecordSwipeNavigation() {
+  const container = document.querySelector('.student-record-container');
+  const tabs = [...document.querySelectorAll('[data-record-tab]')];
+  if (!container || tabs.length < 2 || container.dataset.recordSwipeBound === '1') return;
+
+  container.dataset.recordSwipeBound = '1';
+  const blockedSelector = [
+    'input',
+    'textarea',
+    'select',
+    'button',
+    'a',
+    'label',
+    'video',
+    'iframe',
+    '[contenteditable="true"]',
+    '.record-tabs',
+    '.table-wrap',
+    '.student-media-grid'
+  ].join(',');
+
+  let startX = 0;
+  let startY = 0;
+  let startedAt = 0;
+  let tracking = false;
+
+  const reset = () => {
+    tracking = false;
+    startX = 0;
+    startY = 0;
+    startedAt = 0;
+  };
+
+  container.addEventListener('touchstart', event => {
+    if (event.touches.length !== 1) return reset();
+
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest(blockedSelector)) return reset();
+
+    const touch = event.touches[0];
+    const edgeGuard = 24;
+    if (touch.clientX <= edgeGuard || touch.clientX >= window.innerWidth - edgeGuard) return reset();
+
+    startX = touch.clientX;
+    startY = touch.clientY;
+    startedAt = Date.now();
+    tracking = true;
+  }, { passive: true });
+
+  container.addEventListener('touchend', event => {
+    if (!tracking) return;
+
+    const touch = event.changedTouches?.[0];
+    if (!touch) return reset();
+
+    const deltaX = touch.clientX - startX;
+    const deltaY = touch.clientY - startY;
+    const elapsed = Date.now() - startedAt;
+    reset();
+
+    const horizontalDistance = Math.abs(deltaX);
+    const verticalDistance = Math.abs(deltaY);
+    if (elapsed > 900 || horizontalDistance < 58 || horizontalDistance <= verticalDistance * 1.2) return;
+
+    const currentIndex = tabs.findIndex(tab => tab.classList.contains('active'));
+    if (currentIndex < 0) return;
+
+    const nextIndex = deltaX < 0 ? currentIndex + 1 : currentIndex - 1;
+    const nextTab = tabs[nextIndex];
+    if (!nextTab) return;
+
+    nextTab.click();
+    nextTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, { passive: true });
+
+  container.addEventListener('touchcancel', reset, { passive: true });
+}
+
+setupRecordSwipeNavigation();
+
 function showLocalMessage(text, type = 'success') {
   if (!message) return;
   message.textContent = text;
