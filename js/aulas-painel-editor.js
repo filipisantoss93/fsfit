@@ -17,6 +17,7 @@ let currentStudent = '';
 let workoutsRequest = 0;
 let currentExerciseId = '';
 let currentExercises = new Map();
+let currentProgressSignature = '';
 
 const DAY_NAMES = {
   0: 'Domingo',
@@ -52,12 +53,27 @@ function currentStudentId() {
   }
 }
 
+function sessionProgress() {
+  return {
+    done: Math.max(0, Number(sessionModal?.dataset.progressDone || 0)),
+    total: Math.max(0, Number(sessionModal?.dataset.progressTotal || 0)),
+    active: sessionModal?.dataset.sessionStatus === 'em_aula'
+  };
+}
+
 function injectStyles() {
   if (document.querySelector('#live-session-tabs-styles')) return;
   const style = document.createElement('style');
   style.id = 'live-session-tabs-styles';
   style.textContent = `
-    .live-session-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0 0 16px;padding:5px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.025)}
+    .live-session-modal-header>div:first-child{min-width:0;flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:end}
+    .live-session-modal-header>div:first-child>small{grid-column:1/-1}
+    .live-session-modal-header>div:first-child>h2{grid-column:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .live-session-modal-header>div:first-child>p{grid-column:1/-1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .live-session-modal-header .live-session-progress-label{grid-column:2;grid-row:2;align-self:center;justify-self:end;margin:0;padding:0;background:transparent;border-radius:0}
+    .live-session-modal-header .live-session-progress-label span{display:none}
+    .live-session-modal-header .live-session-progress-label strong{font-size:.76rem;white-space:nowrap;color:var(--text)}
+    .live-session-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0 0 16px;padding:5px;border:1px solid var(--border);border-radius:10px;background:#151a1f}
     .live-session-tab{min-height:40px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-size:.82rem;font-weight:850;cursor:pointer;transition:.18s ease}
     .live-session-tab:hover{color:var(--text);background:rgba(255,255,255,.035)}
     .live-session-tab.active{color:var(--text);background:var(--surface-light);box-shadow:inset 0 0 0 1px rgba(255,255,255,.045)}
@@ -81,13 +97,20 @@ function injectStyles() {
     .live-session-workout-day{display:grid;gap:6px}
     .live-session-workout-day-title{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:.66rem;font-weight:850;letter-spacing:.045em;text-transform:uppercase}
     .live-session-exercise-list{display:grid;gap:5px}
-    .live-session-exercise-row{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:9px;align-items:center;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:rgba(255,255,255,.02);color:inherit;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease}
+    .live-session-exercise-row{width:100%;display:grid;grid-template-columns:18px 26px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:rgba(255,255,255,.02);color:inherit;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease}
     .live-session-exercise-row:hover,.live-session-exercise-row:focus-visible{background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.35);outline:none}
+    .live-session-exercise-row.done{border-color:rgba(50,215,75,.22);background:rgba(50,215,75,.035)}
+    .live-session-exercise-row.current{border-color:rgba(59,130,246,.65);background:rgba(59,130,246,.085)}
+    .live-session-exercise-marker{display:grid;place-items:center;width:18px;height:18px;color:#77808d;font-size:.72rem;font-weight:950;line-height:1}
+    .live-session-exercise-row.done .live-session-exercise-marker{color:var(--primary)}
+    .live-session-exercise-row.current .live-session-exercise-marker{color:var(--secondary)}
     .live-session-exercise-arrow{color:var(--secondary);font-size:1.2rem;line-height:1}
     .live-session-exercise-order{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:rgba(59,130,246,.1);color:var(--secondary);font-size:.68rem;font-weight:900}
+    .live-session-exercise-row.done .live-session-exercise-order{background:rgba(50,215,75,.1);color:var(--primary)}
     .live-session-exercise-copy{min-width:0}
     .live-session-exercise-copy strong{display:block;font-size:.78rem;line-height:1.3}
     .live-session-exercise-copy span{display:block;margin-top:2px;color:var(--muted);font-size:.67rem;line-height:1.35}
+    .live-session-exercise-row.done .live-session-exercise-copy{opacity:.72}
     .live-session-exercise-empty{padding:10px;border:1px dashed rgba(255,255,255,.1);border-radius:7px;color:var(--muted);font-size:.72rem;text-align:center}
     .live-session-workout-empty{padding:18px 14px;border:1px dashed var(--border);border-radius:9px;color:var(--muted);font-size:.8rem;text-align:center}
     .live-session-edit-workout{width:100%;margin-bottom:4px}
@@ -100,10 +123,21 @@ function injectStyles() {
     .live-exercise-edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
     .live-session-tab-panel[data-live-tab-panel="chat"] .live-session-chat-title{margin-top:2px}
     @media(max-width:720px){
-      .live-session-tabs{position:sticky;top:0;z-index:3;background:#151a1f}
+      .live-session-dialog{box-sizing:border-box;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+      .live-session-modal-header{padding:12px 16px 10px;align-items:center}
+      .live-session-modal-header>div:first-child{column-gap:8px}
+      .live-session-modal-header>div:first-child>small{margin-bottom:3px;font-size:.62rem}
+      .live-session-modal-header>div:first-child>h2{margin:0;font-size:1.14rem}
+      .live-session-modal-header>div:first-child>p{margin-top:3px;font-size:.72rem}
+      .live-session-modal-header .live-session-progress-label strong{font-size:.7rem}
+      .live-session-modal-close{width:38px;height:38px;font-size:23px}
+      .live-session-modal-body{padding:14px 18px 20px}
+      .live-session-tabs{position:sticky;top:-14px;z-index:5;margin:-14px -18px 14px;padding:10px 18px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:#151a1f;box-shadow:0 8px 18px rgba(0,0,0,.12)}
       .live-session-workouts-heading{align-items:center}
+      .live-session-workouts-heading p{max-width:36ch}
       .live-session-workout-card{padding:11px 12px}
       .live-session-tab-panel[data-live-tab-panel="chat"] .live-chat-thread{max-height:45dvh}
+      .live-session-modal-actions{margin-top:14px;padding-top:14px}
     }
   `;
   document.head.appendChild(style);
@@ -117,7 +151,7 @@ function ensureTabbedLayout() {
   tabs.className = 'live-session-tabs';
   tabs.setAttribute('aria-label', 'Acompanhamento do aluno');
   tabs.innerHTML = `
-    <button class="live-session-tab active" type="button" data-live-tab="workouts" aria-selected="true">Treinos</button>
+    <button class="live-session-tab active" type="button" data-live-tab="workouts" aria-selected="true">Treino</button>
     <button class="live-session-tab" type="button" data-live-tab="chat" aria-selected="false">Chat</button>`;
 
   const workoutsPanel = document.createElement('section');
@@ -125,7 +159,7 @@ function ensureTabbedLayout() {
   workoutsPanel.dataset.liveTabPanel = 'workouts';
   workoutsPanel.innerHTML = `
     <div class="live-session-workouts-heading">
-      <div><small>PLANEJAMENTO</small><strong>Treinos do aluno</strong><p>Veja planos, dias e exercícios e edite sem sair do acompanhamento.</p></div>
+      <div><small>TREINO DE HOJE</small><strong>Exercícios do aluno</strong><p>Acompanhe a sequência e abra um exercício para ajustar.</p></div>
     </div>
     <div id="live-session-workouts-list" class="live-session-workouts-list"><div class="live-session-workout-empty">Carregando treino de hoje...</div></div>`;
 
@@ -136,7 +170,12 @@ function ensureTabbedLayout() {
   modalBody.prepend(tabs);
   tabs.after(workoutsPanel, chatPanel);
 
-  if (progressLabel) workoutsPanel.prepend(progressLabel);
+  const headerInfo = sessionModal?.querySelector('.live-session-modal-header > div:first-child');
+  if (progressLabel && headerInfo) {
+    const label = progressLabel.querySelector('span');
+    if (label) label.textContent = 'Progresso';
+    headerInfo.append(progressLabel);
+  }
   if (modalActions) workoutsPanel.append(modalActions);
   if (chatTitle) chatPanel.append(chatTitle);
   if (chatThread) chatPanel.append(chatThread);
@@ -156,7 +195,6 @@ function ensureTabbedLayout() {
   ensureExerciseEditor();
   ensureEditActionButton();
 }
-
 
 function ensureEditActionButton() {
   if (!modalActions || modalActions.querySelector('[data-live-edit-workout]')) return;
@@ -283,16 +321,18 @@ function exerciseMeta(row) {
   ].filter(Boolean).join(' • ') || 'Sem prescrição detalhada';
 }
 
-function renderWorkoutExercises(workout, exercises) {
+function renderWorkoutExercises(workout, exercises, exerciseOffset = 0) {
   if (!exercises.length) {
     return '<div class="live-session-exercise-empty">Nenhum exercício cadastrado neste plano.</div>';
   }
 
+  const progress = sessionProgress();
   const groups = exercises.reduce((acc, row) => {
     const day = Number(row.dia_semana) || 0;
     (acc[day] ||= []).push(row);
     return acc;
   }, {});
+  let localPosition = 0;
 
   return Object.keys(groups)
     .map(Number)
@@ -304,15 +344,24 @@ function renderWorkoutExercises(workout, exercises) {
         <section class="live-session-workout-day">
           <div class="live-session-workout-day-title"><span>${escapeHtml(dayName)}</span><span>${rows.length} ${rows.length === 1 ? 'exercício' : 'exercícios'}</span></div>
           <div class="live-session-exercise-list">
-            ${rows.map((row, index) => `
-              <button class="live-session-exercise-row" type="button" data-live-exercise-id="${escapeHtml(row.id)}">
-                <span class="live-session-exercise-order">${escapeHtml(String(row.ordem || index + 1))}</span>
-                <span class="live-session-exercise-copy">
-                  <strong>${escapeHtml(row.exercicios?.nome || 'Exercício')}</strong>
-                  <span>${escapeHtml(exerciseMeta(row))}</span>
-                </span>
-                <span class="live-session-exercise-arrow" aria-hidden="true">›</span>
-              </button>`).join('')}
+            ${rows.map((row, index) => {
+              const progressIndex = exerciseOffset + localPosition++;
+              const done = progressIndex < progress.done;
+              const current = progress.active && !done && progressIndex === progress.done && progress.done < Math.max(progress.total, exercises.length + exerciseOffset);
+              const stateClass = done ? 'done' : current ? 'current' : 'pending';
+              const marker = done ? '✓' : current ? '●' : '○';
+              const stateLabel = done ? 'Concluído' : current ? 'Exercício atual' : 'Pendente';
+              return `
+                <button class="live-session-exercise-row ${stateClass}" type="button" data-live-exercise-id="${escapeHtml(row.id)}" aria-label="${escapeHtml(`${row.exercicios?.nome || 'Exercício'} — ${stateLabel}`)}">
+                  <span class="live-session-exercise-marker" aria-hidden="true">${marker}</span>
+                  <span class="live-session-exercise-order">${escapeHtml(String(row.ordem || index + 1))}</span>
+                  <span class="live-session-exercise-copy">
+                    <strong>${escapeHtml(row.exercicios?.nome || 'Exercício')}</strong>
+                    <span>${escapeHtml(exerciseMeta(row))}</span>
+                  </span>
+                  <span class="live-session-exercise-arrow" aria-hidden="true">›</span>
+                </button>`;
+            }).join('')}
           </div>
         </section>`;
     }).join('');
@@ -379,11 +428,14 @@ async function loadStudentWorkouts(studentId) {
       return;
     }
 
+    let exerciseOffset = 0;
     host.innerHTML = visibleWorkouts.map(workout => {
       const start = formatDate(workout.data_inicio);
       const end = formatDate(workout.data_fim);
       const period = [start, end].filter(Boolean).join(' → ');
       const workoutExercises = exercisesByWorkout[workout.id] || [];
+      const workoutOffset = exerciseOffset;
+      exerciseOffset += workoutExercises.length;
 
       return `
         <article class="live-session-workout-card">
@@ -398,7 +450,7 @@ async function loadStudentWorkouts(studentId) {
             </div>
             <span class="live-session-workout-count">${workoutExercises.length} ${workoutExercises.length === 1 ? 'exercício' : 'exercícios'}</span>
           </div>
-          <div class="live-session-workout-exercises">${renderWorkoutExercises(workout, workoutExercises)}</div>
+          <div class="live-session-workout-exercises">${renderWorkoutExercises(workout, workoutExercises, workoutOffset)}</div>
         </article>`;
     }).join('');
     ensureEditActionButton();
@@ -454,6 +506,15 @@ if (modalActions) {
   });
   observer.observe(modalActions, { childList: true });
 }
+
+sessionModal?.addEventListener('fsfit-live-session-updated', event => {
+  const detail = event.detail || {};
+  const signature = `${detail.sessionId || ''}:${detail.done || 0}:${detail.total || 0}:${detail.status || ''}`;
+  if (signature === currentProgressSignature) return;
+  currentProgressSignature = signature;
+  if (!sessionModal.classList.contains('open') || !currentStudent) return;
+  loadStudentWorkouts(currentStudent).catch(console.error);
+});
 
 modalActions?.addEventListener('click', event => {
   const editButton = event.target.closest('[data-live-edit-workout]');
