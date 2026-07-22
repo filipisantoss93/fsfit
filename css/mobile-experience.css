@@ -51,6 +51,12 @@
   opacity: .82;
 }
 
+/* Botões de paginação podem estar desabilitados por estado da navegação,
+   não por carregamento. Nunca exibir spinner nesses controles. */
+.finance-students-pagination .fsfit-button-busy::after {
+  display: none !important;
+}
+
 @keyframes fsfit-spin {
   to { transform: rotate(360deg); }
 }
