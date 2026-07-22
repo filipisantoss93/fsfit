@@ -1,3 +1,41 @@
+function injectBottomNavigationPositionFix() {
+  if (document.querySelector('#fsfit-bottom-navigation-position-fix')) return;
+
+  const style = document.createElement('style');
+  style.id = 'fsfit-bottom-navigation-position-fix';
+  style.textContent = `
+    @media (max-width: 860px) {
+      html {
+        scroll-padding-bottom: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+      }
+
+      html body {
+        padding-bottom: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+      }
+
+      html body .fsfit-bottom-nav {
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        min-height: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+        padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px)) !important;
+        border-left: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 0 !important;
+        border-radius: 18px 18px 0 0 !important;
+      }
+
+      html body .fsfit-bottom-nav::before {
+        display: none !important;
+        content: none !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+injectBottomNavigationPositionFix();
+
 function bindMoreSheetSwipe(sheet) {
   if (!(sheet instanceof HTMLElement) || sheet.dataset.swipeCloseBound === '1') return;
 
