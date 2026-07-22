@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/aluno-midias.css">
   <link rel="stylesheet" href="css/aluno-notificacoes.css?v=20260716-notifications1">
   <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260721-student-ui1">
+  <link rel="stylesheet" href="css/aluno-perfil.css?v=20260722-student-profile1">
   <link rel="stylesheet" href="css/aulas.css?v=20260721-student-live1">
   <link rel="stylesheet" href="css/aluno-financeiro.css?v=20260717-financeiro1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
@@ -46,9 +47,15 @@
 
     <div id="student-content" class="hidden">
       <section class="student-profile-summary">
-        <h1 id="student-name"></h1>
-        <p>Aluno de <strong id="trainer-name"></strong></p>
-        <p id="updated-at" class="updated hidden" aria-hidden="true"></p>
+        <div id="student-profile-avatar" class="student-profile-avatar" aria-label="Foto de perfil do aluno">
+          <span>A</span>
+          <img class="hidden" alt="Foto de perfil do aluno">
+        </div>
+        <div class="student-profile-summary-copy">
+          <h1 id="student-name"></h1>
+          <p>Aluno de <strong id="trainer-name"></strong></p>
+          <p id="updated-at" class="updated hidden" aria-hidden="true"></p>
+        </div>
       </section>
 
       <section id="student-payment-alert" class="student-payment-alert hidden" aria-live="polite">
@@ -131,6 +138,32 @@
       </div>
       <div class="student-settings-body">
         <section class="student-settings-group">
+          <div class="student-profile-editor-head">
+            <div id="student-profile-editor-avatar" class="student-profile-editor-avatar" aria-label="Prévia da foto de perfil">
+              <span>A</span>
+              <img class="hidden" alt="Prévia da foto de perfil">
+            </div>
+            <div class="student-profile-editor-copy">
+              <h3>Meu perfil</h3>
+              <p>Você pode alterar seu nome de exibição e sua foto. Os demais dados são gerenciados pelo seu personal.</p>
+            </div>
+          </div>
+          <form id="student-profile-form" class="student-profile-form">
+            <div class="form-group">
+              <label for="student-profile-display-name">Nome de exibição</label>
+              <input id="student-profile-display-name" name="nome_exibicao" type="text" minlength="2" maxlength="80" autocomplete="name" required>
+            </div>
+            <input id="student-profile-photo-input" type="file" accept="image/*" hidden>
+            <span class="student-profile-photo-note">A foto é otimizada antes do envio. JPG, PNG e fotos do celular são convertidos para um formato leve.</span>
+            <div class="actions">
+              <button id="student-profile-photo-button" class="btn btn-outline" type="button">Escolher foto</button>
+              <button id="student-profile-save" class="btn btn-primary" type="submit">Salvar perfil</button>
+            </div>
+            <p id="student-profile-save-message" class="student-profile-save-message" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="student-settings-group">
           <h3>Notificações no celular</h3>
           <p id="notification-status">Verificando disponibilidade de notificações...</p>
           <div class="actions">
@@ -195,6 +228,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script type="module" src="js/aluno.js?v=20260716-student-tabs3"></script>
+  <script type="module" src="js/aluno-perfil.js?v=20260722-student-profile1"></script>
   <script type="module" src="js/aluno-financeiro.js?v=20260717-financeiro1"></script>
   <script type="module" src="js/aluno-notificacoes.js?v=20260716-notifications1"></script>
   <script type="module" src="js/aula-aluno.js?v=20260721-student-live1"></script>
