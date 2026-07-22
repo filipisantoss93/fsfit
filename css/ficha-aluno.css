@@ -82,10 +82,93 @@
 .student-media-actions a { font-size: .84rem; }
 .student-media-actions .btn { min-height: 38px; padding: 0 12px; font-size: .8rem; }
 
+.student-activation-overview-card {
+  margin-bottom: 20px;
+  border-color: rgba(50, 215, 75, .32);
+  background: linear-gradient(145deg, rgba(24, 58, 38, .48), rgba(22, 26, 32, .96));
+}
+.student-activation-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.student-activation-heading small {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+.student-activation-heading h2 { margin: 0; }
+.student-activation-status {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 198, 52, .38);
+  border-radius: 999px;
+  background: rgba(255, 198, 52, .1);
+  color: #ffd66b;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.student-activation-intro {
+  margin: 14px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.student-activation-existing {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .045);
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.45;
+}
+.student-activation-result {
+  margin: 16px 0 0;
+  padding: 16px;
+  border: 1px solid rgba(50, 215, 75, .38);
+  border-radius: 14px;
+  background: rgba(50, 215, 75, .08);
+}
+.student-activation-result small,
+.student-activation-result span { display: block; color: var(--muted); }
+.student-activation-result small { margin-bottom: 6px; }
+.student-activation-result strong {
+  display: block;
+  font-size: 1.8rem;
+  letter-spacing: .18em;
+}
+.student-activation-result span { margin-top: 6px; font-size: .82rem; }
+.student-activation-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 @media (max-width: 700px) {
   .media-create-grid,
   .student-media-grid { grid-template-columns: 1fr; }
   .media-form { padding: 15px; }
+
+  .record-tabs.record-tabs-compact {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px !important;
+    overflow: visible !important;
+  }
+  .record-tabs.record-tabs-compact .record-tab {
+    min-width: 0 !important;
+    padding: 12px 4px !important;
+    font-size: .75rem !important;
+    white-space: nowrap;
+  }
+  .student-activation-heading { align-items: center; }
+  .student-activation-overview-card { padding: 18px; }
+  .student-activation-actions { display: grid; }
+  .student-activation-actions .btn { width: 100%; }
 
   /* Safari/iOS: evita múltiplas superfícies sticky com blur simultâneo. */
   .record-tabs,
