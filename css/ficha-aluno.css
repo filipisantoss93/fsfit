@@ -86,4 +86,12 @@
   .media-create-grid,
   .student-media-grid { grid-template-columns: 1fr; }
   .media-form { padding: 15px; }
+
+  /* Safari/iOS: evita múltiplas superfícies sticky com blur simultâneo. */
+  .record-tabs,
+  .fsfit-student-quick-actions {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #14171d !important;
+  }
 }
