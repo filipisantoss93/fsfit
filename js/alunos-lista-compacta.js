@@ -18,6 +18,12 @@ function esc(value = '') {
   return div.innerHTML;
 }
 
+function initials(value = '') {
+  const parts = String(value).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return 'A';
+  return `${parts[0]?.[0] || ''}${parts.length > 1 ? parts[parts.length - 1]?.[0] || '' : ''}`.toUpperCase();
+}
+
 function ensureFilterNav() {
   if (!searchWrap || document.querySelector('#student-filter-nav')) return;
   const nav = document.createElement('nav');
@@ -41,6 +47,49 @@ function getStudentId(row) {
   } catch {
     return '';
   }
+}
+
+function avatarMarkup(studentId, name) {
+  const meta = studentMeta.get(studentId);
+  const photoUrl = String(meta?.foto_perfil_url || '').trim();
+  return `<span class="student-list-avatar" data-student-avatar="${esc(studentId)}" aria-hidden="true">
+    <span class="student-list-avatar-fallback">${esc(initials(name))}</span>
+    ${photoUrl ? `<img src="${esc(photoUrl)}" alt="" loading="lazy">` : ''}
+  </span>`;
+}
+
+function syncStudentAvatars() {
+  if (!list) return;
+  list.querySelectorAll('tr[data-student-id]').forEach(row => {
+    const id = row.dataset.studentId;
+    const name = row.dataset.studentName || 'Aluno';
+    const host = row.querySelector('[data-student-avatar]');
+    if (!host) return;
+
+    const meta = studentMeta.get(id);
+    const photoUrl = String(meta?.foto_perfil_url || '').trim();
+    let image = host.querySelector('img');
+
+    host.querySelector('.student-list-avatar-fallback').textContent = initials(name);
+
+    if (!photoUrl) {
+      image?.remove();
+      return;
+    }
+
+    if (!image) {
+      image = document.createElement('img');
+      image.alt = '';
+      image.loading = 'lazy';
+      host.appendChild(image);
+    }
+
+    if (image.dataset.source !== photoUrl) {
+      image.dataset.source = photoUrl;
+      image.src = photoUrl;
+      image.onerror = () => image.remove();
+    }
+  });
 }
 
 function transformRows() {
@@ -76,12 +125,18 @@ function transformRows() {
     row.className = 'student-compact-row';
     row.innerHTML = `
       <td class="student-compact-main">
-        <strong>${esc(name)}</strong>
-        <small>${esc(phone)}</small>
+        <div class="student-compact-identity">
+          ${avatarMarkup(studentId, name)}
+          <span class="student-compact-copy">
+            <strong>${esc(name)}</strong>
+            <small>${esc(phone)}</small>
+          </span>
+        </div>
       </td>
       <td class="student-compact-arrow" aria-hidden="true">›</td>`;
   });
 
+  syncStudentAvatars();
   applyFilter();
 }
 
@@ -160,13 +215,14 @@ function applyFilter() {
 
 async function refreshFilterData() {
   const [studentsResult, sessionsResult, workoutsResult] = await Promise.all([
-    supabase.from('alunos').select('id,created_at,status').eq('personal_id', session.user.id),
+    supabase.from('alunos').select('id,created_at,status,foto_perfil_url').eq('personal_id', session.user.id),
     supabase.rpc('listar_sessoes_em_aula_personal'),
     supabase.from('treinos').select('aluno_id').eq('personal_id', session.user.id).eq('status', 'ativo')
   ]);
 
   if (!studentsResult.error) {
     studentMeta = new Map((studentsResult.data || []).map(item => [item.id, item]));
+    syncStudentAvatars();
   }
   if (!sessionsResult.error) {
     inClassIds = new Set((sessionsResult.data || []).filter(item => item.status === 'em_aula').map(item => item.aluno_id));
