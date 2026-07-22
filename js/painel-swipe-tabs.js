@@ -12,7 +12,10 @@ if (tabs.length > 1 && surface) {
   let draggedPanel = null;
   let suppressClickUntil = 0;
 
-  const excludedStartSelector = 'input,select,textarea,[contenteditable="true"],.dashboard-tabs';
+  // O gesto é ouvido no documento inteiro para continuar funcionando quando a
+  // aba ativa tem pouco conteúdo e o usuário inicia o arrasto na área vazia da tela.
+  // Elementos de navegação global e campos de formulário continuam excluídos.
+  const excludedStartSelector = 'input,select,textarea,[contenteditable="true"],.dashboard-tabs,#header-container,.fsfit-bottom-nav,.fsfit-more-sheet';
   const modalOpen = () => document.querySelector('.workout-modal.open,.live-session-modal.open,.live-workout-editor-modal.open,.fsfit-more-sheet.is-open,#fsfit-pwa-install-modal');
 
   function activeIndex() {
@@ -29,9 +32,6 @@ if (tabs.length > 1 && surface) {
   function activateIndex(index) {
     if (index < 0 || index >= tabs.length) return false;
 
-    // O clique sintético usado para trocar a aba passava pelo bloqueio de
-    // "ghost click" do próprio gesto e era cancelado. Libera apenas este
-    // clique programático e restaura a proteção logo em seguida.
     const previousSuppressUntil = suppressClickUntil;
     suppressClickUntil = 0;
     tabs[index].click();
@@ -95,8 +95,6 @@ if (tabs.length > 1 && surface) {
       const changed = activateIndex(nextIndex);
 
       if (!changed) {
-        // Fallback: caso outro listener impeça o clique, sincroniza a aba e
-        // o painel diretamente para não deixar o gesto sem efeito.
         tabs.forEach((tab, index) => {
           const active = index === nextIndex;
           tab.setAttribute('aria-selected', String(active));
@@ -126,9 +124,9 @@ if (tabs.length > 1 && surface) {
     }, 120);
   }
 
-  surface.addEventListener('touchstart', event => {
+  document.addEventListener('touchstart', event => {
     if (event.touches.length !== 1 || modalOpen()) return;
-    if (event.target.closest(excludedStartSelector)) return;
+    if (event.target.closest?.(excludedStartSelector)) return;
 
     const touch = event.touches[0];
     startX = touch.clientX;
@@ -140,7 +138,7 @@ if (tabs.length > 1 && surface) {
     draggedPanel = activePanel();
   }, { passive: true });
 
-  surface.addEventListener('touchmove', event => {
+  document.addEventListener('touchmove', event => {
     if (!tracking || event.touches.length !== 1) return;
 
     const touch = event.touches[0];
@@ -180,7 +178,7 @@ if (tabs.length > 1 && surface) {
     }
   }, { passive: false });
 
-  surface.addEventListener('touchend', event => {
+  document.addEventListener('touchend', event => {
     if (!tracking || !horizontalIntent) {
       resetGesture({ animate: false });
       return;
@@ -207,12 +205,13 @@ if (tabs.length > 1 && surface) {
     resetGesture({ animate: true });
   }, { passive: true });
 
-  surface.addEventListener('touchcancel', () => {
+  document.addEventListener('touchcancel', () => {
     resetGesture({ animate: true });
   }, { passive: true });
 
-  surface.addEventListener('click', event => {
+  document.addEventListener('click', event => {
     if (performance.now() >= suppressClickUntil) return;
+    if (event.target.closest?.('.fsfit-bottom-nav,#header-container')) return;
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
