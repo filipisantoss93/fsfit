@@ -73,7 +73,7 @@ function updateChangePersonalButtons() {
 
 function renderSelectedPersonal(personal) {
   if (!selectedPersonalHost) return;
-  const name = personal?.nome || 'Seu personal';
+  const name = personal?.nome || personal?.nome_publico || 'Seu personal';
   const location = [personal?.local_trabalho, personal?.cidade].filter(Boolean).join(' · ');
   const avatar = personal?.foto_url
     ? `<img class="selected-personal-avatar" src="${esc(personal.foto_url)}" alt="Foto de ${esc(name)}">`
@@ -163,7 +163,11 @@ async function beginPersonalAccess(personal, telefone) {
     const result = await invoke({ action: 'lookup', telefone: phone, personal_slug: personalSlug });
     if (result.next === 'activate') {
       activationForm?.classList.remove('hidden');
-      show('Primeiro acesso: crie um PIN de 4 números para entrar.', 'success');
+      if (result.activation_ready) {
+        show('Primeiro acesso: informe o código de 6 números fornecido pelo seu personal e crie seu PIN.', 'success');
+      } else {
+        show('Seu personal ainda precisa gerar seu código de ativação. Solicite o código antes de concluir o primeiro acesso.');
+      }
     } else {
       pinForm?.classList.remove('hidden');
     }
@@ -196,6 +200,10 @@ resolverForm?.telefone?.addEventListener('input', () => {
 
 pinForm?.pin?.addEventListener('input', () => {
   pinForm.pin.value = digits(pinForm.pin.value, 4);
+});
+
+activationForm?.activation_code?.addEventListener('input', () => {
+  activationForm.activation_code.value = digits(activationForm.activation_code.value, 6);
 });
 
 activationForm?.pin?.addEventListener('input', () => {
@@ -271,16 +279,24 @@ pinForm?.addEventListener('submit', async event => {
 activationForm?.addEventListener('submit', async event => {
   event.preventDefault();
   clearMessage();
+  const activationCode = digits(activationForm.activation_code.value, 6);
   const pin = digits(activationForm.pin.value, 4);
   const pinConfirm = digits(activationForm.pin_confirm.value, 4);
 
+  if (activationCode.length !== 6) return show('Informe o código de ativação de 6 números fornecido pelo seu personal.');
   if (pin.length !== 4 || pinConfirm.length !== 4) return show('Crie e confirme um PIN de 4 números.');
   if (pin !== pinConfirm) return show('Os PINs informados não coincidem.');
 
   const button = activationForm.querySelector('[type="submit"]');
   button.disabled = true;
   try {
-    const result = await invoke({ action: 'activate', telefone: phone, pin, personal_slug: personalSlug });
+    const result = await invoke({
+      action: 'activate',
+      telefone: phone,
+      activation_code: activationCode,
+      pin,
+      personal_slug: personalSlug,
+    });
     saveSession(result);
   } catch (error) {
     console.error(error);
