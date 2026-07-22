@@ -11,7 +11,14 @@
   <title>Financeiro — FS Fit</title>
   <link rel="manifest" href="manifest-personal.webmanifest?v=20260721-icons-v3">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260721-icons-v3">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://jjpijncxlkwutbnkpsaw.supabase.co" crossorigin>
+  <link rel="modulepreload" href="js/supabase.js">
+  <link rel="modulepreload" href="js/layout-core.js">
+  <link rel="modulepreload" href="js/layout.js">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/header-menu.css?v=20260717-support2" data-fsfit-header-styles>
+  <link rel="stylesheet" href="css/mobile-navigation.css?v=20260722-shell1" data-fsfit-mobile-navigation>
   <link rel="stylesheet" href="css/financeiro.css?v=20260718-financeiro3">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260721-icons-v3" sizes="any">
@@ -234,7 +241,16 @@
   </style>
 </head>
 <body>
-  <div id="header-container"></div>
+  <div id="header-container">
+    <header class="main-header" data-fsfit-shell-placeholder aria-hidden="true">
+      <nav class="nav-container">
+        <a class="logo-nav" href="painel.html" tabindex="-1"><strong>FS</strong><span>Fit</span></a>
+        <div class="nav-header-actions">
+          <button class="notification-button" type="button" tabindex="-1" aria-hidden="true"><span class="notification-bell">🔔</span></button>
+        </div>
+      </nav>
+    </header>
+  </div>
 
   <main class="container finance-page">
     <section class="page-header finance-page-header">
@@ -377,6 +393,14 @@
       </div>
     </details>
   </main>
+
+  <nav class="fsfit-bottom-nav" data-fsfit-shell-placeholder aria-hidden="true">
+    <a href="painel.html" tabindex="-1"><span aria-hidden="true">⌂</span>Início</a>
+    <a href="alunos.html" tabindex="-1"><span aria-hidden="true">◎</span>Alunos</a>
+    <a href="agenda.html" tabindex="-1"><span aria-hidden="true">▦</span>Agenda</a>
+    <a class="active" href="financeiro.html" tabindex="-1"><span aria-hidden="true">$</span>Financeiro</a>
+    <button type="button" tabindex="-1" disabled><span aria-hidden="true">•••</span>Mais</button>
+  </nav>
 
   <div id="student-finance-modal" class="finance-modal hidden" role="dialog" aria-modal="true" aria-labelledby="student-finance-modal-title">
     <div class="finance-modal-backdrop" data-close-finance-modal></div>
