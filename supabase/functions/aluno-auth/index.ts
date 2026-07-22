@@ -118,6 +118,7 @@ Deno.serve(async (req) => {
       if (action === "lookup") {
         return json({
           success: true,
+          aluno: { id: aluno.id, nome: aluno.nome },
           next: aluno.primeiro_acesso_concluido && aluno.pin_hash ? "login" : "activate",
           activation_ready: Boolean(aluno.codigo_ativacao_hash && aluno.codigo_ativacao_expira_em && new Date(aluno.codigo_ativacao_expira_em) > new Date()),
         });
@@ -142,6 +143,12 @@ Deno.serve(async (req) => {
         if (!validActivationCode) return registerFailedAttempt(admin, aluno, "Código de ativação inválido.");
 
         const now = new Date().toISOString();
+        const validationWindow = new Date(Date.now() + 60 * 1000).toISOString();
+        const { error: validationError } = await admin.from("alunos").update({
+          ativacao_validada_ate: validationWindow,
+        }).eq("id", aluno.id);
+        if (validationError) throw validationError;
+
         const pinHash = await hashPin(pin);
         const { error } = await admin.from("alunos").update({
           pin_hash: pinHash,
