@@ -50,6 +50,25 @@ body.agenda-modal-open { overflow: hidden; }
 .agenda-modal-actions { position: sticky; bottom: -22px; z-index: 2; display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px; margin: 18px -22px -22px; padding: 12px 22px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: rgba(23,27,32,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .agenda-modal-actions .btn { width: 100%; margin: 0; }
 
+.agenda-student-native-select { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important; }
+.agenda-student-search { position: relative; }
+.agenda-student-search-trigger { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-light); color: var(--muted); font: inherit; text-align: left; cursor: pointer; }
+.agenda-student-search-trigger.has-value { color: var(--text); font-weight: 750; }
+.agenda-student-search-trigger:focus-visible, .agenda-student-search.is-open .agenda-student-search-trigger { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(50,215,75,.08); }
+.agenda-student-search-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agenda-student-search-chevron { flex: 0 0 auto; color: var(--muted); font-size: 1.1rem; }
+.agenda-student-search-panel { position: absolute; z-index: 20; top: calc(100% + 7px); left: 0; right: 0; padding: 10px; border: 1px solid var(--border); border-radius: 14px; background: #171b20; box-shadow: 0 18px 46px rgba(0,0,0,.5); }
+.agenda-student-search-input-wrap { display: grid; grid-template-columns: 24px minmax(0,1fr); align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-light); }
+.agenda-student-search-input-wrap > span { color: var(--muted); font-size: 1rem; }
+.agenda-student-search-input { width: 100%; min-height: 42px; padding: 0; border: 0 !important; background: transparent !important; color: var(--text); font: inherit; box-shadow: none !important; outline: none; }
+.agenda-student-search-results { max-height: min(300px,42dvh); overflow-y: auto; margin-top: 8px; overscroll-behavior: contain; }
+.agenda-student-search-option { width: 100%; display: grid; grid-template-columns: 36px minmax(0,1fr) 20px; align-items: center; gap: 10px; min-height: 48px; padding: 7px 8px; border: 0; border-radius: 10px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.agenda-student-search-option:hover, .agenda-student-search-option:focus-visible, .agenda-student-search-option.is-selected { background: rgba(255,255,255,.055); outline: none; }
+.agenda-student-search-initials { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(50,215,75,.1); color: var(--primary); font-size: .68rem; font-weight: 900; }
+.agenda-student-search-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 750; }
+.agenda-student-search-check { color: var(--primary); font-weight: 900; text-align: center; }
+.agenda-student-search-empty { margin: 0; padding: 18px 10px; color: var(--muted); text-align: center; font-size: .84rem; }
+
 @media (max-width: 760px) {
   .agenda-header { align-items: flex-start; }
   .agenda-header-actions { align-items: stretch; }
@@ -71,6 +90,8 @@ body.agenda-modal-open { overflow: hidden; }
   .agenda-modal { align-items: flex-end; padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)); }
   .agenda-modal-card { width: 100%; max-height: calc(100dvh - 20px); padding: 18px 16px; border-radius: 20px; }
   .agenda-modal-actions { bottom: -18px; margin: 16px -16px -18px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .agenda-student-search-panel { position: fixed; z-index: 1200; top: max(72px,calc(env(safe-area-inset-top) + 54px)); left: 14px; right: 14px; max-height: min(520px,70dvh); padding: 12px; border-radius: 18px; }
+  .agenda-student-search-results { max-height: min(430px,58dvh); }
 }
 
 @media (max-width: 420px) {
