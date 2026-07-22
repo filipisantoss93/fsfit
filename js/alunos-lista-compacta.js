@@ -28,8 +28,7 @@ function ensureFilterNav() {
     <button class="student-filter-pill active" type="button" data-student-filter="all" aria-pressed="true">Todos</button>
     <button class="student-filter-pill" type="button" data-student-filter="in_class" aria-pressed="false">Em aula</button>
     <button class="student-filter-pill" type="button" data-student-filter="new" aria-pressed="false">Novos</button>
-    <button class="student-filter-pill" type="button" data-student-filter="no_workout" aria-pressed="false">Sem treino</button>
-    <button class="student-filter-pill" type="button" data-student-filter="alphabetical" aria-pressed="false">A–Z</button>`;
+    <button class="student-filter-pill" type="button" data-student-filter="no_workout" aria-pressed="false">Sem treino</button>`;
   searchWrap.insertAdjacentElement('afterend', nav);
 }
 
