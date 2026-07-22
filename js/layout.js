@@ -2,6 +2,7 @@ import { supabase } from './supabase.js';
 import * as core from './layout-core.js';
 import './checkout-endereco.js';
 import './mobile-more-swipe.js?v=20260721-more-swipe1';
+import './student-avatars-personal.js?v=20260722-student-avatars1';
 
 export * from './layout-core.js';
 
