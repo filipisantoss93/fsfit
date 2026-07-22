@@ -95,46 +95,74 @@ function paymentForStudent(studentId, competence = currentCompetence()) {
 }
 
 function ensureStudentStatusFilter() {
-  if (!studentsToolbar || document.querySelector('#finance-students-status')) return;
+  if (!studentsToolbar || document.querySelector('#finance-students-status-nav')) return;
 
-  studentsToolbar.classList.add('finance-students-toolbar-filtered');
-
-  const group = document.createElement('div');
-  group.className = 'form-group finance-status-filter-group';
-  group.innerHTML = `
-    <label for="finance-students-status">Filtrar por status</label>
-    <select id="finance-students-status" aria-label="Filtrar alunos pelo status da mensalidade">
-      <option value="all">Todos os status</option>
-      <option value="paid">Pago</option>
-      <option value="pending">Pendente</option>
-      <option value="overdue">Atrasado</option>
-      <option value="waiting">Aguardando confirmação</option>
-      <option value="not-configured">Não configurada</option>
-    </select>`;
-  studentsToolbar.appendChild(group);
+  const nav = document.createElement('nav');
+  nav.id = 'finance-students-status-nav';
+  nav.className = 'finance-status-filter-nav';
+  nav.setAttribute('aria-label', 'Filtros de status das mensalidades');
+  nav.innerHTML = `
+    <button class="finance-status-filter-pill active" type="button" data-finance-status-filter="all" aria-pressed="true">Todos</button>
+    <button class="finance-status-filter-pill" type="button" data-finance-status-filter="paid" aria-pressed="false">Pago</button>
+    <button class="finance-status-filter-pill" type="button" data-finance-status-filter="pending" aria-pressed="false">Pendente</button>
+    <button class="finance-status-filter-pill" type="button" data-finance-status-filter="overdue" aria-pressed="false">Atrasado</button>
+    <button class="finance-status-filter-pill" type="button" data-finance-status-filter="waiting" aria-pressed="false">Aguardando confirmação</button>
+    <button class="finance-status-filter-pill" type="button" data-finance-status-filter="not-configured" aria-pressed="false">Não configurada</button>`;
+  studentsToolbar.insertAdjacentElement('afterend', nav);
 
   if (!document.querySelector('#finance-students-status-filter-style')) {
     const style = document.createElement('style');
     style.id = 'finance-students-status-filter-style';
     style.textContent = `
-      .finance-students-toolbar.finance-students-toolbar-filtered {
-        display:grid;
-        grid-template-columns:minmax(0,1fr) minmax(190px,240px);
-        gap:12px;
-        align-items:end;
+      .finance-status-filter-nav {
+        display:flex;
+        align-items:center;
+        gap:8px;
+        width:100%;
+        max-width:100%;
+        margin:-6px 0 16px;
+        padding:2px 0 8px;
+        overflow-x:auto;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:thin;
+        overscroll-behavior-inline:contain;
       }
-      .finance-status-filter-group select { width:100%; }
+      .finance-status-filter-pill {
+        flex:0 0 auto;
+        min-height:38px;
+        padding:8px 14px;
+        border:1px solid var(--border);
+        border-radius:999px;
+        background:var(--surface-light);
+        color:var(--muted);
+        font:inherit;
+        font-size:.82rem;
+        font-weight:800;
+        white-space:nowrap;
+        cursor:pointer;
+      }
+      .finance-status-filter-pill.active {
+        border-color:var(--primary);
+        color:var(--primary);
+        background:rgba(50,215,75,.08);
+      }
       @media (max-width:680px) {
-        .finance-students-toolbar.finance-students-toolbar-filtered {
-          grid-template-columns:1fr;
-          gap:10px;
-        }
+        .finance-status-filter-nav { margin-bottom:12px; }
+        .finance-status-filter-pill { min-height:36px; padding:7px 12px; font-size:.78rem; }
       }`;
     document.head.appendChild(style);
   }
 
-  group.querySelector('select')?.addEventListener('change', event => {
-    studentStatusFilter = event.target.value || 'all';
+  nav.addEventListener('click', event => {
+    const button = event.target.closest('[data-finance-status-filter]');
+    if (!button) return;
+    studentStatusFilter = button.dataset.financeStatusFilter || 'all';
+    nav.querySelectorAll('[data-finance-status-filter]').forEach(item => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
     renderStudents();
   });
 }
