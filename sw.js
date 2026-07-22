@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fsfit-shell-v8';
+const CACHE_NAME = 'fsfit-shell-v9';
 const APP_SHELL = [
   '/',
   '/acesso-aluno.html',
@@ -8,10 +8,12 @@ const APP_SHELL = [
   '/css/aluno-midias.css',
   '/css/aluno-notificacoes.css',
   '/css/aluno-financeiro.css',
+  '/css/aluno-perfil.css',
   '/js/supabase.js',
   '/js/acesso-aluno.js',
   '/js/selecionar-personal.js',
   '/js/aluno.js',
+  '/js/aluno-perfil.js',
   '/js/aluno-notificacoes.js',
   '/js/aluno-financeiro.js',
   '/manifest.webmanifest',
@@ -78,14 +80,14 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
   const targetUrl = event.notification.data?.url || '/aluno.html';
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-      for (const client of clients) {
-        if ('focus' in client) {
-          client.navigate(targetUrl);
-          return client.focus();
-        }
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      const existing = windowClients.find(client => new URL(client.url).pathname === new URL(targetUrl, self.location.origin).pathname);
+      if (existing) {
+        existing.focus();
+        existing.navigate(targetUrl);
+        return;
       }
-      return self.clients.openWindow(targetUrl);
+      return clients.openWindow(targetUrl);
     })
   );
 });
