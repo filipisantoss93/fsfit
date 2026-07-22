@@ -207,25 +207,25 @@ html.fsfit-sheet-open body {
   }
 
   .fsfit-bottom-nav {
+    position: fixed !important;
+    top: auto !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 140 !important;
+    margin: 0 !important;
     isolation: isolate;
     background: #15181e !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 -10px 30px rgba(0,0,0,.34) !important;
-    transform: translateZ(0);
+    transform: none !important;
+    will-change: auto !important;
   }
 
   .fsfit-bottom-nav::before {
-    content: '';
-    position: fixed;
-    z-index: -1;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: calc(104px + env(safe-area-inset-bottom, 0px));
-    background: #0f1115;
-    box-shadow: 0 -16px 28px rgba(15,17,21,.96);
-    pointer-events: none;
+    content: none !important;
+    display: none !important;
   }
 
   .fsfit-bottom-nav button.is-open {
