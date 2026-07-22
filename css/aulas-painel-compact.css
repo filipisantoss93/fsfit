@@ -182,10 +182,18 @@
 /* Mantém cada exercício do acompanhamento em uma única linha de grade. */
 .live-session-exercise-row {
   grid-template-columns: 18px 26px minmax(0,1fr) 18px !important;
+  font-size: 0 !important;
 }
 
-.live-session-exercise-row::before {
+.live-session-exercise-row::before,
+.live-session-exercise-row::after,
+.live-session-exercise-row > *::before,
+.live-session-exercise-row > *::after {
   content: none !important;
+  display: none !important;
+}
+
+.live-session-exercise-row > :not(.live-session-exercise-marker):not(.live-session-exercise-order):not(.live-session-exercise-copy):not(.live-session-exercise-arrow) {
   display: none !important;
 }
 
