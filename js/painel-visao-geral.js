@@ -1,10 +1,57 @@
 import { supabase } from './supabase.js';
 import { requireSession } from './layout.js';
 
+setupDashboardStickySafeArea();
+
 const session = await requireSession();
 
 if (session) {
   await loadOverview();
+}
+
+function setupDashboardStickySafeArea() {
+  const tabs = document.querySelector('.dashboard-tabs');
+  if (!tabs || document.querySelector('.dashboard-tabs-safe-cover')) return;
+
+  const cover = document.createElement('div');
+  cover.className = 'dashboard-tabs-safe-cover';
+  cover.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(cover);
+
+  let frame = 0;
+
+  const sync = () => {
+    frame = 0;
+
+    if (!window.matchMedia('(max-width: 720px)').matches) {
+      cover.classList.remove('is-visible');
+      cover.style.height = '0px';
+      return;
+    }
+
+    const rect = tabs.getBoundingClientRect();
+    const stickyTop = Number.parseFloat(getComputedStyle(tabs).top) || 0;
+    const stuck = window.scrollY > 0 && rect.top <= stickyTop + 1;
+
+    if (stuck) {
+      cover.style.height = `${Math.ceil(rect.bottom + 1)}px`;
+      cover.classList.add('is-visible');
+    } else {
+      cover.classList.remove('is-visible');
+      cover.style.height = '0px';
+    }
+  };
+
+  const requestSync = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(sync);
+  };
+
+  window.addEventListener('scroll', requestSync, { passive: true });
+  window.addEventListener('resize', requestSync, { passive: true });
+  window.addEventListener('orientationchange', requestSync, { passive: true });
+  window.addEventListener('pageshow', requestSync, { passive: true });
+  requestSync();
 }
 
 async function loadOverview() {
