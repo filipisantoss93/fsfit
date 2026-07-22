@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { requireSession, showMessage } from './layout.js';
+import { requireSession, showMessage } from './layout-core.js';
 
 const alunoId = new URLSearchParams(location.search).get('id');
 const accessPanel = document.querySelector('[data-record-panel="access"] .record-section-card');
