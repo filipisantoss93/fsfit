@@ -19,9 +19,12 @@ function injectStructuredWorkoutActionBarStyles() {
     .workout-active-summary-compact .workout-active-compact-heading #active-workout-details{display:none!important}
     .workout-active-summary-compact .workout-compact-actions{
       display:grid!important;
-      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
       gap:8px!important;
       margin-top:12px!important;
+    }
+    .workout-active-summary-compact .workout-compact-actions.has-apply{
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
     }
     .workout-active-summary-compact .workout-compact-actions .btn{
       width:100%!important;
@@ -32,16 +35,57 @@ function injectStructuredWorkoutActionBarStyles() {
       white-space:nowrap;
       font-size:.82rem;
     }
+    .workout-plan-row.selected:not(.active){
+      border-color:rgba(59,130,246,.62)!important;
+      box-shadow:inset 5px 0 0 var(--secondary);
+      background:linear-gradient(90deg,rgba(59,130,246,.09),rgba(59,130,246,.025));
+    }
+    .workout-plan-row-title em.draft{
+      border:1px solid rgba(59,130,246,.25);
+      background:rgba(59,130,246,.1);
+      color:#aecdff;
+    }
+    .workout-plan-row.selected .workout-row-arrow{color:var(--secondary)}
+    .workout-editor-context{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:.7rem;
+      font-weight:800;
+    }
+    .workout-editor-context-badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:20px;
+      padding:2px 7px;
+      border:1px solid rgba(59,130,246,.24);
+      border-radius:999px;
+      color:#aecdff;
+      background:rgba(59,130,246,.08);
+      font-size:.6rem;
+      font-weight:900;
+      letter-spacing:.05em;
+    }
+    .workout-editor-context-badge.active{
+      border-color:rgba(50,215,75,.28);
+      color:var(--primary);
+      background:rgba(50,215,75,.08);
+    }
     @media(max-width:640px){
       .workout-active-summary-compact .workout-compact-actions{
-        grid-template-columns:repeat(3,minmax(0,1fr))!important;
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
         gap:6px!important;
         margin-top:9px!important;
       }
+      .workout-active-summary-compact .workout-compact-actions.has-apply{
+        grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      }
       .workout-active-summary-compact .workout-compact-actions .btn{
-        min-height:38px!important;
+        min-height:40px!important;
         padding:8px 5px!important;
-        font-size:.72rem!important;
+        font-size:.7rem!important;
       }
     }
   `;
@@ -88,8 +132,14 @@ function compactWorkoutPage() {
   if (activeHeading) {
     activeHeading.classList.add('workout-active-compact-heading');
     activeHeading.querySelector('small')?.remove();
+    if (!activeHeading.querySelector('.workout-editor-context')) {
+      const context = document.createElement('div');
+      context.className = 'workout-editor-context';
+      context.innerHTML = '<span class="workout-editor-context-badge">RASCUNHO</span><span>Selecionado para edição</span>';
+      activeHeading.querySelector('div')?.appendChild(context);
+    }
   }
-  if (detailsButton) detailsButton.textContent = 'Detalhes';
+  if (detailsButton) detailsButton.textContent = 'Editar plano';
 
   const addCard = document.querySelector('.workout-add-card');
   const openExerciseButton = document.querySelector('#open-exercise-modal');
@@ -97,20 +147,19 @@ function compactWorkoutPage() {
     const actions = document.createElement('div');
     actions.className = 'workout-compact-actions';
 
-    const libraryLink = addCard.querySelector('a[href*="biblioteca-exercicios"]');
-    if (libraryLink) {
-      libraryLink.textContent = 'Biblioteca';
-      actions.appendChild(libraryLink);
-    }
+    if (detailsButton) actions.appendChild(detailsButton);
 
     if (openExerciseButton) {
       openExerciseButton.textContent = '+ Exercícios';
       actions.appendChild(openExerciseButton);
     }
 
-    if (detailsButton) {
-      actions.appendChild(detailsButton);
-    }
+    const applyButton = document.createElement('button');
+    applyButton.id = 'apply-workout-button';
+    applyButton.className = 'btn btn-primary hidden';
+    applyButton.type = 'button';
+    applyButton.textContent = 'Aplicar ao aluno';
+    actions.appendChild(applyButton);
 
     activeCard.appendChild(actions);
     addCard.remove();
