@@ -16,6 +16,11 @@ const mediaLinkForm = document.querySelector('#media-link-form');
 const mediaList = document.querySelector('#media-list');
 const mediaCount = document.querySelector('#media-count');
 let student = null;
+let mediaLoaded = false;
+let mediaLoading = null;
+let evolutionLoaded = false;
+let evolutionLoading = null;
+let overviewMetricsLoaded = false;
 
 if (!alunoId) {
   showMessage(message, 'Aluno não informado.', 'error');
@@ -53,6 +58,26 @@ function calculateBmi(weight, heightCm) {
   return (Number(weight) / (height * height)).toFixed(1).replace('.', ',');
 }
 
+async function ensureTabData(name) {
+  if (name === 'planning' && !mediaLoaded) {
+    if (!mediaLoading) {
+      mediaLoading = loadMedia()
+        .then(() => { mediaLoaded = true; })
+        .finally(() => { mediaLoading = null; });
+    }
+    await mediaLoading;
+  }
+
+  if (name === 'evolution' && !evolutionLoaded) {
+    if (!evolutionLoading) {
+      evolutionLoading = loadEvolution()
+        .then(() => { evolutionLoaded = true; })
+        .finally(() => { evolutionLoading = null; });
+    }
+    await evolutionLoading;
+  }
+}
+
 function setupTabs() {
   const tabs = [...document.querySelectorAll('[data-record-tab]')];
   const panels = [...document.querySelectorAll('[data-record-panel]')];
@@ -61,6 +86,7 @@ function setupTabs() {
     tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.recordTab === name));
     panels.forEach(panel => panel.classList.toggle('active', panel.dataset.recordPanel === name));
     history.replaceState(null, '', `#${name}`);
+    void ensureTabData(name);
   }
 
   tabs.forEach(tab => tab.addEventListener('click', () => activate(tab.dataset.recordTab)));
@@ -175,6 +201,37 @@ async function loadMedia() {
     </article>`).join('') : '<p class="empty">Nenhuma mídia adicionada para este aluno.</p>';
 }
 
+function renderBaseMetrics(data) {
+  const initialWeight = data.peso_inicial_kg ?? null;
+  const initialFat = data.percentual_gordura_inicial ?? null;
+  document.querySelector('#current-weight').textContent = initialWeight ? `${initialWeight} kg` : '—';
+  document.querySelector('#weight-date').textContent = initialWeight ? 'Peso do cadastro' : 'Sem registros';
+  document.querySelector('#current-fat').textContent = initialFat ? `${initialFat}%` : '—';
+  document.querySelector('#student-bmi').textContent = calculateBmi(initialWeight, data.altura_cm) || '—';
+}
+
+async function loadOverviewMetrics() {
+  if (overviewMetricsLoaded || !student) return;
+  overviewMetricsLoaded = true;
+
+  try {
+    const [{ data: weights, error: weightError }, { data: assessments, error: assessmentError }] = await Promise.all([
+      supabase.from('historico_peso').select('peso_kg,data_registro').eq('aluno_id', alunoId).eq('personal_id', session.user.id).order('data_registro', { ascending: false }).limit(1),
+      supabase.from('avaliacoes').select('percentual_gordura,data_avaliacao').eq('aluno_id', alunoId).eq('personal_id', session.user.id).order('data_avaliacao', { ascending: false }).limit(1)
+    ]);
+
+    if (weightError || assessmentError) return;
+    const latestWeight = weights?.[0]?.peso_kg ?? student.peso_inicial_kg;
+    const latestFat = assessments?.[0]?.percentual_gordura ?? student.percentual_gordura_inicial;
+    document.querySelector('#current-weight').textContent = latestWeight ? `${latestWeight} kg` : '—';
+    document.querySelector('#weight-date').textContent = weights?.[0]?.data_registro ? formatDate(weights[0].data_registro) : (latestWeight ? 'Peso do cadastro' : 'Sem registros');
+    document.querySelector('#current-fat').textContent = latestFat ? `${latestFat}%` : '—';
+    document.querySelector('#student-bmi').textContent = calculateBmi(latestWeight, student.altura_cm) || '—';
+  } catch (error) {
+    console.warn('Resumo físico secundário indisponível:', error);
+  }
+}
+
 async function loadStudent() {
   const { data, error } = await supabase.from('alunos')
     .select('id,nome,telefone,sexo,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,objetivo,restricoes,observacoes,status')
@@ -201,6 +258,7 @@ async function loadStudent() {
     <p><strong>Objetivo:</strong> ${esc(data.objetivo || 'Não informado')}</p>
     <p><strong>Restrições:</strong> ${esc(data.restricoes || 'Nenhuma informada')}</p>
     <p><strong>Observações:</strong> ${esc(data.observacoes || 'Nenhuma')}</p>`;
+  renderBaseMetrics(data);
 }
 
 async function loadEvolution() {
@@ -281,6 +339,7 @@ mediaUploadForm?.addEventListener('submit', async event => {
     mediaUploadForm.reset();
     showMessage(message, 'Mídia enviada com sucesso.');
     await loadMedia();
+    mediaLoaded = true;
   } catch (error) {
     if (storagePath) await supabase.storage.from('aluno-midias').remove([storagePath]);
     showMessage(message, error.message || 'Não foi possível enviar a mídia.', 'error');
@@ -312,6 +371,7 @@ mediaLinkForm?.addEventListener('submit', async event => {
     mediaLinkForm.tipo.value = 'youtube';
     showMessage(message, 'Link adicionado com sucesso.');
     await loadMedia();
+    mediaLoaded = true;
   } catch (error) {
     showMessage(message, error.message || 'Não foi possível adicionar o link.', 'error');
   } finally {
@@ -333,6 +393,7 @@ document.addEventListener('click', async event => {
     if (storagePath) await supabase.storage.from('aluno-midias').remove([storagePath]);
     showMessage(message, 'Mídia excluída.');
     await loadMedia();
+    mediaLoaded = true;
   } catch (error) {
     showMessage(message, error.message || 'Não foi possível excluir a mídia.', 'error');
     button.disabled = false;
@@ -355,6 +416,8 @@ weightForm.addEventListener('submit', async event => {
   weightForm.reset();
   weightForm.data_registro.value = new Date().toISOString().slice(0, 10);
   await loadEvolution();
+  evolutionLoaded = true;
+  overviewMetricsLoaded = true;
 });
 
 assessmentForm.addEventListener('submit', async event => {
@@ -376,6 +439,8 @@ assessmentForm.addEventListener('submit', async event => {
   assessmentForm.reset();
   assessmentForm.data_avaliacao.value = new Date().toISOString().slice(0, 10);
   await loadEvolution();
+  evolutionLoaded = true;
+  overviewMetricsLoaded = true;
 });
 
 pinForm.pin.addEventListener('input', () => {
@@ -393,4 +458,11 @@ pinForm.addEventListener('submit', async event => {
 });
 
 await loadStudent();
-await Promise.all([loadEvolution(), loadMedia()]);
+
+const scheduleOverviewMetrics = () => {
+  const run = () => void loadOverviewMetrics();
+  if ('requestIdleCallback' in window) window.requestIdleCallback(run, { timeout: 1500 });
+  else window.setTimeout(run, 700);
+};
+
+scheduleOverviewMetrics();
