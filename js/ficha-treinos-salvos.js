@@ -6,9 +6,8 @@ const planningActions = document.querySelector('.planning-actions');
 const message = document.querySelector('#record-message');
 
 if (alunoId && planningActions) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const userId = session?.user?.id || null;
   const dayNames = { 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sáb', 7: 'Dom' };
+  let userId = null;
   let templates = [];
   let items = [];
 
@@ -44,8 +43,17 @@ if (alunoId && planningActions) {
 
   function esc(value = '') { const div = document.createElement('div'); div.textContent = value ?? ''; return div.innerHTML; }
 
+  async function ensureUserId() {
+    if (userId) return userId;
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error || !session?.user?.id) throw new Error('Sessão indisponível. Atualize a página e tente novamente.');
+    userId = session.user.id;
+    return userId;
+  }
+
   async function loadTemplates() {
-    const { data, error } = await supabase.from('treinos').select('id,nome,descricao,dias_semana,updated_at').eq('personal_id', userId).eq('modelo', true).is('aluno_id', null).order('updated_at', { ascending: false });
+    const personalId = await ensureUserId();
+    const { data, error } = await supabase.from('treinos').select('id,nome,descricao,dias_semana,updated_at').eq('personal_id', personalId).eq('modelo', true).is('aluno_id', null).order('updated_at', { ascending: false });
     if (error) throw error;
     templates = data || [];
     const ids = templates.map(item => item.id);
@@ -73,6 +81,7 @@ if (alunoId && planningActions) {
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    list.innerHTML = '<p class="empty">Carregando treinos salvos...</p>';
     loadTemplates().catch(error => {
       console.error(error);
       list.innerHTML = '<p class="empty">Não foi possível carregar os treinos salvos.</p>';
