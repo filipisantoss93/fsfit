@@ -179,41 +179,44 @@
 .live-workout-editor-close { position: absolute; top: 12px; right: 12px; z-index: 3; }
 .live-workout-editor-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
 
-/* Mantém cada exercício do acompanhamento em uma única linha de grade. */
+/* Mantém o handle de reordenação e todo o conteúdo do exercício na mesma linha. */
 .live-session-exercise-row {
-  grid-template-columns: 18px 26px minmax(0,1fr) 18px !important;
-  font-size: 0 !important;
+  grid-template-columns: 18px 18px 26px minmax(0,1fr) 18px !important;
 }
 
-.live-session-exercise-row::before,
-.live-session-exercise-row::after,
-.live-session-exercise-row > *::before,
-.live-session-exercise-row > *::after {
-  content: none !important;
-  display: none !important;
-}
-
-.live-session-exercise-row > :not(.live-session-exercise-marker):not(.live-session-exercise-order):not(.live-session-exercise-copy):not(.live-session-exercise-arrow) {
-  display: none !important;
-}
-
-.live-session-exercise-marker {
+.live-session-exercise-row::before {
+  content: '≡' !important;
+  display: grid !important;
+  place-items: center;
   grid-column: 1;
   grid-row: 1;
+  color: #9aa3af;
+  font-size: .82rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: grab;
 }
 
-.live-session-exercise-order {
+.live-session-exercise-row:active::before { cursor: grabbing; }
+.live-session-exercise-row::after { content: none !important; display: none !important; }
+
+.live-session-exercise-marker {
   grid-column: 2;
   grid-row: 1;
 }
 
-.live-session-exercise-copy {
+.live-session-exercise-order {
   grid-column: 3;
   grid-row: 1;
 }
 
-.live-session-exercise-arrow {
+.live-session-exercise-copy {
   grid-column: 4;
+  grid-row: 1;
+}
+
+.live-session-exercise-arrow {
+  grid-column: 5;
   grid-row: 1;
   justify-self: end;
   align-self: center;
