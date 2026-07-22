@@ -25,9 +25,19 @@ function injectStyles() {
       gap:10px!important;
     }
     .exercise-dnd-list .live-session-exercise-row{
-      grid-template-columns:24px 26px minmax(0,1fr) auto!important;
+      grid-template-columns:24px 18px 26px minmax(0,1fr) 18px!important;
       gap:7px!important;
     }
+    .exercise-dnd-list .live-session-exercise-row::before,
+    .exercise-dnd-list .live-session-exercise-row::after{
+      content:none!important;
+      display:none!important;
+    }
+    .exercise-dnd-list .live-session-exercise-row>.exercise-drag-handle{grid-column:1;grid-row:1}
+    .exercise-dnd-list .live-session-exercise-row>.live-session-exercise-marker{grid-column:2;grid-row:1}
+    .exercise-dnd-list .live-session-exercise-row>.live-session-exercise-order{grid-column:3;grid-row:1}
+    .exercise-dnd-list .live-session-exercise-row>.live-session-exercise-copy{grid-column:4;grid-row:1}
+    .exercise-dnd-list .live-session-exercise-row>.live-session-exercise-arrow{grid-column:5;grid-row:1;justify-self:end;align-self:center}
     .exercise-drag-handle{
       display:grid;
       place-items:center;
@@ -85,7 +95,6 @@ function observeExerciseLists() {
   ].filter(Boolean);
 
   if (!roots.length) return;
-
   const observer = new MutationObserver(() => queueEnhance());
   roots.forEach(root => observer.observe(root, { childList: true, subtree: true }));
 }
@@ -221,7 +230,6 @@ async function finishDrag(shouldSave) {
     });
 
     if (error || data !== true) throw error || new Error('A nova ordem não pôde ser salva.');
-
     renumberList(state.list);
     window.dispatchEvent(new CustomEvent('fsfit-exercise-order-updated', {
       detail: { exerciseIds: ids }
