@@ -1,4 +1,3 @@
-import './mobile-experience.js?v=20260721-mobile-polish1';
 import { supabase } from './supabase.js';
 
 const LEGACY_LAYOUT_URL = 'https://cdn.jsdelivr.net/gh/filipisantoss93/fsfit@9168e0e760f187b8f8d78a833122397c0a19b934/js/layout.js';
@@ -26,9 +25,10 @@ function currentPage() {
   return page || 'index.html';
 }
 
-// As correções globais antigas possuem observers redundantes. Mantemos esse
-// complemento fora da ficha, onde a prioridade é minimizar trabalho no main thread.
+// A ficha do aluno precisa iniciar com o menor grafo possível de módulos.
+// Recursos globais de badges, realtime e observers mobile são carregados apenas nas outras páginas.
 if (currentPage() !== 'ficha-aluno.html') {
+  import('./mobile-experience.js?v=20260721-mobile-polish1').catch(() => undefined);
   import('./mobile-experience-fixes.js?v=20260721-mobile-polish2').catch(() => undefined);
 }
 
