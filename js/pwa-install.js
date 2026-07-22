@@ -176,7 +176,7 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
   import('./painel-agenda-modal.js?v=20260721-agenda-dashboard1').catch(error => {
     console.error('Falha ao carregar dashboard da agenda de hoje:', error);
   });
-  import('./painel-swipe-tabs.js?v=20260721-swipe-tabs1').catch(error => {
+  import('./painel-swipe-tabs.js?v=20260721-swipe-tabs2').catch(error => {
     console.error('Falha ao carregar gesto lateral entre abas do painel:', error);
   });
 }
