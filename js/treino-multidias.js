@@ -21,8 +21,9 @@ const batchSelector = document.querySelector('#batch-exercise-selector');
 const singleEditor = document.querySelector('#single-exercise-editor');
 const saveButton = document.querySelector('#save-exercise-batch');
 const modalTitle = document.querySelector('#exercise-modal-title');
+const workspace = document.querySelector('#active-workout-workspace');
 
-let activeWorkoutId = null;
+let targetWorkoutId = null;
 let allowedDays = [];
 let editingExerciseId = null;
 let exerciseLibrary = [];
@@ -66,6 +67,8 @@ if (distanceInput) {
 }
 durationField.parentElement?.insertBefore(distanceField, durationField.nextSibling);
 
+injectCompactConfigStyles();
+
 function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
@@ -98,15 +101,16 @@ function exerciseById(id) {
 }
 
 function defaultConfig(item) {
+  const type = item?.tipo_prescricao || 'repeticoes';
   return {
-    series: '',
-    repeticoes: '',
+    series: '4',
+    repeticoes: type === 'repeticoes' ? '12' : '',
     duracao_minutos: '',
     distancia_km: '',
     carga: '',
-    descanso_segundos: '',
+    descanso_segundos: '60',
     observacoes: '',
-    tipo_prescricao: item?.tipo_prescricao || 'repeticoes'
+    tipo_prescricao: type
   };
 }
 
@@ -126,6 +130,18 @@ function prescriptionInput(item, config) {
   return `<div class="form-group"><label>Repetições</label><input data-config-field="repeticoes" inputmode="numeric" value="${esc(config.repeticoes)}" placeholder="12"></div>`;
 }
 
+function configSummary(item, config) {
+  const type = item?.tipo_prescricao || 'repeticoes';
+  const parts = [];
+  if (config.series) parts.push(`${config.series} séries`);
+  if (type === 'tempo' && config.duracao_minutos) parts.push(`${config.duracao_minutos} min`);
+  else if (type === 'distancia' && config.distancia_km) parts.push(`${config.distancia_km} km`);
+  else if (config.repeticoes) parts.push(`${config.repeticoes} rep.`);
+  if (config.carga) parts.push(config.carga);
+  if (config.descanso_segundos) parts.push(`${config.descanso_segundos}s`);
+  return parts.join(' · ') || 'Toque para configurar';
+}
+
 function renderSelectedBuilder() {
   const items = selectedExerciseIds.map(exerciseById).filter(Boolean);
   selectedSection?.classList.toggle('hidden', items.length === 0);
@@ -139,18 +155,30 @@ function renderSelectedBuilder() {
     return `<article class="selected-exercise-card" data-selected-exercise="${item.id}">
       <div class="selected-exercise-card-head">
         <span class="selected-exercise-order">${index + 1}</span>
-        <div><strong>${esc(item.nome)}</strong><small>${esc(categoryName(item))} · ${esc(prescriptionLabel(item.tipo_prescricao))}</small></div>
+        <button class="selected-exercise-toggle" type="button" data-toggle-selected-config="${item.id}" aria-expanded="false">
+          <span class="selected-exercise-title"><strong>${esc(item.nome)}</strong><small class="selected-exercise-summary">${esc(configSummary(item, config))}</small></span>
+          <span class="selected-exercise-chevron" aria-hidden="true">›</span>
+        </button>
         <button class="selected-exercise-remove" type="button" data-remove-selected="${item.id}" aria-label="Remover ${esc(item.nome)}">×</button>
       </div>
-      <div class="selected-exercise-config-grid">
-        <div class="form-group"><label>Séries</label><select data-config-field="series">${seriesOptions(config.series)}</select></div>
-        ${prescriptionInput(item, config)}
-        <div class="form-group"><label>Carga</label><input data-config-field="carga" value="${esc(config.carga)}" placeholder="Opcional"></div>
-        <div class="form-group"><label>Descanso (s)</label><input data-config-field="descanso_segundos" type="number" min="0" step="5" value="${esc(config.descanso_segundos)}" placeholder="60"></div>
+      <div class="selected-exercise-config-panel" hidden>
+        <div class="selected-exercise-config-grid">
+          <div class="form-group"><label>Séries</label><select data-config-field="series">${seriesOptions(config.series)}</select></div>
+          ${prescriptionInput(item, config)}
+          <div class="form-group"><label>Carga</label><input data-config-field="carga" value="${esc(config.carga)}" placeholder="Opcional"></div>
+          <div class="form-group"><label>Descanso (s)</label><input data-config-field="descanso_segundos" type="number" min="0" step="5" value="${esc(config.descanso_segundos)}" placeholder="60"></div>
+        </div>
+        <div class="form-group selected-exercise-notes"><label>Observações</label><textarea data-config-field="observacoes" placeholder="Técnica, intensidade, cadência...">${esc(config.observacoes)}</textarea></div>
       </div>
-      <div class="form-group selected-exercise-notes"><label>Observações</label><textarea data-config-field="observacoes" placeholder="Técnica, intensidade, cadência...">${esc(config.observacoes)}</textarea></div>
     </article>`;
   }).join('');
+}
+
+function updateCardSummary(card, id) {
+  const item = exerciseById(id);
+  const config = selectedConfigs.get(id) || defaultConfig(item);
+  const summary = card?.querySelector('.selected-exercise-summary');
+  if (summary) summary.textContent = configSummary(item, config);
 }
 
 function renderExerciseCheckboxes(category) {
@@ -220,10 +248,22 @@ async function loadExerciseLibrary() {
   renderExerciseCheckboxes('');
 }
 
-async function refreshActiveWorkoutDays() {
+async function refreshTargetWorkout() {
+  const workspaceId = workspace?.dataset.workoutId || '';
+  if (workspaceId) {
+    targetWorkoutId = workspaceId;
+    try {
+      allowedDays = JSON.parse(workspace?.dataset.workoutDays || '[]').map(Number);
+    } catch {
+      allowedDays = [];
+    }
+    setCheckedDays([]);
+    return;
+  }
+
   if (!alunoId) return;
   const { data } = await supabase.from('treinos').select('id,dias_semana').eq('aluno_id', alunoId).eq('personal_id', session.user.id).eq('status', 'ativo').maybeSingle();
-  activeWorkoutId = data?.id || null;
+  targetWorkoutId = data?.id || null;
   allowedDays = (data?.dias_semana || []).map(Number);
   setCheckedDays([]);
 }
@@ -232,7 +272,7 @@ async function prepareNewExercise() {
   editingExerciseId = null;
   selectedExerciseIds = [];
   selectedConfigs.clear();
-  await refreshActiveWorkoutDays();
+  await refreshTargetWorkout();
   if (batchCategorySelect) batchCategorySelect.value = '';
   batchSelector?.classList.remove('hidden');
   singleEditor?.classList.add('hidden');
@@ -243,6 +283,7 @@ async function prepareNewExercise() {
 
 async function prepareExerciseEdit(id) {
   editingExerciseId = id;
+  await refreshTargetWorkout();
   batchSelector?.classList.add('hidden');
   singleEditor?.classList.remove('hidden');
   if (modalTitle) modalTitle.textContent = 'Editar exercício';
@@ -250,7 +291,8 @@ async function prepareExerciseEdit(id) {
   const selectedDay = Number(originalDaySelect?.value);
   setCheckedDays(selectedDay ? [selectedDay] : []);
 
-  const { data } = await supabase.from('treino_exercicios').select('duracao_minutos,distancia_km,exercicio_id').eq('id', id).maybeSingle();
+  const { data } = await supabase.from('treino_exercicios').select('duracao_minutos,distancia_km,exercicio_id,treino_id').eq('id', id).maybeSingle();
+  if (data?.treino_id) targetWorkoutId = data.treino_id;
   const exerciseId = data?.exercicio_id || form?.exercicio_id?.value || '';
   syncSingleCategoryForExercise(exerciseId);
   if (form?.duracao_minutos) form.duracao_minutos.value = data?.duracao_minutos ?? '';
@@ -258,8 +300,8 @@ async function prepareExerciseEdit(id) {
 }
 
 async function getNextOrders(days) {
-  if (!activeWorkoutId || !days.length) return {};
-  const { data, error } = await supabase.from('treino_exercicios').select('dia_semana,ordem').eq('treino_id', activeWorkoutId).in('dia_semana', days);
+  if (!targetWorkoutId || !days.length) return {};
+  const { data, error } = await supabase.from('treino_exercicios').select('dia_semana,ordem').eq('treino_id', targetWorkoutId).in('dia_semana', days);
   if (error) throw error;
   const nextOrders = {};
   for (const day of days) {
@@ -288,7 +330,7 @@ checkboxList?.addEventListener('change', event => {
   renderSelectedBuilder();
 });
 
-selectedBuilder?.addEventListener('input', event => {
+function syncConfigFromEvent(event) {
   const card = event.target.closest('[data-selected-exercise]');
   const field = event.target.dataset.configField;
   if (!card || !field) return;
@@ -296,26 +338,32 @@ selectedBuilder?.addEventListener('input', event => {
   const config = selectedConfigs.get(id) || defaultConfig(exerciseById(id));
   config[field] = event.target.value;
   selectedConfigs.set(id, config);
-});
+  updateCardSummary(card, id);
+}
 
-selectedBuilder?.addEventListener('change', event => {
-  const card = event.target.closest('[data-selected-exercise]');
-  const field = event.target.dataset.configField;
-  if (!card || !field) return;
-  const id = card.dataset.selectedExercise;
-  const config = selectedConfigs.get(id) || defaultConfig(exerciseById(id));
-  config[field] = event.target.value;
-  selectedConfigs.set(id, config);
-});
+selectedBuilder?.addEventListener('input', syncConfigFromEvent);
+selectedBuilder?.addEventListener('change', syncConfigFromEvent);
 
 selectedBuilder?.addEventListener('click', event => {
   const remove = event.target.closest('[data-remove-selected]');
-  if (!remove) return;
-  const id = remove.dataset.removeSelected;
-  selectedExerciseIds = selectedExerciseIds.filter(item => item !== id);
-  selectedConfigs.delete(id);
-  renderExerciseCheckboxes(batchCategorySelect?.value || '');
-  renderSelectedBuilder();
+  if (remove) {
+    const id = remove.dataset.removeSelected;
+    selectedExerciseIds = selectedExerciseIds.filter(item => item !== id);
+    selectedConfigs.delete(id);
+    renderExerciseCheckboxes(batchCategorySelect?.value || '');
+    renderSelectedBuilder();
+    return;
+  }
+
+  const toggle = event.target.closest('[data-toggle-selected-config]');
+  if (!toggle) return;
+  const card = toggle.closest('[data-selected-exercise]');
+  const panel = card?.querySelector('.selected-exercise-config-panel');
+  if (!card || !panel) return;
+  const expanded = !card.classList.contains('expanded');
+  card.classList.toggle('expanded', expanded);
+  panel.hidden = !expanded;
+  toggle.setAttribute('aria-expanded', String(expanded));
 });
 
 document.querySelector('#open-exercise-modal')?.addEventListener('click', () => setTimeout(() => prepareNewExercise(), 0));
@@ -325,17 +373,25 @@ document.addEventListener('click', event => {
   if (event.target.closest('#exercise-detail-edit')) setTimeout(() => prepareExerciseEdit(editingExerciseId), 0);
 });
 
+window.addEventListener('fsfit-workout-selection-changed', () => {
+  refreshTargetWorkout().catch(console.error);
+});
+
 form?.addEventListener('submit', async event => {
   event.preventDefault();
   event.stopImmediatePropagation();
 
   const days = checkedDays();
   if (!days.length) return showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
-  if (!activeWorkoutId) await refreshActiveWorkoutDays();
-  if (!activeWorkoutId) return showMessage(message, 'Ative um plano de treino antes de adicionar exercícios.', 'error');
+  if (!targetWorkoutId) await refreshTargetWorkout();
+  if (!targetWorkoutId) return showMessage(message, 'Selecione um plano antes de adicionar exercícios.', 'error');
 
   saveButton.disabled = true;
   try {
+    const savedWorkoutId = targetWorkoutId;
+    const wasEditing = Boolean(editingExerciseId);
+    const addedCount = selectedExerciseIds.length;
+
     if (editingExerciseId) {
       const exerciseId = form.exercicio_id.value;
       const exercise = exerciseById(exerciseId);
@@ -347,7 +403,7 @@ form?.addEventListener('submit', async event => {
       if (type === 'distancia' && !distance) return showMessage(message, 'Informe a distância do exercício em quilômetros.', 'error');
       const [firstDay] = days;
       const payload = {
-        treino_id: activeWorkoutId,
+        treino_id: savedWorkoutId,
         exercicio_id: exerciseId,
         dia_semana: firstDay,
         ordem: Number(form.ordem.value || 1),
@@ -359,7 +415,7 @@ form?.addEventListener('submit', async event => {
         descanso_segundos: form.descanso_segundos.value ? Number(form.descanso_segundos.value) : null,
         observacoes: form.observacoes.value.trim() || null
       };
-      const { error } = await supabase.from('treino_exercicios').update(payload).eq('id', editingExerciseId).eq('treino_id', activeWorkoutId);
+      const { error } = await supabase.from('treino_exercicios').update(payload).eq('id', editingExerciseId).eq('treino_id', savedWorkoutId);
       if (error) throw error;
     } else {
       if (!selectedExerciseIds.length) return showMessage(message, 'Selecione pelo menos um exercício.', 'error');
@@ -376,7 +432,7 @@ form?.addEventListener('submit', async event => {
           if (type === 'tempo' && !duration) throw new Error(`Informe a duração de “${exercise.nome}”.`);
           if (type === 'distancia' && !distance) throw new Error(`Informe a distância de “${exercise.nome}”.`);
           rows.push({
-            treino_id: activeWorkoutId,
+            treino_id: savedWorkoutId,
             exercicio_id: exerciseId,
             dia_semana: day,
             ordem: nextOrders[day] + index,
@@ -398,8 +454,14 @@ form?.addEventListener('submit', async event => {
     modal?.classList.remove('open');
     modal?.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('workout-modal-open');
-    showMessage(message, editingExerciseId ? 'Exercício atualizado com sucesso.' : `${selectedExerciseIds.length} ${selectedExerciseIds.length === 1 ? 'exercício adicionado' : 'exercícios adicionados'} ao treino.`);
-    setTimeout(() => location.reload(), 450);
+    showMessage(message, wasEditing ? 'Exercício atualizado com sucesso.' : `${addedCount} ${addedCount === 1 ? 'exercício adicionado' : 'exercícios adicionados'} ao plano.`);
+
+    selectedExerciseIds = [];
+    selectedConfigs.clear();
+    editingExerciseId = null;
+    window.dispatchEvent(new CustomEvent('fsfit-workout-exercises-updated', {
+      detail: { workoutId: savedWorkoutId }
+    }));
   } catch (error) {
     console.error('Erro ao salvar exercícios:', error);
     showMessage(message, error.message || 'Não foi possível salvar os exercícios.', 'error');
@@ -410,8 +472,36 @@ form?.addEventListener('submit', async event => {
 
 try {
   await loadExerciseLibrary();
-  await refreshActiveWorkoutDays();
+  await refreshTargetWorkout();
 } catch (error) {
   console.error(error);
   showMessage(message, 'Não foi possível carregar a biblioteca de exercícios.', 'error');
+}
+
+function injectCompactConfigStyles() {
+  if (document.querySelector('#selected-exercise-compact-config-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'selected-exercise-compact-config-styles';
+  style.textContent = `
+    .selected-exercise-card-head{grid-template-columns:34px minmax(0,1fr) 34px!important;margin-bottom:0!important}
+    .selected-exercise-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+    .selected-exercise-title{display:block;min-width:0}
+    .selected-exercise-title strong,.selected-exercise-title small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .selected-exercise-title strong{font-size:.9rem}
+    .selected-exercise-title small{margin-top:3px;color:var(--muted);font-size:.72rem;font-weight:600}
+    .selected-exercise-chevron{flex:0 0 auto;color:var(--secondary);font-size:1.35rem;transition:transform .18s ease}
+    .selected-exercise-card.expanded .selected-exercise-chevron{transform:rotate(90deg)}
+    .selected-exercise-config-panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+    .selected-exercise-config-panel[hidden]{display:none!important}
+    .selected-exercise-card.expanded{border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.035)}
+    @media(max-width:640px){
+      .selected-exercise-card{padding:10px!important}
+      .selected-exercise-card-head{grid-template-columns:32px minmax(0,1fr) 32px!important;gap:8px!important}
+      .selected-exercise-order{width:30px!important;height:30px!important}
+      .selected-exercise-remove{width:32px!important;height:32px!important}
+      .selected-exercise-title strong{font-size:.84rem}
+      .selected-exercise-title small{font-size:.68rem}
+    }
+  `;
+  document.head.appendChild(style);
 }
