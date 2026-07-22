@@ -93,14 +93,35 @@ function isNewStudent(student) {
   return created >= Date.now() - (30 * 24 * 60 * 60 * 1000);
 }
 
+function appendRowsInOrder(sorted) {
+  const fragment = document.createDocumentFragment();
+  sorted.forEach(row => fragment.appendChild(row));
+  list.appendChild(fragment);
+}
+
 function sortRowsAlphabetically(rows) {
   const sorted = [...rows].sort((a, b) => String(a.dataset.studentName || '').localeCompare(String(b.dataset.studentName || ''), 'pt-BR', { sensitivity: 'base' }));
   const currentIds = rows.map(row => row.dataset.studentId).join('|');
   const sortedIds = sorted.map(row => row.dataset.studentId).join('|');
   if (currentIds === sortedIds) return;
-  const fragment = document.createDocumentFragment();
-  sorted.forEach(row => fragment.appendChild(row));
-  list.appendChild(fragment);
+  appendRowsInOrder(sorted);
+}
+
+function sortRowsByNewest(rows) {
+  const sorted = [...rows].sort((a, b) => {
+    const aMeta = studentMeta.get(a.dataset.studentId);
+    const bMeta = studentMeta.get(b.dataset.studentId);
+    const aTime = aMeta?.created_at ? new Date(aMeta.created_at).getTime() : 0;
+    const bTime = bMeta?.created_at ? new Date(bMeta.created_at).getTime() : 0;
+
+    if (bTime !== aTime) return bTime - aTime;
+    return String(bMeta?.created_at || '').localeCompare(String(aMeta?.created_at || ''));
+  });
+
+  const currentIds = rows.map(row => row.dataset.studentId).join('|');
+  const sortedIds = sorted.map(row => row.dataset.studentId).join('|');
+  if (currentIds === sortedIds) return;
+  appendRowsInOrder(sorted);
 }
 
 function applyFilter() {
@@ -119,7 +140,8 @@ function applyFilter() {
     row.hidden = !visible;
   });
 
-  if (activeFilter === 'alphabetical') sortRowsAlphabetically(rows);
+  if (activeFilter === 'new') sortRowsByNewest(rows);
+  else sortRowsAlphabetically(rows);
 
   const visibleRows = rows.filter(row => !row.hidden);
   let empty = list.querySelector('.student-filter-empty-row');
