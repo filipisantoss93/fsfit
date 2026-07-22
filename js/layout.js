@@ -5,12 +5,30 @@ export * from './layout-core.js';
 
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
+const AUTO_SHELL_ACTIVE_BY_PAGE = {
+  'painel.html': 'painel',
+  'alunos.html': 'alunos',
+  'ficha-aluno.html': 'alunos',
+  'agenda.html': 'agenda',
+  'financeiro.html': 'financeiro',
+  'perfil.html': 'perfil',
+  'biblioteca-exercicios.html': 'exercicios',
+  'biblioteca-alimentar.html': 'alimentacao',
+  'assinatura.html': 'assinatura',
+  'contato.html': 'contato',
+  'admin.html': 'admin',
+  'admin-contatos.html': 'admin'
+};
 let mobileNavigationStylesPromise = null;
 let enhancementsScheduled = false;
 
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
   return page || 'index.html';
+}
+
+function inferShellActivePage() {
+  return AUTO_SHELL_ACTIVE_BY_PAGE[currentPage()] || '';
 }
 
 function ensureMobileNavigationCriticalStyles() {
@@ -294,3 +312,11 @@ if (currentPage() === 'ficha-aluno.html') {
   import('./iniciar-treino-personal.js?v=20260719-start-workout1').catch(error => console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error));
   import('./ficha-aluno-ativacao.js?v=20260722-secure-activation1').catch(error => console.error('Não foi possível carregar o acesso seguro do aluno:', error));
 }
+
+Promise.resolve().then(() => {
+  const active = inferShellActivePage();
+  if (!active) return;
+  const host = document.querySelector('#header-container');
+  if (!host || host.querySelector('.main-header')) return;
+  renderHeader(active);
+});
