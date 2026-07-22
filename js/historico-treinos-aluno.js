@@ -1,86 +1,47 @@
 import { supabase } from './supabase.js';
-import { requireSession } from './layout.js';
 
 const alunoId = new URLSearchParams(location.search).get('id');
 const list = document.querySelector('#workout-history-list');
 const summary = document.querySelector('#workout-history-summary');
-const deleteStudentButton = document.querySelector('#delete-student');
+const historyTab = document.querySelector('[data-record-tab="history"]');
 
-if (!alunoId || !list) {
-  // A página pode ser carregada sem a aba de histórico em versões antigas.
-} else {
-  const session = await requireSession();
+let historyLoaded = false;
+let historyLoadingPromise = null;
 
-  function esc(value = '') {
-    const div = document.createElement('div');
-    div.textContent = value ?? '';
-    return div.innerHTML;
-  }
+function esc(value = '') {
+  const div = document.createElement('div');
+  div.textContent = value ?? '';
+  return div.innerHTML;
+}
 
-  function formatDateTime(value) {
-    if (!value) return '—';
-    return new Date(value).toLocaleString('pt-BR', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  }
+function formatDateTime(value) {
+  if (!value) return '—';
+  return new Date(value).toLocaleString('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
 
-  function formatDuration(start, end) {
-    if (!start || !end) return '—';
-    const minutes = Math.max(0, Math.round((new Date(end) - new Date(start)) / 60000));
-    const hours = Math.floor(minutes / 60);
-    const rest = minutes % 60;
-    return hours ? `${hours}h ${rest}min` : `${rest} min`;
-  }
+function formatDuration(start, end) {
+  if (!start || !end) return '—';
+  const minutes = Math.max(0, Math.round((new Date(end) - new Date(start)) / 60000));
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return hours ? `${hours}h ${rest}min` : `${rest} min`;
+}
 
-  async function deleteStudent() {
-    if (!deleteStudentButton) return;
+async function loadWorkoutHistory() {
+  if (!alunoId || !list || historyLoaded) return;
+  if (historyLoadingPromise) return historyLoadingPromise;
 
-    const studentName = document.querySelector('#student-name')?.textContent?.trim() || 'este aluno';
-    const confirmed = window.confirm(
-      `Excluir ${studentName}?\n\nTodos os dados vinculados ao aluno serão removidos permanentemente. Esta ação não pode ser desfeita.`
-    );
-    if (!confirmed) return;
-
-    const originalText = deleteStudentButton.textContent;
-    deleteStudentButton.disabled = true;
-    deleteStudentButton.textContent = 'Excluindo...';
-
-    try {
-      const { data: mediaRows, error: mediaError } = await supabase
-        .from('aluno_midias')
-        .select('storage_path')
-        .eq('aluno_id', alunoId)
-        .eq('personal_id', session.user.id);
-
-      if (mediaError) console.warn('Não foi possível listar as mídias antes da exclusão:', mediaError);
-
-      const { data: deleted, error } = await supabase
-        .from('alunos')
-        .delete()
-        .eq('id', alunoId)
-        .eq('personal_id', session.user.id)
-        .select('id');
-
-      if (error) throw error;
-      if (!deleted?.length) throw new Error('Aluno não encontrado ou sem permissão para exclusão.');
-
-      const storagePaths = (mediaRows || []).map(item => item.storage_path).filter(Boolean);
-      if (storagePaths.length) {
-        const { error: storageError } = await supabase.storage.from('aluno-midias').remove(storagePaths);
-        if (storageError) console.warn('Aluno excluído, mas algumas mídias não puderam ser removidas do armazenamento:', storageError);
-      }
-
-      window.location.replace('alunos.html');
-    } catch (error) {
-      console.error('Erro ao excluir aluno:', error);
-      alert(error.message || 'Não foi possível excluir o aluno.');
-      deleteStudentButton.disabled = false;
-      deleteStudentButton.textContent = originalText;
+  historyLoadingPromise = (async () => {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session?.user?.id) {
+      if (summary) summary.textContent = 'Não foi possível carregar';
+      list.innerHTML = '<p class="empty">Sessão indisponível. Atualize a página e tente novamente.</p>';
+      return;
     }
-  }
 
-  async function loadWorkoutHistory() {
     const { data, error } = await supabase
       .from('sessoes_treino')
       .select('id,treino_id,checkin_at,iniciado_at,finalizada_at,treinos(nome),sessao_exercicios(id,concluido)')
@@ -91,11 +52,13 @@ if (!alunoId || !list) {
 
     if (error) {
       console.error('Erro ao carregar histórico de treinos:', error);
+      if (summary) summary.textContent = 'Erro ao carregar';
       list.innerHTML = '<p class="empty">Não foi possível carregar o histórico de treinos.</p>';
       return;
     }
 
     const items = data || [];
+    historyLoaded = true;
     if (summary) summary.textContent = `${items.length} ${items.length === 1 ? 'treino finalizado' : 'treinos finalizados'}`;
 
     if (!items.length) {
@@ -130,8 +93,21 @@ if (!alunoId || !list) {
         </div>
       </article>`;
     }).join('');
-  }
+  })();
 
-  deleteStudentButton?.addEventListener('click', deleteStudent);
-  loadWorkoutHistory();
+  try {
+    await historyLoadingPromise;
+  } finally {
+    historyLoadingPromise = null;
+  }
+}
+
+if (alunoId && list) {
+  historyTab?.addEventListener('click', () => {
+    void loadWorkoutHistory();
+  });
+
+  if (location.hash === '#history') {
+    void loadWorkoutHistory();
+  }
 }
