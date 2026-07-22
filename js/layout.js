@@ -1,26 +1,77 @@
 import { supabase } from './supabase.js';
 import * as core from './layout-core.js';
-import './checkout-endereco.js';
-import './mobile-more-swipe.js?v=20260721-more-swipe1';
-import './student-avatars-personal.js?v=20260722-student-avatars1';
 
 export * from './layout-core.js';
 
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
+let mobileNavigationStylesPromise = null;
+let enhancementsScheduled = false;
 
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
   return page || 'index.html';
 }
 
+function ensureMobileNavigationCriticalStyles() {
+  if (document.querySelector('style[data-fsfit-mobile-navigation-critical]')) return;
+  const style = document.createElement('style');
+  style.dataset.fsfitMobileNavigationCritical = 'true';
+  style.textContent = `
+    .fsfit-more-sheet{
+      position:fixed;
+      inset:0;
+      z-index:220;
+      visibility:hidden;
+      pointer-events:none;
+    }
+    .fsfit-more-sheet[aria-hidden="true"]{
+      visibility:hidden!important;
+      pointer-events:none!important;
+    }
+    .fsfit-more-sheet.is-open{
+      visibility:visible;
+      pointer-events:auto;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function ensureMobileNavigationStylesheet() {
-  if (document.querySelector('link[data-fsfit-mobile-navigation]')) return;
+  const existing = document.querySelector('link[data-fsfit-mobile-navigation]');
+  if (existing) {
+    if (existing.sheet) return Promise.resolve(existing);
+    if (!mobileNavigationStylesPromise) {
+      mobileNavigationStylesPromise = new Promise(resolve => {
+        const finish = () => resolve(existing);
+        existing.addEventListener('load', finish, { once: true });
+        existing.addEventListener('error', finish, { once: true });
+      });
+    }
+    return mobileNavigationStylesPromise;
+  }
+
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/mobile-navigation.css?v=20260721-more-sheet1';
+  link.href = 'css/mobile-navigation.css?v=20260722-shell1';
   link.dataset.fsfitMobileNavigation = 'true';
+  mobileNavigationStylesPromise = new Promise(resolve => {
+    const finish = () => resolve(link);
+    link.addEventListener('load', finish, { once: true });
+    link.addEventListener('error', finish, { once: true });
+  });
   document.head.appendChild(link);
+  return mobileNavigationStylesPromise;
+}
+
+function scheduleNonCriticalEnhancements() {
+  if (enhancementsScheduled) return;
+  enhancementsScheduled = true;
+  window.setTimeout(() => {
+    import('./checkout-endereco.js').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
+    import('./mobile-more-swipe.js?v=20260721-more-swipe1').catch(error => console.error('Não foi possível carregar os gestos do menu Mais:', error));
+    import('./student-avatars-personal.js?v=20260722-student-avatars1').catch(error => console.error('Não foi possível carregar os avatares dos alunos:', error));
+  }, 0);
 }
 
 function ensureMobileOverflowGuard() {
@@ -38,7 +89,7 @@ function ensureMobileOverflowGuard() {
   document.head.appendChild(style);
 }
 
-function ensureMobileMoreSheet(trigger) {
+function ensureMobileMoreSheet(trigger, stylesReadyPromise = Promise.resolve()) {
   document.querySelector('.fsfit-more-sheet')?.remove();
 
   const sheet = document.createElement('div');
@@ -69,8 +120,21 @@ function ensureMobileMoreSheet(trigger) {
   const publicPageButton = sheet.querySelector('[data-fsfit-public-page]');
   const logoutButton = sheet.querySelector('[data-fsfit-logout]');
   let previousFocus = null;
+  let stylesReady = false;
+  let queuedOpen = false;
+
+  Promise.resolve(stylesReadyPromise).then(() => {
+    stylesReady = true;
+    trigger.removeAttribute('aria-busy');
+    if (queuedOpen) {
+      queuedOpen = false;
+      openSheet();
+    }
+  });
+  trigger.setAttribute('aria-busy', 'true');
 
   const closeSheet = () => {
+    queuedOpen = false;
     if (!sheet.classList.contains('is-open')) return;
     sheet.classList.remove('is-open');
     sheet.setAttribute('aria-hidden', 'true');
@@ -81,6 +145,10 @@ function ensureMobileMoreSheet(trigger) {
   };
 
   const openSheet = () => {
+    if (!stylesReady) {
+      queuedOpen = true;
+      return;
+    }
     previousFocus = document.activeElement;
     sheet.classList.add('is-open');
     sheet.setAttribute('aria-hidden', 'false');
@@ -128,7 +196,7 @@ function ensureMobileMoreSheet(trigger) {
   return { openSheet, closeSheet };
 }
 
-function ensureMobileBottomNav(active = '') {
+function ensureMobileBottomNav(active = '', stylesReadyPromise = Promise.resolve()) {
   document.querySelector('.fsfit-bottom-nav')?.remove();
   const page = currentPage();
   const inferredActive = active || page.replace(/\.html$/i, '');
@@ -164,7 +232,7 @@ function ensureMobileBottomNav(active = '') {
   nav.appendChild(moreButton);
 
   document.body.appendChild(nav);
-  ensureMobileMoreSheet(moreButton);
+  ensureMobileMoreSheet(moreButton, stylesReadyPromise);
 }
 
 function configureStudentRecordBackLink() {
@@ -204,11 +272,13 @@ function configureStudentRecordBackLink() {
 }
 
 export function renderHeader(active = '') {
-  ensureMobileNavigationStylesheet();
+  ensureMobileNavigationCriticalStyles();
+  const mobileNavigationStylesReady = ensureMobileNavigationStylesheet();
   core.renderHeader(active);
   ensureMobileOverflowGuard();
-  ensureMobileBottomNav(active);
+  ensureMobileBottomNav(active, mobileNavigationStylesReady);
   configureStudentRecordBackLink();
+  scheduleNonCriticalEnhancements();
 }
 
 export async function setGreeting(session) {
