@@ -3,8 +3,8 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="application-name" content="FS Fit">
@@ -16,21 +16,16 @@
   <link rel="stylesheet" href="css/aulas-painel-compact.css?v=20260719-live-compact1">
   <style>
     .dashboard-user-greeting { margin:0 0 6px; color:var(--primary); font-size:.82rem; font-weight:850; letter-spacing:.02em; }
-    .dashboard-tabs { display:flex; align-items:center; gap:6px; width:max-content; max-width:100%; margin:0 0 20px; padding:5px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
-    .dashboard-tab { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:10px 16px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:.84rem; font-weight:850; cursor:pointer; transition:background .2s ease,color .2s ease,transform .2s ease; }
-    .dashboard-tab:hover { color:var(--text); background:var(--surface-light); }
-    .dashboard-tab:active { transform:scale(.98); }
-    .dashboard-tab[aria-selected="true"] { background:var(--primary); color:#07120a; }
-    .dashboard-tab-count { display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:rgba(0,0,0,.18); color:inherit; font-size:.72rem; font-weight:900; }
-    .dashboard-tab-panel[hidden] { display:none !important; }
+    .dashboard-priority-section { margin-bottom:18px; }
 
-    .dashboard-overview-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+    .dashboard-overview-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
     .dashboard-summary-card { min-width:0; padding:18px; }
     .dashboard-summary-card small { display:block; margin-bottom:8px; color:var(--muted); font-size:.72rem; font-weight:800; line-height:1.25; }
     .dashboard-summary-card strong { display:block; overflow:hidden; color:var(--text); font-size:1.45rem; font-weight:900; line-height:1.1; text-overflow:ellipsis; white-space:nowrap; }
     .dashboard-summary-card:nth-child(1) { border-top:4px solid var(--primary); }
     .dashboard-summary-card:nth-child(2) { border-top:4px solid var(--secondary); }
-    .dashboard-summary-card:nth-child(3) { border-top:4px solid var(--warning); }
+    .dashboard-summary-card:nth-child(3) { border-top:4px solid var(--primary); }
+    .dashboard-summary-card:nth-child(4) { border-top:4px solid var(--warning); }
 
     .today-card { padding:0; overflow:hidden; }
     .today-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:22px 22px 16px; border-bottom:1px solid var(--border); }
@@ -51,8 +46,10 @@
     .today-open { color:var(--secondary); font-size:.8rem; font-weight:800; }
 
     .attention-card { margin-bottom:18px; }
-    .attention-card h2 { margin-bottom:7px; }
-    .attention-card > p { margin:0 0 16px; font-size:.86rem; }
+    .attention-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; }
+    .attention-heading h2 { margin:0 0 7px; }
+    .attention-heading p { margin:0; font-size:.86rem; }
+    .attention-total { display:grid; place-items:center; min-width:38px; height:38px; padding:0 10px; border-radius:12px; background:rgba(255,204,51,.1); color:var(--warning); font-size:.9rem; font-weight:900; }
     .attention-list { display:grid; gap:10px; }
     .attention-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 13px; border:1px solid var(--border); border-radius:12px; background:var(--surface-light); }
     .attention-item[hidden] { display:none !important; }
@@ -87,15 +84,19 @@
     .dashboard-empty { padding:28px 22px; color:var(--muted); text-align:center; }
     .premium-locked { opacity:.5 !important; cursor:not-allowed !important; pointer-events:none !important; }
 
+    @media (max-width:820px) {
+      .dashboard-overview-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+
     @media (max-width:620px) {
-      .dashboard-tabs { width:100%; gap:4px; margin-bottom:16px; padding:4px; }
-      .dashboard-tab { flex:1 1 0; min-width:0; gap:5px; padding:9px 6px; font-size:.78rem; }
-      .dashboard-tab-count { min-width:20px; height:20px; padding:0 5px; font-size:.68rem; }
+      .dashboard-priority-section { margin-bottom:14px; }
       .dashboard-overview-summary { gap:8px; margin-bottom:14px; }
-      .dashboard-summary-card { padding:14px 10px; }
+      .dashboard-summary-card { padding:14px 12px; }
       .dashboard-summary-card small { min-height:30px; margin-bottom:6px; font-size:.64rem; }
       .dashboard-summary-card strong { font-size:1.12rem; }
       .attention-card { margin-bottom:14px; }
+      .attention-heading { margin-bottom:13px; }
+      .attention-total { min-width:34px; height:34px; border-radius:10px; }
       .today-card-header { padding:18px 18px 14px; }
       .today-entry { grid-template-columns:52px minmax(0,1fr); padding:14px 18px; }
       .today-open { display:none; }
@@ -122,18 +123,20 @@
       <div>
         <p id="dashboard-user-greeting" class="dashboard-user-greeting hidden"></p>
         <h1>Painel de Controle</h1>
-        <p>O que importa para sua consultoria hoje.</p>
+        <p>Aulas, agenda e pendências que precisam da sua atenção hoje.</p>
       </div>
       <a id="new-student-button" class="btn btn-primary" href="alunos.html?novo=1" data-icon="＋" data-premium-link>Novo aluno</a>
     </section>
 
-    <nav class="dashboard-tabs" role="tablist" aria-label="Seções do painel">
-      <button id="dashboard-tab-overview" class="dashboard-tab" type="button" role="tab" aria-selected="true" aria-controls="dashboard-overview-panel" tabindex="0" data-dashboard-tab="overview">Visão geral</button>
-      <button id="dashboard-tab-agenda" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-agenda-panel" tabindex="-1" data-dashboard-tab="agenda">Hoje <span id="dashboard-agenda-tab-count" class="dashboard-tab-count">—</span></button>
-      <button id="dashboard-tab-live" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-live-panel" tabindex="-1" data-dashboard-tab="live">Em aula <span id="dashboard-live-tab-count" class="dashboard-tab-count">0</span></button>
-    </nav>
+    <section id="dashboard-live-panel" class="card live-students-card dashboard-priority-section" aria-label="Alunos em acompanhamento">
+      <div class="live-students-heading">
+        <div><small>EM ACOMPANHAMENTO</small></div>
+        <span id="live-students-count" class="live-students-count">0</span>
+      </div>
+      <div id="live-students-list" class="live-students-list"><p class="empty">Carregando alunos em aula...</p></div>
+    </section>
 
-    <section id="dashboard-agenda-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-agenda" hidden>
+    <section id="dashboard-agenda-panel" class="dashboard-priority-section" aria-label="Agenda de hoje">
       <article class="card today-card">
         <div class="today-card-header">
           <div>
@@ -147,88 +150,90 @@
       </article>
     </section>
 
-    <section id="dashboard-live-panel" class="card live-students-card dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-live" hidden>
-      <div class="live-students-heading"><div><small>ACOMPANHAMENTO AO VIVO</small></div><span id="live-students-count" class="live-students-count">0</span></div>
-      <div id="live-students-list" class="live-students-list"><p class="empty">Carregando alunos em aula...</p></div>
+    <article class="card attention-card">
+      <div class="attention-heading">
+        <div>
+          <h2>Precisa da sua atenção</h2>
+          <p>Pendências que exigem alguma ação sua.</p>
+        </div>
+        <span id="attention-total-count" class="attention-total" aria-label="Total de pendências">—</span>
+      </div>
+      <div class="attention-list">
+        <p id="attention-loading" class="attention-status">Carregando pendências...</p>
+        <p id="attention-empty" class="attention-status" hidden>Tudo em dia. Nenhuma ação pendente agora.</p>
+
+        <a id="attention-no-workout-item" class="attention-item" href="alunos.html" data-attention-item data-premium-link hidden>
+          <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
+          <span id="attention-no-workout" class="attention-number warning">—</span>
+        </a>
+
+        <a id="attention-overdue-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
+          <div><strong>Mensalidades vencidas</strong><small>Pagamentos atrasados para revisar</small></div>
+          <span id="attention-overdue" class="attention-number danger">—</span>
+        </a>
+
+        <a id="attention-waiting-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
+          <div><strong>Pagamentos para confirmar</strong><small>Alunos informaram pagamento</small></div>
+          <span id="attention-waiting" class="attention-number primary">—</span>
+        </a>
+
+        <a id="attention-due-today-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
+          <div><strong>Mensalidades vencendo hoje</strong><small>Acompanhar os recebimentos do dia</small></div>
+          <span id="attention-due-today" class="attention-number warning">—</span>
+        </a>
+      </div>
+    </article>
+
+    <section class="dashboard-overview-summary" aria-label="Visão rápida da consultoria">
+      <article class="card dashboard-summary-card">
+        <small>Alunos ativos</small>
+        <strong id="summary-active-students">—</strong>
+      </article>
+      <article class="card dashboard-summary-card">
+        <small>Atendimentos hoje</small>
+        <strong id="summary-today-appointments">—</strong>
+      </article>
+      <article class="card dashboard-summary-card">
+        <small>Recebido no mês</small>
+        <strong id="summary-month-received">—</strong>
+      </article>
+      <article class="card dashboard-summary-card">
+        <small>Pendências financeiras</small>
+        <strong id="summary-finance-pending">—</strong>
+      </article>
     </section>
 
-    <div id="dashboard-overview-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-overview">
-      <section class="dashboard-overview-summary" aria-label="Resumo da consultoria">
-        <article class="card dashboard-summary-card">
-          <small>Alunos ativos</small>
-          <strong id="summary-active-students">—</strong>
-        </article>
-        <article class="card dashboard-summary-card">
-          <small>Recebido no mês</small>
-          <strong id="summary-month-received">—</strong>
-        </article>
-        <article class="card dashboard-summary-card">
-          <small>Pendências financeiras</small>
-          <strong id="summary-finance-pending">—</strong>
-        </article>
-      </section>
+    <section class="quick-actions">
+      <h2>Atalhos rápidos</h2>
+      <div class="quick-actions-grid">
+        <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
+        <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades e recebimentos</small></a>
+        <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
+        <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda completa</strong><small>Consultar todos os atendimentos</small></a>
+        <a class="card quick-action" href="perfil.html"><strong>👤 Perfil</strong><small>Editar sua página pública</small></a>
+      </div>
+    </section>
 
-      <article class="card attention-card">
-        <h2>Atenção</h2>
-        <p>Somente o que precisa de uma ação sua.</p>
-        <div class="attention-list">
-          <p id="attention-loading" class="attention-status">Carregando pendências...</p>
-          <p id="attention-empty" class="attention-status" hidden>Tudo em dia. Nenhuma ação pendente agora.</p>
+    <section id="public-link-card" class="card public-link-card dashboard-public-link-compact">
+      <h2>Sua página pública</h2>
+      <p id="public-link-description">Página pública configurada e pronta para compartilhar.</p>
+      <div id="dashboard-public-link" class="dashboard-public-link"></div>
+      <div class="public-link-actions">
+        <button id="copy-dashboard-public-link" class="btn btn-outline" type="button" data-icon="⧉">Copiar link</button>
+        <a id="open-dashboard-public-link" class="btn btn-secondary" href="#" data-icon="↗">Abrir página</a>
+        <a id="configure-dashboard-public-link" class="btn btn-secondary hidden" href="perfil.html" data-icon="⚙">Configurar página</a>
+      </div>
+    </section>
 
-          <a id="attention-no-workout-item" class="attention-item" href="alunos.html" data-attention-item data-premium-link hidden>
-            <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
-            <span id="attention-no-workout" class="attention-number warning">—</span>
-          </a>
-
-          <a id="attention-overdue-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
-            <div><strong>Mensalidades vencidas</strong><small>Pagamentos atrasados para revisar</small></div>
-            <span id="attention-overdue" class="attention-number danger">—</span>
-          </a>
-
-          <a id="attention-waiting-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
-            <div><strong>Pagamentos para confirmar</strong><small>Alunos informaram pagamento</small></div>
-            <span id="attention-waiting" class="attention-number primary">—</span>
-          </a>
-
-          <a id="attention-due-today-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
-            <div><strong>Mensalidades vencendo hoje</strong><small>Acompanhar os recebimentos do dia</small></div>
-            <span id="attention-due-today" class="attention-number warning">—</span>
-          </a>
-        </div>
-      </article>
-
-      <section class="quick-actions">
-        <h2>Atalhos rápidos</h2>
-        <div class="quick-actions-grid">
-          <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
-          <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades e recebimentos</small></a>
-          <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
-          <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda completa</strong><small>Consultar todos os atendimentos</small></a>
-          <a class="card quick-action" href="perfil.html"><strong>👤 Perfil</strong><small>Editar sua página pública</small></a>
-        </div>
-      </section>
-
-      <section id="public-link-card" class="card public-link-card dashboard-public-link-compact">
-        <h2>Sua página pública</h2>
-        <p id="public-link-description">Página pública configurada e pronta para compartilhar.</p>
-        <div id="dashboard-public-link" class="dashboard-public-link"></div>
-        <div class="public-link-actions">
-          <button id="copy-dashboard-public-link" class="btn btn-outline" type="button" data-icon="⧉">Copiar link</button>
-          <a id="open-dashboard-public-link" class="btn btn-secondary" href="#" data-icon="↗">Abrir página</a>
-          <a id="configure-dashboard-public-link" class="btn btn-secondary hidden" href="perfil.html" data-icon="⚙">Configurar página</a>
-        </div>
-      </section>
-
-      <section class="card dashboard-activity-card">
-        <div class="dashboard-activity-heading">
-          <h2>Atividade recente</h2>
-          <p>Novos alunos e movimentações financeiras recentes.</p>
-        </div>
-        <div id="dashboard-activity-list" class="dashboard-activity-list">
-          <p class="dashboard-empty">Carregando atividade recente...</p>
-        </div>
-      </section>
-    </div>
+    <section class="card dashboard-activity-card">
+      <div class="dashboard-activity-heading">
+        <h2>Atividade recente</h2>
+        <p>Novos alunos e movimentações financeiras recentes.</p>
+      </div>
+      <div id="dashboard-activity-list" class="dashboard-activity-list">
+        <p class="dashboard-empty">Carregando atividade recente...</p>
+      </div>
+    </section>
   </main>
 
   <div id="live-session-modal" class="live-session-modal" aria-hidden="true">
@@ -263,63 +268,47 @@
 
   <script>
     (() => {
-      const tabs = Array.from(document.querySelectorAll('[data-dashboard-tab]'));
-      const overviewPanel = document.getElementById('dashboard-overview-panel');
-      const agendaPanel = document.getElementById('dashboard-agenda-panel');
-      const livePanel = document.getElementById('dashboard-live-panel');
       const todayCount = document.getElementById('today-count');
-      const agendaTabCount = document.getElementById('dashboard-agenda-tab-count');
-      const liveCount = document.getElementById('live-students-count');
-      const liveTabCount = document.getElementById('dashboard-live-tab-count');
+      const todaySummary = document.getElementById('summary-today-appointments');
+      const attentionCard = document.querySelector('.attention-card');
+      const attentionTotal = document.getElementById('attention-total-count');
+      const attentionItems = Array.from(document.querySelectorAll('[data-attention-item]'));
 
-      const panels = {
-        overview: overviewPanel,
-        agenda: agendaPanel,
-        live: livePanel
+      const syncTodayCount = () => {
+        if (!todayCount || !todaySummary) return;
+        todaySummary.textContent = todayCount.textContent.trim() || '—';
       };
 
-      const activateTab = (name, shouldFocus = false) => {
-        tabs.forEach((tab) => {
-          const active = tab.dataset.dashboardTab === name;
-          tab.setAttribute('aria-selected', String(active));
-          tab.tabIndex = active ? 0 : -1;
-          if (active && shouldFocus) tab.focus();
-        });
-
-        Object.entries(panels).forEach(([panelName, panel]) => {
-          if (panel) panel.hidden = panelName !== name;
-        });
+      const syncAttentionCount = () => {
+        if (!attentionTotal) return;
+        const total = attentionItems.reduce((sum, item) => {
+          if (item.hidden) return sum;
+          const value = Number(item.querySelector('.attention-number')?.textContent || 0);
+          return sum + (Number.isFinite(value) ? value : 0);
+        }, 0);
+        attentionTotal.textContent = String(total);
       };
 
-      tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => activateTab(tab.dataset.dashboardTab));
-        tab.addEventListener('keydown', (event) => {
-          let nextIndex = null;
-          if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
-          if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
-          if (event.key === 'Home') nextIndex = 0;
-          if (event.key === 'End') nextIndex = tabs.length - 1;
-          if (nextIndex === null) return;
-          event.preventDefault();
-          activateTab(tabs[nextIndex].dataset.dashboardTab, true);
+      syncTodayCount();
+      syncAttentionCount();
+
+      if (todayCount) {
+        new MutationObserver(syncTodayCount).observe(todayCount, { childList:true, subtree:true, characterData:true });
+      }
+
+      attentionItems.forEach(item => {
+        new MutationObserver(syncAttentionCount).observe(item, {
+          attributes:true,
+          attributeFilter:['hidden'],
+          childList:true,
+          subtree:true,
+          characterData:true
         });
       });
 
-      const syncAgendaCount = () => {
-        if (!todayCount || !agendaTabCount) return;
-        agendaTabCount.textContent = todayCount.textContent.trim() || '—';
-      };
-
-      const syncLiveCount = () => {
-        if (!liveCount || !liveTabCount) return;
-        liveTabCount.textContent = liveCount.textContent.trim() || '0';
-      };
-
-      syncAgendaCount();
-      syncLiveCount();
-      if (todayCount) new MutationObserver(syncAgendaCount).observe(todayCount, { childList:true, subtree:true, characterData:true });
-      if (liveCount) new MutationObserver(syncLiveCount).observe(liveCount, { childList:true, subtree:true, characterData:true });
-      activateTab('overview');
+      if (attentionCard) {
+        new MutationObserver(syncAttentionCount).observe(attentionCard, { attributes:true, attributeFilter:['hidden'] });
+      }
     })();
   </script>
   <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
