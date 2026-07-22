@@ -34,8 +34,10 @@ const exerciseDetailBody = document.querySelector('#exercise-detail-body');
 const exerciseDetailEdit = document.querySelector('#exercise-detail-edit');
 const exerciseDetailDelete = document.querySelector('#exercise-detail-delete');
 const openExerciseModalButton = document.querySelector('#open-exercise-modal');
+const applyWorkoutButton = document.querySelector('#apply-workout-button');
 
 let treinoId = null;
+let activeTreinoId = null;
 let selectedWorkoutId = null;
 let editingWorkoutId = null;
 let selectedExerciseId = null;
@@ -72,18 +74,38 @@ function setSelectedDays(days = []) {
   });
 }
 
-function activeWorkout() {
+function selectedWorkout() {
   return workoutsCache.find(item => item.id === treinoId) || null;
 }
 
-function updateWorkoutDayOptions(days = activeWorkout()?.dias_semana || []) {
+function updateWorkoutDayOptions(days = selectedWorkout()?.dias_semana || []) {
   const current = workoutDaySelect.value;
   const orderedDays = [1, 2, 3, 4, 5, 6, 7].filter(day => (days || []).map(Number).includes(day));
   workoutDaySelect.innerHTML = orderedDays.length
     ? '<option value="">Selecione</option>' + orderedDays.map(day => `<option value="${day}">${dayNames[day]}</option>`).join('')
-    : '<option value="">Configure os dias do treino ativo</option>';
+    : '<option value="">Configure os dias do plano selecionado</option>';
   workoutDaySelect.disabled = orderedDays.length === 0;
   if (orderedDays.includes(Number(current))) workoutDaySelect.value = current;
+}
+
+function syncWorkspaceContext(workout = selectedWorkout()) {
+  const days = (workout?.dias_semana || []).map(Number);
+  activeWorkoutWorkspace.dataset.workoutId = workout?.id || '';
+  activeWorkoutWorkspace.dataset.workoutDays = JSON.stringify(days);
+  activeWorkoutWorkspace.dataset.workoutStatus = workout?.status || '';
+
+  const contextBadge = document.querySelector('.workout-editor-context-badge');
+  const contextText = document.querySelector('.workout-editor-context span:last-child');
+  const isActive = workout?.status === 'ativo';
+  if (contextBadge) {
+    contextBadge.textContent = isActive ? 'ATIVO' : 'RASCUNHO';
+    contextBadge.classList.toggle('active', isActive);
+  }
+  if (contextText) contextText.textContent = isActive ? 'Plano aplicado ao aluno' : 'Selecionado para edição';
+
+  window.dispatchEvent(new CustomEvent('fsfit-workout-selection-changed', {
+    detail: { workoutId: workout?.id || '', days, status: workout?.status || '' }
+  }));
 }
 
 function closeWorkoutModal() {
@@ -124,10 +146,11 @@ function openWorkoutModal(id) {
   const days = (workout.dias_semana || []).map(Number).map(day => dayNames[day]).filter(Boolean).join(', ') || 'Nenhum dia configurado';
   workoutModalTitle.textContent = workout.nome || 'Plano de treino';
   workoutModalBody.innerHTML = `
-    <div class="workout-detail"><small>Status</small><strong>${workout.status === 'ativo' ? 'Plano ativo' : 'Plano inativo'}</strong></div>
+    <div class="workout-detail"><small>Status</small><strong>${workout.status === 'ativo' ? 'Plano ativo' : 'Rascunho'}</strong></div>
     <div class="workout-detail"><small>Período</small><strong>${esc(formatDate(workout.data_inicio))} → ${esc(formatDate(workout.data_fim))}</strong></div>
     <div class="workout-detail"><small>Dias da semana</small><p>${esc(days)}</p></div>
     <div class="workout-detail"><small>Descrição</small><p>${esc(workout.descricao || 'Nenhuma descrição informada.')}</p></div>`;
+  workoutModalActivate.textContent = 'Aplicar ao aluno';
   workoutModalActivate.classList.toggle('hidden', workout.status === 'ativo');
   workoutForm.classList.add('hidden');
   workoutModalView.classList.remove('hidden');
@@ -137,8 +160,8 @@ function openWorkoutModal(id) {
 }
 
 function openExerciseModal(exerciseId = null) {
-  if (!treinoId) return showMessage(message, 'Crie ou ative um plano de treino antes de adicionar exercícios.', 'error');
-  const workout = activeWorkout();
+  if (!treinoId) return showMessage(message, 'Crie ou selecione um plano antes de adicionar exercícios.', 'error');
+  const workout = selectedWorkout();
   updateWorkoutDayOptions(workout?.dias_semana || []);
   editingExerciseId = exerciseId;
   const data = exerciseId ? workoutExercisesCache.find(item => item.id === exerciseId) : null;
@@ -151,8 +174,8 @@ function openExerciseModal(exerciseId = null) {
   workoutExerciseForm.carga.value = data?.carga || '';
   workoutExerciseForm.descanso_segundos.value = data?.descanso_segundos ?? '';
   workoutExerciseForm.observacoes.value = data?.observacoes || '';
-  document.querySelector('#exercise-modal-title').textContent = data ? 'Editar exercício' : 'Novo exercício';
-  workoutExerciseForm.querySelector('[type="submit"]').textContent = data ? 'Salvar alteração' : 'Salvar exercício';
+  document.querySelector('#exercise-modal-title').textContent = data ? 'Editar exercício' : 'Montar sequência';
+  workoutExerciseForm.querySelector('[type="submit"]').textContent = data ? 'Salvar alteração' : 'Adicionar exercícios';
   exerciseModal.classList.add('open');
   exerciseModal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('workout-modal-open');
@@ -206,7 +229,7 @@ async function loadStudent() {
   document.querySelector('#back-link').href = `ficha-aluno.html?id=${data.id}`;
 }
 
-async function loadWorkouts() {
+async function loadWorkouts(preferredId = treinoId) {
   const { data, error } = await supabase
     .from('treinos')
     .select('id,nome,descricao,dias_semana,data_inicio,data_fim,status,created_at,updated_at')
@@ -214,48 +237,97 @@ async function loadWorkouts() {
     .eq('personal_id', session.user.id)
     .order('updated_at', { ascending: false });
   if (error) throw error;
-  workoutsCache = data || [];
+
+  const workouts = data || [];
+  const ids = workouts.map(item => item.id);
+  const counts = new Map();
+  if (ids.length) {
+    const { data: exerciseRows, error: exerciseCountError } = await supabase
+      .from('treino_exercicios')
+      .select('treino_id')
+      .in('treino_id', ids);
+    if (!exerciseCountError) {
+      (exerciseRows || []).forEach(row => counts.set(row.treino_id, (counts.get(row.treino_id) || 0) + 1));
+    }
+  }
+
+  workoutsCache = workouts.map(item => ({ ...item, exercise_count: counts.get(item.id) || 0 }));
   const active = workoutsCache.find(item => item.status === 'ativo') || null;
-  treinoId = active?.id || null;
+  activeTreinoId = active?.id || null;
+
+  if (preferredId && workoutsCache.some(item => item.id === preferredId)) treinoId = preferredId;
+  else if (treinoId && workoutsCache.some(item => item.id === treinoId)) treinoId = treinoId;
+  else treinoId = activeTreinoId || workoutsCache[0]?.id || null;
+
   renderWorkoutList();
   renderActiveWorkout();
-  updateWorkoutDayOptions(active?.dias_semana || []);
+  updateWorkoutDayOptions(selectedWorkout()?.dias_semana || []);
   await loadWorkoutExercises();
 }
 
 function renderWorkoutList() {
   if (!workoutsCache.length) {
-    workoutList.innerHTML = '<div class="workout-plan-empty"><strong>Nenhum plano de treino cadastrado.</strong><span>Crie o primeiro treino para começar a adicionar exercícios.</span></div>';
+    workoutList.innerHTML = '<div class="workout-plan-empty"><strong>Nenhum plano de treino cadastrado.</strong><span>Crie o primeiro plano e monte os exercícios antes de aplicar ao aluno.</span></div>';
     return;
   }
+
   workoutList.innerHTML = workoutsCache.map(workout => {
     const days = (workout.dias_semana || []).map(Number).map(day => dayNames[day]?.replace('-feira', '')).filter(Boolean).join(', ') || 'Dias não definidos';
-    return `<button class="workout-plan-row ${workout.status === 'ativo' ? 'active' : ''}" type="button" data-open-workout="${workout.id}">
+    const isActive = workout.status === 'ativo';
+    const isSelected = workout.id === treinoId;
+    const count = Number(workout.exercise_count || 0);
+    return `<button class="workout-plan-row ${isActive ? 'active' : ''} ${isSelected ? 'selected' : ''}" type="button" data-select-workout="${workout.id}">
       <span class="workout-plan-row-main">
-        <span class="workout-plan-row-title"><strong>${esc(workout.nome)}</strong>${workout.status === 'ativo' ? '<em>ATIVO</em>' : ''}</span>
-        <span class="workout-plan-row-meta">${esc(formatDate(workout.data_inicio))} → ${esc(formatDate(workout.data_fim))}</span>
-        <span class="workout-plan-row-note">${esc(days)}</span>
-      </span><span class="workout-row-arrow">›</span></button>`;
+        <span class="workout-plan-row-title"><strong>${esc(workout.nome)}</strong><em class="${isActive ? 'active' : 'draft'}">${isActive ? 'ATIVO' : 'RASCUNHO'}</em></span>
+        <span class="workout-plan-row-meta">${esc(days)}</span>
+        <span class="workout-plan-row-note">${count} ${count === 1 ? 'exercício' : 'exercícios'} · ${esc(formatDate(workout.data_inicio))} → ${esc(formatDate(workout.data_fim))}</span>
+      </span><span class="workout-row-arrow">${isSelected ? '✓' : '›'}</span></button>`;
   }).join('');
 }
 
 function renderActiveWorkout() {
-  const workout = activeWorkout();
+  const workout = selectedWorkout();
   const enabled = Boolean(workout);
   activeWorkoutWorkspace.classList.toggle('workout-disabled', !enabled);
   activeWorkoutDetails.disabled = !enabled;
   openExerciseModalButton.disabled = !enabled;
+
   if (!workout) {
-    activeWorkoutTitle.textContent = 'Nenhum treino ativo';
-    activeWorkoutSummary.innerHTML = '<p>Crie um plano de treino ou torne um treino existente ativo para adicionar exercícios.</p>';
+    activeWorkoutTitle.textContent = 'Nenhum plano selecionado';
+    activeWorkoutSummary.innerHTML = '<p>Crie um plano de treino para começar a montar os exercícios.</p>';
+    applyWorkoutButton?.classList.add('hidden');
+    applyWorkoutButton?.closest('.workout-compact-actions')?.classList.remove('has-apply');
+    syncWorkspaceContext(null);
     return;
   }
+
   const days = (workout.dias_semana || []).map(Number).map(day => dayNames[day]).filter(Boolean).join(', ') || 'Nenhum dia configurado';
   activeWorkoutTitle.textContent = workout.nome;
   activeWorkoutSummary.innerHTML = `
+    <div><small>Status</small><strong>${workout.status === 'ativo' ? 'Aplicado ao aluno' : 'Rascunho'}</strong></div>
     <div><small>Período</small><strong>${esc(formatDate(workout.data_inicio))} → ${esc(formatDate(workout.data_fim))}</strong></div>
     <div><small>Dias de treino</small><strong>${esc(days)}</strong></div>
     <div class="wide"><small>Descrição</small><p>${esc(workout.descricao || 'Nenhuma descrição informada.')}</p></div>`;
+
+  if (applyWorkoutButton) {
+    const shouldShow = workout.status !== 'ativo';
+    applyWorkoutButton.classList.toggle('hidden', !shouldShow);
+    applyWorkoutButton.dataset.workoutId = workout.id;
+    applyWorkoutButton.closest('.workout-compact-actions')?.classList.toggle('has-apply', shouldShow);
+  }
+
+  syncWorkspaceContext(workout);
+}
+
+async function selectWorkout(id) {
+  if (!id || id === treinoId) return;
+  const workout = workoutsCache.find(item => item.id === id);
+  if (!workout) return;
+  treinoId = id;
+  renderWorkoutList();
+  renderActiveWorkout();
+  updateWorkoutDayOptions(workout.dias_semana || []);
+  await loadWorkoutExercises();
 }
 
 async function loadExerciseLibrary() {
@@ -270,18 +342,25 @@ async function loadExerciseLibrary() {
 async function loadWorkoutExercises() {
   if (!treinoId) {
     workoutExercisesCache = [];
-    workoutDays.innerHTML = '<p class="empty">Nenhum plano de treino ativo.</p>';
+    workoutDays.innerHTML = '<p class="empty">Selecione ou crie um plano de treino.</p>';
     return;
   }
+  const requestedWorkoutId = treinoId;
   const { data, error } = await supabase
     .from('treino_exercicios')
     .select('id,treino_id,exercicio_id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,exercicios(nome,grupo_muscular,equipamento,instrucoes,video_url)')
-    .eq('treino_id', treinoId)
+    .eq('treino_id', requestedWorkoutId)
     .order('dia_semana').order('ordem');
   if (error) throw error;
+  if (requestedWorkoutId !== treinoId) return;
+
   workoutExercisesCache = data || [];
+  const currentWorkout = workoutsCache.find(item => item.id === treinoId);
+  if (currentWorkout) currentWorkout.exercise_count = workoutExercisesCache.length;
+  renderWorkoutList();
+
   if (!workoutExercisesCache.length) {
-    workoutDays.innerHTML = '<p class="empty">Nenhum exercício cadastrado no treino ativo.</p>';
+    workoutDays.innerHTML = '<p class="empty">Nenhum exercício cadastrado neste plano. Use “+ Exercícios” para montar a sequência.</p>';
     return;
   }
   const groups = workoutExercisesCache.reduce((acc, row) => {
@@ -295,7 +374,7 @@ async function loadWorkoutExercises() {
       <div class="workout-day-header"><div><small>DIA ${day}</small><strong>${dayNames[day]}</strong></div><span>${rows.length} ${rows.length === 1 ? 'exercício' : 'exercícios'}</span></div>
       <div class="workout-exercise-list">${rows.map(row => `<button class="workout-exercise-row" type="button" data-open-exercise-detail="${row.id}">
         <span class="workout-exercise-order">${row.ordem || '—'}</span>
-        <span class="workout-exercise-main"><strong>${esc(row.exercicios?.nome || '')}</strong><span>${esc([row.series ? `${row.series} séries` : null, row.repeticoes, row.carga].filter(Boolean).join(' • ') || 'Ver detalhes')}</span></span>
+        <span class="workout-exercise-main"><strong>${esc(row.exercicios?.nome || '')}</strong><span>${esc([row.series ? `${row.series} séries` : null, row.repeticoes ? `${row.repeticoes} rep.` : null, row.carga, row.descanso_segundos ? `${row.descanso_segundos}s` : null].filter(Boolean).join(' • ') || 'Ver detalhes')}</span></span>
         <span class="workout-row-arrow">›</span></button>`).join('')}</div>
     </section>`;
   }).join('');
@@ -303,26 +382,34 @@ async function loadWorkoutExercises() {
 
 async function setActiveWorkout(id) {
   const target = workoutsCache.find(item => item.id === id);
-  if (!target) return;
+  if (!target || target.status === 'ativo') return;
+  const current = workoutsCache.find(item => item.id === activeTreinoId);
+  const confirmation = current
+    ? `Aplicar o plano “${target.nome}” ao aluno?\n\nO plano “${current.nome}” deixará de ser o plano ativo.`
+    : `Aplicar o plano “${target.nome}” ao aluno?`;
+  if (!confirm(confirmation)) return;
+
   const { error: deactivateError } = await supabase.from('treinos').update({ status: 'inativo' }).eq('aluno_id', alunoId).eq('personal_id', session.user.id).neq('id', id);
-  if (deactivateError) return showMessage(message, 'Não foi possível atualizar o treino ativo.', 'error');
+  if (deactivateError) return showMessage(message, 'Não foi possível atualizar o plano ativo.', 'error');
   const { error } = await supabase.from('treinos').update({ status: 'ativo' }).eq('id', id).eq('personal_id', session.user.id);
-  if (error) return showMessage(message, 'Não foi possível ativar o treino.', 'error');
+  if (error) return showMessage(message, 'Não foi possível aplicar o plano ao aluno.', 'error');
+
   closeWorkoutModal();
-  showMessage(message, `Treino “${target.nome}” definido como ativo.`);
-  await loadWorkouts();
+  treinoId = id;
+  activeTreinoId = id;
+  showMessage(message, `Plano “${target.nome}” aplicado ao aluno.`);
+  await loadWorkouts(id);
 }
 
 async function deleteWorkout(id) {
   const workout = workoutsCache.find(item => item.id === id);
-  if (!workout || !confirm(`Excluir o treino “${workout.nome}”? Todos os exercícios vinculados também serão removidos.`)) return;
-  const wasActive = workout.status === 'ativo';
+  if (!workout || !confirm(`Excluir o plano “${workout.nome}”? Todos os exercícios vinculados também serão removidos.`)) return;
   const { error } = await supabase.from('treinos').delete().eq('id', id).eq('aluno_id', alunoId).eq('personal_id', session.user.id);
-  if (error) return showMessage(message, 'Não foi possível excluir o treino.', 'error');
+  if (error) return showMessage(message, 'Não foi possível excluir o plano.', 'error');
   closeWorkoutModal();
+  if (treinoId === id) treinoId = null;
   showMessage(message, 'Plano de treino excluído com sucesso.');
   await loadWorkouts();
-  if (wasActive && !treinoId && workoutsCache.length) await setActiveWorkout(workoutsCache[0].id);
 }
 
 async function deleteExercise(id) {
@@ -350,26 +437,27 @@ workoutForm.addEventListener('submit', async event => {
   let savedId = editingWorkoutId;
   if (editingWorkoutId) {
     const { error } = await supabase.from('treinos').update(payload).eq('id', editingWorkoutId).eq('personal_id', session.user.id);
-    if (error) return showMessage(message, 'Não foi possível atualizar o treino.', 'error');
+    if (error) return showMessage(message, 'Não foi possível atualizar o plano.', 'error');
     showMessage(message, 'Plano de treino atualizado com sucesso.');
   } else {
     const shouldActivate = !workoutsCache.some(item => item.status === 'ativo');
     const { data, error } = await supabase.from('treinos').insert({ ...payload, personal_id: session.user.id, aluno_id: alunoId, status: shouldActivate ? 'ativo' : 'inativo', modelo: false }).select('id').single();
-    if (error) return showMessage(message, 'Não foi possível criar o treino.', 'error');
+    if (error) return showMessage(message, 'Não foi possível criar o plano.', 'error');
     savedId = data.id;
-    showMessage(message, 'Plano de treino criado com sucesso.');
+    showMessage(message, shouldActivate ? 'Plano criado e aplicado ao aluno.' : 'Plano criado como rascunho. Agora monte os exercícios.');
   }
+
+  treinoId = savedId || treinoId;
   closeWorkoutModal();
-  await loadWorkouts();
-  if (savedId && workoutsCache.some(item => item.id === savedId)) openWorkoutModal(savedId);
+  await loadWorkouts(treinoId);
 });
 
 workoutExerciseForm.addEventListener('submit', async event => {
   event.preventDefault();
-  if (!treinoId) return showMessage(message, 'Ative um plano de treino antes de adicionar exercícios.', 'error');
+  if (!treinoId) return showMessage(message, 'Selecione um plano antes de adicionar exercícios.', 'error');
   const day = Number(workoutExerciseForm.dia_semana.value);
-  const allowedDays = (activeWorkout()?.dias_semana || []).map(Number);
-  if (!allowedDays.includes(day)) return showMessage(message, 'Selecione um dia habilitado no treino ativo.', 'error');
+  const allowedDays = (selectedWorkout()?.dias_semana || []).map(Number);
+  if (!allowedDays.includes(day)) return showMessage(message, 'Selecione um dia habilitado no plano selecionado.', 'error');
   const payload = {
     treino_id: treinoId,
     exercicio_id: workoutExerciseForm.exercicio_id.value,
@@ -393,6 +481,7 @@ workoutExerciseForm.addEventListener('submit', async event => {
 newWorkoutButton.addEventListener('click', () => showWorkoutForm());
 cancelWorkoutEdit.addEventListener('click', () => selectedWorkoutId ? openWorkoutModal(selectedWorkoutId) : closeWorkoutModal());
 activeWorkoutDetails.addEventListener('click', () => { if (treinoId) openWorkoutModal(treinoId); });
+applyWorkoutButton?.addEventListener('click', () => { if (treinoId) setActiveWorkout(treinoId); });
 workoutModalEdit.addEventListener('click', () => { const workout = workoutsCache.find(item => item.id === selectedWorkoutId); if (workout) showWorkoutForm(workout); });
 workoutModalActivate.addEventListener('click', () => { if (selectedWorkoutId) setActiveWorkout(selectedWorkoutId); });
 workoutModalDelete.addEventListener('click', () => { if (selectedWorkoutId) deleteWorkout(selectedWorkoutId); });
@@ -401,8 +490,8 @@ exerciseDetailEdit.addEventListener('click', () => { const id = selectedExercise
 exerciseDetailDelete.addEventListener('click', () => { if (selectedExerciseId) deleteExercise(selectedExerciseId); });
 
 document.addEventListener('click', event => {
-  const openWorkout = event.target.closest('[data-open-workout]');
-  if (openWorkout) return openWorkoutModal(openWorkout.dataset.openWorkout);
+  const selectPlan = event.target.closest('[data-select-workout]');
+  if (selectPlan) return selectWorkout(selectPlan.dataset.selectWorkout).catch(console.error);
   const openExercise = event.target.closest('[data-open-exercise-detail]');
   if (openExercise) return openExerciseDetailModal(openExercise.dataset.openExerciseDetail);
   if (event.target.closest('[data-close-workout-modal]')) return closeWorkoutModal();
@@ -415,6 +504,11 @@ document.addEventListener('keydown', event => {
   if (exerciseDetailModal.classList.contains('open')) closeExerciseDetailModal();
   else if (exerciseModal.classList.contains('open')) closeExerciseModal();
   else if (workoutModal.classList.contains('open')) closeWorkoutModal();
+});
+
+window.addEventListener('fsfit-workout-exercises-updated', event => {
+  if (!event.detail?.workoutId || event.detail.workoutId !== treinoId) return;
+  loadWorkoutExercises().catch(console.error);
 });
 
 try {
