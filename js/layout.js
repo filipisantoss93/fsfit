@@ -5,15 +5,6 @@ import './mobile-more-swipe.js?v=20260721-more-swipe1';
 
 export * from './layout-core.js';
 
-const FREE_ALLOWED_PAGES = new Set([
-  'painel.html',
-  'perfil.html',
-  'contato.html',
-  'assinatura.html',
-  'admin.html',
-  'admin-contatos.html'
-]);
-
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
 
@@ -39,41 +30,11 @@ function ensureMobileOverflowGuard() {
     html,body{max-width:100%;overflow-x:clip}
     #header-container .user-greeting{display:none!important}
     @media(max-width:860px){
-      #header-container .nav-menu{
-        transform:translateY(-8px) scale(.98)!important;
-        transform-origin:top right!important;
-      }
-      #header-container .nav-menu.active{
-        transform:translateY(0) scale(1)!important;
-      }
+      #header-container .nav-menu{transform:translateY(-8px) scale(.98)!important;transform-origin:top right!important}
+      #header-container .nav-menu.active{transform:translateY(0) scale(1)!important}
     }
   `;
   document.head.appendChild(style);
-}
-
-function normalizeHeaderLabels() {
-  const profileLink = document.querySelector('#nav-menu [data-page="perfil"]');
-  if (profileLink) profileLink.textContent = 'Perfil';
-
-  const subscriptionLink = document.querySelector('#nav-menu [data-page="assinatura"]');
-  if (subscriptionLink) subscriptionLink.textContent = 'Assinatura';
-}
-
-function ensureSubscriptionMenuLink(active = '') {
-  const menu = document.querySelector('#nav-menu');
-  if (!menu || menu.querySelector('[data-page="assinatura"]')) return;
-  const divider = Array.from(menu.children).find(item => item.classList?.contains('nav-divider'));
-  const item = document.createElement('li');
-  const link = document.createElement('a');
-  link.dataset.page = 'assinatura';
-  link.href = 'assinatura.html';
-  link.textContent = 'Assinatura';
-  if (active === 'assinatura') link.classList.add('active');
-  link.addEventListener('click', () => menu.classList.remove('active'));
-  item.appendChild(link);
-
-  if (divider) menu.insertBefore(item, divider);
-  else menu.appendChild(item);
 }
 
 function ensureMobileMoreSheet(trigger) {
@@ -87,46 +48,18 @@ function ensureMobileMoreSheet(trigger) {
     <section class="fsfit-more-panel" role="dialog" aria-modal="true" aria-labelledby="fsfit-more-title">
       <div class="fsfit-more-handle" aria-hidden="true"></div>
       <header class="fsfit-more-heading">
-        <div>
-          <small>FS FIT</small>
-          <h2 id="fsfit-more-title">Mais opções</h2>
-        </div>
+        <div><small>FS FIT</small><h2 id="fsfit-more-title">Mais opções</h2></div>
         <button class="fsfit-more-close" type="button" aria-label="Fechar">×</button>
       </header>
       <nav class="fsfit-more-list" aria-label="Mais opções do FS Fit">
-        <a class="fsfit-more-item" href="perfil.html">
-          <span class="fsfit-more-item-icon" aria-hidden="true">PF</span>
-          <span class="fsfit-more-item-copy"><strong>Perfil</strong><small>Dados profissionais e configurações</small></span>
-          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
-        </a>
-        <a class="fsfit-more-item" href="biblioteca-exercicios.html">
-          <span class="fsfit-more-item-icon" aria-hidden="true">EX</span>
-          <span class="fsfit-more-item-copy"><strong>Biblioteca de exercícios</strong><small>Gerencie exercícios e categorias</small></span>
-          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
-        </a>
-        <button class="fsfit-more-item" type="button" data-fsfit-public-page>
-          <span class="fsfit-more-item-icon" aria-hidden="true">↗</span>
-          <span class="fsfit-more-item-copy"><strong>Página pública</strong><small>Veja sua página como seus alunos veem</small></span>
-          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
-        </button>
-        <a class="fsfit-more-item" href="assinatura.html">
-          <span class="fsfit-more-item-icon" aria-hidden="true">AS</span>
-          <span class="fsfit-more-item-copy"><strong>Assinatura</strong><small>Plano, cobrança e renovação</small></span>
-          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
-        </a>
-        <a class="fsfit-more-item" href="contato.html">
-          <span class="fsfit-more-item-icon" aria-hidden="true">?</span>
-          <span class="fsfit-more-item-copy"><strong>Contato</strong><small>Suporte e canais de atendimento</small></span>
-          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
-        </a>
-        <button class="fsfit-more-item is-danger" type="button" data-fsfit-logout>
-          <span class="fsfit-more-item-icon" aria-hidden="true">SA</span>
-          <span class="fsfit-more-item-copy"><strong>Sair</strong><small>Encerrar sua sessão no FS Fit</small></span>
-          <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
-        </button>
+        <a class="fsfit-more-item" href="perfil.html"><span class="fsfit-more-item-icon" aria-hidden="true">PF</span><span class="fsfit-more-item-copy"><strong>Perfil</strong><small>Dados profissionais e configurações</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
+        <a class="fsfit-more-item" href="biblioteca-exercicios.html"><span class="fsfit-more-item-icon" aria-hidden="true">EX</span><span class="fsfit-more-item-copy"><strong>Biblioteca de exercícios</strong><small>Gerencie exercícios e categorias</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
+        <button class="fsfit-more-item" type="button" data-fsfit-public-page><span class="fsfit-more-item-icon" aria-hidden="true">↗</span><span class="fsfit-more-item-copy"><strong>Página pública</strong><small>Veja sua página como seus alunos veem</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></button>
+        <a class="fsfit-more-item" href="assinatura.html"><span class="fsfit-more-item-icon" aria-hidden="true">AS</span><span class="fsfit-more-item-copy"><strong>Assinatura</strong><small>Plano, cobrança e renovação</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
+        <a class="fsfit-more-item" href="contato.html"><span class="fsfit-more-item-icon" aria-hidden="true">?</span><span class="fsfit-more-item-copy"><strong>Contato</strong><small>Suporte e canais de atendimento</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
+        <button class="fsfit-more-item is-danger" type="button" data-fsfit-logout><span class="fsfit-more-item-icon" aria-hidden="true">SA</span><span class="fsfit-more-item-copy"><strong>Sair</strong><small>Encerrar sua sessão no FS Fit</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></button>
       </nav>
-    </section>
-  `;
+    </section>`;
 
   document.body.appendChild(sheet);
 
@@ -158,34 +91,15 @@ function ensureMobileMoreSheet(trigger) {
 
   backdrop?.addEventListener('click', closeSheet);
   closeButton?.addEventListener('click', closeSheet);
-
-  sheet.querySelectorAll('a.fsfit-more-item').forEach(link => {
-    link.addEventListener('click', () => {
-      sheet.classList.remove('is-open');
-      document.documentElement.classList.remove('fsfit-sheet-open');
-    });
-  });
+  sheet.querySelectorAll('a.fsfit-more-item').forEach(link => link.addEventListener('click', closeSheet));
 
   publicPageButton?.addEventListener('click', async () => {
     publicPageButton.disabled = true;
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.assign('perfil.html');
-        return;
-      }
-
-      const { data: publicProfile, error } = await supabase
-        .from('perfis_publicos')
-        .select('slug')
-        .eq('personal_id', session.user.id)
-        .maybeSingle();
-
-      if (!error && publicProfile?.slug) {
-        window.location.assign(`/p/${encodeURIComponent(publicProfile.slug)}`);
-        return;
-      }
-
+      if (!session) return window.location.assign('perfil.html');
+      const { data: publicProfile, error } = await supabase.from('perfis_publicos').select('slug').eq('personal_id', session.user.id).maybeSingle();
+      if (!error && publicProfile?.slug) return window.location.assign(`/p/${encodeURIComponent(publicProfile.slug)}`);
       window.location.assign('perfil.html');
     } catch (error) {
       console.error('Não foi possível abrir a página pública:', error);
@@ -197,15 +111,9 @@ function ensureMobileMoreSheet(trigger) {
 
   logoutButton?.addEventListener('click', async () => {
     closeSheet();
-    const existingLogout = document.querySelector('#nav-menu .logout, #nav-menu [data-action="logout"], #logout-button');
-    if (existingLogout instanceof HTMLElement) {
-      existingLogout.click();
-      return;
-    }
-
-    try {
-      await supabase.auth.signOut();
-    } finally {
+    const existingLogout = document.querySelector('#logout-button');
+    if (existingLogout instanceof HTMLElement) return existingLogout.click();
+    try { await supabase.auth.signOut(); } finally {
       localStorage.clear();
       window.location.replace('index.html');
     }
@@ -214,7 +122,6 @@ function ensureMobileMoreSheet(trigger) {
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && sheet.classList.contains('is-open')) closeSheet();
   });
-
   trigger.addEventListener('click', openSheet);
 
   return { openSheet, closeSheet };
@@ -222,7 +129,6 @@ function ensureMobileMoreSheet(trigger) {
 
 function ensureMobileBottomNav(active = '') {
   document.querySelector('.fsfit-bottom-nav')?.remove();
-
   const page = currentPage();
   const inferredActive = active || page.replace(/\.html$/i, '');
   const primaryPages = new Set(['painel', 'alunos', 'agenda', 'financeiro']);
@@ -260,71 +166,13 @@ function ensureMobileBottomNav(active = '') {
   ensureMobileMoreSheet(moreButton);
 }
 
-function enhanceDashboard() {
-  if (currentPage() !== 'painel.html' || document.body.classList.contains('fsfit-dashboard-modern')) return;
-  document.body.classList.add('fsfit-dashboard-modern');
-
-  const overviewPanel = document.getElementById('dashboard-overview-panel');
-  const summary = overviewPanel?.querySelector('.dashboard-overview-summary');
-  const attention = overviewPanel?.querySelector('.attention-card');
-
-  if (overviewPanel && summary && attention) {
-    overviewPanel.insertBefore(attention, summary);
-  }
-
-  if (summary) {
-    const cards = Array.from(summary.querySelectorAll('.dashboard-summary-card'));
-    cards[0]?.classList.add('is-students');
-    cards[1]?.classList.add('is-revenue');
-    cards[2]?.classList.add('is-pending');
-
-    if (!document.getElementById('summary-today-sessions')) {
-      const todayCard = document.createElement('article');
-      todayCard.className = 'card dashboard-summary-card is-today';
-      todayCard.innerHTML = '<small>Atendimentos hoje</small><strong id="summary-today-sessions">—</strong>';
-      if (cards[0]?.nextSibling) summary.insertBefore(todayCard, cards[0].nextSibling);
-      else summary.appendChild(todayCard);
-    }
-  }
-
-  const todayCount = document.getElementById('today-count');
-  const todaySummary = document.getElementById('summary-today-sessions');
-  const syncTodaySummary = () => {
-    if (!todaySummary || !todayCount) return;
-    todaySummary.textContent = todayCount.textContent.trim() || '—';
-  };
-  syncTodaySummary();
-  if (todayCount && todaySummary) {
-    new MutationObserver(syncTodaySummary).observe(todayCount, { childList:true, subtree:true, characterData:true });
-  }
-
-  const quickActionsTitle = overviewPanel?.querySelector('.quick-actions h2');
-  if (quickActionsTitle) quickActionsTitle.textContent = 'Acesso rápido';
-
-  const tabIcons = {
-    overview: '⌂',
-    agenda: '▦',
-    live: '●'
-  };
-  document.querySelectorAll('[data-dashboard-tab]').forEach(tab => {
-    if (tab.querySelector('.dashboard-tab-icon')) return;
-    const icon = document.createElement('span');
-    icon.className = 'dashboard-tab-icon';
-    icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = tabIcons[tab.dataset.dashboardTab] || '•';
-    tab.prepend(icon);
-  });
-}
-
 function configureStudentRecordBackLink() {
   if (currentPage() !== 'ficha-aluno.html') return;
-
   const backLink = document.querySelector('.record-back-link');
   if (!backLink) return;
 
   const params = new URLSearchParams(window.location.search);
   const origin = params.get('origem');
-
   if (origin === 'aula') {
     backLink.textContent = '← Voltar para aula';
     backLink.href = 'painel.html#live-students-list';
@@ -338,15 +186,8 @@ function configureStudentRecordBackLink() {
       let canReturnToSavedPanel = false;
       try {
         const saved = JSON.parse(sessionStorage.getItem(PANEL_RETURN_SCROLL_KEY) || 'null');
-        canReturnToSavedPanel = Boolean(
-          saved &&
-          Number.isFinite(Number(saved.y)) &&
-          Date.now() - Number(saved.savedAt || 0) < 2 * 60 * 60 * 1000
-        );
-      } catch {
-        canReturnToSavedPanel = false;
-      }
-
+        canReturnToSavedPanel = Boolean(saved && Number.isFinite(Number(saved.y)) && Date.now() - Number(saved.savedAt || 0) < 2 * 60 * 60 * 1000);
+      } catch {}
       if (!canReturnToSavedPanel || window.history.length <= 1) return;
       event.preventDefault();
       sessionStorage.setItem(PANEL_RESTORE_SCROLL_KEY, '1');
@@ -356,83 +197,29 @@ function configureStudentRecordBackLink() {
   }
 
   if (origin !== 'agenda') return;
-
   const date = params.get('data');
   backLink.textContent = '← Voltar para agenda';
-  backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || ''))
-    ? `agenda.html?data=${encodeURIComponent(date)}`
-    : 'agenda.html';
+  backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? `agenda.html?data=${encodeURIComponent(date)}` : 'agenda.html';
 }
 
 export function renderHeader(active = '') {
   ensureMobileNavigationStylesheet();
   core.renderHeader(active);
   ensureMobileOverflowGuard();
-  ensureSubscriptionMenuLink(active);
-  normalizeHeaderLabels();
   ensureMobileBottomNav(active);
-  enhanceDashboard();
   configureStudentRecordBackLink();
 }
 
 export async function setGreeting(session) {
-  await core.setGreeting(session);
-
-  const headerGreeting = document.querySelector('#user-greeting');
-  const dashboardGreeting = document.querySelector('#dashboard-user-greeting');
-  if (dashboardGreeting) {
-    dashboardGreeting.textContent = headerGreeting?.textContent || '';
-    dashboardGreeting.classList.toggle('hidden', !dashboardGreeting.textContent.trim());
-  }
+  return core.setGreeting(session);
 }
 
 export async function requireSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session) {
-    window.location.replace('index.html?login=1');
-    return null;
-  }
-
-  try {
-    await core.ensurePersonalProfile(session);
-    const access = await core.getAccessStatus();
-
-    if (access?.tipo_acesso === 'inativo' && !access?.admin) {
-      document.body.innerHTML = `
-        <main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px">
-          <section class="card" style="width:min(520px,100%);text-align:center;padding:32px">
-            <h1>Conta desativada</h1>
-            <p style="margin:12px 0 22px;color:var(--muted)">Seu acesso ao FS Fit foi suspenso pela administração. Entre em contato com o suporte caso precise de ajuda.</p>
-            <button id="inactive-account-logout" class="btn btn-primary" type="button">Voltar para o login</button>
-          </section>
-        </main>`;
-      document.querySelector('#inactive-account-logout')?.addEventListener('click', async () => {
-        await supabase.auth.signOut();
-        localStorage.clear();
-        window.location.replace('index.html');
-      });
-      return null;
-    }
-
-    if (!access?.acesso_premium && !FREE_ALLOWED_PAGES.has(currentPage())) {
-      window.location.replace('painel.html?acesso=free');
-      return null;
-    }
-
-    session.fsfitAccess = access;
-  } catch (profileError) {
-    console.error('Não foi possível preparar/verificar o perfil do personal:', profileError);
-    throw new Error('Não foi possível verificar seu acesso. Atualize a página e tente novamente.');
-  }
-
-  return session;
+  return core.requireSession();
 }
 
 if (currentPage() === 'ficha-aluno.html') {
-  import('./ficha-treinos-salvos.js?v=20260718-workout-library1').catch(error => {
-    console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error);
-  });
-  import('./iniciar-treino-personal.js?v=20260719-start-workout1').catch(error => {
-    console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error);
-  });
+  import('./ficha-treinos-salvos.js?v=20260718-workout-library1').catch(error => console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error));
+  import('./iniciar-treino-personal.js?v=20260719-start-workout1').catch(error => console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error));
+  import('./ficha-aluno-ativacao.js?v=20260722-secure-activation1').catch(error => console.error('Não foi possível carregar o acesso seguro do aluno:', error));
 }
