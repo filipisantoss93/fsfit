@@ -7,6 +7,7 @@ const message = document.querySelector('#workout-message');
 const weekdayOptions = document.querySelector('#exercise-weekday-options');
 const selectedBuilder = document.querySelector('#selected-exercises-builder');
 const saveButton = document.querySelector('#save-exercise-batch');
+const workspace = document.querySelector('#active-workout-workspace');
 
 const dayNames = {
   1: 'Segunda-feira',
@@ -38,7 +39,9 @@ function selectedExerciseIds() {
     .filter(Boolean);
 }
 
-async function getActiveWorkoutId() {
+async function getTargetWorkoutId() {
+  const selectedId = workspace?.dataset.workoutId || '';
+  if (selectedId) return selectedId;
   if (!alunoId) return null;
 
   const { data, error } = await supabase
@@ -103,9 +106,9 @@ document.addEventListener('submit', async event => {
       return;
     }
 
-    const treinoId = await getActiveWorkoutId();
+    const treinoId = await getTargetWorkoutId();
     if (!treinoId) {
-      showMessage(message, 'Ative um plano de treino antes de adicionar exercícios.', 'error');
+      showMessage(message, 'Selecione um plano antes de adicionar exercícios.', 'error');
       return;
     }
 
