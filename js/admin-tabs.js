@@ -1,3 +1,28 @@
+const ADMIN_ICON_VERSION = '20260722-admin-icon1';
+
+function applyAdminPageIcon() {
+  const icon32 = `/assets/icons/admin/admin-icon-32x32.png?v=${ADMIN_ICON_VERSION}`;
+  const icon180 = `/assets/icons/admin/admin-icon-180x180.png?v=${ADMIN_ICON_VERSION}`;
+
+  document.querySelectorAll('link[rel="icon"]').forEach(link => link.remove());
+  document.querySelectorAll('link[rel="apple-touch-icon"]').forEach(link => link.remove());
+
+  const favicon = document.createElement('link');
+  favicon.rel = 'icon';
+  favicon.type = 'image/png';
+  favicon.sizes = '32x32';
+  favicon.href = icon32;
+  document.head.appendChild(favicon);
+
+  const appleTouchIcon = document.createElement('link');
+  appleTouchIcon.rel = 'apple-touch-icon';
+  appleTouchIcon.sizes = '180x180';
+  appleTouchIcon.href = icon180;
+  document.head.appendChild(appleTouchIcon);
+}
+
+applyAdminPageIcon();
+
 const tabButtons = [...document.querySelectorAll('[data-admin-tab]')];
 const tabPanels = [...document.querySelectorAll('[data-admin-tab-panel]')];
 const validTabs = new Set(tabButtons.map(button => button.dataset.adminTab));
