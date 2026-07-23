@@ -1,0 +1,241 @@
+name: Aplicar pack de ícones FS Fit v4
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.icon-replace-v4-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  replace-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: pip install pillow
+
+      - name: Gerar pack completo de ícones
+        run: |
+          python <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          import json
+
+          source_path = Path('assets/icons-source-v4/fsfit-source.webp')
+          if not source_path.exists():
+              raise SystemExit(f'Fonte não encontrada: {source_path}')
+
+          source = Image.open(source_path).convert('RGB')
+          w, h = source.size
+          if w != h:
+              side = min(w, h)
+              left = (w - side) // 2
+              top = (h - side) // 2
+              source = source.crop((left, top, left + side, top + side))
+
+          RESAMPLE = Image.Resampling.LANCZOS
+
+          def ensure(path):
+              Path(path).parent.mkdir(parents=True, exist_ok=True)
+
+          def rgb(size):
+              return source.resize((size, size), RESAMPLE).convert('RGB')
+
+          def rgba(size):
+              return source.resize((size, size), RESAMPLE).convert('RGBA')
+
+          def save_png(path, size, alpha=False):
+              ensure(path)
+              img = rgba(size) if alpha else rgb(size)
+              img.save(path, 'PNG', optimize=True)
+
+          def save_round(path, size):
+              ensure(path)
+              base = rgba(size)
+              mask = Image.new('L', (size, size), 0)
+              ImageDraw.Draw(mask).ellipse((0, 0, size - 1, size - 1), fill=255)
+              base.putalpha(mask)
+              base.save(path, 'PNG', optimize=True)
+
+          # Master
+          save_png('assets/icons/00-master/fs-fit-master-1024.png', 1024)
+          save_png('assets/icons/00-master/fs-fit-master-2048.png', 2048)
+
+          # Web / favicon
+          save_png('assets/icons/01-web-favicon/android-chrome-192x192.png', 192)
+          save_png('assets/icons/01-web-favicon/android-chrome-512x512.png', 512)
+          save_png('assets/icons/01-web-favicon/apple-touch-icon.png', 180)
+          for size in (16, 32, 48, 64, 96, 128, 256, 512):
+              save_png(f'assets/icons/01-web-favicon/favicon-{size}x{size}.png', size)
+          ensure('assets/icons/01-web-favicon/favicon.ico')
+          ico_base = source.resize((256, 256), RESAMPLE).convert('RGBA')
+          ico_base.save(
+              'assets/icons/01-web-favicon/favicon.ico',
+              format='ICO',
+              sizes=[(16,16),(32,32),(48,48),(64,64),(96,96),(128,128),(256,256)]
+          )
+
+          # PWA
+          for size in (72, 96, 128, 144, 152, 192, 384, 512):
+              save_png(f'assets/icons/02-pwa/icon-{size}x{size}.png', size)
+          save_png('assets/icons/02-pwa/icon-maskable-192x192.png', 192)
+          save_png('assets/icons/02-pwa/icon-maskable-512x512.png', 512)
+          ensure('assets/icons/02-pwa/manifest-icons-example.json')
+          Path('assets/icons/02-pwa/manifest-icons-example.json').write_text(json.dumps({
+              'icons': [
+                  {'src': '/assets/icons/02-pwa/icon-192x192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
+                  {'src': '/assets/icons/02-pwa/icon-512x512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
+                  {'src': '/assets/icons/02-pwa/icon-maskable-192x192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'maskable'},
+                  {'src': '/assets/icons/02-pwa/icon-maskable-512x512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}
+              ]
+          }, indent=2), encoding='utf-8')
+
+          # Android legacy launchers
+          android_sizes = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+          for density, size in android_sizes.items():
+              save_png(f'assets/icons/03-android/res/mipmap-{density}/ic_launcher.png', size, alpha=True)
+              save_round(f'assets/icons/03-android/res/mipmap-{density}/ic_launcher_round.png', size)
+
+          # Android adaptive foregrounds. Mantém o visual centralizado da arte mestre.
+          foreground_sizes = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+          for density, size in foreground_sizes.items():
+              save_png(f'assets/icons/03-android/adaptive-foreground/mipmap-{density}/ic_launcher_foreground.png', size, alpha=True)
+          save_png('assets/icons/03-android/play-store-icon-512x512.png', 512)
+
+          # iOS AppIcon
+          ios = {
+              'AppIcon-20@1x.png': 20,
+              'AppIcon-20@2x.png': 40,
+              'AppIcon-20@3x.png': 60,
+              'AppIcon-29@1x.png': 29,
+              'AppIcon-29@2x.png': 58,
+              'AppIcon-29@3x.png': 87,
+              'AppIcon-40@1x.png': 40,
+              'AppIcon-40@2x.png': 80,
+              'AppIcon-40@3x.png': 120,
+              'AppIcon-60@2x.png': 120,
+              'AppIcon-60@3x.png': 180,
+              'AppIcon-76@1x.png': 76,
+              'AppIcon-76@2x.png': 152,
+              'AppIcon-83.5@2x.png': 167,
+              'AppIcon-1024.png': 1024,
+          }
+          for filename, size in ios.items():
+              save_png(f'assets/icons/04-ios/AppIcon.appiconset/{filename}', size)
+
+          contents = {
+              'images': [
+                  {'filename':'AppIcon-20@2x.png','idiom':'iphone','scale':'2x','size':'20x20'},
+                  {'filename':'AppIcon-20@3x.png','idiom':'iphone','scale':'3x','size':'20x20'},
+                  {'filename':'AppIcon-29@2x.png','idiom':'iphone','scale':'2x','size':'29x29'},
+                  {'filename':'AppIcon-29@3x.png','idiom':'iphone','scale':'3x','size':'29x29'},
+                  {'filename':'AppIcon-40@2x.png','idiom':'iphone','scale':'2x','size':'40x40'},
+                  {'filename':'AppIcon-40@3x.png','idiom':'iphone','scale':'3x','size':'40x40'},
+                  {'filename':'AppIcon-60@2x.png','idiom':'iphone','scale':'2x','size':'60x60'},
+                  {'filename':'AppIcon-60@3x.png','idiom':'iphone','scale':'3x','size':'60x60'},
+                  {'filename':'AppIcon-20@1x.png','idiom':'ipad','scale':'1x','size':'20x20'},
+                  {'filename':'AppIcon-20@2x.png','idiom':'ipad','scale':'2x','size':'20x20'},
+                  {'filename':'AppIcon-29@1x.png','idiom':'ipad','scale':'1x','size':'29x29'},
+                  {'filename':'AppIcon-29@2x.png','idiom':'ipad','scale':'2x','size':'29x29'},
+                  {'filename':'AppIcon-40@1x.png','idiom':'ipad','scale':'1x','size':'40x40'},
+                  {'filename':'AppIcon-40@2x.png','idiom':'ipad','scale':'2x','size':'40x40'},
+                  {'filename':'AppIcon-76@1x.png','idiom':'ipad','scale':'1x','size':'76x76'},
+                  {'filename':'AppIcon-76@2x.png','idiom':'ipad','scale':'2x','size':'76x76'},
+                  {'filename':'AppIcon-83.5@2x.png','idiom':'ipad','scale':'2x','size':'83.5x83.5'},
+                  {'filename':'AppIcon-1024.png','idiom':'ios-marketing','scale':'1x','size':'1024x1024'}
+              ],
+              'info': {'author':'xcode','version':1}
+          }
+          ensure('assets/icons/04-ios/AppIcon.appiconset/Contents.json')
+          Path('assets/icons/04-ios/AppIcon.appiconset/Contents.json').write_text(json.dumps(contents, indent=2), encoding='utf-8')
+
+          # Windows tiles
+          for name, width, height in (
+              ('mstile-70x70.png',70,70),
+              ('mstile-150x150.png',150,150),
+              ('mstile-310x310.png',310,310),
+          ):
+              ensure(f'assets/icons/05-windows-tiles/{name}')
+              source.resize((width, height), RESAMPLE).convert('RGB').save(f'assets/icons/05-windows-tiles/{name}', 'PNG', optimize=True)
+          ensure('assets/icons/05-windows-tiles/mstile-310x150.png')
+          wide = Image.new('RGB', (310, 150), source.getpixel((0, 0)))
+          tile = source.resize((150, 150), RESAMPLE).convert('RGB')
+          wide.paste(tile, ((310 - 150)//2, 0))
+          wide.save('assets/icons/05-windows-tiles/mstile-310x150.png', 'PNG', optimize=True)
+
+          # Tamanhos extras
+          for size in (36,48,72,96,128,144,180,192,256,384,512,1024):
+              save_png(f'assets/icons/06-extra-common-sizes/fs-fit-icon-{size}x{size}.png', size)
+          PY
+
+      - name: Atualizar manifests, cache busting e service worker
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json, re
+
+          VERSION = '20260722-icons-v4'
+
+          for manifest_name in ('manifest.webmanifest', 'manifest-personal.webmanifest'):
+              path = Path(manifest_name)
+              data = json.loads(path.read_text(encoding='utf-8'))
+              data['icons'] = [
+                  {'src': f'/assets/icons/02-pwa/icon-192x192.png?v={VERSION}', 'sizes':'192x192', 'type':'image/png', 'purpose':'any'},
+                  {'src': f'/assets/icons/02-pwa/icon-512x512.png?v={VERSION}', 'sizes':'512x512', 'type':'image/png', 'purpose':'any'},
+                  {'src': f'/assets/icons/02-pwa/icon-maskable-512x512.png?v={VERSION}', 'sizes':'512x512', 'type':'image/png', 'purpose':'maskable'},
+              ]
+              path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          for path in Path('.').rglob('*.html'):
+              text = path.read_text(encoding='utf-8')
+              updated = text.replace('20260721-icons-v3', VERSION)
+              if updated != text:
+                  path.write_text(updated, encoding='utf-8')
+
+          sw = Path('sw.js')
+          if sw.exists():
+              text = sw.read_text(encoding='utf-8')
+              text = re.sub(r"const CACHE_NAME = 'fsfit-shell-v\\d+';", "const CACHE_NAME = 'fsfit-shell-v10';", text)
+              sw.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validar arquivos essenciais
+        run: |
+          test -f assets/icons/01-web-favicon/favicon.ico
+          test -f assets/icons/01-web-favicon/apple-touch-icon.png
+          test -f assets/icons/02-pwa/icon-192x192.png
+          test -f assets/icons/02-pwa/icon-512x512.png
+          test -f assets/icons/02-pwa/icon-maskable-512x512.png
+          test -f assets/icons/04-ios/AppIcon.appiconset/AppIcon-1024.png
+          test -f assets/icons/03-android/play-store-icon-512x512.png
+
+      - name: Remover fonte temporária e trigger
+        run: |
+          rm -f assets/icons-source-v4/fsfit-source.webp
+          rmdir assets/icons-source-v4 2>/dev/null || true
+          rm -f .icon-replace-v4-trigger
+
+      - name: Commitar novo pack de ícones
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração detectada.'
+            exit 0
+          fi
+          git commit -m 'Aplicar novo pack de ícones grafite do FS Fit'
+          git push origin main
