@@ -176,7 +176,7 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
   import('./painel-agenda-modal.js?v=20260723-agenda-dashboard2').catch(error => {
     console.error('Falha ao carregar dashboard da agenda de hoje:', error);
   });
-  import('./painel-agenda-modal-hotfix.js?v=20260723-agenda-modal-hotfix2').catch(error => {
+  import('./painel-agenda-modal-hotfix.js?v=20260723-agenda-modal-hotfix3').catch(error => {
     console.error('Falha ao carregar correção do modal da agenda de hoje:', error);
   });
   import('./painel-agenda-modal-avatar.js?v=20260723-agenda-avatar3').catch(error => {
