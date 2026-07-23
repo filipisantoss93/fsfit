@@ -578,3 +578,65 @@ body.fsfit-dashboard-modern .dashboard-activity-card {
     height: 42px;
   }
 }
+
+/* FS Fit · hierarquia cromática de ações alinhada à marca · 2026-07-23
+   Verde-lima identifica ações; azul permanece reservado a estados e informação. */
+.btn:focus-visible {
+  outline-color: rgba(184,229,28,.34);
+}
+
+.btn-secondary {
+  color: var(--primary);
+  border-color: rgba(184,229,28,.46);
+  background: linear-gradient(180deg,rgba(184,229,28,.105),rgba(184,229,28,.055));
+  box-shadow: 0 8px 22px rgba(184,229,28,.065);
+}
+
+.btn-secondary:hover {
+  color: #d9fa5a;
+  border-color: rgba(204,241,66,.68);
+  background: rgba(184,229,28,.14);
+  box-shadow: 0 10px 26px rgba(184,229,28,.1);
+}
+
+.btn-secondary .btn-action-description {
+  color: var(--muted);
+}
+
+.btn-outline {
+  color: var(--primary);
+  border-color: rgba(184,229,28,.66);
+  background: rgba(184,229,28,.018);
+}
+
+.btn-outline:hover {
+  color: #d9fa5a;
+  border-color: rgba(204,241,66,.82);
+  background: rgba(184,229,28,.09);
+}
+
+.auth-switch button,
+.record-back-link,
+.record-secondary-link {
+  color: var(--primary);
+}
+
+.quick-action:hover,
+body.fsfit-dashboard-modern .quick-action:hover {
+  border-color: rgba(184,229,28,.36);
+}
+
+.public-link-actions .btn-secondary,
+.profile-summary-actions .btn-secondary {
+  color: #091005;
+  border-color: rgba(204,241,66,.62);
+  background: linear-gradient(180deg,#c8f23a 0%,#a9da16 100%);
+  box-shadow: 0 10px 28px rgba(184,229,28,.18);
+}
+
+.public-link-actions .btn-secondary:hover,
+.profile-summary-actions .btn-secondary:hover {
+  color: #091005;
+  background: linear-gradient(180deg,#d3f75a 0%,#b7e525 100%);
+  box-shadow: 0 13px 32px rgba(184,229,28,.22);
+}
