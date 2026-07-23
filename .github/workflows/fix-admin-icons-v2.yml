@@ -1,0 +1,66 @@
+name: Corrigir ícones FS Fit Admin v2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'assets/icons/admin/admin-source.png'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Gerar PNGs válidos
+        run: |
+          pip install pillow
+          python <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          src = Path('assets/icons/admin/admin-source.png')
+          img = Image.open(src).convert('RGB')
+          w, h = img.size
+          if w != h:
+              side = min(w, h)
+              img = img.crop(((w-side)//2, (h-side)//2, (w+side)//2, (h+side)//2))
+          out = Path('assets/icons/admin')
+          for size in (32, 180, 192, 512):
+              resized = img.resize((size, size), Image.Resampling.LANCZOS)
+              resized.save(out / f'admin-icon-{size}x{size}.png', 'PNG', optimize=True)
+          PY
+
+      - name: Validar arquivos
+        run: |
+          python <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          for size in (32, 180, 192, 512):
+              p = Path(f'assets/icons/admin/admin-icon-{size}x{size}.png')
+              with Image.open(p) as im:
+                  im.verify()
+              with Image.open(p) as im:
+                  assert im.size == (size, size), (p, im.size)
+              print('OK', p)
+          PY
+
+      - name: Commitar substituição
+        run: |
+          rm -f assets/icons/admin/admin-source.png
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/icons/admin
+          git commit -m 'Substituir PNGs do ícone FS Fit Admin por arquivos válidos'
+          git push origin main
