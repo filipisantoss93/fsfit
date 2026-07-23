@@ -299,19 +299,23 @@ html.fsfit-sheet-open body {
   }
 }
 
-/* Painel mobile: camada opaca atrás da barra superior e da safe area.
-   Evita que cards e textos em rolagem apareçam acima das abas sticky. */
+/* Abas do painel permanecem no fluxo normal da página no mobile. */
 @media (max-width: 720px) {
-  body:has(.dashboard-tabs)::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 89;
-    height: calc(76px + var(--safe-area-top) + 1px);
-    background: var(--background);
-    pointer-events: none;
+  .dashboard-tabs,
+  .dashboard-tabs.is-fixed-fallback {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+    transform: none !important;
+  }
+
+  .dashboard-tabs-fallback-placeholder,
+  .dashboard-tabs-fallback-placeholder.is-active {
+    display: none !important;
+    height: 0 !important;
   }
 }
 
