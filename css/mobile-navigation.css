@@ -299,6 +299,22 @@ html.fsfit-sheet-open body {
   }
 }
 
+/* Painel mobile: camada opaca atrás da barra superior e da safe area.
+   Evita que cards e textos em rolagem apareçam acima das abas sticky. */
+@media (max-width: 720px) {
+  body:has(.dashboard-tabs)::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 89;
+    height: calc(76px + var(--safe-area-top) + 1px);
+    background: var(--background);
+    pointer-events: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fsfit-more-sheet,
   .fsfit-more-backdrop,
