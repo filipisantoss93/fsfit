@@ -10,6 +10,13 @@ if (PANEL_PAGE) {
     return document.getElementById(MODAL_ID);
   }
 
+  function ensureRowFallback(row) {
+    if (!row || row.tagName !== 'A' || row.hasAttribute('href')) return;
+    const studentId = row.dataset.studentId || '';
+    if (!studentId) return;
+    row.href = `ficha-aluno.html?id=${encodeURIComponent(studentId)}&origem=painel`;
+  }
+
   function clearForcedVisibility(modal) {
     if (!modal || modal.classList.contains('open')) return;
     FORCED_PROPERTIES.forEach(property => modal.style.removeProperty(property));
@@ -75,6 +82,11 @@ if (PANEL_PAGE) {
   document.addEventListener('click', event => {
     const row = event.target.closest?.('#today-list .today-entry');
     if (!row || row.classList.contains('locked') || row.classList.contains('is-in-class')) return;
+
+    // O modal remove o href para transformar a linha em botão. Restauramos o link
+    // como fallback progressivo: se o módulo do modal falhar, o clique ainda abre
+    // a ficha do aluno em vez de deixar a interface sem resposta.
+    ensureRowFallback(row);
     scheduleVisibilityCheck();
   }, true);
 
@@ -87,6 +99,7 @@ if (PANEL_PAGE) {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const row = event.target.closest?.('#today-list .today-entry');
     if (!row || row.classList.contains('locked') || row.classList.contains('is-in-class')) return;
+    ensureRowFallback(row);
     scheduleVisibilityCheck();
   }, true);
 
