@@ -1,15 +1,29 @@
-const CACHE_NAME = 'fsfit-shell-v10';
+const CACHE_NAME = 'fsfit-shell-v11';
 const APP_SHELL = [
   '/',
+  '/painel.html',
+  '/alunos.html',
+  '/agenda.html',
+  '/financeiro.html',
+  '/perfil.html',
+  '/biblioteca-exercicios.html',
   '/acesso-aluno.html',
   '/selecionar-personal.html',
   '/aluno.html',
   '/css/style.css',
+  '/css/header-menu.css',
+  '/css/mobile-navigation.css',
   '/css/aluno-midias.css',
   '/css/aluno-notificacoes.css',
   '/css/aluno-financeiro.css',
   '/css/aluno-perfil.css',
   '/js/supabase.js',
+  '/js/layout-core.js',
+  '/js/layout.js',
+  '/js/ui-cache.js',
+  '/js/painel-ui-cache.js',
+  '/js/painel-dashboard.js',
+  '/js/painel-visao-geral.js',
   '/js/acesso-aluno.js',
   '/js/selecionar-personal.js',
   '/js/aluno.js',
@@ -17,11 +31,13 @@ const APP_SHELL = [
   '/js/aluno-notificacoes.js',
   '/js/aluno-financeiro.js',
   '/manifest.webmanifest',
+  '/manifest-personal.webmanifest',
   '/assets/icons/02-pwa/icon-192x192.png',
   '/assets/icons/02-pwa/icon-512x512.png',
   '/assets/icons/02-pwa/icon-maskable-512x512.png'
 ];
 const APP_SHELL_PATHS = new Set(APP_SHELL.map(path => new URL(path, self.location.origin).pathname));
+const STATIC_DESTINATIONS = new Set(['style', 'script', 'image', 'font', 'manifest']);
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).catch(() => undefined));
@@ -38,22 +54,52 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || url.pathname === '/sw.js') return;
 
-  // O service worker pertence ao portal/PWA do aluno. Não armazenar páginas e scripts
-  // administrativos do personal, evitando servir versões antigas da biblioteca e painel.
-  if (!APP_SHELL_PATHS.has(url.pathname)) return;
+  // HTML: prioriza a rede para nunca prender o usuário em uma versão antiga,
+  // mantendo a última cópia apenas como fallback de navegação/offline.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(networkFirst(event.request, url.pathname));
+    return;
+  }
 
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)).catch(() => undefined);
-        return response;
-      })
-      .catch(() => caches.match(event.request).then(cached => cached || caches.match('/acesso-aluno.html')))
-  );
+  // CSS, JS, imagens e fontes: responde do cache imediatamente e atualiza em background.
+  // URLs versionadas continuam criando novas entradas quando há deploy.
+  if (STATIC_DESTINATIONS.has(event.request.destination) || APP_SHELL_PATHS.has(url.pathname)) {
+    event.respondWith(staleWhileRevalidate(event.request, url.pathname));
+  }
 });
+
+async function networkFirst(request, pathname) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request);
+    if (response?.ok) cache.put(request, response.clone()).catch(() => undefined);
+    return response;
+  } catch {
+    return (await cache.match(request))
+      || (await cache.match(pathname))
+      || (await cache.match('/'));
+  }
+}
+
+async function staleWhileRevalidate(request, pathname) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = (await cache.match(request)) || (await cache.match(pathname));
+  const networkPromise = fetch(request)
+    .then(response => {
+      if (response?.ok) cache.put(request, response.clone()).catch(() => undefined);
+      return response;
+    })
+    .catch(() => null);
+
+  if (cached) {
+    networkPromise.catch(() => undefined);
+    return cached;
+  }
+
+  return (await networkPromise) || Response.error();
+}
 
 self.addEventListener('push', event => {
   let payload = {};
