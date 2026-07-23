@@ -20,7 +20,7 @@
 .library-clickable-row::after{content:'›';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:2rem;line-height:1;color:var(--muted);font-weight:400;pointer-events:none}
 .library-clickable-row:hover{border-color:rgba(184,229,28,.24)!important;background:rgba(184,229,28,.025)!important}
 .library-clickable-row:active{transform:scale(.995)}
-.library-clickable-row:focus-visible{outline:2px solid #4f91ff;outline-offset:2px}
+.library-clickable-row:focus-visible{outline:2px solid #b8e51c;outline-offset:2px}
 .library-clickable-row .actions:has([data-delete-exercise]),.library-clickable-row .actions:has([data-delete-food]){margin-right:12px}
 @media(max-width:760px){
   .exercise-library-item{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important}
