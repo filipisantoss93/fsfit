@@ -53,3 +53,11 @@ export function removeUiCache(userId, scope) {
   if (!key) return;
   try { localStorage.removeItem(key); } catch {}
 }
+
+// O painel importa este módulo antes de aguardar perfil, plano e notificações.
+// Assim o último estado válido é restaurado imediatamente e a rede apenas revalida depois.
+if (window.location.pathname.endsWith('/painel.html')) {
+  Promise.resolve()
+    .then(() => import('./painel-ui-cache.js?v=20260723-swr1'))
+    .catch(error => console.info('Cache visual do painel indisponível:', error?.message || error));
+}
