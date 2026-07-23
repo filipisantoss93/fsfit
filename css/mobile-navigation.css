@@ -307,3 +307,38 @@ html.fsfit-sheet-open body {
     transition: none !important;
   }
 }
+
+/* FS Fit · identidade visual alinhada ao ícone oficial · 2026-07-23 */
+.fsfit-more-panel {
+  border-color: rgba(77,94,121,.42);
+  background: rgba(8,13,21,.985);
+}
+
+.fsfit-more-item {
+  border-color: rgba(77,94,121,.36);
+  background: rgba(16,24,36,.88);
+}
+
+.fsfit-more-item-icon {
+  background: rgba(184,229,28,.1);
+}
+
+@media (max-width: 860px) {
+  .fsfit-bottom-nav {
+    border-color: rgba(77,94,121,.42);
+    background: rgba(8,13,21,.985) !important;
+    box-shadow: 0 -12px 34px rgba(0,0,0,.42) !important;
+  }
+
+  .fsfit-bottom-nav a,
+  .fsfit-bottom-nav button {
+    color: #8f9aab;
+  }
+
+  .fsfit-bottom-nav a.active,
+  .fsfit-bottom-nav button.active,
+  .fsfit-bottom-nav button.is-open {
+    background: rgba(184,229,28,.11);
+    color: var(--primary);
+  }
+}
