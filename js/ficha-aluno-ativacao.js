@@ -21,41 +21,7 @@ function compactMobileTabs() {
   document.querySelector('.record-tabs')?.classList.add('record-tabs-compact');
 }
 
-function setupStickySafeArea() {
-  const tabs = document.querySelector('.record-tabs');
-  if (!tabs || document.querySelector('.record-tabs-safe-cover')) return;
-
-  const cover = document.createElement('div');
-  cover.className = 'record-tabs-safe-cover';
-  cover.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(cover);
-
-  let frame = 0;
-  const sync = () => {
-    frame = 0;
-    if (!window.matchMedia('(max-width: 700px)').matches) {
-      cover.classList.remove('is-visible');
-      return;
-    }
-
-    const stickyTop = Number.parseFloat(getComputedStyle(tabs).top) || 0;
-    const stuck = window.scrollY > 0 && tabs.getBoundingClientRect().top <= stickyTop + 1;
-    cover.classList.toggle('is-visible', stuck);
-  };
-
-  const requestSync = () => {
-    if (frame) return;
-    frame = requestAnimationFrame(sync);
-  };
-
-  window.addEventListener('scroll', requestSync, { passive: true });
-  window.addEventListener('resize', requestSync, { passive: true });
-  window.addEventListener('orientationchange', requestSync, { passive: true });
-  requestSync();
-}
-
 compactMobileTabs();
-setupStickySafeArea();
 
 if (alunoId && overviewPanel && !document.querySelector('#student-activation-code-card')) {
   const session = await requireSession();
