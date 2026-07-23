@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fsfit-shell-v12';
+const CACHE_NAME = 'fsfit-shell-v13';
 const APP_SHELL = [
   '/',
   '/painel.html',
@@ -14,6 +14,7 @@ const APP_SHELL = [
   '/css/style.css',
   '/css/header-menu.css',
   '/css/mobile-navigation.css',
+  '/css/financeiro.css',
   '/css/aluno-midias.css',
   '/css/aluno-notificacoes.css',
   '/css/aluno-financeiro.css',
@@ -28,6 +29,7 @@ const APP_SHELL = [
   '/js/painel-visao-geral.js',
   '/js/alunos.js',
   '/js/agenda.js',
+  '/js/financeiro.js',
   '/js/biblioteca-exercicios.js',
   '/js/biblioteca-alimentar.js',
   '/js/acesso-aluno.js',
