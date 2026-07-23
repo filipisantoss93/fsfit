@@ -75,8 +75,17 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
     }
 
     if (!avatar) return;
+
     const photoUrl = activeStudent.photo || photoCache.get(activeStudent.id) || '';
-    avatar.textContent = '';
+    const avatarSignature = photoUrl ? `photo:${photoUrl}` : `initials:${initials(activeStudent.name)}`;
+
+    // Evita reescrever o mesmo conteúdo do avatar. A versão anterior fazia isso
+    // dentro de um MutationObserver global e acabava disparando o próprio observer
+    // repetidamente, o que podia travar o Safari/iOS assim que o modal era aberto.
+    if (avatar.dataset.renderSignature === avatarSignature) return;
+    avatar.dataset.renderSignature = avatarSignature;
+    avatar.replaceChildren();
+
     if (photoUrl) {
       const image = document.createElement('img');
       image.src = photoUrl;
@@ -86,6 +95,12 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
     } else {
       avatar.textContent = initials(activeStudent.name);
     }
+  }
+
+  function scheduleDecorate() {
+    queueMicrotask(decorateModal);
+    requestAnimationFrame(decorateModal);
+    window.setTimeout(decorateModal, 80);
   }
 
   async function loadPhoto(studentId) {
@@ -110,6 +125,7 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
   function captureStudent(row) {
     const studentId = studentIdFromRow(row);
     if (!studentId) return;
+
     activeStudent = {
       id: studentId,
       name: studentNameFromRow(row),
@@ -117,7 +133,7 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
     };
 
     if (activeStudent.photo) photoCache.set(studentId, activeStudent.photo);
-    queueMicrotask(decorateModal);
+    scheduleDecorate();
 
     if (!activeStudent.photo) {
       loadPhoto(studentId).then(photo => {
@@ -135,14 +151,17 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
     if (row) captureStudent(row);
   }, true);
 
+  document.addEventListener('click', event => {
+    const row = event.target.closest?.('#today-list .today-entry');
+    if (row) {
+      captureStudent(row);
+      scheduleDecorate();
+    }
+  }, true);
+
   document.addEventListener('keydown', event => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     const row = event.target.closest?.('#today-list .today-entry');
     if (row) captureStudent(row);
   }, true);
-
-  const observer = new MutationObserver(() => {
-    if (document.querySelector('#today-workout-dashboard-modal.open')) decorateModal();
-  });
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 }
