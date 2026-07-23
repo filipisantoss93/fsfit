@@ -3,6 +3,7 @@ const PANEL_PAGE = (window.location.pathname.split('/').pop() || '') === 'painel
 if (PANEL_PAGE) {
   const BODY_LOCK_CLASS = 'today-workout-dashboard-open';
   const MODAL_ID = 'today-workout-dashboard-modal';
+  const FORCED_PROPERTIES = ['display', 'visibility', 'opacity', 'pointer-events', 'z-index'];
   let visibilityTimer = 0;
 
   function modalElement() {
@@ -11,21 +12,19 @@ if (PANEL_PAGE) {
 
   function clearForcedVisibility(modal) {
     if (!modal || modal.classList.contains('open')) return;
-    ['display', 'visibility', 'opacity', 'pointer-events', 'z-index'].forEach(property => {
-      modal.style.removeProperty(property);
-    });
+    FORCED_PROPERTIES.forEach(property => modal.style.removeProperty(property));
   }
 
   function unlockOrphanedPage() {
     const modal = modalElement();
     const modalOpen = Boolean(modal?.classList.contains('open'));
-    if (!modalOpen) {
-      document.body.classList.remove(BODY_LOCK_CLASS);
-      clearForcedVisibility(modal);
-    }
+    if (modalOpen) return;
+
+    document.body.classList.remove(BODY_LOCK_CLASS);
+    clearForcedVisibility(modal);
   }
 
-  function guaranteeVisibleModal() {
+  function forceVisibleModal() {
     window.clearTimeout(visibilityTimer);
 
     if (!document.body.classList.contains(BODY_LOCK_CLASS)) {
@@ -34,61 +33,62 @@ if (PANEL_PAGE) {
     }
 
     const modal = modalElement();
-    if (!modal) {
+    if (!modal || !modal.classList.contains('open')) {
+      // Nunca deixa a página bloqueada quando o modal não chegou a abrir.
       document.body.classList.remove(BODY_LOCK_CLASS);
+      clearForcedVisibility(modal);
       return;
     }
 
-    // O clique no atendimento bloqueia o scroll antes da consulta ao Supabase.
-    // No iOS/PWA, uma combinação de JS em cache e repaint pode deixar o modal
-    // invisível enquanto o body continua bloqueado. Reforça somente o estado
-    // visual do modal já aberto, sem interferir na lógica ou nos dados.
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    modal.style.setProperty('display', 'flex', 'important');
-    modal.style.setProperty('visibility', 'visible', 'important');
-    modal.style.setProperty('opacity', '1', 'important');
-    modal.style.setProperty('pointer-events', 'auto', 'important');
-    modal.style.setProperty('z-index', '10000', 'important');
+    // O modal principal já deve estar aberto por painel-agenda-modal.js.
+    // Aqui apenas reforçamos a pintura no iOS/PWA, sem alterar novamente a classe
+    // .open em um MutationObserver (isso gerava um ciclo de mutações e travava a UI).
+    if (modal.getAttribute('aria-hidden') !== 'false') {
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    const expectedStyles = {
+      display: 'flex',
+      visibility: 'visible',
+      opacity: '1',
+      'pointer-events': 'auto',
+      'z-index': '10000'
+    };
+
+    Object.entries(expectedStyles).forEach(([property, value]) => {
+      if (modal.style.getPropertyValue(property) !== value || modal.style.getPropertyPriority(property) !== 'important') {
+        modal.style.setProperty(property, value, 'important');
+      }
+    });
 
     visibilityTimer = window.setTimeout(() => {
       if (!document.body.classList.contains(BODY_LOCK_CLASS)) clearForcedVisibility(modal);
     }, 350);
   }
 
+  function scheduleVisibilityCheck() {
+    queueMicrotask(forceVisibleModal);
+    requestAnimationFrame(forceVisibleModal);
+    window.setTimeout(forceVisibleModal, 80);
+  }
+
   document.addEventListener('click', event => {
     const row = event.target.closest?.('#today-list .today-entry');
     if (!row || row.classList.contains('locked') || row.classList.contains('is-in-class')) return;
-
-    // Executa depois dos listeners existentes da agenda, garantindo que o modal
-    // criado por painel-agenda-modal.js seja exibido no mesmo frame do clique.
-    queueMicrotask(guaranteeVisibleModal);
-    requestAnimationFrame(guaranteeVisibleModal);
-    window.setTimeout(guaranteeVisibleModal, 80);
+    scheduleVisibilityCheck();
   }, true);
 
-  const stateObserver = new MutationObserver(records => {
-    const relevant = records.some(record =>
-      record.target === document.body ||
-      record.target?.id === MODAL_ID ||
-      record.addedNodes?.length
-    );
-    if (!relevant) return;
-
-    if (document.body.classList.contains(BODY_LOCK_CLASS)) guaranteeVisibleModal();
-    else clearForcedVisibility(modalElement());
-  });
-
-  stateObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class', 'aria-hidden']
-  });
-
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') window.setTimeout(unlockOrphanedPage, 0);
-  });
+    if (event.key === 'Escape') {
+      window.setTimeout(unlockOrphanedPage, 0);
+      return;
+    }
+
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const row = event.target.closest?.('#today-list .today-entry');
+    if (!row || row.classList.contains('locked') || row.classList.contains('is-in-class')) return;
+    scheduleVisibilityCheck();
+  }, true);
 
   window.addEventListener('pageshow', unlockOrphanedPage);
   window.addEventListener('pagehide', unlockOrphanedPage);
