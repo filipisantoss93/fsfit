@@ -18,7 +18,7 @@
 .exercise-library-item [data-edit-exercise],.food-library-item [data-edit-food]{display:none!important}
 .library-clickable-row{cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .12s ease}
 .library-clickable-row::after{content:'›';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:2rem;line-height:1;color:var(--muted);font-weight:400;pointer-events:none}
-.library-clickable-row:hover{border-color:rgba(79,145,255,.6)!important;background:rgba(79,145,255,.035)!important}
+.library-clickable-row:hover{border-color:rgba(184,229,28,.24)!important;background:rgba(184,229,28,.025)!important}
 .library-clickable-row:active{transform:scale(.995)}
 .library-clickable-row:focus-visible{outline:2px solid #4f91ff;outline-offset:2px}
 .library-clickable-row .actions:has([data-delete-exercise]),.library-clickable-row .actions:has([data-delete-food]){margin-right:12px}
