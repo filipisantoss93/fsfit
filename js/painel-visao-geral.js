@@ -1,108 +1,10 @@
 import { supabase } from './supabase.js';
 import { requireSession } from './layout.js';
 
-setupDashboardStickySafeArea();
-
 const session = await requireSession();
 
 if (session) {
   await loadOverview();
-}
-
-function setupDashboardStickySafeArea() {
-  const tabs = document.querySelector('.dashboard-tabs');
-  if (!tabs || tabs.dataset.stickyFallbackReady === '1') return;
-
-  tabs.dataset.stickyFallbackReady = '1';
-
-  const placeholder = document.createElement('div');
-  placeholder.className = 'dashboard-tabs-fallback-placeholder';
-  placeholder.setAttribute('aria-hidden', 'true');
-  placeholder.style.display = 'block';
-  placeholder.style.height = '0px';
-  tabs.before(placeholder);
-
-  const mobileQuery = window.matchMedia('(max-width: 720px)');
-  const supportsSticky = typeof CSS !== 'undefined'
-    && typeof CSS.supports === 'function'
-    && (CSS.supports('position', 'sticky') || CSS.supports('position', '-webkit-sticky'));
-
-  let frame = 0;
-  let fallbackActive = false;
-
-  const stickyTop = () => Number.parseFloat(getComputedStyle(tabs).top) || 0;
-
-  const activateFallback = () => {
-    if (fallbackActive) return;
-    placeholder.style.height = `${Math.ceil(tabs.getBoundingClientRect().height)}px`;
-    placeholder.classList.add('is-active');
-    tabs.classList.add('is-fixed-fallback');
-    fallbackActive = true;
-  };
-
-  const deactivateFallback = () => {
-    if (!fallbackActive) return;
-    tabs.classList.remove('is-fixed-fallback');
-    placeholder.classList.remove('is-active');
-    placeholder.style.height = '0px';
-    fallbackActive = false;
-  };
-
-  const sync = () => {
-    frame = 0;
-
-    if (!mobileQuery.matches) {
-      deactivateFallback();
-      return;
-    }
-
-    const top = stickyTop();
-    const anchorY = placeholder.getBoundingClientRect().top + window.scrollY;
-    const shouldBeStuck = window.scrollY >= Math.max(0, anchorY - top - 1);
-
-    if (!shouldBeStuck) {
-      deactivateFallback();
-      return;
-    }
-
-    if (fallbackActive) {
-      placeholder.style.height = `${Math.ceil(tabs.getBoundingClientRect().height)}px`;
-      return;
-    }
-
-    const rect = tabs.getBoundingClientRect();
-    const stickyFailedAtRuntime = rect.top < top - 2;
-
-    if (!supportsSticky || stickyFailedAtRuntime) activateFallback();
-  };
-
-  const requestSync = () => {
-    if (frame) return;
-    frame = requestAnimationFrame(sync);
-  };
-
-  const resetAndSync = () => {
-    deactivateFallback();
-    requestAnimationFrame(requestSync);
-  };
-
-  window.addEventListener('scroll', requestSync, { passive: true });
-  window.addEventListener('resize', resetAndSync, { passive: true });
-  window.addEventListener('orientationchange', resetAndSync, { passive: true });
-  window.addEventListener('pageshow', resetAndSync, { passive: true });
-
-  if (typeof mobileQuery.addEventListener === 'function') {
-    mobileQuery.addEventListener('change', resetAndSync);
-  }
-
-  if ('ResizeObserver' in window) {
-    new ResizeObserver(() => {
-      if (fallbackActive) placeholder.style.height = `${Math.ceil(tabs.getBoundingClientRect().height)}px`;
-      requestSync();
-    }).observe(tabs);
-  }
-
-  requestSync();
 }
 
 async function loadOverview() {
