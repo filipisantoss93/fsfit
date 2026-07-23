@@ -328,13 +328,12 @@ body.fsfit-dashboard-modern .dashboard-public-link-compact, body.fsfit-dashboard
   body.fsfit-dashboard-modern .quick-actions-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 
-/* Abas do painel: sticky nativo com fallback JS para WebKit/iOS problemático. */
+/* Abas do painel: permanecem no fluxo normal da página no mobile. */
 @media (max-width: 720px) {
   .dashboard-tabs {
-    position: -webkit-sticky;
-    position: sticky;
-    top: calc(76px + var(--safe-area-top));
-    z-index: 90;
+    position: static;
+    top: auto;
+    z-index: auto;
     width: 100%;
     margin-bottom: 16px;
     border-color: rgba(255,255,255,.09);
@@ -349,24 +348,22 @@ body.fsfit-dashboard-modern .dashboard-public-link-compact, body.fsfit-dashboard
     min-width: 0;
   }
 
-  .dashboard-tabs-fallback-placeholder {
-    display: none;
+  .dashboard-tabs-fallback-placeholder,
+  .dashboard-tabs-fallback-placeholder.is-active {
+    display: none !important;
+    height: 0 !important;
     width: 100%;
   }
 
-  .dashboard-tabs-fallback-placeholder.is-active {
-    display: block;
-  }
-
   .dashboard-tabs.is-fixed-fallback {
-    position: fixed !important;
-    top: calc(76px + var(--safe-area-top)) !important;
-    left: 50%;
+    position: static !important;
+    top: auto !important;
+    left: auto;
     right: auto;
-    width: min(calc(100% - 24px), var(--container));
-    margin: 0;
-    transform: translateX(-50%);
-    z-index: 90;
+    width: 100%;
+    margin-bottom: 16px;
+    transform: none;
+    z-index: auto;
   }
 }
 
