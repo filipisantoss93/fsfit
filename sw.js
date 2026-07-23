@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fsfit-shell-v13';
+const CACHE_NAME = 'fsfit-shell-v14';
 const APP_SHELL = [
   '/',
   '/painel.html',
@@ -27,6 +27,10 @@ const APP_SHELL = [
   '/js/painel-ui-cache.js',
   '/js/painel-dashboard.js',
   '/js/painel-visao-geral.js',
+  '/js/pwa-install.js',
+  '/js/painel-agenda-modal.js',
+  '/js/painel-agenda-modal-hotfix.js',
+  '/js/painel-agenda-modal-avatar.js',
   '/js/alunos.js',
   '/js/agenda.js',
   '/js/financeiro.js',
@@ -45,7 +49,7 @@ const APP_SHELL = [
   '/assets/icons/02-pwa/icon-maskable-512x512.png'
 ];
 const APP_SHELL_PATHS = new Set(APP_SHELL.map(path => new URL(path, self.location.origin).pathname));
-const STATIC_DESTINATIONS = new Set(['style', 'script', 'image', 'font', 'manifest']);
+const SWR_DESTINATIONS = new Set(['style', 'image', 'font', 'manifest']);
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).catch(() => undefined));
@@ -67,18 +71,25 @@ self.addEventListener('fetch', event => {
   // HTML: prioriza a rede para nunca prender o usuário em uma versão antiga,
   // mantendo a última cópia apenas como fallback de navegação/offline.
   if (event.request.mode === 'navigate') {
-    event.respondWith(networkFirst(event.request, url.pathname));
+    event.respondWith(networkFirstNavigation(event.request, url.pathname));
     return;
   }
 
-  // CSS, JS, imagens e fontes: responde do cache imediatamente e atualiza em background.
-  // URLs versionadas continuam criando novas entradas quando há deploy.
-  if (STATIC_DESTINATIONS.has(event.request.destination) || APP_SHELL_PATHS.has(url.pathname)) {
+  // JavaScript da aplicação também precisa priorizar a rede. Servir módulos antigos
+  // junto de HTML/DOM novos pode causar estados incompatíveis, como modal invisível
+  // com o scroll bloqueado. O cache continua sendo usado como fallback offline.
+  if (event.request.destination === 'script') {
+    event.respondWith(networkFirstAsset(event.request, url.pathname));
+    return;
+  }
+
+  // CSS, imagens, fontes e manifests podem abrir do cache e revalidar em background.
+  if (SWR_DESTINATIONS.has(event.request.destination) || APP_SHELL_PATHS.has(url.pathname)) {
     event.respondWith(staleWhileRevalidate(event.request, url.pathname));
   }
 });
 
-async function networkFirst(request, pathname) {
+async function networkFirstNavigation(request, pathname) {
   const cache = await caches.open(CACHE_NAME);
   try {
     const response = await fetch(request);
@@ -88,6 +99,19 @@ async function networkFirst(request, pathname) {
     return (await cache.match(request))
       || (await cache.match(pathname))
       || (await cache.match('/'));
+  }
+}
+
+async function networkFirstAsset(request, pathname) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request);
+    if (response?.ok) cache.put(request, response.clone()).catch(() => undefined);
+    return response;
+  } catch {
+    return (await cache.match(request))
+      || (await cache.match(pathname))
+      || Response.error();
   }
 }
 
