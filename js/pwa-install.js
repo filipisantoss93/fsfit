@@ -139,23 +139,6 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-function normalizeDashboardTabsPosition() {
-  const tabs = document.querySelector('.dashboard-tabs');
-  if (!tabs || !window.matchMedia('(max-width: 720px)').matches) return;
-
-  tabs.classList.remove('is-fixed-fallback');
-  tabs.style.setProperty('position', 'relative', 'important');
-  tabs.style.setProperty('top', 'auto', 'important');
-  tabs.style.setProperty('right', 'auto', 'important');
-  tabs.style.setProperty('left', 'auto', 'important');
-  tabs.style.setProperty('width', '100%', 'important');
-  tabs.style.setProperty('margin', '0 0 16px', 'important');
-  tabs.style.setProperty('transform', 'none', 'important');
-  tabs.style.setProperty('z-index', 'auto', 'important');
-
-  document.querySelectorAll('.dashboard-tabs-fallback-placeholder').forEach(placeholder => placeholder.remove());
-}
-
 window.addEventListener('beforeinstallprompt', event => {
   event.preventDefault();
   deferredPrompt = event;
@@ -175,10 +158,6 @@ if ('serviceWorker' in navigator) {
 }
 
 injectStyles();
-normalizeDashboardTabsPosition();
-requestAnimationFrame(normalizeDashboardTabsPosition);
-window.setTimeout(normalizeDashboardTabsPosition, 100);
-window.setTimeout(normalizeDashboardTabsPosition, 500);
 
 if (isIos()) {
   window.setTimeout(showModal, 900);
