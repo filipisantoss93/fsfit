@@ -26,6 +26,31 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Reconstruir e validar fonte v4
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+
+          parts_dir = Path('assets/icons-source-v4-parts')
+          parts = sorted(parts_dir.glob('fsfit-source.part*'))
+          if len(parts) != 8:
+              raise SystemExit(f'Esperadas 8 partes da fonte, encontradas {len(parts)}')
+
+          encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
+          data = base64.b64decode(encoded, validate=True)
+          expected = 'a4e5acc2752941b2a8420f29056fcd4d688d04baeeefbf8500a2393dde096b91'
+          actual = hashlib.sha256(data).hexdigest()
+          if actual != expected:
+              raise SystemExit(f'Hash inválido da fonte: {actual}')
+
+          output = Path('assets/icons-source-v4/fsfit-source.webp')
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_bytes(data)
+          print(f'Fonte reconstruída e validada: {len(data)} bytes')
+          PY
+
       - name: Executar gerador v4 existente
         run: |
           pip install pillow pyyaml
@@ -47,9 +72,8 @@ jobs:
 
       - name: Limpar arquivos temporários
         run: |
-          rm -f assets/icons-source-v4/fsfit-source.webp
-          rm -f assets/icons-source-v4/README.md
-          rmdir assets/icons-source-v4 2>/dev/null || true
+          rm -rf assets/icons-source-v4
+          rm -rf assets/icons-source-v4-parts
           rm -f .icon-replace-v4-trigger
           rm -f .icon-replace-v4-trigger-merge-note
 
