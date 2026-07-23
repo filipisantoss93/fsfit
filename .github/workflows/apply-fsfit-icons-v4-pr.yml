@@ -1,0 +1,66 @@
+name: Aplicar ícones FS Fit v4 via PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.icon-replace-v4-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-icons:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout da branch do PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Executar gerador v4 existente
+        run: |
+          pip install pillow pyyaml
+          python <<'PY'
+          from pathlib import Path
+          import subprocess
+          import yaml
+
+          workflow = yaml.safe_load(Path('.github/workflows/replace-fsfit-icons-v4.yml').read_text(encoding='utf-8'))
+          wanted = {
+              'Gerar pack completo de ícones',
+              'Atualizar manifests, cache busting e service worker',
+              'Validar arquivos essenciais',
+          }
+          for step in workflow['jobs']['replace-icons']['steps']:
+              if step.get('name') in wanted:
+                  subprocess.run(step['run'], shell=True, executable='/bin/bash', check=True)
+          PY
+
+      - name: Limpar arquivos temporários
+        run: |
+          rm -f assets/icons-source-v4/fsfit-source.webp
+          rm -f assets/icons-source-v4/README.md
+          rmdir assets/icons-source-v4 2>/dev/null || true
+          rm -f .icon-replace-v4-trigger
+          rm -f .icon-replace-v4-trigger-merge-note
+
+      - name: Commitar pack na branch do PR
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração detectada.'
+            exit 0
+          fi
+          git commit -m 'Aplicar novo pack de ícones grafite do FS Fit'
+          git push origin HEAD:${{ github.head_ref }}
