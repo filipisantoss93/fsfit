@@ -116,30 +116,11 @@ function setupIosInstallAction() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-function setupDashboardTabsStickyOffset() {
-  const tabs = document.querySelector('.dashboard-tabs');
-  if (!tabs) return;
-
-  const mobileQuery = window.matchMedia('(max-width: 720px)');
-  const sync = () => {
-    if (mobileQuery.matches) {
-      tabs.style.setProperty('top', 'calc(env(safe-area-inset-top, 0px) + 8px)', 'important');
-      return;
-    }
-    tabs.style.removeProperty('top');
-  };
-
-  sync();
-  if (typeof mobileQuery.addEventListener === 'function') mobileQuery.addEventListener('change', sync);
-  else if (typeof mobileQuery.addListener === 'function') mobileQuery.addListener(sync);
-}
-
 function init() {
   ensureFixStyles();
   setupSkeletonCleanup();
   setupToastMessages();
   setupIosInstallAction();
-  setupDashboardTabsStickyOffset();
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
