@@ -21,7 +21,37 @@ function compactMobileTabs() {
   document.querySelector('.record-tabs')?.classList.add('record-tabs-compact');
 }
 
+function setupStickyTabsState() {
+  const tabs = document.querySelector('.record-tabs');
+  if (!tabs) return;
+
+  let frame = 0;
+  const sync = () => {
+    frame = 0;
+    if (!window.matchMedia('(max-width: 700px)').matches) {
+      tabs.classList.remove('is-stuck');
+      return;
+    }
+
+    const stickyTop = Number.parseFloat(getComputedStyle(tabs).top) || 0;
+    const stuck = window.scrollY > 0 && tabs.getBoundingClientRect().top <= stickyTop + 1;
+    tabs.classList.toggle('is-stuck', stuck);
+  };
+
+  const requestSync = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(sync);
+  };
+
+  window.addEventListener('scroll', requestSync, { passive: true });
+  window.addEventListener('resize', requestSync, { passive: true });
+  window.addEventListener('orientationchange', requestSync, { passive: true });
+  window.visualViewport?.addEventListener('resize', requestSync, { passive: true });
+  requestSync();
+}
+
 compactMobileTabs();
+setupStickyTabsState();
 
 if (alunoId && overviewPanel && !document.querySelector('#student-activation-code-card')) {
   const session = await requireSession();
