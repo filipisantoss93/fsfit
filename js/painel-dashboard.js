@@ -1,8 +1,15 @@
 import { supabase } from './supabase.js';
 import { renderHeader, requireSession, setGreeting } from './layout.js';
+import { patchUiCache, readUiCache } from './ui-cache.js';
 
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
+const PANEL_CACHE_SCOPE = 'painel-operacional';
+const PANEL_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+let session = null;
+let hasCachedStudents = false;
+let hasCachedTodayAgenda = false;
 
 function savePanelReturnPosition() {
   try {
@@ -35,55 +42,17 @@ window.addEventListener('pageshow', restorePanelReturnPosition);
 restorePanelReturnPosition();
 
 renderHeader('painel');
-const session = await requireSession();
+session = await requireSession();
 
 if (session) {
-  await setGreeting(session);
-
   const access = session.fsfitAccess;
   const freeMode = !access?.acesso_premium;
-  const card = document.querySelector('#public-link-card');
-  const linkText = document.querySelector('#dashboard-public-link');
-  const description = document.querySelector('#public-link-description');
-  const openLink = document.querySelector('#open-dashboard-public-link');
-  const copyButton = document.querySelector('#copy-dashboard-public-link');
-  const configureLink = document.querySelector('#configure-dashboard-public-link');
+  const cached = readUiCache(session.user.id, PANEL_CACHE_SCOPE, { maxAgeMs: PANEL_CACHE_MAX_AGE_MS });
 
-  try {
-    const { data: publicProfile, error: publicProfileError } = await supabase
-      .from('perfis_publicos')
-      .select('slug')
-      .eq('personal_id', session.user.id)
-      .maybeSingle();
+  if (cached?.value) hydrateOperationalCache(cached.value, freeMode);
 
-    if (!publicProfileError && publicProfile?.slug) {
-      const url = `https://fsfit.com.br/p/${encodeURIComponent(publicProfile.slug)}`;
-      linkText.textContent = url;
-      linkText.title = url;
-      openLink.href = url;
-
-      copyButton?.addEventListener('click', async () => {
-        const originalText = copyButton.textContent;
-        try {
-          await navigator.clipboard.writeText(url);
-          copyButton.textContent = 'Link copiado!';
-          setTimeout(() => { copyButton.textContent = originalText; }, 1800);
-        } catch {
-          copyButton.textContent = 'Não foi possível copiar';
-          setTimeout(() => { copyButton.textContent = originalText; }, 2200);
-        }
-      });
-    } else {
-      card?.classList.add('public-link-unconfigured');
-      if (description) description.textContent = 'Configure sua página profissional para ter um link único e compartilhar com seus alunos.';
-      if (linkText) linkText.textContent = 'Sua página pública ainda não está configurada.';
-      copyButton?.classList.add('hidden');
-      openLink?.classList.add('hidden');
-      configureLink?.classList.remove('hidden');
-    }
-  } catch (error) {
-    console.error('Erro ao carregar link público:', error);
-  }
+  // Saudação, notificações e verificação administrativa não devem bloquear os dados do painel.
+  setGreeting(session).catch(error => console.info('Saudação/notificações indisponíveis temporariamente:', error?.message || error));
 
   if (freeMode) {
     const notice = document.querySelector('#access-notice');
@@ -101,8 +70,110 @@ if (session) {
     });
   }
 
-  await loadStudents(freeMode);
-  await loadTodayAgenda(freeMode);
+  // Stale-while-revalidate: o cache já foi exibido; agora sincroniza tudo em paralelo.
+  await Promise.allSettled([
+    loadPublicProfile(),
+    loadStudents(freeMode),
+    loadTodayAgenda(freeMode)
+  ]);
+}
+
+function hydrateOperationalCache(cache, freeMode) {
+  if (cache.publicConfigured === true && cache.publicUrl) applyPublicProfileUrl(cache.publicUrl);
+  if (cache.publicConfigured === false) applyPublicProfileUnconfigured();
+
+  if (Array.isArray(cache.students)) {
+    hasCachedStudents = true;
+    renderRecentStudents(cache.students, freeMode);
+  }
+
+  if (Number.isFinite(Number(cache.noWorkoutCount))) {
+    const count = Number(cache.noWorkoutCount);
+    setText('#sem-treino', count);
+    setText('#attention-no-workout', count);
+  }
+
+  if (cache.todayKey === localDateKey() && Array.isArray(cache.todayEntries)) {
+    hasCachedTodayAgenda = true;
+    renderTodayEntries(cache.todayEntries, freeMode);
+  }
+}
+
+async function loadPublicProfile() {
+  try {
+    const { data: publicProfile, error: publicProfileError } = await supabase
+      .from('perfis_publicos')
+      .select('slug')
+      .eq('personal_id', session.user.id)
+      .maybeSingle();
+
+    if (publicProfileError) throw publicProfileError;
+
+    if (publicProfile?.slug) {
+      const url = `https://fsfit.com.br/p/${encodeURIComponent(publicProfile.slug)}`;
+      applyPublicProfileUrl(url);
+      patchUiCache(session.user.id, PANEL_CACHE_SCOPE, { publicConfigured: true, publicUrl: url });
+      return;
+    }
+
+    applyPublicProfileUnconfigured();
+    patchUiCache(session.user.id, PANEL_CACHE_SCOPE, { publicConfigured: false, publicUrl: '' });
+  } catch (error) {
+    console.error('Erro ao carregar link público:', error);
+  }
+}
+
+function applyPublicProfileUrl(url) {
+  const card = document.querySelector('#public-link-card');
+  const linkText = document.querySelector('#dashboard-public-link');
+  const description = document.querySelector('#public-link-description');
+  const openLink = document.querySelector('#open-dashboard-public-link');
+  const copyButton = document.querySelector('#copy-dashboard-public-link');
+  const configureLink = document.querySelector('#configure-dashboard-public-link');
+
+  card?.classList.remove('public-link-unconfigured');
+  if (description) description.textContent = 'Página pública configurada e pronta para compartilhar.';
+  if (linkText) {
+    linkText.textContent = url;
+    linkText.title = url;
+  }
+  if (openLink) {
+    openLink.href = url;
+    openLink.classList.remove('hidden');
+  }
+  copyButton?.classList.remove('hidden');
+  configureLink?.classList.add('hidden');
+
+  if (copyButton && copyButton.dataset.copyBound !== url) {
+    copyButton.dataset.copyBound = url;
+    copyButton.onclick = async () => {
+      const originalText = copyButton.textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+        copyButton.textContent = 'Link copiado!';
+        setTimeout(() => { copyButton.textContent = originalText; }, 1800);
+      } catch {
+        copyButton.textContent = 'Não foi possível copiar';
+        setTimeout(() => { copyButton.textContent = originalText; }, 2200);
+      }
+    };
+  }
+}
+
+function applyPublicProfileUnconfigured() {
+  const card = document.querySelector('#public-link-card');
+  const linkText = document.querySelector('#dashboard-public-link');
+  const description = document.querySelector('#public-link-description');
+  const openLink = document.querySelector('#open-dashboard-public-link');
+  const copyButton = document.querySelector('#copy-dashboard-public-link');
+  const configureLink = document.querySelector('#configure-dashboard-public-link');
+
+  card?.classList.add('public-link-unconfigured');
+  if (description) description.textContent = 'Configure sua página profissional para ter um link único e compartilhar com seus alunos.';
+  if (linkText) linkText.textContent = 'Sua página pública ainda não está configurada.';
+  copyButton?.classList.add('hidden');
+  openLink?.classList.add('hidden');
+  configureLink?.classList.remove('hidden');
 }
 
 function bindRecentStudentRows() {
@@ -143,8 +214,6 @@ bindRecentStudentRows();
 bindTodayAgendaReturn();
 
 async function loadStudents(freeMode) {
-  const list = document.querySelector('#recent-list');
-
   try {
     const { data, error } = await supabase
       .from('alunos')
@@ -154,33 +223,41 @@ async function loadStudents(freeMode) {
     if (error) throw error;
     const alunos = Array.isArray(data) ? data : [];
 
-    setText('#total-alunos', alunos.length);
-
-    if (list) {
-      list.innerHTML = alunos.length
-        ? alunos.slice(0, 5).map(aluno => {
-            const href = `ficha-aluno.html?id=${encodeURIComponent(aluno.id)}`;
-            const rowAttrs = freeMode
-              ? 'class="recent-student-row is-locked" aria-disabled="true" title="Disponível em um plano pago"'
-              : `class="recent-student-row" data-student-href="${href}" tabindex="0" role="link" aria-label="Abrir ficha de ${escapeHtml(aluno.nome)}"`;
-            return `
-              <tr ${rowAttrs}>
-                <td><span class="recent-student-person"><span class="recent-student-avatar" aria-hidden="true">${escapeHtml(initials(aluno.nome))}</span><strong>${escapeHtml(aluno.nome)}</strong></span></td>
-                <td>${formatDate(aluno.created_at)}</td>
-                <td class="recent-student-chevron" aria-hidden="true">${freeMode ? '·' : '›'}</td>
-              </tr>`;
-          }).join('')
-        : '<tr><td colspan="3" class="empty">Nenhum aluno cadastrado.</td></tr>';
-    }
+    renderRecentStudents(alunos, freeMode);
+    patchUiCache(session.user.id, PANEL_CACHE_SCOPE, { students: alunos });
+    hasCachedStudents = true;
 
     await loadStudentsWithoutWorkout(alunos);
   } catch (error) {
     console.error('Erro ao carregar alunos do painel:', error);
+    if (hasCachedStudents) return;
     setText('#total-alunos', '—');
     setText('#sem-treino', '—');
     setText('#attention-no-workout', '—');
+    const list = document.querySelector('#recent-list');
     if (list) list.innerHTML = '<tr><td colspan="3" class="empty">Não foi possível carregar os alunos recentes.</td></tr>';
   }
+}
+
+function renderRecentStudents(alunos, freeMode) {
+  const list = document.querySelector('#recent-list');
+  setText('#total-alunos', alunos.length);
+
+  if (!list) return;
+  list.innerHTML = alunos.length
+    ? alunos.slice(0, 5).map(aluno => {
+        const href = `ficha-aluno.html?id=${encodeURIComponent(aluno.id)}`;
+        const rowAttrs = freeMode
+          ? 'class="recent-student-row is-locked" aria-disabled="true" title="Disponível em um plano pago"'
+          : `class="recent-student-row" data-student-href="${href}" tabindex="0" role="link" aria-label="Abrir ficha de ${escapeHtml(aluno.nome)}"`;
+        return `
+          <tr ${rowAttrs}>
+            <td><span class="recent-student-person"><span class="recent-student-avatar" aria-hidden="true">${escapeHtml(initials(aluno.nome))}</span><strong>${escapeHtml(aluno.nome)}</strong></span></td>
+            <td>${formatDate(aluno.created_at)}</td>
+            <td class="recent-student-chevron" aria-hidden="true">${freeMode ? '·' : '›'}</td>
+          </tr>`;
+      }).join('')
+    : '<tr><td colspan="3" class="empty">Nenhum aluno cadastrado.</td></tr>';
 }
 
 async function loadStudentsWithoutWorkout(alunos) {
@@ -198,24 +275,19 @@ async function loadStudentsWithoutWorkout(alunos) {
 
     setText('#sem-treino', noWorkoutCount);
     setText('#attention-no-workout', noWorkoutCount);
+    patchUiCache(session.user.id, PANEL_CACHE_SCOPE, { noWorkoutCount });
   } catch (error) {
     console.error('Erro ao calcular alunos sem treino ativo:', error);
+    const cached = readUiCache(session.user.id, PANEL_CACHE_SCOPE)?.value;
+    if (Number.isFinite(Number(cached?.noWorkoutCount))) return;
     setText('#sem-treino', '—');
     setText('#attention-no-workout', '—');
   }
 }
 
 async function loadTodayAgenda(freeMode) {
-  const list = document.querySelector('#today-list');
   const today = new Date();
   const todayDay = today.getDay();
-
-  const dateLabel = new Intl.DateTimeFormat('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long'
-  }).format(today);
-  setText('#today-date', capitalize(dateLabel));
 
   try {
     const { data, error } = await supabase
@@ -254,39 +326,60 @@ async function loadTodayAgenda(freeMode) {
       return String(a.horario).localeCompare(String(b.horario));
     });
 
-    setText('#alunos-hoje', entries.length);
-    setText('#attention-today', entries.length);
-    setText('#today-count', entries.length);
-
-    if (!list) return;
-    if (!entries.length) {
-      list.innerHTML = '<p class="dashboard-empty">Nenhum aluno programado para hoje. Sua agenda está livre.</p>';
-      return;
-    }
-
-    list.innerHTML = entries.map(entry => {
-      const time = entry.horario ? String(entry.horario).slice(0, 5) : '—';
-      const details = [periodLabel(entry.periodo), entry.local || 'Local não informado'].join(' · ');
-      const content = `
-        <div class="today-time">${escapeHtml(time)}</div>
-        <div class="today-entry-main">
-          <strong>${escapeHtml(entry.nome)}</strong>
-          <span>${escapeHtml(entry.treino || 'Treino ativo')}</span>
-          <small>${escapeHtml(details)}</small>
-        </div>
-        <span class="today-open">${freeMode ? 'Bloqueado' : 'Abrir ficha →'}</span>`;
-
-      return freeMode
-        ? `<div class="today-entry locked" aria-disabled="true" title="Disponível em um plano pago">${content}</div>`
-        : `<a class="today-entry" data-panel-return href="ficha-aluno.html?id=${encodeURIComponent(entry.id)}&origem=painel">${content}</a>`;
-    }).join('');
+    renderTodayEntries(entries, freeMode);
+    patchUiCache(session.user.id, PANEL_CACHE_SCOPE, { todayKey: localDateKey(), todayEntries: entries });
+    hasCachedTodayAgenda = true;
   } catch (error) {
     console.error('Erro ao carregar agenda de hoje:', error);
+    if (hasCachedTodayAgenda) return;
     setText('#alunos-hoje', '—');
     setText('#attention-today', '—');
     setText('#today-count', '—');
+    const list = document.querySelector('#today-list');
     if (list) list.innerHTML = '<p class="dashboard-empty">Não foi possível carregar a agenda de hoje.</p>';
   }
+}
+
+function renderTodayEntries(entries, freeMode) {
+  const today = new Date();
+  const dateLabel = new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long'
+  }).format(today);
+
+  setText('#today-date', capitalize(dateLabel));
+  setText('#alunos-hoje', entries.length);
+  setText('#attention-today', entries.length);
+  setText('#today-count', entries.length);
+
+  const list = document.querySelector('#today-list');
+  if (!list) return;
+  if (!entries.length) {
+    list.innerHTML = '<p class="dashboard-empty">Nenhum aluno programado para hoje. Sua agenda está livre.</p>';
+    return;
+  }
+
+  list.innerHTML = entries.map(entry => {
+    const time = entry.horario ? String(entry.horario).slice(0, 5) : '—';
+    const details = [periodLabel(entry.periodo), entry.local || 'Local não informado'].join(' · ');
+    const content = `
+      <div class="today-time">${escapeHtml(time)}</div>
+      <div class="today-entry-main">
+        <strong>${escapeHtml(entry.nome)}</strong>
+        <span>${escapeHtml(entry.treino || 'Treino ativo')}</span>
+        <small>${escapeHtml(details)}</small>
+      </div>
+      <span class="today-open">${freeMode ? 'Bloqueado' : 'Abrir ficha →'}</span>`;
+
+    return freeMode
+      ? `<div class="today-entry locked" aria-disabled="true" title="Disponível em um plano pago">${content}</div>`
+      : `<a class="today-entry" data-panel-return href="ficha-aluno.html?id=${encodeURIComponent(entry.id)}&origem=painel">${content}</a>`;
+  }).join('');
+}
+
+function localDateKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 function periodLabel(value) {
