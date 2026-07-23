@@ -5,8 +5,8 @@
   "start_url": "/painel.html",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0f1115",
-  "theme_color": "#0f1115",
+  "background_color": "#060b12",
+  "theme_color": "#060b12",
   "icons": [
     {
       "src": "/assets/icons/02-pwa/icon-192x192.png?v=20260722-icons-v4",
