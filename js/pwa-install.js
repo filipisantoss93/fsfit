@@ -173,10 +173,13 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
   import('./exercicio-drag-order.js?v=20260722-dnd2').catch(error => {
     console.error('Falha ao carregar reordenação de exercícios em aula:', error);
   });
-  import('./painel-agenda-modal.js?v=20260721-agenda-dashboard1').catch(error => {
+  import('./painel-agenda-modal.js?v=20260723-agenda-dashboard2').catch(error => {
     console.error('Falha ao carregar dashboard da agenda de hoje:', error);
   });
-  import('./painel-agenda-modal-avatar.js?v=20260722-agenda-avatar1').catch(error => {
+  import('./painel-agenda-modal-hotfix.js?v=20260723-agenda-modal-hotfix1').catch(error => {
+    console.error('Falha ao carregar correção do modal da agenda de hoje:', error);
+  });
+  import('./painel-agenda-modal-avatar.js?v=20260723-agenda-avatar2').catch(error => {
     console.error('Falha ao carregar a foto do aluno no modal da agenda de hoje:', error);
   });
   import('./painel-swipe-tabs.js?v=20260721-swipe-tabs5').catch(error => {
