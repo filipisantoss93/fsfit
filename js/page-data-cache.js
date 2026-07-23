@@ -5,6 +5,7 @@ const PAGE = window.location.pathname.split('/').pop() || 'index.html';
 const TARGET_PAGES = new Set([
   'alunos.html',
   'agenda.html',
+  'financeiro.html',
   'biblioteca-exercicios.html',
   'biblioteca-alimentar.html'
 ]);
@@ -24,6 +25,7 @@ async function boot() {
 
   if (PAGE === 'alunos.html') setupStudentsCache(userId);
   if (PAGE === 'agenda.html') setupAgendaCache(userId);
+  if (PAGE === 'financeiro.html') setupFinanceCache(userId);
   if (PAGE === 'biblioteca-exercicios.html') setupExerciseLibraryCache(userId);
   if (PAGE === 'biblioteca-alimentar.html') setupFoodLibraryCache(userId);
 }
@@ -31,7 +33,8 @@ async function boot() {
 function cacheReadyHtml(html = '') {
   const text = String(html || '');
   if (!text.trim()) return false;
-  return !/carregando|aguarde/i.test(stripHtml(text));
+  const plain = stripHtml(text);
+  return !/carregando|aguarde|não foi possível/i.test(plain);
 }
 
 function stripHtml(html = '') {
@@ -144,6 +147,102 @@ function setupAgendaCache(userId) {
   document.querySelector('#agenda-next-day')?.addEventListener('click', restoreAfterNavigation);
   document.querySelector('#agenda-today')?.addEventListener('click', restoreAfterNavigation);
   window.addEventListener('pageshow', restoreAfterNavigation);
+  window.addEventListener('pagehide', save);
+}
+
+function currentMonthKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function setupFinanceCache(userId) {
+  const scope = `page:financeiro:v1:${currentMonthKey()}`;
+  const studentsList = document.querySelector('#finance-students-list');
+  const confirmationsCard = document.querySelector('#payment-confirmations-card');
+  const confirmationsList = document.querySelector('#payment-confirmations-list');
+  const confirmationsCount = document.querySelector('#payment-confirmations-count');
+  const pageInfo = document.querySelector('#finance-students-page-info');
+  const summarySelectors = [
+    '#summary-expected',
+    '#summary-expected-count',
+    '#summary-received',
+    '#summary-received-count',
+    '#summary-waiting',
+    '#summary-waiting-count',
+    '#summary-overdue',
+    '#summary-overdue-count'
+  ];
+  const summaryElements = summarySelectors.map(selector => document.querySelector(selector));
+  if (!studentsList) return;
+
+  const cached = readUiCache(userId, scope)?.value;
+  const cachedStudentsHtml = cacheReadyHtml(cached?.studentsHtml) ? cached.studentsHtml : '';
+
+  const restore = () => {
+    if (!cached || !cachedStudentsHtml) return false;
+
+    studentsList.innerHTML = cachedStudentsHtml;
+    summarySelectors.forEach((selector, index) => {
+      const value = cached.summary?.[selector];
+      if (summaryElements[index] && value != null) summaryElements[index].textContent = value;
+    });
+
+    if (confirmationsList && cacheReadyHtml(cached.confirmationsHtml)) {
+      confirmationsList.innerHTML = cached.confirmationsHtml;
+    }
+    if (confirmationsCount && cached.confirmationsCount != null) {
+      confirmationsCount.textContent = String(cached.confirmationsCount);
+    }
+    if (confirmationsCard && typeof cached.confirmationsHidden === 'boolean') {
+      confirmationsCard.classList.toggle('hidden', cached.confirmationsHidden);
+    }
+    if (pageInfo && cached.pageInfo) pageInfo.textContent = cached.pageInfo;
+
+    document.documentElement.dataset.fsfitFinanceCache = 'restored';
+    return true;
+  };
+
+  restore();
+
+  let restoringFailure = false;
+  const save = debounce(() => {
+    const activeFilter = document.querySelector('[data-finance-status-filter].active')?.dataset.financeStatusFilter || 'all';
+    const listText = stripHtml(studentsList.innerHTML);
+
+    if (/não foi possível/i.test(listText) && cachedStudentsHtml && !restoringFailure) {
+      restoringFailure = true;
+      studentsList.innerHTML = cachedStudentsHtml;
+      window.setTimeout(() => { restoringFailure = false; }, 0);
+      return;
+    }
+
+    if (activeFilter !== 'all' || !cacheReadyHtml(studentsList.innerHTML)) return;
+
+    const summary = {};
+    summarySelectors.forEach((selector, index) => {
+      summary[selector] = summaryElements[index]?.textContent?.trim() || '';
+    });
+
+    writeUiCache(userId, scope, {
+      studentsHtml: studentsList.innerHTML,
+      summary,
+      confirmationsHtml: confirmationsList?.innerHTML || '',
+      confirmationsCount: confirmationsCount?.textContent?.trim() || '0',
+      confirmationsHidden: Boolean(confirmationsCard?.classList.contains('hidden')),
+      pageInfo: pageInfo?.textContent?.trim() || ''
+    });
+  }, 180);
+
+  observeElements([
+    studentsList,
+    confirmationsCard,
+    confirmationsList,
+    confirmationsCount,
+    pageInfo,
+    ...summaryElements
+  ], save);
+
+  window.addEventListener('pageshow', restore);
   window.addEventListener('pagehide', save);
 }
 
