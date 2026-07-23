@@ -1,10 +1,89 @@
 import { supabase } from './supabase.js';
 import { requireSession } from './layout.js';
 
+setupDashboardStickyTabs();
+
 const session = await requireSession();
 
 if (session) {
   await loadOverview();
+}
+
+function setupDashboardStickyTabs() {
+  const tabs = document.querySelector('.dashboard-tabs');
+  if (!tabs || tabs.dataset.stickyTabsReady === '1') return;
+
+  tabs.dataset.stickyTabsReady = '1';
+
+  if (!document.querySelector('style[data-dashboard-sticky-tabs]')) {
+    const style = document.createElement('style');
+    style.dataset.dashboardStickyTabs = 'true';
+    style.textContent = `
+      @media (max-width: 720px) {
+        .dashboard-tabs {
+          position: -webkit-sticky !important;
+          position: sticky !important;
+          top: var(--safe-area-top) !important;
+          z-index: 90 !important;
+          width: 100% !important;
+          margin-bottom: 16px !important;
+          border-color: rgba(255,255,255,.09) !important;
+          background: #14171d !important;
+          box-shadow: 0 10px 28px rgba(0,0,0,.28) !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+
+        .dashboard-tabs.is-stuck::before {
+          content: '';
+          position: absolute;
+          left: 50%;
+          bottom: 100%;
+          width: 100vw;
+          height: calc(var(--safe-area-top) + 1px);
+          transform: translateX(-50%);
+          pointer-events: none;
+          background: #14171d;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  const mobileQuery = window.matchMedia('(max-width: 720px)');
+  let frame = 0;
+
+  const sync = () => {
+    frame = 0;
+
+    if (!mobileQuery.matches) {
+      tabs.classList.remove('is-stuck');
+      return;
+    }
+
+    const stickyTop = Number.parseFloat(getComputedStyle(tabs).top) || 0;
+    const stuck = window.scrollY > 0 && tabs.getBoundingClientRect().top <= stickyTop + 1;
+    tabs.classList.toggle('is-stuck', stuck);
+  };
+
+  const requestSync = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(sync);
+  };
+
+  window.addEventListener('scroll', requestSync, { passive: true });
+  window.addEventListener('resize', requestSync, { passive: true });
+  window.addEventListener('orientationchange', requestSync, { passive: true });
+  window.addEventListener('pageshow', requestSync, { passive: true });
+  window.visualViewport?.addEventListener('resize', requestSync, { passive: true });
+
+  if (typeof mobileQuery.addEventListener === 'function') {
+    mobileQuery.addEventListener('change', requestSync);
+  } else if (typeof mobileQuery.addListener === 'function') {
+    mobileQuery.addListener(requestSync);
+  }
+
+  requestSync();
 }
 
 async function loadOverview() {
