@@ -342,3 +342,28 @@ html.fsfit-sheet-open body {
     color: var(--primary);
   }
 }
+
+/* FS Fit · correções iOS e refinamento da identidade · 2026-07-23 */
+html {
+  background-color: #060b12;
+  color-scheme: dark;
+}
+
+body {
+  background-color: #060b12;
+}
+
+html.fsfit-sheet-open,
+html.fsfit-sheet-open body {
+  background-color: #060b12 !important;
+}
+
+/* Evita o emoji amarelo nativo e mantém o sino dentro da paleta oficial. */
+.notification-bell {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  font-size: 0 !important;
+  line-height: 0;
+  background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8e51c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9'/%3E%3Cpath d='M13.73 21a2 2 0 0 1-3.46 0'/%3E%3C/svg%3E");
+}
