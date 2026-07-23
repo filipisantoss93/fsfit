@@ -34,20 +34,33 @@ function setupDashboardStickyTabs() {
           -webkit-backdrop-filter: none !important;
         }
 
-        .dashboard-tabs.is-stuck::before {
-          content: '';
-          position: absolute;
-          left: 50%;
-          bottom: 100%;
-          width: 100vw;
-          height: calc(var(--safe-area-top) + 1px);
-          transform: translateX(-50%);
+        .dashboard-tabs-top-cover {
+          position: fixed;
+          top: 0;
+          right: 0;
+          left: 0;
+          z-index: 89;
+          height: 0;
           pointer-events: none;
           background: #14171d;
+          opacity: 0;
+          transition: opacity .12s ease;
+        }
+
+        .dashboard-tabs-top-cover.is-visible {
+          opacity: 1;
         }
       }
     `;
     document.head.appendChild(style);
+  }
+
+  let topCover = document.querySelector('.dashboard-tabs-top-cover');
+  if (!topCover) {
+    topCover = document.createElement('div');
+    topCover.className = 'dashboard-tabs-top-cover';
+    topCover.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(topCover);
   }
 
   const mobileQuery = window.matchMedia('(max-width: 720px)');
@@ -58,12 +71,18 @@ function setupDashboardStickyTabs() {
 
     if (!mobileQuery.matches) {
       tabs.classList.remove('is-stuck');
+      topCover.classList.remove('is-visible');
+      topCover.style.height = '0px';
       return;
     }
 
     const stickyTop = Number.parseFloat(getComputedStyle(tabs).top) || 0;
-    const stuck = window.scrollY > 0 && tabs.getBoundingClientRect().top <= stickyTop + 1;
+    const rect = tabs.getBoundingClientRect();
+    const stuck = window.scrollY > 0 && rect.top <= stickyTop + 1;
+
     tabs.classList.toggle('is-stuck', stuck);
+    topCover.classList.toggle('is-visible', stuck);
+    topCover.style.height = stuck ? `${Math.max(0, Math.ceil(rect.top))}px` : '0px';
   };
 
   const requestSync = () => {
@@ -76,6 +95,7 @@ function setupDashboardStickyTabs() {
   window.addEventListener('orientationchange', requestSync, { passive: true });
   window.addEventListener('pageshow', requestSync, { passive: true });
   window.visualViewport?.addEventListener('resize', requestSync, { passive: true });
+  window.visualViewport?.addEventListener('scroll', requestSync, { passive: true });
 
   if (typeof mobileQuery.addEventListener === 'function') {
     mobileQuery.addEventListener('change', requestSync);
