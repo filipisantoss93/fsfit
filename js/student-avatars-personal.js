@@ -16,6 +16,11 @@ function initials(value = '') {
 }
 
 function studentIdFromHref(element) {
+  // A agenda do painel transforma a linha em botão e pode remover o href.
+  // O data-student-id é a identidade estável da linha e deve ter prioridade.
+  const directId = String(element?.dataset?.studentId || '').trim();
+  if (directId) return directId;
+
   const href = element?.getAttribute?.('href') || element?.dataset?.studentHref || '';
   if (!href) return '';
   try {
