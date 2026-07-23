@@ -1,0 +1,17 @@
+{
+  "name": "FS Fit Admin",
+  "short_name": "FS Fit Admin",
+  "start_url": "/admin.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "icons": [
+    {
+      "src": "/assets/icons/admin/admin-icon-180x180.png?v=20260722-admin-icon2",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
