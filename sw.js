@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fsfit-shell-v9';
+const CACHE_NAME = 'fsfit-shell-v10';
 const APP_SHELL = [
   '/',
   '/acesso-aluno.html',
