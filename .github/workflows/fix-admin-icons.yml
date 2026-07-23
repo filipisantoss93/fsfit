@@ -1,0 +1,81 @@
+name: Corrigir ícones FS Fit Admin
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'assets/icons/admin/admin-icon-192x192.png'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-admin-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: pip install pillow
+
+      - name: Gerar tamanhos válidos do ícone Admin
+        run: |
+          python <<'PY'
+          from PIL import Image
+          from pathlib import Path
+
+          source = Path('assets/icons/admin/admin-icon-192x192.png')
+          image = Image.open(source).convert('RGB')
+          resample = Image.Resampling.LANCZOS
+
+          for size in (32, 180, 512):
+              target = Path(f'assets/icons/admin/admin-icon-{size}x{size}.png')
+              image.resize((size, size), resample).save(target, 'PNG', optimize=True)
+
+          for target in [
+              Path('assets/icons/admin/admin-icon-32x32.png'),
+              Path('assets/icons/admin/admin-icon-180x180.png'),
+              Path('assets/icons/admin/admin-icon-192x192.png'),
+              Path('assets/icons/admin/admin-icon-512x512.png'),
+          ]:
+              with Image.open(target) as check:
+                  check.verify()
+              print('OK:', target)
+          PY
+
+      - name: Atualizar cache busting do Admin
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          for name in ('admin.html', 'manifest-admin.webmanifest'):
+              path = Path(name)
+              if not path.exists():
+                  continue
+              text = path.read_text(encoding='utf-8')
+              text = text.replace('20260723-admin-pwa3', '20260723-admin-pwa4')
+              path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Remover workflow temporário
+        run: rm -f .github/workflows/fix-admin-icons.yml
+
+      - name: Commitar correção
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração detectada.'
+            exit 0
+          fi
+          git commit -m 'Corrigir arquivos de ícone do FS Fit Admin'
+          git push origin main
