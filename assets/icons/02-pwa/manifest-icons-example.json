@@ -1,63 +1,25 @@
 {
-  "name": "FS Fit",
-  "short_name": "FS Fit",
   "icons": [
     {
-      "src": "/assets/icons/02-pwa/icon-72x72.png?v=20260721-icons-v3",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/02-pwa/icon-96x96.png?v=20260721-icons-v3",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/02-pwa/icon-128x128.png?v=20260721-icons-v3",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/02-pwa/icon-144x144.png?v=20260721-icons-v3",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/02-pwa/icon-152x152.png?v=20260721-icons-v3",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/02-pwa/icon-192x192.png?v=20260721-icons-v3",
+      "src": "/assets/icons/02-pwa/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/02-pwa/icon-384x384.png?v=20260721-icons-v3",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/02-pwa/icon-512x512.png?v=20260721-icons-v3",
+      "src": "/assets/icons/02-pwa/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/02-pwa/icon-maskable-192x192.png?v=20260721-icons-v3",
+      "src": "/assets/icons/02-pwa/icon-maskable-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/assets/icons/02-pwa/icon-maskable-512x512.png?v=20260721-icons-v3",
+      "src": "/assets/icons/02-pwa/icon-maskable-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
