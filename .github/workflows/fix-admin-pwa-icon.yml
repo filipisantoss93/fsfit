@@ -1,0 +1,172 @@
+name: Corrigir ícone PWA do Admin
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.admin-icon-fix-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-admin-icon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar Pillow
+        run: pip install pillow
+
+      - name: Gerar ícones e manifest exclusivos do Admin
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+          import re
+
+          version = '20260722-admin-icon2'
+          icon_dir = Path('assets/icons/admin')
+          source_path = icon_dir / 'admin-icon-180x180.png'
+          if not source_path.exists():
+              raise SystemExit(f'Ícone fonte não encontrado: {source_path}')
+
+          source = Image.open(source_path).convert('RGB')
+          if source.width != source.height:
+              side = min(source.size)
+              left = (source.width - side) // 2
+              top = (source.height - side) // 2
+              source = source.crop((left, top, left + side, top + side))
+
+          resample = Image.Resampling.LANCZOS
+          for size in (32, 180, 192, 512):
+              source.resize((size, size), resample).save(icon_dir / f'admin-icon-{size}x{size}.png', 'PNG', optimize=True)
+
+          manifest = {
+              'name': 'FS Fit Admin',
+              'short_name': 'FS Fit Admin',
+              'description': 'Administração da plataforma FS Fit',
+              'start_url': '/admin.html',
+              'scope': '/',
+              'display': 'standalone',
+              'background_color': '#0f1115',
+              'theme_color': '#0f1115',
+              'icons': [
+                  {
+                      'src': f'/assets/icons/admin/admin-icon-192x192.png?v={version}',
+                      'sizes': '192x192',
+                      'type': 'image/png',
+                      'purpose': 'any'
+                  },
+                  {
+                      'src': f'/assets/icons/admin/admin-icon-512x512.png?v={version}',
+                      'sizes': '512x512',
+                      'type': 'image/png',
+                      'purpose': 'any'
+                  },
+                  {
+                      'src': f'/assets/icons/admin/admin-icon-512x512.png?v={version}',
+                      'sizes': '512x512',
+                      'type': 'image/png',
+                      'purpose': 'maskable'
+                  }
+              ]
+          }
+          Path('manifest-admin.webmanifest').write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+
+          admin_path = Path('admin.html')
+          html = admin_path.read_text(encoding='utf-8')
+
+          # Remove referências de manifest anteriores e insere o manifest exclusivo do admin.
+          html = re.sub(r'\s*<link\s+rel=["\']manifest["\'][^>]*>\s*', '\n', html, flags=re.I)
+          manifest_link = f'  <link rel="manifest" href="/manifest-admin.webmanifest?v={version}">\n'
+          if '<meta name="theme-color" content="#0f1115">' in html:
+              html = html.replace(
+                  '<meta name="theme-color" content="#0f1115">',
+                  '<meta name="theme-color" content="#0f1115">\n' + manifest_link.rstrip()
+              )
+          else:
+              html = html.replace('</head>', manifest_link + '</head>')
+
+          # Metadados exclusivos para instalação do painel administrativo.
+          html = re.sub(
+              r'<meta\s+name=["\']apple-mobile-web-app-title["\']\s+content=["\'][^"\']*["\']\s*/?>',
+              '<meta name="apple-mobile-web-app-title" content="FS Fit Admin">',
+              html,
+              flags=re.I
+          )
+          html = re.sub(
+              r'<meta\s+name=["\']application-name["\']\s+content=["\'][^"\']*["\']\s*/?>',
+              '<meta name="application-name" content="FS Fit Admin">',
+              html,
+              flags=re.I
+          )
+
+          if 'name="apple-mobile-web-app-capable"' not in html:
+              html = html.replace(
+                  '<meta name="apple-mobile-web-app-title" content="FS Fit Admin">',
+                  '<meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="apple-mobile-web-app-title" content="FS Fit Admin">'
+              )
+          if 'name="mobile-web-app-capable"' not in html:
+              html = html.replace(
+                  '<meta name="apple-mobile-web-app-capable" content="yes">',
+                  '<meta name="mobile-web-app-capable" content="yes">\n  <meta name="apple-mobile-web-app-capable" content="yes">'
+              )
+
+          # Substitui apenas os ícones declarados em admin.html.
+          html = re.sub(
+              r'<link\s+rel=["\']icon["\'][^>]*sizes=["\']any["\'][^>]*>',
+              f'<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/admin/admin-icon-192x192.png?v={version}">',
+              html,
+              flags=re.I
+          )
+          html = re.sub(
+              r'<link\s+rel=["\']icon["\'][^>]*sizes=["\']32x32["\'][^>]*>',
+              f'<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/admin/admin-icon-32x32.png?v={version}">',
+              html,
+              flags=re.I
+          )
+          html = re.sub(
+              r'<link\s+rel=["\']apple-touch-icon["\'][^>]*>',
+              f'<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/admin/admin-icon-180x180.png?v={version}">',
+              html,
+              flags=re.I
+          )
+
+          admin_path.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Validar saída
+        run: |
+          test -s manifest-admin.webmanifest
+          test -s assets/icons/admin/admin-icon-180x180.png
+          test -s assets/icons/admin/admin-icon-192x192.png
+          test -s assets/icons/admin/admin-icon-512x512.png
+          grep -q 'manifest-admin.webmanifest' admin.html
+          grep -q 'FS Fit Admin' admin.html
+
+      - name: Limpar trigger e commitar
+        run: |
+          rm -f .admin-icon-fix-trigger
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração detectada.'
+            exit 0
+          fi
+          git commit -m 'Corrigir instalação do ícone exclusivo do admin no iPhone'
+          git push origin main
