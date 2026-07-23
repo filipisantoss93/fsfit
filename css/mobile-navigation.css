@@ -299,26 +299,6 @@ html.fsfit-sheet-open body {
   }
 }
 
-/* Abas do painel permanecem no fluxo normal da página no mobile. */
-@media (max-width: 720px) {
-  .dashboard-tabs,
-  .dashboard-tabs.is-fixed-fallback {
-    position: static !important;
-    top: auto !important;
-    right: auto !important;
-    left: auto !important;
-    width: 100% !important;
-    margin-bottom: 16px !important;
-    transform: none !important;
-  }
-
-  .dashboard-tabs-fallback-placeholder,
-  .dashboard-tabs-fallback-placeholder.is-active {
-    display: none !important;
-    height: 0 !important;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .fsfit-more-sheet,
   .fsfit-more-backdrop,
