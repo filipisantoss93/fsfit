@@ -37,7 +37,6 @@ const openExerciseModalButton = document.querySelector('#open-exercise-modal');
 const applyWorkoutButton = document.querySelector('#apply-workout-button');
 
 let treinoId = null;
-let activeTreinoId = null;
 let selectedWorkoutId = null;
 let editingWorkoutId = null;
 let selectedExerciseId = null;
@@ -76,6 +75,19 @@ function setSelectedDays(days = []) {
 
 function selectedWorkout() {
   return workoutsCache.find(item => item.id === treinoId) || null;
+}
+
+function effectiveExercise(row = {}) {
+  const ex = row.exercicios || {};
+  return {
+    nome: row.exercicio_nome_snapshot ?? ex.nome ?? '',
+    grupo_muscular: row.grupo_muscular_snapshot ?? ex.grupo_muscular ?? '',
+    equipamento: row.equipamento_snapshot ?? ex.equipamento ?? '',
+    instrucoes: row.instrucoes_snapshot ?? ex.instrucoes ?? '',
+    video_url: row.video_url_snapshot ?? ex.video_url ?? '',
+    imagem_url: row.imagem_url_snapshot ?? ex.imagem_url ?? '',
+    tipo_prescricao: row.tipo_prescricao_snapshot ?? ex.tipo_prescricao ?? ''
+  };
 }
 
 function updateWorkoutDayOptions(days = selectedWorkout()?.dias_semana || []) {
@@ -192,7 +204,7 @@ function openExerciseDetailModal(id) {
   const row = workoutExercisesCache.find(item => item.id === id);
   if (!row) return;
   selectedExerciseId = id;
-  const ex = row.exercicios || {};
+  const ex = effectiveExercise(row);
   exerciseDetailTitle.textContent = ex.nome || 'Exercício';
   exerciseDetailBody.innerHTML = `
     <div class="workout-detail"><small>Dia</small><strong>${esc(dayNames[row.dia_semana] || 'Não informado')}</strong></div>
@@ -252,12 +264,11 @@ async function loadWorkouts(preferredId = treinoId) {
   }
 
   workoutsCache = workouts.map(item => ({ ...item, exercise_count: counts.get(item.id) || 0 }));
-  const active = workoutsCache.find(item => item.status === 'ativo') || null;
-  activeTreinoId = active?.id || null;
+  const firstActive = workoutsCache.find(item => item.status === 'ativo') || null;
 
   if (preferredId && workoutsCache.some(item => item.id === preferredId)) treinoId = preferredId;
   else if (treinoId && workoutsCache.some(item => item.id === treinoId)) treinoId = treinoId;
-  else treinoId = activeTreinoId || workoutsCache[0]?.id || null;
+  else treinoId = firstActive?.id || workoutsCache[0]?.id || null;
 
   renderWorkoutList();
   renderActiveWorkout();
@@ -348,7 +359,7 @@ async function loadWorkoutExercises() {
   const requestedWorkoutId = treinoId;
   const { data, error } = await supabase
     .from('treino_exercicios')
-    .select('id,treino_id,exercicio_id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,exercicios(nome,grupo_muscular,equipamento,instrucoes,video_url)')
+    .select('id,treino_id,exercicio_id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,exercicio_nome_snapshot,grupo_muscular_snapshot,equipamento_snapshot,instrucoes_snapshot,video_url_snapshot,imagem_url_snapshot,tipo_prescricao_snapshot,exercicios(nome,grupo_muscular,equipamento,instrucoes,video_url,imagem_url,tipo_prescricao)')
     .eq('treino_id', requestedWorkoutId)
     .order('dia_semana').order('ordem');
   if (error) throw error;
@@ -374,7 +385,7 @@ async function loadWorkoutExercises() {
       <div class="workout-day-header"><div><small>DIA ${day}</small><strong>${dayNames[day]}</strong></div><span>${rows.length} ${rows.length === 1 ? 'exercício' : 'exercícios'}</span></div>
       <div class="workout-exercise-list">${rows.map(row => `<button class="workout-exercise-row" type="button" data-open-exercise-detail="${row.id}">
         <span class="workout-exercise-order">${row.ordem || '—'}</span>
-        <span class="workout-exercise-main"><strong>${esc(row.exercicios?.nome || '')}</strong><span>${esc([row.series ? `${row.series} séries` : null, row.repeticoes ? `${row.repeticoes} rep.` : null, row.carga, row.descanso_segundos ? `${row.descanso_segundos}s` : null].filter(Boolean).join(' • ') || 'Ver detalhes')}</span></span>
+        <span class="workout-exercise-main"><strong>${esc(effectiveExercise(row).nome || '')}</strong><span>${esc([row.series ? `${row.series} séries` : null, row.repeticoes ? `${row.repeticoes} rep.` : null, row.carga, row.descanso_segundos ? `${row.descanso_segundos}s` : null].filter(Boolean).join(' • ') || 'Ver detalhes')}</span></span>
         <span class="workout-row-arrow">›</span></button>`).join('')}</div>
     </section>`;
   }).join('');
@@ -383,21 +394,20 @@ async function loadWorkoutExercises() {
 async function setActiveWorkout(id) {
   const target = workoutsCache.find(item => item.id === id);
   if (!target || target.status === 'ativo') return;
-  const current = workoutsCache.find(item => item.id === activeTreinoId);
-  const confirmation = current
-    ? `Aplicar o plano “${target.nome}” ao aluno?\n\nO plano “${current.nome}” deixará de ser o plano ativo.`
-    : `Aplicar o plano “${target.nome}” ao aluno?`;
+  const confirmation = `Aplicar o plano “${target.nome}” ao aluno?\n\nPlanos já ativos em dias diferentes e sem conflito de período permanecerão ativos.`;
   if (!confirm(confirmation)) return;
 
-  const { error: deactivateError } = await supabase.from('treinos').update({ status: 'inativo' }).eq('aluno_id', alunoId).eq('personal_id', session.user.id).neq('id', id);
-  if (deactivateError) return showMessage(message, 'Não foi possível atualizar o plano ativo.', 'error');
-  const { error } = await supabase.from('treinos').update({ status: 'ativo' }).eq('id', id).eq('personal_id', session.user.id);
-  if (error) return showMessage(message, 'Não foi possível aplicar o plano ao aluno.', 'error');
+  const { error } = await supabase.rpc('fsfit_ativar_treino_aluno', { p_treino_id: id });
+  if (error) {
+    const conflictMessage = String(error.message || '').includes('Conflito de treino')
+      ? error.message
+      : 'Não foi possível aplicar o plano ao aluno.';
+    return showMessage(message, conflictMessage, 'error');
+  }
 
   closeWorkoutModal();
   treinoId = id;
-  activeTreinoId = id;
-  showMessage(message, `Plano “${target.nome}” aplicado ao aluno.`);
+  showMessage(message, `Plano “${target.nome}” aplicado ao aluno. Planos compatíveis permaneceram ativos.`);
   await loadWorkouts(id);
 }
 
@@ -414,7 +424,8 @@ async function deleteWorkout(id) {
 
 async function deleteExercise(id) {
   const row = workoutExercisesCache.find(item => item.id === id);
-  if (!row || !confirm(`Remover “${row.exercicios?.nome || 'este exercício'}” do treino?`)) return;
+  const exerciseName = row ? effectiveExercise(row).nome : '';
+  if (!row || !confirm(`Remover “${exerciseName || 'este exercício'}” do treino?`)) return;
   const { error } = await supabase.from('treino_exercicios').delete().eq('id', id).eq('treino_id', treinoId);
   if (error) return showMessage(message, 'Não foi possível remover o exercício.', 'error');
   closeExerciseDetailModal();
@@ -432,12 +443,18 @@ workoutForm.addEventListener('submit', async event => {
     data_fim: workoutForm.data_fim.value || null
   };
   if (!payload.nome) return showMessage(message, 'Informe o nome do treino.', 'error');
+  if (!payload.dias_semana.length) return showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
   if (payload.data_inicio && payload.data_fim && payload.data_fim < payload.data_inicio) return showMessage(message, 'A data final não pode ser anterior à data inicial.', 'error');
 
   let savedId = editingWorkoutId;
   if (editingWorkoutId) {
     const { error } = await supabase.from('treinos').update(payload).eq('id', editingWorkoutId).eq('personal_id', session.user.id);
-    if (error) return showMessage(message, 'Não foi possível atualizar o plano.', 'error');
+    if (error) {
+      const conflictMessage = String(error.message || '').includes('Conflito de treino')
+        ? error.message
+        : 'Não foi possível atualizar o plano.';
+      return showMessage(message, conflictMessage, 'error');
+    }
     showMessage(message, 'Plano de treino atualizado com sucesso.');
   } else {
     const shouldActivate = !workoutsCache.some(item => item.status === 'ativo');
