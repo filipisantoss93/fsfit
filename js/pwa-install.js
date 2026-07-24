@@ -169,9 +169,13 @@ if (isIos()) {
 }
 
 if (document.querySelector('#today-list') || document.querySelector('#live-students-list')) {
-  import('./painel-home-redesign.js?v=20260723-home-redesign1').catch(error => {
-    console.error('Falha ao carregar nova tela inicial do painel:', error);
-  });
+  import('./painel-home-redesign.js?v=20260723-home-redesign1')
+    .then(() => import('./painel-day-summary.js?v=20260724-day-summary1').catch(error => {
+      console.error('Falha ao carregar o resumo diário do painel:', error);
+    }))
+    .catch(error => {
+      console.error('Falha ao carregar nova tela inicial do painel:', error);
+    });
   import('./painel-home-avatar.js?v=20260724-home-avatar1').catch(error => {
     console.error('Falha ao carregar a foto do aluno no card Agora:', error);
   });
