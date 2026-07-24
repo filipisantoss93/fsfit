@@ -1,8 +1,10 @@
 /* Página de alunos */
 .students-page { max-width: 1080px; }
-.students-page-header { align-items: center; }
+.students-page-header { align-items: flex-start; gap: 14px; }
+.students-header-actions { display: flex; align-items: flex-start; flex: 0 0 auto; margin-left: auto; }
+.students-add-button { width: auto; min-height: 40px; padding: 8px 14px; font-size: .78rem; white-space: nowrap; }
 .student-form-card { margin-top: 20px; margin-bottom: 20px; }
-.student-list-card { margin-top: 20px; }
+.student-list-card { margin-top: 14px; }
 
 .student-section-heading {
   display: flex;
@@ -110,7 +112,8 @@
   outline-offset: 2px;
 }
 
-.student-list-heading { margin-bottom: 14px; }
+.student-list-heading { align-items: center; flex-direction: row; margin-bottom: 14px; }
+.student-list-heading .hero-badge { flex: 0 0 auto; margin: 0; white-space: nowrap; }
 .responsive-students .actions { gap: 8px; }
 .responsive-students .btn { min-height: 40px; padding-inline: 13px; font-size: .86rem; }
 
@@ -120,11 +123,16 @@
 
 @media (max-width: 620px) {
   .students-page-header {
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 10px;
     margin-bottom: 20px;
   }
   .students-page-header h1 { font-size: 2.15rem; }
   .students-page-header p { max-width: 330px; font-size: .95rem; line-height: 1.5; }
+  .students-header-actions { justify-self: end; margin-left: 0; }
+  .students-add-button { min-height: 40px; padding: 8px 12px; font-size: .72rem; }
 
   .student-form-card,
   .student-list-card { padding: 17px; }
@@ -135,6 +143,13 @@
   }
   .student-section-heading .btn { width: 100%; }
   .student-section-heading h2 { font-size: 1.6rem; }
+  .student-list-heading {
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .student-list-heading .hero-badge { padding: 7px 11px; font-size: .68rem; }
 
   .student-fieldset { margin-bottom: 18px; padding-bottom: 16px; }
   .student-fieldset legend { margin-bottom: 13px; }
@@ -212,6 +227,8 @@
 }
 
 @media (max-width: 390px) {
+  .students-add-button { padding-inline: 10px; }
+  .student-list-heading .hero-badge { padding-inline: 9px; }
   .student-physical-grid { grid-template-columns: 1fr; }
   .student-weekdays label { flex-basis: calc(33.333% - 8px); }
   .responsive-students td { grid-template-columns: 88px minmax(0, 1fr); gap: 9px; }
