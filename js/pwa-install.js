@@ -190,6 +190,9 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
     .catch(error => {
       console.error('Falha ao carregar ações rápidas da aula:', error);
     });
+  import('./aulas-painel-delete-controls.js?v=20260724-live-delete1').catch(error => {
+    console.error('Falha ao carregar exclusão de exercícios em aula:', error);
+  });
   import('./aulas-painel-exercise-controls.js?v=20260720-live-exercise-controls1').catch(error => {
     console.error('Falha ao carregar controles de exercício em aula:', error);
   });
