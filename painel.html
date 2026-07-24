@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="application-name" content="FS Fit">
-  <title>Painel — FS Fit</title>
+  <title>Início — FS Fit</title>
   <link rel="manifest" href="manifest-personal.webmanifest?v=20260722-icons-v4">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -22,122 +22,135 @@
   <link rel="stylesheet" href="css/aulas.css?v=20260716-live2">
   <link rel="stylesheet" href="css/aulas-painel-compact.css?v=20260719-live-compact1">
   <style>
-    .dashboard-user-greeting { margin:0 0 6px; color:var(--primary); font-size:.82rem; font-weight:850; letter-spacing:.02em; }
-    .dashboard-tabs { display:flex; align-items:center; gap:6px; width:max-content; max-width:100%; margin:0 0 20px; padding:5px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
-    .dashboard-tab { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:10px 16px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:.84rem; font-weight:850; cursor:pointer; transition:background .2s ease,color .2s ease,transform .2s ease; }
-    .dashboard-tab:hover { color:var(--text); background:var(--surface-light); }
+    .dashboard-home-header { margin-bottom:12px; }
+    .dashboard-user-greeting { margin:0; color:var(--text); font-size:1.35rem; font-weight:900; letter-spacing:-.02em; }
+    .dashboard-welcome-line { margin:4px 0 0; color:var(--muted); font-size:.82rem; }
+
+    .dashboard-tabs { display:flex; align-items:center; gap:6px; width:max-content; max-width:100%; margin:0 0 16px; padding:5px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+    .dashboard-tab { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:9px 14px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:inherit; font-size:.8rem; font-weight:850; cursor:pointer; transition:background .2s ease,color .2s ease,transform .2s ease; }
     .dashboard-tab:active { transform:scale(.98); }
     .dashboard-tab[aria-selected="true"] { background:var(--primary); color:#07120a; }
-    .dashboard-tab-count { display:grid; place-items:center; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:rgba(0,0,0,.18); color:inherit; font-size:.72rem; font-weight:900; }
+    .dashboard-tab-count { display:grid; place-items:center; min-width:21px; height:21px; padding:0 5px; border-radius:999px; background:rgba(0,0,0,.18); color:inherit; font-size:.68rem; font-weight:900; }
     .dashboard-tab-panel[hidden] { display:none !important; }
 
-    .dashboard-overview-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
-    .dashboard-summary-card { min-width:0; padding:18px; }
-    .dashboard-summary-card small { display:block; margin-bottom:8px; color:var(--muted); font-size:.72rem; font-weight:800; line-height:1.25; }
-    .dashboard-summary-card strong { display:block; overflow:hidden; color:var(--text); font-size:1.45rem; font-weight:900; line-height:1.1; text-overflow:ellipsis; white-space:nowrap; }
-    .dashboard-summary-card:nth-child(1) { border-top:4px solid var(--primary); }
-    .dashboard-summary-card:nth-child(2) { border-top:4px solid var(--secondary); }
-    .dashboard-summary-card:nth-child(3) { border-top:4px solid var(--primary); }
-    .dashboard-summary-card:nth-child(4) { border-top:4px solid var(--warning); }
+    #dashboard-home-panel { display:grid; gap:10px; }
+    .home-now-card { padding:16px; border-left:4px solid var(--primary); background:linear-gradient(120deg,rgba(177,255,0,.1),rgba(18,28,31,.82) 48%,rgba(9,22,31,.94)); }
+    .home-now-content { display:grid; grid-template-columns:46px minmax(0,1fr); gap:12px; }
+    .home-now-icon { display:grid; place-items:center; width:46px; height:46px; border-radius:50%; background:var(--primary-soft); color:var(--primary); font-size:1.1rem; font-weight:950; }
+    .home-card-kicker { display:block; margin-bottom:4px; color:var(--primary); font-size:.62rem; font-weight:950; letter-spacing:.08em; }
+    .home-now-copy h2 { margin:0; font-size:1.25rem; line-height:1.1; }
+    .home-now-status { margin:5px 0 0; color:var(--muted); font-size:.74rem; }
+    .home-now-person { display:flex; gap:7px; margin-top:10px; font-size:.78rem; }
+    .home-now-person[hidden], .home-now-indicators[hidden], .home-now-swipe-hint[hidden], .home-now-action[hidden] { display:none !important; }
+    .home-now-meta { display:block; margin-top:4px; color:var(--muted); font-size:.69rem; }
+    .home-now-action { width:100%; min-height:44px; margin-top:14px; border:0; border-radius:12px; background:var(--primary); color:#07120a; font:inherit; font-size:.78rem; font-weight:950; }
+    .home-day-card { padding:14px; }
+    .home-section-title { margin:0 0 10px; font-size:.92rem; }
+    .home-day-summary { display:flex; flex-wrap:wrap; gap:7px 10px; color:var(--muted); font-size:.68rem; }
+    .home-day-summary span { display:inline-flex; align-items:center; gap:5px; }
+    .home-day-dot { width:7px; height:7px; border-radius:50%; background:#77808d; }
+    .home-day-dot.done { background:var(--primary); }
+    .home-day-dot.live { background:var(--secondary); }
+    .home-day-progress { display:flex; height:7px; margin-top:12px; overflow:hidden; border-radius:999px; background:rgba(255,255,255,.09); }
+    .home-day-progress span { display:block; height:100%; }
+    .home-day-progress-done { background:var(--primary); }
+    .home-day-progress-live { background:var(--secondary); }
+    .home-upcoming-card { padding:15px 14px 4px; }
+    .home-upcoming-item { display:grid; grid-template-columns:72px minmax(0,1fr) auto; gap:10px; align-items:center; min-height:62px; padding:10px 0; border-top:1px solid var(--border); color:inherit; text-decoration:none; }
+    .home-upcoming-item:first-child { border-top:0; }
+    .home-upcoming-time small,.home-upcoming-time strong,.home-upcoming-main strong,.home-upcoming-main span { display:block; }
+    .home-upcoming-time small { color:var(--muted); font-size:.62rem; }
+    .home-upcoming-time strong { font-size:.92rem; }
+    .home-upcoming-main { min-width:0; padding-left:10px; border-left:1px solid var(--border); }
+    .home-upcoming-main strong,.home-upcoming-main span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .home-upcoming-main strong { font-size:.78rem; }
+    .home-upcoming-main span { margin-top:3px; color:var(--muted); font-size:.64rem; }
+    .home-upcoming-arrow { color:var(--primary); }
+    .home-upcoming-empty { margin:0; padding:10px 0 16px; color:var(--muted); font-size:.72rem; }
+    .home-review-card { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:13px 14px; border-left:4px solid var(--warning); background:linear-gradient(110deg,rgba(255,204,51,.07),rgba(255,204,51,.015) 55%,var(--surface)); text-align:left; }
+    .home-review-leading { display:flex; align-items:center; gap:10px; min-width:0; }
+    .home-review-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:rgba(255,204,51,.11); color:var(--warning); }
+    .home-review-copy { min-width:0; }
+    .home-review-copy strong,.home-review-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .home-review-copy strong { font-size:.78rem; }
+    .home-review-copy span { margin-top:3px; color:var(--muted); font-size:.64rem; }
+    .home-review-link { color:var(--warning); font-size:.66rem; font-weight:900; white-space:nowrap; }
+    .home-summary-strip { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding:12px; }
+    .home-summary-item { display:flex; align-items:center; gap:9px; min-width:0; }
+    .home-summary-item+.home-summary-item { padding-left:12px; border-left:1px solid var(--border); }
+    .home-summary-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--primary-soft); color:var(--primary); font-size:.67rem; font-weight:950; }
+    .home-summary-copy { min-width:0; }
+    .home-summary-copy strong,.home-summary-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .home-summary-copy strong { font-size:.94rem; }
+    .home-summary-copy span { margin-top:2px; color:var(--muted); font-size:.6rem; }
 
-    .dashboard-day-snapshot { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
-    .dashboard-snapshot-card { display:flex; align-items:center; justify-content:space-between; gap:14px; min-width:0; padding:16px 18px; text-align:left; cursor:pointer; }
-    .dashboard-snapshot-copy { min-width:0; }
-    .dashboard-snapshot-copy small { display:block; margin-bottom:5px; color:var(--muted); font-size:.69rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
-    .dashboard-snapshot-copy strong { display:block; overflow:hidden; color:var(--text); font-size:.94rem; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
-    .dashboard-snapshot-copy span { display:block; overflow:hidden; margin-top:4px; color:var(--muted); font-size:.75rem; text-overflow:ellipsis; white-space:nowrap; }
-    .dashboard-snapshot-value { flex:0 0 auto; display:grid; place-items:center; min-width:42px; height:42px; padding:0 10px; border-radius:12px; background:var(--surface-light); color:var(--primary); font-size:1rem; font-weight:900; }
-    .dashboard-snapshot-arrow { flex:0 0 auto; color:var(--muted); font-size:1.35rem; line-height:1; }
-
-    .today-card { padding:0; overflow:hidden; }
-    .today-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:22px 22px 16px; border-bottom:1px solid var(--border); }
-    .today-card-header small { display:block; margin-bottom:5px; color:var(--primary); font-size:.72rem; font-weight:800; letter-spacing:.08em; }
-    .today-card-header h2 { margin:0 0 4px; }
-    .today-card-header p { margin:0; font-size:.86rem; }
-    .today-count { display:grid; place-items:center; min-width:42px; height:42px; padding:0 10px; border-radius:12px; background:var(--primary-soft); color:var(--primary); font-weight:900; }
-    .today-list { display:grid; }
-    .today-entry { display:grid; grid-template-columns:62px minmax(0,1fr) auto; gap:14px; align-items:center; padding:15px 22px; border-bottom:1px solid var(--border); transition:.2s ease; }
-    .today-entry:last-child { border-bottom:0; }
-    a.today-entry:hover { background:var(--surface-light); }
-    .today-entry.locked { cursor:not-allowed; opacity:.62; }
-    .today-time { color:var(--primary); font-size:1.05rem; font-weight:900; }
-    .today-entry-main { min-width:0; }
-    .today-entry-main strong, .today-entry-main span, .today-entry-main small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .today-entry-main span { margin-top:3px; color:var(--muted); font-size:.82rem; }
-    .today-entry-main small { margin-top:3px; color:#8d96a3; font-size:.74rem; }
-    .today-open { color:var(--secondary); font-size:.8rem; font-weight:800; }
-
-    .attention-card { margin-bottom:18px; }
-    .attention-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; }
-    .attention-heading h2 { margin:0 0 7px; }
-    .attention-heading p { margin:0; font-size:.86rem; }
-    .attention-total { display:grid; place-items:center; min-width:38px; height:38px; padding:0 10px; border-radius:12px; background:rgba(255,204,51,.1); color:var(--warning); font-size:.9rem; font-weight:900; }
-    .attention-list { display:grid; gap:10px; }
-    .attention-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 13px; border:1px solid var(--border); border-radius:12px; background:var(--surface-light); }
-    .attention-item[hidden] { display:none !important; }
-    .attention-item strong { display:block; font-size:.87rem; }
-    .attention-item small { display:block; margin-top:3px; color:var(--muted); font-size:.72rem; }
-    .attention-number { flex:0 0 auto; font-size:1.2rem; font-weight:900; }
+    .attention-card { margin-bottom:14px; padding:14px; }
+    .attention-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .attention-heading h2 { margin:0 0 4px; font-size:1rem; }
+    .attention-heading p { margin:0; font-size:.72rem; }
+    .attention-total { display:grid; place-items:center; min-width:34px; height:34px; padding:0 9px; border-radius:10px; background:rgba(255,204,51,.1); color:var(--warning); font-weight:900; }
+    .attention-list { display:grid; gap:8px; }
+    .attention-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 11px; border:1px solid var(--border); border-radius:12px; background:var(--surface-light); }
+    .attention-item[hidden], .attention-status[hidden] { display:none !important; }
+    .attention-item strong { display:block; font-size:.78rem; }
+    .attention-item small { display:block; margin-top:3px; color:var(--muted); font-size:.65rem; }
+    .attention-number { font-size:1.1rem; font-weight:900; }
     .attention-number.warning { color:var(--warning); }
     .attention-number.primary { color:var(--primary); }
     .attention-number.danger { color:#ff5f67; }
-    .attention-status { margin:0; padding:8px 2px; color:var(--muted); font-size:.82rem; }
-    .attention-status[hidden] { display:none !important; }
+    .attention-status { margin:0; padding:8px 2px; color:var(--muted); font-size:.78rem; }
 
-    .dashboard-public-link-compact { margin-bottom:22px; }
+    .dashboard-overview-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:14px; }
+    .dashboard-summary-card { min-width:0; padding:11px 10px; }
+    .dashboard-summary-card small { display:block; margin-bottom:5px; color:var(--muted); font-size:.6rem; font-weight:800; }
+    .dashboard-summary-card strong { display:block; overflow:hidden; font-size:1rem; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+    .dashboard-summary-card:nth-child(1),.dashboard-summary-card:nth-child(3) { border-top:4px solid var(--primary); }
+    .dashboard-summary-card:nth-child(2) { border-top:4px solid var(--secondary); }
+    .dashboard-summary-card:nth-child(4) { border-top:4px solid var(--warning); }
+
+    .today-card { padding:0; overflow:hidden; }
+    .today-card-header { display:flex; justify-content:space-between; gap:14px; padding:18px 18px 14px; border-bottom:1px solid var(--border); }
+    .today-card-header small { display:block; margin-bottom:5px; color:var(--primary); font-size:.68rem; font-weight:800; letter-spacing:.08em; }
+    .today-card-header h2 { margin:0 0 4px; }
+    .today-card-header p { margin:0; font-size:.8rem; }
+    .today-count { display:grid; place-items:center; min-width:38px; height:38px; padding:0 9px; border-radius:11px; background:var(--primary-soft); color:var(--primary); font-weight:900; }
+    .today-entry { display:grid; grid-template-columns:52px minmax(0,1fr); gap:12px; padding:14px 18px; border-bottom:1px solid var(--border); }
+    .today-entry:last-child { border-bottom:0; }
+    .today-time { color:var(--primary); font-size:.95rem; font-weight:900; }
+    .today-entry-main { min-width:0; }
+    .today-entry-main strong,.today-entry-main span,.today-entry-main small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .today-entry-main span { margin-top:3px; color:var(--muted); font-size:.78rem; }
+    .today-entry-main small { margin-top:3px; color:#8d96a3; font-size:.7rem; }
+    .today-open { display:none; }
+
+    .dashboard-public-link-compact { margin-bottom:12px; }
     .dashboard-public-link-compact h2 { margin-bottom:5px; }
-    .dashboard-public-link-compact > p { margin:0 0 12px; font-size:.8rem; }
-    .dashboard-public-link-compact .dashboard-public-link { margin-bottom:12px; font-size:.86rem; }
-
-    .dashboard-activity-card { margin-top:22px; padding:0; overflow:hidden; }
-    .dashboard-activity-heading { padding:20px 22px 14px; border-bottom:1px solid var(--border); }
+    .dashboard-public-link-compact>p { margin:0 0 12px; font-size:.78rem; }
+    .dashboard-public-link-compact .dashboard-public-link { margin-bottom:12px; font-size:.82rem; }
+    .dashboard-activity-card { margin-top:12px; padding:0; overflow:hidden; }
+    .dashboard-activity-heading { padding:18px 18px 13px; border-bottom:1px solid var(--border); }
     .dashboard-activity-heading h2 { margin:0 0 4px; }
-    .dashboard-activity-heading p { margin:0; font-size:.8rem; }
+    .dashboard-activity-heading p { margin:0; font-size:.78rem; }
     .dashboard-activity-list { display:grid; }
-    .dashboard-activity-item { display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:12px; align-items:center; padding:14px 22px; border-bottom:1px solid var(--border); }
+    .dashboard-activity-item { display:grid; grid-template-columns:34px minmax(0,1fr) auto; gap:10px; align-items:center; padding:13px 18px; border-bottom:1px solid var(--border); }
     .dashboard-activity-item:last-child { border-bottom:0; }
-    .dashboard-activity-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; background:var(--surface-light); font-size:.9rem; font-weight:900; }
+    .dashboard-activity-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--surface-light); font-size:.85rem; font-weight:900; }
     .dashboard-activity-copy { min-width:0; }
-    .dashboard-activity-copy strong, .dashboard-activity-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .dashboard-activity-copy strong { font-size:.85rem; }
-    .dashboard-activity-copy span { margin-top:3px; color:var(--muted); font-size:.74rem; }
-    .dashboard-activity-item time { color:var(--muted); font-size:.7rem; font-weight:800; white-space:nowrap; }
-
-    .dashboard-empty { padding:28px 22px; color:var(--muted); text-align:center; }
+    .dashboard-activity-copy strong,.dashboard-activity-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .dashboard-activity-copy strong { font-size:.82rem; }
+    .dashboard-activity-copy span { margin-top:3px; color:var(--muted); font-size:.7rem; }
+    .dashboard-activity-item time { color:var(--muted); font-size:.68rem; font-weight:800; white-space:nowrap; }
+    .dashboard-empty { padding:24px 18px; color:var(--muted); text-align:center; }
     .premium-locked { opacity:.5 !important; cursor:not-allowed !important; pointer-events:none !important; }
 
-    @media (max-width:820px) {
-      .dashboard-overview-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    }
-
     @media (max-width:620px) {
-      .dashboard-tabs { width:100%; gap:4px; margin-bottom:16px; padding:4px; }
-      .dashboard-tab { flex:1 1 0; min-width:0; gap:5px; padding:9px 6px; font-size:.78rem; }
-      .dashboard-tab-count { min-width:20px; height:20px; padding:0 5px; font-size:.68rem; }
-      .dashboard-overview-summary { gap:8px; margin-bottom:14px; }
-      .dashboard-summary-card { padding:14px 12px; }
-      .dashboard-summary-card small { min-height:30px; margin-bottom:6px; font-size:.64rem; }
-      .dashboard-summary-card strong { font-size:1.12rem; }
-      .dashboard-day-snapshot { grid-template-columns:1fr; gap:8px; margin-bottom:14px; }
-      .dashboard-snapshot-card { padding:13px 14px; }
-      .attention-card { margin-bottom:14px; }
-      .attention-heading { margin-bottom:13px; }
-      .attention-total { min-width:34px; height:34px; border-radius:10px; }
-      .today-card-header { padding:18px 18px 14px; }
-      .today-entry { grid-template-columns:52px minmax(0,1fr); padding:14px 18px; }
-      .today-open { display:none; }
-      .today-time { font-size:.95rem; }
-      .dashboard-public-link-compact { margin-bottom:18px; }
-      .dashboard-activity-card { margin-top:18px; }
-      .dashboard-activity-heading { padding:18px 18px 13px; }
-      .dashboard-activity-item { grid-template-columns:34px minmax(0,1fr) auto; gap:10px; padding:13px 18px; }
-      .dashboard-activity-icon { width:34px; height:34px; border-radius:10px; }
+      .dashboard-tabs { width:100%; gap:2px; padding:3px; border-radius:12px; }
+      .dashboard-tab { flex:1 1 0; min-width:0; min-height:36px; gap:3px; padding:7px 4px; border-radius:9px; font-size:.69rem; }
+      .dashboard-tab-count { min-width:18px; height:18px; padding:0 4px; font-size:.6rem; }
     }
   </style>
   <meta name="apple-mobile-web-app-title" content="FS Fit">
-  <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
 </head>
 <body>
@@ -151,24 +164,83 @@
       </nav>
     </header>
   </div>
+
   <main class="container">
     <div id="access-notice" class="message" style="display:none;margin-bottom:20px"></div>
 
-    <section class="page-header">
+    <section class="page-header dashboard-home-header">
       <div>
         <p id="dashboard-user-greeting" class="dashboard-user-greeting hidden"></p>
-        <h1>Painel de Controle</h1>
-        <p>O que precisa da sua atenção e como está o seu dia.</p>
+        <p class="dashboard-welcome-line">Vamos começar seu dia.</p>
       </div>
     </section>
 
     <nav class="dashboard-tabs" role="tablist" aria-label="Seções do painel">
-      <button id="dashboard-tab-overview" class="dashboard-tab" type="button" role="tab" aria-selected="true" aria-controls="dashboard-overview-panel" tabindex="0" data-dashboard-tab="overview">Visão geral</button>
+      <button id="dashboard-tab-home" class="dashboard-tab" type="button" role="tab" aria-selected="true" aria-controls="dashboard-home-panel" tabindex="0" data-dashboard-tab="home"><span aria-hidden="true">⌂</span><span>Início</span></button>
+      <button id="dashboard-tab-overview" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-overview-panel" tabindex="-1" data-dashboard-tab="overview">Visão geral</button>
       <button id="dashboard-tab-agenda" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-agenda-panel" tabindex="-1" data-dashboard-tab="agenda">Hoje <span id="dashboard-agenda-tab-count" class="dashboard-tab-count">—</span></button>
       <button id="dashboard-tab-live" class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="dashboard-live-panel" tabindex="-1" data-dashboard-tab="live">Em aula <span id="dashboard-live-tab-count" class="dashboard-tab-count">0</span></button>
     </nav>
 
-    <div id="dashboard-overview-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-overview">
+    <section id="dashboard-home-panel" class="dashboard-home-panel dashboard-tab-panel home-redesign" role="tabpanel" aria-labelledby="dashboard-tab-home">
+      <article id="home-now-card" class="card home-now-card" aria-live="polite">
+        <div class="home-now-content">
+          <span id="home-now-icon" class="home-now-icon" aria-hidden="true">⌁</span>
+          <div class="home-now-copy">
+            <small class="home-card-kicker">AGORA</small>
+            <h2 id="home-now-title">Carregando seu dia...</h2>
+            <p id="home-now-status" class="home-now-status">Consultando agenda e aulas em andamento.</p>
+            <div class="home-now-person"><span aria-hidden="true">♙</span><span id="home-now-person-text">FS Fit</span></div>
+            <span id="home-now-meta" class="home-now-meta">Sincronizando informações</span>
+            <div id="home-now-indicators" class="home-now-indicators" hidden></div>
+            <small id="home-now-swipe-hint" class="home-now-swipe-hint" hidden></small>
+          </div>
+        </div>
+        <button id="home-now-action" class="home-now-action" type="button">Acompanhar aula →</button>
+      </article>
+
+      <article class="card home-day-card">
+        <h2 class="home-section-title">Seu dia</h2>
+        <div class="home-day-summary">
+          <span><i class="home-day-dot done"></i><strong id="home-day-completed">0</strong> concluídos</span>
+          <span><i class="home-day-dot live"></i><strong id="home-day-live">0</strong> em andamento</span>
+          <span><i class="home-day-dot"></i><strong id="home-day-total">0</strong> atendimentos</span>
+        </div>
+        <div class="home-day-progress" aria-hidden="true">
+          <span id="home-day-progress-done" class="home-day-progress-done"></span>
+          <span id="home-day-progress-live" class="home-day-progress-live"></span>
+        </div>
+      </article>
+
+      <article class="card home-upcoming-card">
+        <h2 class="home-section-title">Próximos da agenda</h2>
+        <div id="home-upcoming-list" class="home-upcoming-list"><p class="home-upcoming-empty">Carregando próximos atendimentos...</p></div>
+      </article>
+
+      <button id="home-review-card" class="card home-review-card" type="button">
+        <span class="home-review-leading">
+          <span class="home-review-icon" aria-hidden="true">▣</span>
+          <span class="home-review-copy">
+            <strong id="home-review-title">Itens para revisar</strong>
+            <span id="home-review-detail">Carregando pendências...</span>
+          </span>
+        </span>
+        <span class="home-review-link">Ver detalhes ›</span>
+      </button>
+
+      <article class="card home-summary-strip" aria-label="Resumo rápido">
+        <div class="home-summary-item">
+          <span class="home-summary-icon" aria-hidden="true">♟♟</span>
+          <div class="home-summary-copy"><strong id="home-summary-active">—</strong><span>alunos ativos</span></div>
+        </div>
+        <div class="home-summary-item">
+          <span class="home-summary-icon" aria-hidden="true">R$</span>
+          <div class="home-summary-copy"><strong id="home-summary-received">—</strong><span>recebidos no mês</span></div>
+        </div>
+      </article>
+    </section>
+
+    <div id="dashboard-overview-panel" class="dashboard-tab-panel" role="tabpanel" aria-labelledby="dashboard-tab-overview" hidden>
       <article class="card attention-card">
         <div class="attention-heading">
           <div>
@@ -180,22 +252,18 @@
         <div class="attention-list">
           <p id="attention-loading" class="attention-status">Carregando pendências...</p>
           <p id="attention-empty" class="attention-status" hidden>Tudo em dia. Nenhuma ação pendente agora.</p>
-
           <a id="attention-no-workout-item" class="attention-item" href="alunos.html" data-attention-item data-premium-link hidden>
             <div><strong>Alunos sem treino ativo</strong><small>Precisam de planejamento</small></div>
             <span id="attention-no-workout" class="attention-number warning">—</span>
           </a>
-
           <a id="attention-overdue-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
             <div><strong>Mensalidades vencidas</strong><small>Pagamentos atrasados para revisar</small></div>
             <span id="attention-overdue" class="attention-number danger">—</span>
           </a>
-
           <a id="attention-waiting-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
             <div><strong>Pagamentos para confirmar</strong><small>Alunos informaram pagamento</small></div>
             <span id="attention-waiting" class="attention-number primary">—</span>
           </a>
-
           <a id="attention-due-today-item" class="attention-item" href="financeiro.html" data-attention-item data-premium-link hidden>
             <div><strong>Mensalidades vencendo hoje</strong><small>Acompanhar os recebimentos do dia</small></div>
             <span id="attention-due-today" class="attention-number warning">—</span>
@@ -204,53 +272,10 @@
       </article>
 
       <section class="dashboard-overview-summary" aria-label="Visão rápida da consultoria">
-        <article class="card dashboard-summary-card">
-          <small>Alunos ativos</small>
-          <strong id="summary-active-students">—</strong>
-        </article>
-        <article class="card dashboard-summary-card">
-          <small>Atendimentos hoje</small>
-          <strong id="summary-today-appointments">—</strong>
-        </article>
-        <article class="card dashboard-summary-card">
-          <small>Recebido no mês</small>
-          <strong id="summary-month-received">—</strong>
-        </article>
-        <article class="card dashboard-summary-card">
-          <small>Pendências financeiras</small>
-          <strong id="summary-finance-pending">—</strong>
-        </article>
-      </section>
-
-      <section class="dashboard-day-snapshot" aria-label="Resumo operacional de hoje">
-        <button class="card dashboard-snapshot-card" type="button" data-dashboard-jump="live">
-          <div class="dashboard-snapshot-copy">
-            <small>Em acompanhamento</small>
-            <strong><span id="overview-live-count-text">0 alunos em aula agora</span></strong>
-            <span>Abrir acompanhamento ao vivo</span>
-          </div>
-          <span class="dashboard-snapshot-arrow" aria-hidden="true">›</span>
-        </button>
-
-        <button class="card dashboard-snapshot-card" type="button" data-dashboard-jump="agenda">
-          <div class="dashboard-snapshot-copy">
-            <small>Próximo atendimento</small>
-            <strong id="overview-next-appointment">Carregando agenda...</strong>
-            <span id="overview-next-appointment-detail">Ver agenda de hoje</span>
-          </div>
-          <span class="dashboard-snapshot-arrow" aria-hidden="true">›</span>
-        </button>
-      </section>
-
-      <section class="quick-actions">
-        <h2>Atalhos rápidos</h2>
-        <div class="quick-actions-grid">
-          <a class="card quick-action" href="alunos.html" data-premium-link><strong>👥 Alunos</strong><small>Ver e gerenciar alunos</small></a>
-          <a class="card quick-action" href="financeiro.html" data-premium-link><strong>💰 Financeiro</strong><small>Mensalidades e recebimentos</small></a>
-          <a class="card quick-action" href="biblioteca-exercicios.html" data-premium-link><strong>🏋️ Exercícios</strong><small>Acessar biblioteca de exercícios</small></a>
-          <a class="card quick-action" href="agenda.html" data-premium-link><strong>📅 Agenda completa</strong><small>Consultar todos os atendimentos</small></a>
-          <a class="card quick-action" href="perfil.html"><strong>👤 Perfil</strong><small>Editar sua página pública</small></a>
-        </div>
+        <article class="card dashboard-summary-card"><small>Alunos ativos</small><strong id="summary-active-students">—</strong></article>
+        <article class="card dashboard-summary-card"><small>Atendimentos hoje</small><strong id="summary-today-appointments">—</strong></article>
+        <article class="card dashboard-summary-card"><small>Recebido no mês</small><strong id="summary-month-received">—</strong></article>
+        <article class="card dashboard-summary-card"><small>Pendências financeiras</small><strong id="summary-finance-pending">—</strong></article>
       </section>
 
       <section id="public-link-card" class="card public-link-card dashboard-public-link-compact">
@@ -269,9 +294,7 @@
           <h2>Atividade recente</h2>
           <p>Novos alunos e movimentações financeiras recentes.</p>
         </div>
-        <div id="dashboard-activity-list" class="dashboard-activity-list">
-          <p class="dashboard-empty">Carregando atividade recente...</p>
-        </div>
+        <div id="dashboard-activity-list" class="dashboard-activity-list"><p class="dashboard-empty">Carregando atividade recente...</p></div>
       </section>
     </div>
 
@@ -340,6 +363,7 @@
     (() => {
       const tabs = Array.from(document.querySelectorAll('[data-dashboard-tab]'));
       const panels = {
+        home: document.getElementById('dashboard-home-panel'),
         overview: document.getElementById('dashboard-overview-panel'),
         agenda: document.getElementById('dashboard-agenda-panel'),
         live: document.getElementById('dashboard-live-panel')
@@ -349,10 +373,6 @@
       const agendaTabCount = document.getElementById('dashboard-agenda-tab-count');
       const liveCount = document.getElementById('live-students-count');
       const liveTabCount = document.getElementById('dashboard-live-tab-count');
-      const overviewLiveCountText = document.getElementById('overview-live-count-text');
-      const nextAppointment = document.getElementById('overview-next-appointment');
-      const nextAppointmentDetail = document.getElementById('overview-next-appointment-detail');
-      const todayList = document.getElementById('today-list');
       const attentionCard = document.querySelector('.attention-card');
       const attentionTotal = document.getElementById('attention-total-count');
       const attentionItems = Array.from(document.querySelectorAll('[data-attention-item]'));
@@ -364,7 +384,6 @@
           tab.tabIndex = active ? 0 : -1;
           if (active && shouldFocus) tab.focus();
         });
-
         Object.entries(panels).forEach(([panelName, panel]) => {
           if (panel) panel.hidden = panelName !== name;
         });
@@ -384,13 +403,6 @@
         });
       });
 
-      document.querySelectorAll('[data-dashboard-jump]').forEach(button => {
-        button.addEventListener('click', () => {
-          activateTab(button.dataset.dashboardJump);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
-
       const syncTodayCount = () => {
         const value = todayCount?.textContent.trim() || '—';
         if (todaySummary) todaySummary.textContent = value;
@@ -398,13 +410,8 @@
       };
 
       const syncLiveCount = () => {
-        const raw = liveCount?.textContent.trim() || '0';
-        const value = Number(raw);
-        if (liveTabCount) liveTabCount.textContent = raw;
-        if (overviewLiveCountText) {
-          const safeValue = Number.isFinite(value) ? value : 0;
-          overviewLiveCountText.textContent = safeValue === 1 ? '1 aluno em aula agora' : `${safeValue} alunos em aula agora`;
-        }
+        const value = liveCount?.textContent.trim() || '0';
+        if (liveTabCount) liveTabCount.textContent = value;
       };
 
       const syncAttentionCount = () => {
@@ -417,49 +424,12 @@
         attentionTotal.textContent = String(total);
       };
 
-      const timeToMinutes = value => {
-        const match = String(value || '').trim().match(/^(\d{1,2}):(\d{2})$/);
-        if (!match) return null;
-        return Number(match[1]) * 60 + Number(match[2]);
-      };
-
-      const syncNextAppointment = () => {
-        if (!todayList || !nextAppointment || !nextAppointmentDetail) return;
-        const rows = Array.from(todayList.querySelectorAll('.today-entry'));
-        if (!rows.length) {
-          nextAppointment.textContent = 'Nenhum atendimento restante';
-          nextAppointmentDetail.textContent = 'Sua agenda de hoje está livre';
-          return;
-        }
-
-        const now = new Date();
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
-        const nextRow = rows.find(row => {
-          const minutes = timeToMinutes(row.querySelector('.today-time')?.textContent);
-          return minutes !== null && minutes >= nowMinutes;
-        });
-
-        if (!nextRow) {
-          nextAppointment.textContent = 'Agenda concluída por hoje';
-          nextAppointmentDetail.textContent = `${rows.length} atendimento${rows.length === 1 ? '' : 's'} no dia`;
-          return;
-        }
-
-        const time = nextRow.querySelector('.today-time')?.textContent?.trim() || '—';
-        const name = nextRow.querySelector('.today-entry-main strong')?.textContent?.trim() || 'Aluno';
-        nextAppointment.textContent = `${time} · ${name}`;
-        nextAppointmentDetail.textContent = 'Toque para abrir a agenda de hoje';
-      };
-
       syncTodayCount();
       syncLiveCount();
       syncAttentionCount();
-      syncNextAppointment();
 
       if (todayCount) new MutationObserver(syncTodayCount).observe(todayCount, { childList:true, subtree:true, characterData:true });
       if (liveCount) new MutationObserver(syncLiveCount).observe(liveCount, { childList:true, subtree:true, characterData:true });
-      if (todayList) new MutationObserver(syncNextAppointment).observe(todayList, { childList:true, subtree:true, characterData:true });
-
       attentionItems.forEach(item => {
         new MutationObserver(syncAttentionCount).observe(item, {
           attributes:true,
@@ -469,12 +439,11 @@
           characterData:true
         });
       });
-
       if (attentionCard) {
         new MutationObserver(syncAttentionCount).observe(attentionCard, { attributes:true, attributeFilter:['hidden'] });
       }
 
-      activateTab('overview');
+      activateTab('home');
     })();
   </script>
   <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
