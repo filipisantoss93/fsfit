@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/header-menu.css?v=20260717-support2" data-fsfit-header-styles>
   <link rel="stylesheet" href="css/mobile-navigation.css?v=20260722-shell1" data-fsfit-mobile-navigation>
-  <link rel="stylesheet" href="css/alunos.css?v=20260719-compact1">
+  <link rel="stylesheet" href="css/alunos.css?v=20260724-header1">
   <link rel="stylesheet" href="css/alunos-lista-compacta.css?v=20260722-avatar1">
   <style>
     .student-actions-cell .actions > button { display: none; }
@@ -99,7 +99,9 @@
         <h1>Meus Alunos</h1>
         <p>Cadastre dados físicos e acompanhe a evolução individual.</p>
       </div>
-      <span class="hero-badge"><span id="student-count">0</span>&nbsp;<span id="student-count-label">ALUNOS</span></span>
+      <div class="students-header-actions">
+        <button id="toggle-student-form" class="btn btn-primary students-add-button" type="button">+ Aluno</button>
+      </div>
     </section>
 
     <div id="student-message" class="message"></div>
@@ -110,7 +112,7 @@
           <small>GESTÃO</small>
           <h2>Lista de alunos</h2>
         </div>
-        <button id="toggle-student-form" class="btn btn-primary" type="button">+ Cadastrar novo aluno</button>
+        <span class="hero-badge"><span id="student-count">0</span>&nbsp;<span id="student-count-label">ALUNOS</span></span>
       </div>
 
       <div class="student-search-wrap">
