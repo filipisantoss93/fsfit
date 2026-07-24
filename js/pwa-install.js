@@ -126,6 +126,11 @@ function injectStyles() {
     .pwa-install-android-note{margin-top:18px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);color:#e8eaee;font-size:.88rem;line-height:1.5}
     .pwa-install-actions{display:flex;gap:10px;margin-top:18px}
     .pwa-install-actions .btn{flex:1}
+    @media(max-width:860px){
+      .main-header .nav-container{min-height:58px!important}
+      body.nav-menu-open::before{inset:calc(var(--safe-area-top) + 58px) 0 0!important}
+      .main-header .nav-menu{top:100%!important;max-height:calc(100dvh - var(--safe-area-top) - 74px)!important}
+    }
     @media(max-width:520px){
       #fsfit-pwa-install-modal{place-items:end center;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}
       .pwa-install-dialog{width:100%;max-height:calc(100dvh - max(24px,env(safe-area-inset-top)) - max(24px,env(safe-area-inset-bottom)));padding:20px 18px;border-radius:22px}
