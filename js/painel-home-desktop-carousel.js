@@ -1,36 +1,66 @@
-const card = await waitForElement('#home-now-card');
-const liveList = document.querySelector('#live-students-list');
+const homePanel = await waitForElement('#dashboard-home-panel');
+const liveList = await waitForElement('#live-students-list');
+const desktopQuery = window.matchMedia('(min-width: 721px)');
 
-if (card && liveList && !card.querySelector('[data-home-live-navigation]')) {
+let currentCard = null;
+let previousButton = null;
+let nextButton = null;
+
+if (homePanel && liveList) {
   injectStyles();
 
-  const previousButton = createNavigationButton('previous', '‹', 'Voltar para o aluno anterior');
-  const nextButton = createNavigationButton('next', '›', 'Avançar para o próximo aluno');
-  card.append(previousButton, nextButton);
+  const ensureNavigation = () => {
+    const card = document.querySelector('#home-now-card');
+    if (!card) return;
 
-  const liveRows = () => [...liveList.querySelectorAll('[data-open-live-session]')];
+    const cardChanged = card !== currentCard;
+    const controlsMissing = !card.querySelector('[data-home-live-navigation="previous"]')
+      || !card.querySelector('[data-home-live-navigation="next"]');
+
+    if (cardChanged || controlsMissing) {
+      currentCard = card;
+      currentCard.querySelectorAll('[data-home-live-navigation]').forEach(control => control.remove());
+
+      previousButton = createNavigationButton('previous', '‹', 'Voltar para o aluno anterior');
+      nextButton = createNavigationButton('next', '›', 'Avançar para o próximo aluno');
+      currentCard.append(previousButton, nextButton);
+
+      previousButton.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        dispatchSwipe(currentCard, 'previous');
+      });
+
+      nextButton.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        dispatchSwipe(currentCard, 'next');
+      });
+    }
+
+    syncNavigation();
+  };
 
   const syncNavigation = () => {
+    if (!currentCard || !currentCard.isConnected || !previousButton || !nextButton) {
+      ensureNavigation();
+      return;
+    }
+
     const hasMultipleStudents = liveRows().length > 1;
-    previousButton.hidden = !hasMultipleStudents;
-    nextButton.hidden = !hasMultipleStudents;
-    card.classList.toggle('has-desktop-student-navigation', hasMultipleStudents);
+    const showControls = desktopQuery.matches && hasMultipleStudents;
+
+    previousButton.hidden = !showControls;
+    nextButton.hidden = !showControls;
+    currentCard.classList.toggle('has-desktop-student-navigation', showControls);
     syncDesktopHint();
   };
 
-  previousButton.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    dispatchSwipe(card, 'previous');
-  });
+  const homeObserver = new MutationObserver(ensureNavigation);
+  homeObserver.observe(homePanel, { childList: true, subtree: true });
 
-  nextButton.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    dispatchSwipe(card, 'next');
-  });
-
-  new MutationObserver(syncNavigation).observe(liveList, { childList: true, subtree: true });
+  const liveObserver = new MutationObserver(syncNavigation);
+  liveObserver.observe(liveList, { childList: true, subtree: true });
 
   const hint = await waitForElement('#home-now-swipe-hint');
   if (hint) {
@@ -43,12 +73,19 @@ if (card && liveList && !card.querySelector('[data-home-live-navigation]')) {
     });
   }
 
-  const desktopQuery = window.matchMedia('(min-width: 721px)');
   if (typeof desktopQuery.addEventListener === 'function') {
     desktopQuery.addEventListener('change', syncNavigation);
+  } else {
+    desktopQuery.addListener(syncNavigation);
   }
 
-  syncNavigation();
+  ensureNavigation();
+  requestAnimationFrame(ensureNavigation);
+  window.setTimeout(ensureNavigation, 250);
+}
+
+function liveRows() {
+  return [...document.querySelectorAll('#live-students-list [data-open-live-session]')];
 }
 
 function createNavigationButton(direction, symbol, label) {
@@ -62,9 +99,11 @@ function createNavigationButton(direction, symbol, label) {
 }
 
 function dispatchSwipe(target, direction) {
-  const startX = direction === 'next' ? 180 : 40;
-  const endX = direction === 'next' ? 40 : 180;
-  const clientY = 120;
+  if (!target) return;
+
+  const startX = direction === 'next' ? 220 : 50;
+  const endX = direction === 'next' ? 50 : 220;
+  const clientY = Math.max(80, Math.round(target.getBoundingClientRect().height / 2));
 
   const startEvent = new Event('touchstart', { bubbles: true, cancelable: true });
   Object.defineProperty(startEvent, 'touches', {
@@ -84,16 +123,17 @@ function dispatchSwipe(target, direction) {
 }
 
 function syncDesktopHint() {
-  if (!window.matchMedia('(min-width: 721px)').matches) return;
+  if (!desktopQuery.matches) return;
 
   const hint = document.querySelector('#home-now-swipe-hint');
   if (!hint || hint.hidden) return;
 
   const current = hint.textContent?.trim() || '';
-  if (!current || current.includes('use as setas')) return;
+  if (!current) return;
 
   const position = current.split('·')[0]?.trim();
-  hint.textContent = `${position}${position ? ' · ' : ''}use as setas para trocar de aluno`;
+  const replacement = `${position}${position ? ' · ' : ''}use as setas para trocar de aluno`;
+  if (hint.textContent !== replacement) hint.textContent = replacement;
 }
 
 function injectStyles() {
@@ -104,35 +144,35 @@ function injectStyles() {
   style.textContent = `
     .home-now-desktop-nav{
       position:absolute;
-      z-index:5;
-      top:62%;
+      z-index:12;
+      top:50%;
       display:none;
       place-items:center;
-      width:44px;
-      height:44px;
+      width:46px;
+      height:46px;
       padding:0;
-      border:1px solid rgba(177,255,0,.42);
+      border:1px solid rgba(177,255,0,.65);
       border-radius:50%;
-      background:rgba(7,15,20,.82);
+      background:rgba(7,15,20,.92);
       color:var(--primary);
       font:inherit;
       font-size:2rem;
-      font-weight:500;
+      font-weight:700;
       line-height:1;
       cursor:pointer;
-      box-shadow:0 9px 26px rgba(0,0,0,.32);
+      box-shadow:0 10px 28px rgba(0,0,0,.42);
       backdrop-filter:blur(8px);
       -webkit-backdrop-filter:blur(8px);
       transform:translateY(-50%);
       transition:background .18s ease,border-color .18s ease,transform .18s ease;
     }
-    .home-now-desktop-nav span{display:block;transform:translateY(-1px)}
-    .home-now-desktop-nav-previous{left:4%}
-    .home-now-desktop-nav-next{right:4%}
+    .home-now-desktop-nav span{display:block;transform:translateY(-2px)}
+    .home-now-desktop-nav-previous{left:18px}
+    .home-now-desktop-nav-next{right:18px}
     .home-now-desktop-nav:hover,
     .home-now-desktop-nav:focus-visible{
       border-color:var(--primary);
-      background:rgba(177,255,0,.14);
+      background:rgba(177,255,0,.17);
       outline:none;
       transform:translateY(-50%) scale(1.06);
     }
@@ -140,9 +180,9 @@ function injectStyles() {
     .home-now-desktop-nav[hidden]{display:none!important}
 
     @media(min-width:721px){
-      .home-now-card.has-desktop-student-navigation .home-now-desktop-nav{display:grid}
-      .home-now-card.has-desktop-student-navigation .home-now-copy{padding-inline:58px}
-      .home-now-card.has-desktop-student-navigation .home-now-action{width:calc(100% - 116px);margin-left:58px}
+      .home-now-card.has-desktop-student-navigation .home-now-desktop-nav{display:grid!important}
+      .home-now-card.has-desktop-student-navigation .home-now-copy{padding-inline:64px}
+      .home-now-card.has-desktop-student-navigation .home-now-action{width:calc(100% - 128px);margin-left:64px}
     }
   `;
   document.head.appendChild(style);
