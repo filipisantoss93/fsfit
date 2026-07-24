@@ -55,6 +55,7 @@ async function initializeHome(session) {
     const liveStudents = getLiveStudents();
     const title = document.querySelector('#home-now-title');
     const status = document.querySelector('#home-now-status');
+    const personRow = document.querySelector('.home-now-person');
     const person = document.querySelector('#home-now-person-text');
     const meta = document.querySelector('#home-now-meta');
     const icon = document.querySelector('#home-now-icon');
@@ -74,11 +75,12 @@ async function initializeHome(session) {
       selectedLiveSessionId = student.sessionId;
 
       icon.textContent = student.pending ? '!' : '⌁';
-      title.textContent = student.pending ? 'Aguardando confirmação' : 'Aula em andamento';
+      title.textContent = student.name;
       status.textContent = liveStudents.length === 1
         ? (student.pending ? '1 aluno aguardando confirmação agora' : '1 aluno em acompanhamento agora')
         : `${liveStudents.length} alunos em acompanhamento agora`;
-      person.textContent = student.name;
+      if (personRow) personRow.hidden = true;
+      person.textContent = '';
       meta.textContent = student.meta;
       nowAction.hidden = false;
       nowAction.textContent = student.pending ? 'Revisar solicitação  →' : 'Acompanhar aula  →';
@@ -103,9 +105,10 @@ async function initializeHome(session) {
     const next = currentUpcomingEntries()[0];
     if (next) {
       icon.textContent = '◷';
-      title.textContent = 'Próximo atendimento';
+      title.textContent = next.name;
       status.textContent = `${relativeDayLabel(next.date)}${next.time ? ` às ${formatTime(next.time)}` : ''}`;
-      person.textContent = next.name;
+      if (personRow) personRow.hidden = false;
+      person.textContent = 'Próximo atendimento';
       meta.textContent = next.workout || 'Atendimento agendado';
       nowAction.hidden = false;
       nowAction.textContent = 'Ver atendimento  →';
@@ -118,6 +121,7 @@ async function initializeHome(session) {
     icon.textContent = '✓';
     title.textContent = 'Tudo em dia por agora';
     status.textContent = 'Nenhum atendimento próximo na agenda.';
+    if (personRow) personRow.hidden = false;
     person.textContent = 'Sua agenda está livre';
     meta.textContent = 'Os próximos compromissos aparecerão aqui automaticamente.';
     nowAction.hidden = true;
@@ -604,9 +608,10 @@ function injectStyles() {
     .home-now-icon{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:rgba(177,255,0,.12);color:var(--primary);font-size:1.35rem;font-weight:950;box-shadow:inset 0 0 0 1px rgba(177,255,0,.12)}
     .home-now-copy{min-width:0}
     .home-card-kicker{display:block;margin-bottom:5px;color:var(--primary);font-size:.67rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
-    .home-now-copy h2{margin:0;color:var(--text);font-size:1.35rem;font-weight:950;line-height:1.15;letter-spacing:-.02em}
+    .home-now-copy h2{margin:0;color:var(--text);font-size:1.55rem;font-weight:950;line-height:1.1;letter-spacing:-.03em}
     .home-now-status{margin:5px 0 0;color:var(--muted);font-size:.82rem;line-height:1.4}
     .home-now-person{display:flex;align-items:center;gap:8px;min-width:0;margin-top:13px;color:var(--text);font-size:.85rem}
+    .home-now-person[hidden]{display:none!important}
     .home-now-person span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .home-now-meta{display:block;overflow:hidden;margin-top:5px;color:var(--muted);font-size:.76rem;text-overflow:ellipsis;white-space:nowrap}
     .home-now-indicators{display:flex;gap:5px;margin-top:12px}
@@ -669,7 +674,7 @@ function injectStyles() {
       .home-now-card{padding:16px!important}
       .home-now-content{grid-template-columns:46px minmax(0,1fr);gap:12px}
       .home-now-icon{width:46px;height:46px;font-size:1.15rem}
-      .home-now-copy h2{font-size:1.12rem}
+      .home-now-copy h2{font-size:1.28rem}
       .home-now-status{font-size:.74rem}
       .home-now-person{margin-top:10px;font-size:.78rem}
       .home-now-meta{font-size:.69rem}
