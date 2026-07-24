@@ -220,16 +220,9 @@ async function loadTodaySessions(personalId, now = new Date()) {
   if (completedResult.error) throw completedResult.error;
   if (liveResult.error) throw liveResult.error;
 
-  const live = (liveResult.data || []).filter(row => {
-    const timestamp = row.iniciado_at || row.checkin_at;
-    if (!timestamp) return false;
-    const value = new Date(timestamp);
-    return value >= start && value < end;
-  });
-
   return {
     completed: completedResult.data || [],
-    live
+    live: liveResult.data || []
   };
 }
 
