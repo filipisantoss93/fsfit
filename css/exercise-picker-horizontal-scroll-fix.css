@@ -1,0 +1,42 @@
+.saved-exercise-picker-categories {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 2px 0 6px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  touch-action: pan-x;
+  pointer-events: auto;
+  scrollbar-width: none;
+}
+
+.saved-exercise-picker-categories::-webkit-scrollbar {
+  display: none;
+}
+
+.saved-exercise-picker-categories > .saved-exercise-picker-category {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  touch-action: pan-x;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.saved-exercise-picker-tools {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  overflow: visible;
+}
+
+.saved-exercise-picker-dialog {
+  min-width: 0;
+}
