@@ -2,11 +2,322 @@ import { supabase } from './supabase.js';
 import { requireSession } from './layout.js';
 
 setupDashboardStickyTabs();
+setupHomeDashboard();
 
 const session = await requireSession();
 
 if (session) {
   await loadOverview();
+}
+
+function setupHomeDashboard() {
+  const tabs = document.querySelector('.dashboard-tabs');
+  const overviewTab = document.querySelector('[data-dashboard-tab="overview"]');
+  const overviewPanel = document.querySelector('#dashboard-overview-panel');
+  if (!tabs || !overviewTab || !overviewPanel || document.querySelector('#dashboard-home-panel')) return;
+
+  const style = document.createElement('style');
+  style.dataset.dashboardHome = 'true';
+  style.textContent = `
+    .dashboard-home-header { margin-bottom:12px; }
+    .dashboard-home-header .dashboard-user-greeting { margin:0; color:var(--text); font-size:1.35rem; font-weight:900; letter-spacing:-.02em; }
+    .dashboard-welcome-line { margin:3px 0 0; color:var(--muted); font-size:.82rem; }
+    .dashboard-home-panel { display:grid; gap:12px; }
+    .dashboard-home-panel[hidden] { display:none !important; }
+    .home-ready-card { display:flex; align-items:center; gap:12px; padding:14px 16px; border-left:3px solid var(--primary); background:linear-gradient(110deg,rgba(177,255,0,.09),rgba(177,255,0,.025) 58%,var(--surface)); }
+    .home-ready-icon { flex:0 0 auto; display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:var(--primary-soft); color:var(--primary); font-size:1.1rem; font-weight:950; }
+    .home-ready-copy { min-width:0; }
+    .home-ready-copy strong { display:block; margin-bottom:3px; color:var(--text); font-size:.98rem; font-weight:900; }
+    .home-ready-copy span { display:block; color:var(--muted); font-size:.76rem; line-height:1.35; }
+    .home-next-card { padding:14px 16px; border-left:3px solid var(--secondary); }
+    .home-card-kicker { display:block; margin-bottom:7px; color:var(--secondary); font-size:.64rem; font-weight:900; letter-spacing:.07em; text-transform:uppercase; }
+    .home-next-main { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .home-next-info { min-width:0; }
+    .home-next-line { display:flex; align-items:center; gap:8px; min-width:0; }
+    .home-next-time { color:var(--text); font-size:1.35rem; font-weight:950; line-height:1; }
+    .home-next-dot { color:var(--secondary); font-weight:950; }
+    .home-next-name { overflow:hidden; color:var(--text); font-size:1rem; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+    .home-next-workout { display:block; overflow:hidden; margin-top:6px; color:var(--muted); font-size:.76rem; text-overflow:ellipsis; white-space:nowrap; }
+    .home-next-avatar { flex:0 0 auto; display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:rgba(68,134,255,.22); color:#9ec0ff; font-size:.82rem; font-weight:900; }
+    .home-next-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
+    .home-mini-action { display:flex; align-items:center; justify-content:center; min-height:36px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:.72rem; font-weight:850; text-align:center; }
+    .home-mini-action.secondary { border-color:rgba(68,134,255,.65); color:#75a7ff; }
+    .home-quick-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .home-quick-action { min-width:0; padding:11px 10px; }
+    .home-quick-action strong { display:block; overflow:hidden; color:var(--text); font-size:.73rem; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+    .home-quick-action small { display:block; overflow:hidden; margin-top:3px; color:var(--muted); font-size:.62rem; text-overflow:ellipsis; white-space:nowrap; }
+    .home-quick-icon { display:block; margin-bottom:7px; color:var(--primary); font-size:1rem; font-weight:950; }
+    .home-summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .home-summary-card { display:flex; align-items:center; gap:10px; min-width:0; padding:12px 13px; border-left:3px solid var(--primary); }
+    .home-summary-icon { flex:0 0 auto; display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--primary-soft); color:var(--primary); font-size:.73rem; font-weight:950; }
+    .home-summary-copy { min-width:0; }
+    .home-summary-copy strong { display:block; overflow:hidden; color:var(--text); font-size:1rem; font-weight:950; text-overflow:ellipsis; white-space:nowrap; }
+    .home-summary-copy span { display:block; overflow:hidden; margin-top:2px; color:var(--muted); font-size:.64rem; text-overflow:ellipsis; white-space:nowrap; }
+    .home-review-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-left:3px solid var(--warning); background:linear-gradient(110deg,rgba(255,204,51,.07),rgba(255,204,51,.015) 55%,var(--surface)); cursor:pointer; text-align:left; }
+    .home-review-copy { min-width:0; }
+    .home-review-copy strong { display:block; color:var(--text); font-size:.78rem; font-weight:900; }
+    .home-review-copy span { display:block; overflow:hidden; margin-top:3px; color:var(--muted); font-size:.66rem; text-overflow:ellipsis; white-space:nowrap; }
+    .home-review-copy small { display:block; margin-top:4px; color:var(--warning); font-size:.65rem; font-weight:850; }
+    .home-review-arrow { flex:0 0 auto; color:var(--warning); font-size:1.25rem; }
+    #dashboard-overview-panel > .dashboard-day-snapshot,
+    #dashboard-overview-panel > .quick-actions { display:none !important; }
+
+    @media (max-width:620px) {
+      .dashboard-home-header { margin-bottom:9px; }
+      .dashboard-home-header .dashboard-user-greeting { font-size:1.18rem; }
+      .dashboard-welcome-line { font-size:.75rem; }
+      .dashboard-tabs { gap:2px !important; margin-bottom:10px !important; padding:3px !important; border-radius:12px !important; }
+      .dashboard-tab { min-height:36px !important; gap:3px !important; padding:7px 4px !important; border-radius:9px !important; font-size:.69rem !important; }
+      .dashboard-tab-count { min-width:18px !important; height:18px !important; padding:0 4px !important; font-size:.6rem !important; }
+      .dashboard-home-panel { gap:8px; }
+      .home-ready-card { gap:10px; padding:11px 12px; }
+      .home-ready-icon { width:36px; height:36px; font-size:.95rem; }
+      .home-ready-copy strong { font-size:.86rem; }
+      .home-ready-copy span { font-size:.68rem; }
+      .home-next-card { padding:12px; }
+      .home-card-kicker { margin-bottom:6px; font-size:.58rem; }
+      .home-next-time { font-size:1.2rem; }
+      .home-next-name { font-size:.88rem; }
+      .home-next-workout { margin-top:4px; font-size:.68rem; }
+      .home-next-avatar { width:36px; height:36px; font-size:.72rem; }
+      .home-next-actions { gap:6px; margin-top:9px; }
+      .home-mini-action { min-height:32px; padding:7px 8px; font-size:.66rem; }
+      .home-quick-grid { gap:6px; }
+      .home-quick-action { padding:9px 8px; }
+      .home-quick-action strong { font-size:.66rem; }
+      .home-quick-action small { font-size:.56rem; }
+      .home-quick-icon { margin-bottom:5px; font-size:.9rem; }
+      .home-summary-grid { gap:6px; }
+      .home-summary-card { gap:8px; padding:10px; }
+      .home-summary-icon { width:30px; height:30px; font-size:.65rem; }
+      .home-summary-copy strong { font-size:.88rem; }
+      .home-summary-copy span { font-size:.58rem; }
+      .home-review-card { padding:10px 12px; }
+      .home-review-copy strong { font-size:.72rem; }
+      .home-review-copy span { font-size:.6rem; }
+      .home-review-copy small { font-size:.59rem; }
+      .attention-card { padding:14px !important; }
+      .attention-heading { margin-bottom:10px !important; }
+      .attention-heading h2 { margin-bottom:4px !important; font-size:1rem !important; }
+      .attention-heading p { font-size:.72rem !important; }
+      .attention-item { padding:10px 11px !important; }
+      .attention-item strong { font-size:.78rem !important; }
+      .attention-item small { font-size:.65rem !important; }
+      .dashboard-summary-card { padding:11px 10px !important; }
+      .dashboard-summary-card small { min-height:0 !important; margin-bottom:5px !important; font-size:.6rem !important; }
+      .dashboard-summary-card strong { font-size:1rem !important; }
+      .dashboard-public-link-compact,
+      .dashboard-activity-card { margin-top:12px !important; margin-bottom:12px !important; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  const pageHeader = document.querySelector('.page-header');
+  const greeting = document.querySelector('#dashboard-user-greeting');
+  if (pageHeader) {
+    pageHeader.classList.add('dashboard-home-header');
+    pageHeader.querySelector('h1')?.remove();
+    const subtitle = pageHeader.querySelector('div > p:not(#dashboard-user-greeting)');
+    subtitle?.remove();
+    if (!pageHeader.querySelector('.dashboard-welcome-line')) {
+      const welcome = document.createElement('p');
+      welcome.className = 'dashboard-welcome-line';
+      welcome.textContent = 'Vamos começar seu dia.';
+      greeting?.after(welcome);
+    }
+  }
+
+  const homeTab = document.createElement('button');
+  homeTab.id = 'dashboard-tab-home';
+  homeTab.className = 'dashboard-tab';
+  homeTab.type = 'button';
+  homeTab.setAttribute('role', 'tab');
+  homeTab.setAttribute('aria-selected', 'false');
+  homeTab.setAttribute('aria-controls', 'dashboard-home-panel');
+  homeTab.tabIndex = -1;
+  homeTab.innerHTML = '<span aria-hidden="true">⌂</span><span>Início</span>';
+  tabs.insertBefore(homeTab, overviewTab);
+
+  const homePanel = document.createElement('section');
+  homePanel.id = 'dashboard-home-panel';
+  homePanel.className = 'dashboard-home-panel dashboard-tab-panel';
+  homePanel.setAttribute('role', 'tabpanel');
+  homePanel.setAttribute('aria-labelledby', 'dashboard-tab-home');
+  homePanel.hidden = true;
+  homePanel.innerHTML = `
+    <article class="card home-ready-card">
+      <span class="home-ready-icon" aria-hidden="true">✓</span>
+      <div class="home-ready-copy">
+        <strong id="home-ready-title">Tudo pronto para hoje</strong>
+        <span id="home-ready-copy">Carregando seu resumo do dia...</span>
+      </div>
+    </article>
+
+    <article class="card home-next-card">
+      <small class="home-card-kicker">Próximo atendimento</small>
+      <div class="home-next-main">
+        <div class="home-next-info">
+          <div class="home-next-line"><strong id="home-next-time" class="home-next-time">—</strong><span class="home-next-dot">•</span><strong id="home-next-name" class="home-next-name">Carregando...</strong></div>
+          <span id="home-next-workout" class="home-next-workout">Consultando agenda de hoje</span>
+        </div>
+        <span id="home-next-avatar" class="home-next-avatar" aria-hidden="true">FS</span>
+      </div>
+      <div class="home-next-actions">
+        <a id="home-next-student-link" class="home-mini-action" href="alunos.html">Ver aluno</a>
+        <a class="home-mini-action secondary" href="agenda.html">Abrir agenda</a>
+      </div>
+    </article>
+
+    <section class="home-quick-grid" aria-label="Atalhos rápidos">
+      <a class="card home-quick-action" href="alunos.html" data-premium-link><span class="home-quick-icon" aria-hidden="true">＋</span><strong>Novo aluno</strong><small>Cadastrar aluno</small></a>
+      <a class="card home-quick-action" href="alunos.html" data-premium-link><span class="home-quick-icon" aria-hidden="true">◇</span><strong>Criar treino</strong><small>Escolher aluno</small></a>
+      <a class="card home-quick-action" href="agenda.html" data-premium-link><span class="home-quick-icon" aria-hidden="true">▦</span><strong>Agendar</strong><small>Novo atendimento</small></a>
+    </section>
+
+    <section class="home-summary-grid" aria-label="Resumo rápido">
+      <article class="card home-summary-card"><span class="home-summary-icon" aria-hidden="true">👥</span><div class="home-summary-copy"><strong id="home-summary-active">—</strong><span>alunos ativos</span></div></article>
+      <article class="card home-summary-card"><span class="home-summary-icon" aria-hidden="true">R$</span><div class="home-summary-copy"><strong id="home-summary-received">—</strong><span>recebidos no mês</span></div></article>
+    </section>
+
+    <button id="home-review-card" class="card home-review-card" type="button">
+      <div class="home-review-copy"><strong id="home-review-title">Itens para revisar</strong><span id="home-review-detail">Carregando pendências...</span><small>Ver na visão geral</small></div>
+      <span class="home-review-arrow" aria-hidden="true">›</span>
+    </button>
+  `;
+  overviewPanel.before(homePanel);
+
+  const legacyTabs = Array.from(tabs.querySelectorAll('[data-dashboard-tab]'));
+  const legacyPanels = ['dashboard-overview-panel', 'dashboard-agenda-panel', 'dashboard-live-panel']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+
+  const activateHome = (shouldFocus = false) => {
+    legacyTabs.forEach(tab => {
+      tab.setAttribute('aria-selected', 'false');
+      tab.tabIndex = -1;
+    });
+    legacyPanels.forEach(panel => { panel.hidden = true; });
+    homeTab.setAttribute('aria-selected', 'true');
+    homeTab.tabIndex = 0;
+    homePanel.hidden = false;
+    if (shouldFocus) homeTab.focus();
+  };
+
+  homeTab.addEventListener('click', () => activateHome());
+  homeTab.addEventListener('keydown', event => {
+    if (event.key === 'ArrowRight' || event.key === 'End') {
+      event.preventDefault();
+      overviewTab.click();
+      overviewTab.focus();
+    }
+  });
+
+  legacyTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      homeTab.setAttribute('aria-selected', 'false');
+      homeTab.tabIndex = -1;
+      homePanel.hidden = true;
+    });
+  });
+
+  document.querySelector('#home-review-card')?.addEventListener('click', () => {
+    overviewTab.click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  overviewPanel.querySelector('.dashboard-day-snapshot')?.setAttribute('aria-hidden', 'true');
+  overviewPanel.querySelector('.quick-actions')?.setAttribute('aria-hidden', 'true');
+
+  const syncHome = () => {
+    const todayRaw = document.querySelector('#dashboard-agenda-tab-count')?.textContent?.trim() || '—';
+    const liveRaw = document.querySelector('#dashboard-live-tab-count')?.textContent?.trim() || '0';
+    const activeRaw = document.querySelector('#summary-active-students')?.textContent?.trim() || '—';
+    const receivedRaw = document.querySelector('#summary-month-received')?.textContent?.trim() || '—';
+    const attentionRaw = document.querySelector('#attention-total-count')?.textContent?.trim() || '0';
+    const live = Number(liveRaw);
+
+    setHomeText('#home-summary-active', activeRaw);
+    setHomeText('#home-summary-received', receivedRaw);
+
+    if (Number.isFinite(live) && live > 0) {
+      setHomeText('#home-ready-title', live === 1 ? 'Você tem uma aula em andamento' : 'Você tem aulas em andamento');
+      setHomeText('#home-ready-copy', `${live} aluno${live === 1 ? '' : 's'} em acompanhamento agora. ${todayRaw} atendimento${todayRaw === '1' ? '' : 's'} programado${todayRaw === '1' ? '' : 's'} hoje.`);
+    } else {
+      setHomeText('#home-ready-title', 'Tudo pronto para hoje');
+      setHomeText('#home-ready-copy', `${todayRaw} atendimento${todayRaw === '1' ? '' : 's'} programado${todayRaw === '1' ? '' : 's'} e nenhum aluno em aula agora.`);
+    }
+
+    const attention = Number(attentionRaw);
+    setHomeText('#home-review-title', Number.isFinite(attention) && attention > 0 ? `${attention} ${attention === 1 ? 'item' : 'itens'} para revisar` : 'Tudo em dia');
+
+    const attentionParts = [];
+    const noWorkout = document.querySelector('#attention-no-workout-item');
+    const overdue = document.querySelector('#attention-overdue-item');
+    const waiting = document.querySelector('#attention-waiting-item');
+    if (noWorkout && !noWorkout.hidden) attentionParts.push(`${document.querySelector('#attention-no-workout')?.textContent || '0'} sem treino`);
+    if (overdue && !overdue.hidden) attentionParts.push(`${document.querySelector('#attention-overdue')?.textContent || '0'} mensalidades vencidas`);
+    if (waiting && !waiting.hidden) attentionParts.push(`${document.querySelector('#attention-waiting')?.textContent || '0'} pagamentos para confirmar`);
+    setHomeText('#home-review-detail', attentionParts.length ? attentionParts.slice(0, 2).join(' • ') : 'Nenhuma pendência importante agora.');
+
+    syncHomeNextAppointment();
+  };
+
+  const syncHomeNextAppointment = () => {
+    const list = document.querySelector('#today-list');
+    const rows = Array.from(list?.querySelectorAll('.today-entry') || []);
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const parseMinutes = value => {
+      const match = String(value || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+      return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+    };
+    const nextRow = rows.find(row => {
+      const minutes = parseMinutes(row.querySelector('.today-time')?.textContent);
+      return minutes !== null && minutes >= nowMinutes;
+    });
+
+    if (!nextRow) {
+      setHomeText('#home-next-time', '—');
+      setHomeText('#home-next-name', rows.length ? 'Agenda concluída' : 'Agenda livre');
+      setHomeText('#home-next-workout', rows.length ? 'Nenhum atendimento restante hoje' : 'Nenhum atendimento programado para hoje');
+      setHomeText('#home-next-avatar', '✓');
+      const studentLink = document.querySelector('#home-next-student-link');
+      if (studentLink) {
+        studentLink.href = 'alunos.html';
+        studentLink.textContent = 'Ver alunos';
+      }
+      return;
+    }
+
+    const time = nextRow.querySelector('.today-time')?.textContent?.trim() || '—';
+    const name = nextRow.querySelector('.today-entry-main strong')?.textContent?.trim() || 'Aluno';
+    const workout = nextRow.querySelector('.today-entry-main span')?.textContent?.trim() || 'Treino ativo';
+    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0)).join('').toUpperCase() || 'A';
+    setHomeText('#home-next-time', time);
+    setHomeText('#home-next-name', name);
+    setHomeText('#home-next-workout', workout);
+    setHomeText('#home-next-avatar', initials);
+
+    const studentLink = document.querySelector('#home-next-student-link');
+    if (studentLink) {
+      studentLink.textContent = 'Ver aluno';
+      studentLink.href = nextRow.tagName === 'A' && nextRow.getAttribute('href') ? nextRow.getAttribute('href') : 'alunos.html';
+    }
+  };
+
+  const observe = selector => {
+    const element = document.querySelector(selector);
+    if (element) new MutationObserver(syncHome).observe(element, { childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:['hidden'] });
+  };
+
+  ['#dashboard-agenda-tab-count','#dashboard-live-tab-count','#summary-active-students','#summary-month-received','#attention-total-count','#today-list','#attention-no-workout-item','#attention-overdue-item','#attention-waiting-item'].forEach(observe);
+  syncHome();
+  activateHome();
+}
+
+function setHomeText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value;
 }
 
 function setupDashboardStickyTabs() {
