@@ -176,6 +176,9 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
     .catch(error => {
       console.error('Falha ao carregar nova tela inicial do painel:', error);
     });
+  import('./painel-home-desktop-carousel.js?v=20260724-desktop-carousel1').catch(error => {
+    console.error('Falha ao carregar as setas do carrossel de alunos:', error);
+  });
   import('./painel-home-avatar.js?v=20260724-home-avatar1').catch(error => {
     console.error('Falha ao carregar a foto do aluno no card Agora:', error);
   });
