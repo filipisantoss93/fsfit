@@ -164,6 +164,9 @@ if (isIos()) {
 }
 
 if (document.querySelector('#today-list') || document.querySelector('#live-students-list')) {
+  import('./painel-home-redesign.js?v=20260723-home-redesign1').catch(error => {
+    console.error('Falha ao carregar nova tela inicial do painel:', error);
+  });
   import('./painel-compact-enhancements.js?v=20260720-dashboard-compact2').catch(error => {
     console.error('Falha ao carregar melhorias compactas do painel:', error);
   });
