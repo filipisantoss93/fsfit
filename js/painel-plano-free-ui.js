@@ -1,7 +1,13 @@
+import { supabase } from './supabase.js';
+
+const ACCESS_CACHE_KEY = 'fsfit:access-status-cache';
+const ACCESS_CACHE_MAX_AGE_MS = 15 * 60 * 1000;
 const REDIRECT_NOTICE_DURATION_MS = 7000;
 const redirectedFromBlockedPage = new URLSearchParams(window.location.search).get('acesso') === 'free';
 let redirectNoticeDismissed = false;
 let updatingNotice = false;
+let freeAccessActive = false;
+let syncScheduled = false;
 
 function injectStyles() {
   if (document.querySelector('#fsfit-free-plan-panel-styles')) return;
@@ -79,18 +85,22 @@ function injectStyles() {
     }
 
     .plan-renewal-card.free-compact .plan-renewal-copy small {
+      display: block;
       margin-bottom: 3px;
       color: var(--primary);
       font-size: .6rem;
+      font-weight: 900;
       letter-spacing: .08em;
     }
 
     .plan-renewal-card.free-compact .plan-renewal-copy strong {
+      display: block;
       font-size: .88rem;
       line-height: 1.25;
     }
 
     .plan-renewal-card.free-compact .plan-renewal-copy span {
+      display: block;
       margin-top: 2px;
       color: var(--muted);
       font-size: .68rem;
@@ -98,7 +108,9 @@ function injectStyles() {
     }
 
     .plan-renewal-card.free-compact .plan-renewal-actions {
+      display: flex;
       width: auto;
+      flex: 0 0 auto;
       flex-wrap: nowrap;
     }
 
@@ -204,7 +216,7 @@ function configureAccessNotice() {
 
   sync();
 
-  const observer = new MutationObserver(() => sync());
+  const observer = new MutationObserver(sync);
   observer.observe(notice, { attributes: true, childList: true, subtree: true });
 
   if (redirectedFromBlockedPage) {
@@ -219,46 +231,84 @@ function isFreePlanCard(card) {
   return card.classList.contains('expired') || label === 'PLANO FREE' || button === 'ativar plano';
 }
 
-function setTextIfChanged(element, text) {
-  if (element && element.textContent !== text) element.textContent = text;
+function removeTransientFreeCard() {
+  const transientCard = document.querySelector('#plan-renewal-card');
+  if (isFreePlanCard(transientCard)) transientCard.remove();
 }
 
-function compactFreePlanCard(card) {
-  if (!isFreePlanCard(card)) return;
+function buildPersistentFreeCard() {
+  const card = document.createElement('section');
+  card.id = 'free-plan-persistent-card';
+  card.className = 'plan-renewal-card free-compact';
+  card.setAttribute('aria-label', 'Plano Free');
+  card.innerHTML = `
+    <div class="plan-renewal-copy">
+      <small>PLANO FREE</small>
+      <strong>Recursos profissionais bloqueados</strong>
+      <span>Ative um plano para liberar as áreas de gestão.</span>
+    </div>
+    <div class="plan-renewal-actions">
+      <a class="btn btn-primary" href="assinatura.html">Ativar plano</a>
+    </div>`;
+  return card;
+}
 
-  if (card.classList.contains('expired')) card.classList.remove('expired');
-  if (!card.classList.contains('free-compact')) card.classList.add('free-compact');
-
-  const label = card.querySelector('.plan-renewal-copy small');
-  const title = card.querySelector('.plan-renewal-copy strong');
-  const detail = card.querySelector('.plan-renewal-copy span');
-  const action = card.querySelector('#plan-card-action');
-
-  setTextIfChanged(label, 'PLANO FREE');
-  setTextIfChanged(title, 'Recursos profissionais bloqueados');
-  setTextIfChanged(
-    detail,
-    action
-      ? 'Ative um plano para liberar as áreas de gestão.'
-      : 'Entre em contato com o suporte para consultar as opções de acesso.'
-  );
-  setTextIfChanged(action, 'Ativar plano');
-
+function ensurePersistentFreeCard() {
+  if (!freeAccessActive) return;
   const homePanel = document.querySelector('#dashboard-home-panel');
-  if (homePanel && card.parentElement !== homePanel) homePanel.prepend(card);
+  if (!(homePanel instanceof HTMLElement)) return;
+
+  let card = document.querySelector('#free-plan-persistent-card');
+  if (!(card instanceof HTMLElement)) card = buildPersistentFreeCard();
+  if (card.parentElement !== homePanel) homePanel.prepend(card);
+
+  removeTransientFreeCard();
 }
 
-function configurePlanCard() {
-  const sync = () => {
-    const card = document.querySelector('#plan-renewal-card');
-    if (card) compactFreePlanCard(card);
-  };
+function removePersistentFreeCard() {
+  document.querySelector('#free-plan-persistent-card')?.remove();
+}
 
-  sync();
+function applyAccessStatus(access) {
+  freeAccessActive = Boolean(access && !access.admin && !access.acesso_premium && access.tipo_acesso !== 'inativo');
+  if (freeAccessActive) ensurePersistentFreeCard();
+  else removePersistentFreeCard();
+}
 
-  const main = document.querySelector('main.container') || document.body;
-  const observer = new MutationObserver(sync);
-  observer.observe(main, { childList: true, subtree: true });
+function readCachedAccess() {
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(ACCESS_CACHE_KEY) || 'null');
+    if (cached?.value && Date.now() - Number(cached.savedAt || 0) < ACCESS_CACHE_MAX_AGE_MS) return cached.value;
+  } catch {}
+  return null;
+}
+
+async function resolveAccessStatus() {
+  const cached = readCachedAccess();
+  if (cached) applyAccessStatus(cached);
+
+  try {
+    const { data, error } = await supabase.rpc('fsfit_sincronizar_meu_acesso');
+    if (error) throw error;
+    if (data) applyAccessStatus(data);
+  } catch (error) {
+    if (!cached) console.warn('Não foi possível confirmar o estado do plano Free:', error);
+  }
+}
+
+function schedulePersistentCardSync() {
+  if (!freeAccessActive || syncScheduled) return;
+  syncScheduled = true;
+  queueMicrotask(() => {
+    syncScheduled = false;
+    ensurePersistentFreeCard();
+  });
+}
+
+function observePersistentCard() {
+  const root = document.querySelector('main.container') || document.body;
+  const observer = new MutationObserver(schedulePersistentCardSync);
+  observer.observe(root, { childList: true, subtree: true });
 }
 
 function init() {
@@ -266,7 +316,8 @@ function init() {
   injectStyles();
   removeRedirectParameter();
   configureAccessNotice();
-  configurePlanCard();
+  observePersistentCard();
+  resolveAccessStatus();
 }
 
 if (document.readyState === 'loading') {
