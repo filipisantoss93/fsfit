@@ -119,3 +119,11 @@ if (!globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__) {
       .catch(error => console.warn('Melhorias integradas do aluno indisponíveis:', error));
   });
 }
+
+if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER_LOADER__) {
+  globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER_LOADER__ = true;
+  queueMicrotask(() => {
+    import('./treino-dia-personalizacao.js?v=20260725-day-custom1')
+      .catch(error => console.warn('Personalização do treino aplicado indisponível:', error));
+  });
+}
