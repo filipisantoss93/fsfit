@@ -23,7 +23,6 @@ function injectExperienceStyles() {
     .subscription-management-secondary-list .subscription-management-action:last-child{border-bottom:0}
     .subscription-management-secondary-list .subscription-management-action .btn{min-width:122px}
     html.subscription-modal-active,body.subscription-modal-active{overflow:hidden;overscroll-behavior:none}
-    body.subscription-modal-active{touch-action:none}
     .subscription-modal-backdrop{overscroll-behavior:contain;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
     .subscription-modal{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
     .subscription-history-item{grid-template-columns:minmax(0,1fr) auto auto}
