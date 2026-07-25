@@ -39,6 +39,27 @@
     console.warn('Não foi possível salvar a atribuição da campanha:', error);
   }
 
+  function configureHeaderAccess() {
+    const studentButton = document.querySelector('.lp-nav-actions .lp-student-entry');
+    const personalButton = document.querySelector('.lp-nav-actions .lp-btn-primary');
+
+    if (studentButton) {
+      studentButton.href = '/acesso-aluno.html';
+      studentButton.setAttribute('aria-label', 'Acessar portal do aluno');
+      studentButton.dataset.trackCta = 'portal-aluno-topo';
+    }
+
+    if (personalButton) {
+      personalButton.href = '/?modo=login#cadastro';
+      personalButton.textContent = 'Personal';
+      personalButton.setAttribute('aria-label', 'Entrar como personal trainer');
+      personalButton.dataset.trackCta = 'login-personal-topo';
+      personalButton.classList.add('lp-personal-entry');
+    }
+  }
+
+  configureHeaderAccess();
+
   function track(eventName, detail = {}) {
     const payload = { event: eventName, page: url.pathname, ...detail };
     window.dataLayer = window.dataLayer || [];
