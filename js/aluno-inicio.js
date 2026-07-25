@@ -21,6 +21,13 @@ function setText(node, value) {
   if (node && node.textContent !== value) node.textContent = value;
 }
 
+function setClass(node, className, enabled) {
+  if (!node) return;
+  const hasClass = node.classList.contains(className);
+  if (enabled && !hasClass) node.classList.add(className);
+  if (!enabled && hasClass) node.classList.remove(className);
+}
+
 function firstName(value = '') {
   return String(value).trim().split(/\s+/)[0] || 'Aluno';
 }
@@ -64,12 +71,14 @@ function agendaSummary(host, singular, plural, emptyText) {
 function syncWhatsapp() {
   if (!homeWhatsapp || !settingsWhatsapp) return;
   const href = settingsWhatsapp.getAttribute('href') || '';
+  const currentHref = homeWhatsapp.getAttribute('href') || '';
+
   if (href) {
-    homeWhatsapp.setAttribute('href', href);
-    homeWhatsapp.classList.add('visible');
+    if (currentHref !== href) homeWhatsapp.setAttribute('href', href);
+    setClass(homeWhatsapp, 'visible', true);
   } else {
-    homeWhatsapp.removeAttribute('href');
-    homeWhatsapp.classList.remove('visible');
+    if (currentHref) homeWhatsapp.removeAttribute('href');
+    setClass(homeWhatsapp, 'visible', false);
   }
 }
 
@@ -85,9 +94,7 @@ function syncHome() {
   const workout = agendaSummary(workoutContent, 'exercício', 'exercícios', 'Dia de descanso');
   setText(workoutStatus, workout.title);
   setText(workoutDetail, workout.rows ? 'Abrir treino de hoje' : 'Consulte os próximos dias');
-  if (primaryWorkoutButton) {
-    primaryWorkoutButton.textContent = workout.rows ? 'Abrir treino de hoje' : 'Ver agenda de treinos';
-  }
+  setText(primaryWorkoutButton, workout.rows ? 'Abrir treino de hoje' : 'Ver agenda de treinos');
 
   const diet = agendaSummary(dietContent, 'refeição', 'refeições', 'Sem refeições hoje');
   setText(dietStatus, diet.title);
@@ -95,8 +102,8 @@ function syncHome() {
 
   const observationText = observations?.textContent?.trim() || '';
   if (homeObservation && homeObservationText) {
-    const hasObservation = observationText && observationText !== 'Nenhuma observação publicada ainda.';
-    homeObservation.classList.toggle('hidden', !hasObservation);
+    const hasObservation = Boolean(observationText && observationText !== 'Nenhuma observação publicada ainda.');
+    setClass(homeObservation, 'hidden', !hasObservation);
     if (hasObservation) setText(homeObservationText, observationText);
   }
 
@@ -109,11 +116,21 @@ document.querySelectorAll('[data-student-home-target]').forEach(button => {
 
 primaryWorkoutButton?.addEventListener('click', () => activateTab('treino'));
 
-const observer = new MutationObserver(syncHome);
+let syncScheduled = false;
+function scheduleSync() {
+  if (syncScheduled) return;
+  syncScheduled = true;
+  requestAnimationFrame(() => {
+    syncScheduled = false;
+    syncHome();
+  });
+}
+
+const observer = new MutationObserver(scheduleSync);
 if (content) observer.observe(content, { subtree: true, childList: true, attributes: true, characterData: true });
 if (settingsWhatsapp) observer.observe(settingsWhatsapp, { attributes: true, attributeFilter: ['href', 'class'] });
 
-window.addEventListener('load', syncHome);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) syncHome(); });
-setTimeout(syncHome, 250);
-setTimeout(syncHome, 900);
+window.addEventListener('load', scheduleSync);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) scheduleSync(); });
+setTimeout(scheduleSync, 250);
+setTimeout(scheduleSync, 900);
