@@ -135,3 +135,11 @@ if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_EXERCISE_CATEGO
       .catch(error => console.warn('Categorias do seletor de exercícios indisponíveis:', error));
   });
 }
+
+if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_DAY_EXERCISE_PICKER_LOADER__) {
+  globalThis.__FSFIT_DAY_EXERCISE_PICKER_LOADER__ = true;
+  queueMicrotask(() => {
+    import('./treino-aluno-exercicios-avulsos.js?v=20260725-day-exercises1')
+      .catch(error => console.warn('Inclusão de exercícios avulsos indisponível:', error));
+  });
+}
