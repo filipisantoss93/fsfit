@@ -11,15 +11,15 @@
   },
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "fit.fssolucoes.tech"
         }
       ],
-      "destination": "https://www.fsfit.com.br/:path*",
-      "permanent": true
+      "destination": "https://www.fsfit.com.br/$1",
+      "statusCode": 301
     }
   ],
   "rewrites": [
