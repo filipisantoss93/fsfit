@@ -127,3 +127,11 @@ if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_DAY_WORKOUT_CUS
       .catch(error => console.warn('Personalização do treino aplicado indisponível:', error));
   });
 }
+
+if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_EXERCISE_CATEGORY_FILTER_LOADER__) {
+  globalThis.__FSFIT_EXERCISE_CATEGORY_FILTER_LOADER__ = true;
+  queueMicrotask(() => {
+    import('./treino-exercicio-categorias.js?v=20260725-category1')
+      .catch(error => console.warn('Categorias do seletor de exercícios indisponíveis:', error));
+  });
+}
