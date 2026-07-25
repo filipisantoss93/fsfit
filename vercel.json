@@ -20,6 +20,21 @@
       ],
       "destination": "https://www.fsfit.com.br/$1",
       "statusCode": 301
+    },
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/sistema-para-personal-trainer",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
+      "source": "/lp-gads",
+      "destination": "/",
+      "statusCode": 301
     }
   ],
   "rewrites": [
@@ -28,11 +43,7 @@
       "destination": "/assets/icons/01-web-favicon/favicon.ico"
     },
     {
-      "source": "/sistema-para-personal-trainer",
-      "destination": "/sistema-para-personal-trainer.html"
-    },
-    {
-      "source": "/lp-gads",
+      "source": "/",
       "destination": "/sistema-para-personal-trainer.html"
     },
     {
