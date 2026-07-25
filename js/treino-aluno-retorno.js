@@ -1,3 +1,5 @@
+globalThis.__FSFIT_WORKOUT_PUBLICATION_GUARD__ = true;
+
 const params = new URLSearchParams(window.location.search);
 const embedded = params.get('embed') === '1';
 const backLink = document.querySelector('#back-link');
