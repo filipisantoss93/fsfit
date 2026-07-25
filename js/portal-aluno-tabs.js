@@ -115,7 +115,7 @@ export function ensureStudentPortalMainTabs() {
   nav.className = 'student-main-tabs';
   nav.setAttribute('aria-label', 'Áreas do portal do aluno');
   nav.innerHTML = `
-    <button class="student-main-tab active" type="button" data-student-main-tab="live">Em aula</button>
+    <button class="student-main-tab active" type="button" data-student-main-tab="live" data-live-state="today">Hoje</button>
     <button class="student-main-tab" type="button" data-student-main-tab="agenda">Agenda</button>
     <button class="student-main-tab" type="button" data-student-main-tab="chat">Chat</button>
   `;
