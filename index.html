@@ -5,28 +5,29 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#0f1115">
 
-  <title>FS Fit | Sistema para Personal Trainer e Gestão de Alunos</title>
-  <meta name="description" content="Sistema para personal trainers gerenciarem alunos, treinos, agenda e mensalidades em um só lugar. Teste o FS Fit grátis por 7 dias.">
+  <title>FS Fit | Gestão para Personal Trainer e Acesso do Aluno</title>
+  <meta name="description" content="FS Fit para personal trainers gerenciarem alunos, treinos, agenda e mensalidades. Alunos acessam seus treinos pelo celular. Teste grátis por 7 dias.">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <link rel="canonical" href="https://www.fsfit.com.br/">
 
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="FS Fit">
-  <meta property="og:title" content="FS Fit | Sistema para Personal Trainer e Gestão de Alunos">
-  <meta property="og:description" content="Organize alunos, treinos, agenda e mensalidades em uma plataforma feita para personal trainers. Teste grátis por 7 dias.">
+  <meta property="og:title" content="FS Fit | Gestão para Personal Trainer e Acesso do Aluno">
+  <meta property="og:description" content="Personal trainers organizam alunos, treinos, agenda e mensalidades. Alunos acessam seus treinos diretamente pelo FS Fit.">
   <meta property="og:url" content="https://www.fsfit.com.br/">
-  <meta property="og:image" content="https://www.fsfit.com.br/assets/icons/01-web-favicon/apple-touch-icon.png">
+  <meta property="og:image" content="https://www.fsfit.com.br/assets/icons/02-pwa/icon-512x512.png">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="FS Fit | Sistema para Personal Trainer e Gestão de Alunos">
-  <meta name="twitter:description" content="Organize alunos, treinos, agenda e mensalidades em uma plataforma feita para personal trainers. Teste grátis por 7 dias.">
-  <meta name="twitter:image" content="https://www.fsfit.com.br/assets/icons/01-web-favicon/apple-touch-icon.png">
+  <meta name="twitter:title" content="FS Fit | Gestão para Personal Trainer e Acesso do Aluno">
+  <meta name="twitter:description" content="Gestão para personal trainers e acesso aos treinos para alunos em um só lugar.">
+  <meta name="twitter:image" content="https://www.fsfit.com.br/assets/icons/02-pwa/icon-512x512.png">
 
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/02-pwa/icon-192x192.png?v=20260722-icons-v4">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
   <link rel="stylesheet" href="css/style.css">
 
@@ -39,7 +40,7 @@
         "@id": "https://www.fsfit.com.br/#organization",
         "name": "FS Fit",
         "url": "https://www.fsfit.com.br/",
-        "logo": "https://www.fsfit.com.br/assets/icons/01-web-favicon/apple-touch-icon.png"
+        "logo": "https://www.fsfit.com.br/assets/icons/02-pwa/icon-512x512.png"
       },
       {
         "@type": "WebSite",
@@ -48,6 +49,9 @@
         "name": "FS Fit",
         "publisher": {
           "@id": "https://www.fsfit.com.br/#organization"
+        },
+        "hasPart": {
+          "@id": "https://www.fsfit.com.br/acesso-aluno.html#webpage"
         },
         "inLanguage": "pt-BR"
       },
@@ -58,9 +62,19 @@
         "url": "https://www.fsfit.com.br/",
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
-        "description": "Plataforma de gestão para personal trainers organizarem alunos, treinos, agenda e mensalidades.",
+        "description": "Plataforma para personal trainers organizarem alunos, treinos, agenda e mensalidades, com acesso individual do aluno aos seus treinos.",
         "publisher": {
           "@id": "https://www.fsfit.com.br/#organization"
+        },
+        "inLanguage": "pt-BR"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://www.fsfit.com.br/acesso-aluno.html#webpage",
+        "url": "https://www.fsfit.com.br/acesso-aluno.html",
+        "name": "Já sou aluno | Acessar meus treinos no FS Fit",
+        "isPartOf": {
+          "@id": "https://www.fsfit.com.br/#website"
         },
         "inLanguage": "pt-BR"
       }
@@ -99,9 +113,9 @@
 </head>
 <body>
   <header class="main-header">
-    <nav class="nav-container landing-nav">
-      <a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a>
-      <a class="btn student-header-access" href="acesso-aluno.html">Área do aluno</a>
+    <nav class="nav-container landing-nav" aria-label="Navegação principal">
+      <a class="logo-nav" href="/" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
+      <a class="btn student-header-access" href="/acesso-aluno.html">Já sou aluno</a>
     </nav>
   </header>
   <main class="container">
@@ -134,7 +148,8 @@
     </section>
   </main>
   <footer class="landing-footer">
-    <nav aria-label="Links legais">
+    <nav aria-label="Links do FS Fit">
+      <a href="/acesso-aluno.html">Já sou aluno</a>
       <a href="termos.html">Termos de Uso</a>
       <a href="privacidade.html">Política de Privacidade</a>
       <a href="cancelamento.html">Cancelamento e Reembolso</a>
