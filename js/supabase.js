@@ -111,3 +111,11 @@ if (!globalThis[SCHEDULE_NORMALIZER_KEY] && ['agenda.html', 'painel.html'].inclu
     return table === 'treinos' ? wrapTreinosBuilder(builder) : builder;
   };
 }
+
+if (!globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__) {
+  globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__ = true;
+  queueMicrotask(() => {
+    import('./student-workflow-improvements.js?v=20260725-student-workflow1')
+      .catch(error => console.warn('Melhorias integradas do aluno indisponíveis:', error));
+  });
+}
