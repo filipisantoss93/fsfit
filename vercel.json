@@ -9,6 +9,19 @@
   "github": {
     "autoJobCancelation": true
   },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "fit.fssolucoes.tech"
+        }
+      ],
+      "destination": "https://www.fsfit.com.br/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sistema-para-personal-trainer",
