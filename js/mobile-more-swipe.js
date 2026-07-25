@@ -1,5 +1,146 @@
 import { supabase } from './supabase.js';
 
+const ACCESS_CACHE_KEY = 'fsfit:access-status-cache';
+const ACCESS_CACHE_MAX_AGE_MS = 15 * 60 * 1000;
+const FREE_ALLOWED_PAGES = new Set([
+  'painel.html',
+  'perfil.html',
+  'contato.html',
+  'assinatura.html',
+  'admin.html',
+  'admin-contatos.html'
+]);
+const PREMIUM_NAV_PAGES = new Set([
+  'alunos.html',
+  'ficha-aluno.html',
+  'biblioteca-exercicios.html',
+  'biblioteca-alimentar.html',
+  'agenda.html',
+  'financeiro.html'
+]);
+let freePlanNavigationActive = false;
+
+function currentPage() {
+  const page = window.location.pathname.split('/').pop();
+  return page || 'index.html';
+}
+
+function pageFromHref(value = '') {
+  try {
+    const url = new URL(String(value), window.location.href);
+    return url.pathname.split('/').pop() || 'index.html';
+  } catch {
+    return '';
+  }
+}
+
+function injectFreePlanNavigationStyles() {
+  if (document.querySelector('#fsfit-free-plan-navigation-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'fsfit-free-plan-navigation-styles';
+  style.textContent = `
+    a.fsfit-plan-locked {
+      opacity: .42 !important;
+      cursor: not-allowed !important;
+      filter: grayscale(.35);
+      pointer-events: none !important;
+      user-select: none;
+    }
+
+    a.fsfit-plan-locked::after {
+      content: '🔒';
+      display: inline-block;
+      margin-left: .38em;
+      font-size: .72em;
+      line-height: 1;
+      vertical-align: .08em;
+    }
+
+    .fsfit-bottom-nav a.fsfit-plan-locked::after {
+      position: absolute;
+      top: 5px;
+      right: calc(50% - 22px);
+      margin: 0;
+      font-size: 10px;
+    }
+
+    .fsfit-more-item.fsfit-plan-locked .fsfit-more-item-chevron {
+      display: none;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function premiumNavigationHref(link) {
+  if (!(link instanceof HTMLAnchorElement)) return '';
+  return link.dataset.fsfitPremiumHref || link.getAttribute('href') || '';
+}
+
+function isPremiumNavigationLink(link) {
+  return PREMIUM_NAV_PAGES.has(pageFromHref(premiumNavigationHref(link)));
+}
+
+function lockPremiumNavigationLink(link) {
+  if (!(link instanceof HTMLAnchorElement) || !isPremiumNavigationLink(link)) return;
+
+  const href = link.getAttribute('href');
+  if (href && !link.dataset.fsfitPremiumHref) link.dataset.fsfitPremiumHref = href;
+  link.removeAttribute('href');
+  link.classList.add('fsfit-plan-locked');
+  link.setAttribute('aria-disabled', 'true');
+  link.setAttribute('tabindex', '-1');
+  link.setAttribute('title', 'Disponível em um plano pago');
+}
+
+function applyFreePlanNavigationLocks(root = document) {
+  if (!freePlanNavigationActive) return;
+
+  if (root instanceof HTMLAnchorElement) lockPremiumNavigationLink(root);
+  root.querySelectorAll?.('a').forEach(lockPremiumNavigationLink);
+}
+
+function readCachedAccess() {
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(ACCESS_CACHE_KEY) || 'null');
+    if (cached?.value && Date.now() - Number(cached.savedAt || 0) < ACCESS_CACHE_MAX_AGE_MS) {
+      return cached.value;
+    }
+  } catch {}
+  return null;
+}
+
+async function resolveAccessStatus() {
+  const cached = readCachedAccess();
+  if (cached) return cached;
+
+  const { data, error } = await supabase.rpc('fsfit_sincronizar_meu_acesso');
+  if (error) throw error;
+  return data || null;
+}
+
+function redirectFreeUserFromBlockedPage() {
+  if (FREE_ALLOWED_PAGES.has(currentPage())) return false;
+  window.location.replace('painel.html?acesso=free');
+  return true;
+}
+
+async function initFreePlanNavigationGuard() {
+  try {
+    const access = await resolveAccessStatus();
+    if (access?.acesso_premium) return;
+
+    freePlanNavigationActive = true;
+    document.documentElement.classList.add('fsfit-free-plan');
+    injectFreePlanNavigationStyles();
+
+    if (redirectFreeUserFromBlockedPage()) return;
+    applyFreePlanNavigationLocks();
+  } catch (error) {
+    console.warn('Não foi possível aplicar o bloqueio visual do plano Free:', error);
+  }
+}
+
 function injectBottomNavigationPositionFix() {
   if (document.querySelector('#fsfit-bottom-navigation-position-fix')) return;
 
@@ -95,6 +236,7 @@ function ensureMoreSheetEntries(sheet) {
       </a>`);
   }
 
+  applyFreePlanNavigationLocks(list);
   resolveAdminEntry(list.querySelector('[data-fsfit-admin-entry]'));
 }
 
@@ -224,11 +366,14 @@ function bindExistingSheets(root = document) {
 
 function initMoreSheetSwipe() {
   bindExistingSheets();
+  initFreePlanNavigationGuard();
 
   const observer = new MutationObserver(records => {
     records.forEach(record => {
       record.addedNodes.forEach(node => {
-        if (node instanceof HTMLElement) bindExistingSheets(node);
+        if (!(node instanceof HTMLElement)) return;
+        bindExistingSheets(node);
+        applyFreePlanNavigationLocks(node);
       });
     });
   });
