@@ -77,7 +77,7 @@ async function cancelPreviousPendingCharges(
 ) {
   const { data: pending, error } = await admin
     .from("cobrancas_pix")
-    .select("id,txid,status")
+    .select("id,txid,status,vence_em")
     .eq("personal_id", personalId)
     .eq("status", "pendente")
     .order("created_at", { ascending: false });
@@ -85,6 +85,17 @@ async function cancelPreviousPendingCharges(
   if (error) throw error;
 
   for (const charge of pending || []) {
+    const expiresAt = charge.vence_em ? new Date(charge.vence_em).getTime() : Number.NaN;
+    if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) {
+      const { error: expireError } = await admin
+        .from("cobrancas_pix")
+        .update({ status: "expirada", updated_at: new Date().toISOString() })
+        .eq("id", charge.id)
+        .eq("status", "pendente");
+      if (expireError) throw expireError;
+      continue;
+    }
+
     let canceled = !charge.txid;
 
     if (charge.txid) {
