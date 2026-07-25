@@ -3,8 +3,76 @@ import { ensurePersonalProfile } from './layout.js';
 
 const PLAY_DISTRIBUTION_KEY = 'fsfit_distribution';
 const PLAY_DISTRIBUTION_VALUE = 'google-play';
+const ATTRIBUTION_STORAGE_KEY = 'fsfit_attribution';
+const ATTRIBUTION_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'gbraid', 'wbraid'];
 const currentUrl = new URL(window.location.href);
 const launchedFromGooglePlay = currentUrl.searchParams.get('platform') === 'android-play';
+
+function readStoredAttribution() {
+  try {
+    return JSON.parse(localStorage.getItem(ATTRIBUTION_STORAGE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function captureAttribution() {
+  const now = new Date().toISOString();
+  const stored = readStoredAttribution();
+  const current = {};
+
+  ATTRIBUTION_PARAMS.forEach(key => {
+    const value = currentUrl.searchParams.get(key);
+    if (value) current[key] = value.slice(0, 300);
+  });
+
+  const merged = {
+    ...stored,
+    ...current,
+    first_landing_page: stored.first_landing_page || currentUrl.pathname,
+    first_seen_at: stored.first_seen_at || now,
+    last_landing_page: currentUrl.pathname,
+    last_seen_at: now
+  };
+
+  try {
+    localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(merged));
+  } catch (error) {
+    console.warn('Não foi possível salvar a atribuição do cadastro:', error);
+  }
+
+  return merged;
+}
+
+function acquisitionMetadata(attribution) {
+  const clickId = attribution.gclid || attribution.gbraid || attribution.wbraid || null;
+  return {
+    acquisition_source: attribution.utm_source || (clickId ? 'google' : 'direct'),
+    acquisition_medium: attribution.utm_medium || (clickId ? 'paid_search' : null),
+    acquisition_campaign: attribution.utm_campaign || null,
+    acquisition_content: attribution.utm_content || null,
+    acquisition_term: attribution.utm_term || null,
+    acquisition_click_id: clickId,
+    acquisition_first_landing_page: attribution.first_landing_page || null,
+    acquisition_last_landing_page: attribution.last_landing_page || currentUrl.pathname,
+    acquisition_first_seen_at: attribution.first_seen_at || null
+  };
+}
+
+function trackSignupCreated(attribution) {
+  const detail = {
+    event: 'fsfit_signup_created',
+    source: attribution.utm_source || 'direct',
+    medium: attribution.utm_medium || null,
+    campaign: attribution.utm_campaign || null,
+    landing_page: attribution.last_landing_page || currentUrl.pathname
+  };
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push(detail);
+  window.dispatchEvent(new CustomEvent('fsfit:signup-created', { detail }));
+}
+
+const attribution = captureAttribution();
 
 if (launchedFromGooglePlay) {
   localStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
@@ -28,6 +96,13 @@ const trialNote = document.querySelector('#auth-trial-note');
 const priceNote = document.querySelector('.auth-price-note');
 const heroBadge = document.querySelector('.hero-badge');
 const message = document.querySelector('#auth-message');
+const requestedMode = currentUrl.searchParams.get('modo');
+const defaultAuthMode = document.body?.dataset.authDefault === 'signup'
+  || requestedMode === 'cadastro'
+  || requestedMode === 'signup'
+  || currentUrl.searchParams.get('cadastro') === '1'
+  ? 'signup'
+  : 'login';
 let mode = 'login';
 
 function show(text, type = 'error') {
@@ -128,12 +203,15 @@ form?.addEventListener('submit', async event => {
           termos_aceitos_em: acceptedAt,
           politica_privacidade_aceita_em: acceptedAt,
           versao_termos: '2026-07-17',
-          versao_privacidade: '2026-07-17'
+          versao_privacidade: '2026-07-17',
+          ...acquisitionMetadata(attribution)
         }
       }
     });
 
     if (error) throw error;
+
+    trackSignupCreated(attribution);
 
     if (data.session) {
       await supabase.auth.signOut();
@@ -158,12 +236,13 @@ form?.addEventListener('submit', async event => {
 });
 
 applyGooglePlayConsumptionMode();
-setMode('login');
+setMode(defaultAuthMode);
 
 const url = new URL(window.location.href);
 const emailConfirmedReturn = url.searchParams.get('email_confirmado') === 'true';
 
 if (emailConfirmedReturn) {
+  setMode('login');
   show('✅ E-mail confirmado com sucesso! Sua conta foi ativada. Agora você pode acessar o FS Fit.', 'success');
   url.searchParams.delete('email_confirmado');
   window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
