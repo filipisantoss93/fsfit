@@ -1,15 +1,28 @@
 import { supabase } from './supabase.js';
-import { ensureStudentPortalMainTabs } from './portal-aluno-tabs.js';
+import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js';
 
 const token = localStorage.getItem('fsfit_aluno_token');
 const root = document.querySelector('#student-content');
 if (!token || !root) throw new Error('Sessão do aluno indisponível');
 
+function ensureContextStyles() {
+  if (document.querySelector('link[data-student-live-context]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/css/aluno-aula-contexto.css?v=20260725-student-live2';
+  link.dataset.studentLiveContext = 'true';
+  document.head.appendChild(link);
+}
+
+ensureContextStyles();
+
 const portalTabs = ensureStudentPortalMainTabs();
 const liveHost = portalTabs?.live || root;
+const liveTabButton = root.querySelector('[data-student-main-tab="live"]');
 
 let accessToken = null;
 let sessionState = null;
+let contextRenderScheduled = false;
 
 const box = document.createElement('section');
 box.className = 'card live-class-card';
@@ -22,11 +35,40 @@ function esc(value = '') {
   return div.innerHTML;
 }
 
+function digits(value = '') {
+  return String(value || '').replace(/\D/g, '');
+}
+
 function formatElapsed(value) {
   if (!value) return '';
-  const minutes = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 60000));
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return '';
+  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000));
+  if (minutes < 1) return 'agora';
   if (minutes < 60) return `${minutes} min`;
   return `${Math.floor(minutes / 60)}h ${minutes % 60}min`;
+}
+
+function formatToday() {
+  const value = new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long'
+  }).format(new Date());
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function sameLocalDay(value, reference = new Date()) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  return date.getFullYear() === reference.getFullYear()
+    && date.getMonth() === reference.getMonth()
+    && date.getDate() === reference.getDate();
+}
+
+function recentCompletion() {
+  const value = sessionStorage.getItem('fsfit_aluno_treino_concluido_em');
+  return value && sameLocalDay(value) ? value : '';
 }
 
 function youtubeEmbedUrl(url) {
@@ -45,6 +87,119 @@ function youtubeEmbedUrl(url) {
   } catch {
     return null;
   }
+}
+
+function setLiveTab(label, state = 'today') {
+  if (!liveTabButton) return;
+  if (liveTabButton.textContent !== label) liveTabButton.textContent = label;
+  liveTabButton.dataset.liveState = state;
+}
+
+function openPlanSection(target = 'inicio') {
+  showStudentPortalTab('agenda');
+  requestAnimationFrame(() => {
+    const targetTab = root.querySelector(`[data-student-tab="${target}"]`);
+    targetTab?.click();
+    root.querySelector('.student-plan-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function getDaySnapshot() {
+  const ready = !root.classList.contains('hidden');
+  const workoutContent = document.querySelector('#workout-content');
+  const dietContent = document.querySelector('#diet-content');
+  const workoutRows = workoutContent?.querySelectorAll('.student-compact-row').length || 0;
+  const dietRows = dietContent?.querySelectorAll('.student-compact-row').length || 0;
+  const workoutHeader = workoutContent?.querySelector('.student-agenda-day-header span')?.textContent?.trim() || '';
+  const dietHeader = dietContent?.querySelector('.student-agenda-day-header span')?.textContent?.trim() || '';
+  const workoutName = document.querySelector('#workout-plan-name')?.textContent?.trim() || '';
+  const observation = document.querySelector('#student-observations')?.textContent?.trim() || '';
+  const settingsWhatsapp = document.querySelector('#whatsapp-button');
+  const whatsappHref = settingsWhatsapp?.getAttribute('href') || '';
+
+  return {
+    ready,
+    workoutRows,
+    dietRows,
+    workoutHeader,
+    dietHeader,
+    workoutName,
+    observation: observation === 'Nenhuma observação publicada ainda.' ? '' : observation,
+    whatsappHref
+  };
+}
+
+function dayOverviewHtml() {
+  const day = getDaySnapshot();
+  const workoutTitle = day.ready
+    ? (day.workoutRows ? `${day.workoutRows} ${day.workoutRows === 1 ? 'exercício' : 'exercícios'}` : 'Dia de descanso')
+    : 'Carregando treino';
+  const workoutDetail = day.workoutName || day.workoutHeader || 'Veja sua programação completa';
+  const dietTitle = day.ready
+    ? (day.dietRows ? `${day.dietRows} ${day.dietRows === 1 ? 'refeição' : 'refeições'}` : 'Sem refeições hoje')
+    : 'Carregando alimentação';
+  const dietDetail = day.dietHeader || 'Consulte seu plano alimentar';
+
+  return `<section class="live-day-overview">
+    <div class="live-day-overview-heading">
+      <div><small>SEU DIA</small><h3>Continue sua rotina</h3></div>
+      <span>${esc(formatToday())}</span>
+    </div>
+    <div class="live-day-grid">
+      <button class="live-day-card" type="button" data-live-go="treino">
+        <small>TREINO</small>
+        <strong>${esc(workoutTitle)}</strong>
+        <span>${esc(workoutDetail)}</span>
+        <b>VER TREINO →</b>
+      </button>
+      <button class="live-day-card" type="button" data-live-go="dieta">
+        <small>ALIMENTAÇÃO</small>
+        <strong>${esc(dietTitle)}</strong>
+        <span>${esc(dietDetail)}</span>
+        <b>VER ALIMENTAÇÃO →</b>
+      </button>
+    </div>
+    ${day.observation ? `<button class="live-day-guidance" type="button" data-live-go="observacoes"><small>ORIENTAÇÃO DO PERSONAL</small><p>${esc(day.observation)}</p><span>VER ORIENTAÇÕES →</span></button>` : ''}
+  </section>`;
+}
+
+function optionalSessionContext(state = {}) {
+  const items = [];
+  const workoutName = String(state.treino_nome || '').trim();
+  const scheduledAt = state.agendado_para || state.horario_agendado || state.inicio_previsto || '';
+  const location = String(state.local || state.local_treino || state.modalidade || '').trim();
+  const exercises = Array.isArray(state.exercicios) ? state.exercicios.length : 0;
+
+  if (workoutName) items.push(['TREINO', workoutName]);
+  if (scheduledAt) {
+    const date = new Date(scheduledAt);
+    const value = Number.isNaN(date.getTime())
+      ? String(scheduledAt)
+      : date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    items.push(['HORÁRIO', value]);
+  }
+  if (location) items.push(['LOCAL / MODALIDADE', location]);
+  if (exercises) items.push(['PROGRAMAÇÃO', `${exercises} ${exercises === 1 ? 'exercício' : 'exercícios'}`]);
+
+  if (!items.length) return '';
+  return `<div class="live-context-grid">${items.map(([label, value]) => `<div class="live-context-item"><small>${esc(label)}</small><strong>${esc(value)}</strong></div>`).join('')}</div>`;
+}
+
+function personalLinkHtml() {
+  const href = getDaySnapshot().whatsappHref;
+  if (!href) return '';
+  return `<a class="btn btn-outline live-personal-link visible" href="${esc(href)}" target="_blank" rel="noopener">Falar com meu personal</a>`;
+}
+
+function bindRenderedActions() {
+  box.querySelectorAll('[data-live-go]').forEach(button => {
+    button.addEventListener('click', () => openPlanSection(button.dataset.liveGo || 'inicio'));
+  });
+  box.querySelector('#start-live-class')?.addEventListener('click', startSession);
+  box.querySelector('#cancel-live-checkin')?.addEventListener('click', cancelCheckin);
+  box.querySelectorAll('[data-session-exercise]').forEach(input => input.addEventListener('change', toggleExercise));
+  box.querySelectorAll('[data-live-exercise-detail]').forEach(button => button.addEventListener('click', () => openExerciseDetail(button.dataset.liveExerciseDetail)));
+  box.querySelector('#finish-live-class')?.addEventListener('click', finishSession);
 }
 
 function openExerciseDetail(id) {
@@ -111,27 +266,65 @@ function exerciseSummary(item) {
   return parts.join(' · ') || 'Ver detalhes';
 }
 
-function render() {
-  const state = sessionState;
-  if (!state?.sessao_id) {
-    box.innerHTML = `
-      <div class="live-class-header"><div><small>TREINO DE HOJE</small><h2>Pronto para treinar?</h2></div><span class="live-status idle">AGUARDANDO</span></div>
-      <p>Faça seu check-in. Seu personal receberá a solicitação e confirmará o início da aula.</p>
-      <button id="start-live-class" class="btn btn-primary" type="button">Fazer check-in</button>`;
-    box.querySelector('#start-live-class')?.addEventListener('click', startSession);
-    return;
-  }
+function renderIdle(state = {}) {
+  setLiveTab('Hoje', 'today');
+  const completion = recentCompletion();
+  box.innerHTML = `
+    ${completion ? '<div class="live-completed-banner"><strong>Treino concluído hoje</strong><span>Seu progresso foi salvo. Você pode consultar a agenda ou iniciar outra sessão quando necessário.</span></div>' : ''}
+    <div class="live-class-header">
+      <div><span class="live-class-date">${esc(formatToday())}</span><h2>Pronto para treinar?</h2></div>
+      <span class="live-status idle">CHECK-IN PENDENTE</span>
+    </div>
+    <div class="live-session-state">Aguardando seu check-in</div>
+    <p class="live-class-intro">Faça seu check-in. Seu personal receberá a solicitação e confirmará o início da aula.</p>
+    ${optionalSessionContext(state)}
+    <div class="live-class-actions ${personalLinkHtml() ? '' : 'single'}">
+      <button id="start-live-class" class="btn btn-primary" type="button">Fazer check-in</button>
+      ${personalLinkHtml()}
+    </div>
+    ${dayOverviewHtml()}`;
+  bindRenderedActions();
+}
 
-  if (state.status === 'aguardando_confirmacao') {
-    box.innerHTML = `
-      <div class="live-class-header"><div><small>CHECK-IN REALIZADO</small><h2>Aguardando seu personal</h2></div><span class="live-status idle">AGUARDANDO CONFIRMAÇÃO</span></div>
-      <p>Seu check-in foi enviado. O treino será liberado assim que o personal confirmar o início da aula.</p>
-      <div class="live-class-meta"><span>Check-in feito há ${esc(formatElapsed(state.checkin_at))}</span><strong>Aguardando liberação</strong></div>
-      <div class="actions"><button id="cancel-live-checkin" class="btn btn-outline" type="button">Cancelar check-in</button></div>`;
-    box.querySelector('#cancel-live-checkin')?.addEventListener('click', cancelCheckin);
-    return;
-  }
+function renderWaiting(state) {
+  setLiveTab('Aguardando', 'waiting');
+  const elapsed = formatElapsed(state.checkin_at);
+  box.innerHTML = `
+    <div class="live-class-header">
+      <div><small>CHECK-IN REALIZADO</small><h2>Check-in enviado</h2></div>
+      <span class="live-status pending">AGUARDANDO PERSONAL</span>
+    </div>
+    <div class="live-session-state pending">Aguardando confirmação do personal</div>
+    <p class="live-class-intro">Seu personal recebeu a solicitação. O treino será liberado assim que ele confirmar o início da aula.</p>
+    ${optionalSessionContext(state)}
+    ${elapsed ? `<div class="live-class-meta"><span>Check-in feito há ${esc(elapsed)}</span><strong>Aguardando liberação</strong></div>` : ''}
+    <div class="live-class-actions ${personalLinkHtml() ? '' : 'single'}">
+      <button id="cancel-live-checkin" class="btn btn-outline" type="button">Cancelar check-in</button>
+      ${personalLinkHtml()}
+    </div>
+    ${dayOverviewHtml()}`;
+  bindRenderedActions();
+}
 
+function renderCompleted(state = {}) {
+  setLiveTab('Hoje', 'today');
+  box.innerHTML = `
+    <div class="live-class-header">
+      <div><small>TREINO FINALIZADO</small><h2>Treino concluído 🎉</h2></div>
+      <span class="live-status complete">CONCLUÍDO</span>
+    </div>
+    <p class="live-class-intro">Seu progresso foi salvo. Continue acompanhando o treino, a alimentação e as orientações do seu personal.</p>
+    ${optionalSessionContext(state)}
+    <div class="live-class-actions ${personalLinkHtml() ? '' : 'single'}">
+      <button class="btn btn-primary" type="button" data-live-go="inicio">Voltar para meu dia</button>
+      ${personalLinkHtml()}
+    </div>
+    ${dayOverviewHtml()}`;
+  bindRenderedActions();
+}
+
+function renderActive(state) {
+  setLiveTab('Em aula', 'active');
   const items = Array.isArray(state.exercicios) ? state.exercicios : [];
   const done = items.filter(item => item.concluido).length;
   const total = items.length;
@@ -144,17 +337,20 @@ function render() {
   box.innerHTML = `
     <div class="live-class-header live-class-header-compact">
       <div>
-        <small>EM AULA</small>
+        <small>AULA EM ANDAMENTO</small>
         <h2>${esc(state.treino_nome || 'Treino em andamento')}</h2>
         <p>Iniciado há ${esc(formatElapsed(state.iniciado_at || state.checkin_at))}</p>
       </div>
+      <span class="live-status active">EM AULA</span>
     </div>
+    <div class="live-session-state active">Aula em andamento com seu personal</div>
+    ${optionalSessionContext(state)}
     <div class="live-progress-summary">
       <strong>${done} de ${total} concluídos</strong>
       <span>${percent}%</span>
     </div>
     <div class="live-progress" aria-label="Progresso do treino"><span style="width:${percent}%"></span></div>
-    ${completed ? '<div class="live-complete-message">Treino concluído 🎉</div>' : ''}
+    ${completed ? '<div class="live-complete-message">Todos os exercícios foram concluídos 🎉</div>' : ''}
     <div class="live-exercise-list">
       ${items.length ? items.map(item => {
         const id = String(item.id || '');
@@ -176,18 +372,64 @@ function render() {
             <span class="live-exercise-arrow" aria-hidden="true">›</span>
           </button>
         </div>`;
-      }).join('') : '<p>Nenhum exercício programado para hoje.</p>'}
+      }).join('') : '<p>Nenhum exercício programado para esta aula.</p>'}
     </div>
     <button id="finish-live-class" class="btn btn-secondary" type="button">Finalizar treino</button>`;
 
-  box.querySelectorAll('[data-session-exercise]').forEach(input => input.addEventListener('change', toggleExercise));
-  box.querySelectorAll('[data-live-exercise-detail]').forEach(button => button.addEventListener('click', () => openExerciseDetail(button.dataset.liveExerciseDetail)));
-  box.querySelector('#finish-live-class')?.addEventListener('click', finishSession);
+  bindRenderedActions();
+}
+
+function render() {
+  const state = sessionState || {};
+  if (state.status === 'finalizada' || state.status === 'concluida') {
+    renderCompleted(state);
+    return;
+  }
+  if (!state.sessao_id) {
+    renderIdle(state);
+    return;
+  }
+  if (state.status === 'aguardando_confirmacao') {
+    renderWaiting(state);
+    return;
+  }
+  renderActive(state);
+}
+
+function scheduleContextRender() {
+  if (contextRenderScheduled) return;
+  contextRenderScheduled = true;
+  requestAnimationFrame(() => {
+    contextRenderScheduled = false;
+    if (!sessionState?.sessao_id || sessionState?.status === 'aguardando_confirmacao') render();
+  });
+}
+
+function observeDayContext() {
+  const targets = [
+    root,
+    document.querySelector('#workout-content'),
+    document.querySelector('#diet-content'),
+    document.querySelector('#workout-plan-name'),
+    document.querySelector('#student-observations'),
+    document.querySelector('#whatsapp-button')
+  ].filter(Boolean);
+
+  const observer = new MutationObserver(scheduleContextRender);
+  targets.forEach(target => {
+    const options = target === root
+      ? { attributes: true, attributeFilter: ['class'] }
+      : { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['href', 'class'] };
+    observer.observe(target, options);
+  });
 }
 
 async function startSession() {
   const button = box.querySelector('#start-live-class');
-  if (button) button.disabled = true;
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Enviando check-in...';
+  }
   try {
     await rpc('iniciar_aluno_sessao_treino', { p_access_token: accessToken });
     try {
@@ -199,7 +441,10 @@ async function startSession() {
   } catch (error) {
     console.error(error);
     alert(error.message || 'Não foi possível realizar o check-in.');
-    if (button) button.disabled = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Fazer check-in';
+    }
   }
 }
 
@@ -240,22 +485,32 @@ async function toggleExercise(event) {
 async function finishSession() {
   if (!confirm('Finalizar o treino de hoje?')) return;
   const button = box.querySelector('#finish-live-class');
-  if (button) button.disabled = true;
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Finalizando...';
+  }
   try {
     await rpc('finalizar_aluno_sessao_treino', { p_access_token: accessToken });
-    sessionState = null;
+    sessionStorage.setItem('fsfit_aluno_treino_concluido_em', new Date().toISOString());
+    sessionState = { ...sessionState, status: 'finalizada' };
     render();
   } catch (error) {
     console.error(error);
     alert('Não foi possível finalizar o treino.');
-    if (button) button.disabled = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Finalizar treino';
+    }
   }
 }
 
 try {
+  observeDayContext();
   await resolveAccessToken();
   await loadSession();
-  setInterval(() => { if (sessionState?.sessao_id) loadSession().catch(console.error); }, 10000);
+  setInterval(() => {
+    if (sessionState?.sessao_id && sessionState.status !== 'finalizada') loadSession().catch(console.error);
+  }, 10000);
 } catch (error) {
   console.error(error);
   box.remove();
