@@ -1,0 +1,79 @@
+.simple-picker-filter-panel{
+  position:sticky;
+  top:-17px;
+  z-index:4;
+  margin:-17px -17px 12px;
+  padding:14px 17px 11px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  background:#171b21;
+}
+.simple-picker-filter-panel .simple-search-field{
+  position:static!important;
+  top:auto!important;
+  z-index:auto!important;
+  margin:0 0 11px!important;
+  padding:0!important;
+  background:transparent!important;
+}
+.simple-picker-category-bar{
+  display:flex;
+  gap:7px;
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:1px 1px 4px;
+  overscroll-behavior-x:contain;
+  scroll-behavior:smooth;
+  scroll-snap-type:x proximity;
+  scrollbar-width:none;
+  touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.simple-picker-category-bar::-webkit-scrollbar{display:none}
+.simple-picker-category-chip{
+  flex:0 0 auto;
+  min-height:38px;
+  padding:0 13px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  color:var(--muted);
+  font:inherit;
+  font-size:.73rem;
+  font-weight:850;
+  white-space:nowrap;
+  cursor:pointer;
+  scroll-snap-align:start;
+  touch-action:pan-x;
+  -webkit-tap-highlight-color:transparent;
+}
+.simple-picker-category-chip.active{
+  border-color:rgba(50,215,75,.75);
+  background:var(--primary);
+  color:#071109;
+  box-shadow:0 7px 20px rgba(50,215,75,.14);
+}
+.simple-picker-category-chip:focus-visible{
+  outline:3px solid rgba(50,215,75,.22);
+  outline-offset:2px;
+}
+.simple-picker-option[hidden]{display:none!important}
+.simple-category-empty{
+  margin-top:2px;
+  border:1px dashed rgba(255,255,255,.11);
+  border-radius:11px;
+  background:rgba(255,255,255,.018);
+}
+@media(max-width:640px){
+  .simple-picker-filter-panel{
+    top:-15px;
+    margin:-15px -15px 11px;
+    padding:12px 15px 10px;
+  }
+  .simple-picker-filter-panel .simple-search-field{margin-bottom:10px!important}
+  .simple-picker-category-bar{margin-right:-15px;padding-right:15px}
+  .simple-picker-category-chip{min-height:36px;padding:0 12px;font-size:.7rem}
+}
