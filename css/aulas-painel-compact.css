@@ -1,310 +1,87 @@
-.live-students-card {
-  margin: 18px 0;
-  padding: 0;
-  overflow: hidden;
+@import url("./aulas-painel-compact-base.css?v=20260725-personal-live2");
+
+/* Refinamento do modal do personal enquanto o aluno aguarda confirmação. */
+#live-session-modal[data-session-status="aguardando_confirmacao"] .live-session-progress-label {
+  display: none !important;
 }
 
-.live-students-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 20px 22px 14px;
-  border-bottom: 1px solid var(--border);
+#live-session-modal[data-session-status="aguardando_confirmacao"] .live-session-workouts-heading strong {
+  font-size: 0 !important;
 }
 
-.live-students-heading small {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--muted);
-  font-size: .7rem;
-  font-weight: 800;
-  letter-spacing: .08em;
+#live-session-modal[data-session-status="aguardando_confirmacao"] .live-session-workouts-heading strong::after {
+  content: "Treino preparado para hoje";
+  font-size: 1rem;
+  line-height: 1.3;
 }
 
-.live-students-heading h2 { margin: 0; }
-.live-students-list { display: grid; gap: 0; margin-top: 0; }
-
-.live-student-row {
-  width: 100%;
-  display: grid !important;
-  grid-template-columns: minmax(0,1fr) minmax(150px,.42fr) auto;
-  align-items: center !important;
-  gap: 14px !important;
-  padding: 14px 20px !important;
-  border: 0 !important;
-  border-bottom: 1px solid var(--border) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background .18s ease;
+#live-session-modal[data-session-status="aguardando_confirmacao"] .live-session-workouts-heading p {
+  max-width: 42ch;
 }
 
-.live-student-row:last-child { border-bottom: 0 !important; }
-.live-student-row:hover,
-.live-student-row:focus-visible { background: rgba(255,255,255,.035) !important; }
-.live-student-main { display: flex !important; align-items: center !important; gap: 12px !important; min-width: 0 !important; }
-.live-student-main > div { display: grid; gap: 3px; min-width: 0; }
-.live-student-main strong,
-.live-student-main small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.live-student-main strong { font-size: .94rem; }
-.live-student-main small { color: var(--muted); font-size: .75rem; }
-.live-student-progress { display: grid !important; gap: 6px !important; min-width: 0 !important; }
-.live-student-progress > span { font-size: .77rem; font-weight: 750; white-space: nowrap; }
-.live-student-progress .live-progress { width: 100%; height: 6px; }
-.live-student-arrow { color: var(--muted); font-size: 1.75rem; line-height: 1; }
-.live-student-row.pending .live-dot { background: #f4b740; box-shadow: 0 0 0 5px rgba(244,183,64,.12); }
-
-.live-session-modal,
-.live-workout-editor-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1500;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  background: rgba(4,7,10,.82);
-  backdrop-filter: blur(6px);
+/* Ação principal em largura total. */
+.live-session-modal-actions [data-modal-confirm-session] {
+  order: -3 !important;
+  grid-column: 1 / -1 !important;
 }
 
-.live-session-modal.open,
-.live-workout-editor-modal.open { display: flex; }
-
-.live-session-dialog {
-  width: min(680px,100%);
-  max-height: min(92dvh,900px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: #151a1f;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 14px;
-  box-shadow: 0 24px 70px rgba(0,0,0,.45);
+/* Editar treino e abrir ficha formam o mesmo nível visual. */
+.live-session-modal-actions [data-live-edit-workout],
+.live-session-modal-actions a[href*="ficha-aluno.html"] {
+  order: -2 !important;
+  grid-column: auto !important;
+  min-width: 0;
 }
 
-.live-session-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 20px 20px 14px;
-  border-bottom: 1px solid var(--border);
+/* Cancelamento continua acessível, mas deixa de competir com a confirmação. */
+.live-session-modal-actions [data-modal-cancel-checkin] {
+  order: 1 !important;
+  grid-column: 1 / -1 !important;
+  min-height: 48px !important;
+  margin-top: 2px !important;
+  border: 1px solid rgba(255,95,103,.55) !important;
+  background: rgba(255,95,103,.035) !important;
+  color: #ff9da3 !important;
+  box-shadow: none !important;
 }
 
-.live-session-modal-header small {
-  display: block;
-  color: var(--primary);
-  font-size: .68rem;
-  font-weight: 850;
-  letter-spacing: .08em;
-  margin-bottom: 5px;
+.live-session-modal-actions [data-modal-cancel-checkin] .btn-action-icon {
+  color: #ff8d94 !important;
 }
 
-.live-session-modal-header h2 { margin: 0 0 5px; font-size: 1.35rem; }
-.live-session-modal-header p { margin: 0; color: var(--muted); font-size: .8rem; }
-.live-session-modal-close,
-.live-workout-editor-close {
-  flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.14);
-  background: #232a33;
-  color: #fff;
-  font-size: 26px;
-  line-height: 1;
-  cursor: pointer;
+.live-session-modal-actions [data-modal-cancel-checkin] .btn-action-title {
+  font-size: .82rem !important;
 }
 
-.live-session-modal-body { overflow-y: auto; padding: 16px 20px 20px; }
-.live-session-progress-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.035);
-}
-.live-session-progress-label span { color: var(--muted); font-size: .75rem; }
-.live-session-progress-label strong { font-size: .86rem; }
-.live-session-chat-title { margin: 4px 0 10px; font-size: .83rem; font-weight: 850; letter-spacing: .04em; }
-.live-session-modal .live-chat-thread { max-height: 320px; min-height: 160px; }
-.live-session-modal .live-chat-form.hidden { display: none; }
-
-/* Hierarquia das ações: principal > secundárias > destrutiva > neutra */
-.live-session-modal-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap: 10px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+.live-session-modal-actions [data-modal-cancel-checkin] .btn-action-description {
+  font-size: .68rem !important;
+  opacity: .78;
 }
 
-.live-session-modal-actions .btn {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.live-session-modal-actions [data-modal-confirm-session],
-.live-session-modal-actions [data-modal-cancel-checkin],
-.live-session-modal-actions [data-modal-finish-session],
-.live-session-modal-actions [data-modal-close-session] {
-  grid-column: 1 / -1;
-}
-
-.live-session-modal-actions [data-live-edit-workout] { order: -1; }
-.live-session-modal-actions [data-modal-confirm-session] { order: -2; }
-.live-session-modal-actions [data-modal-cancel-checkin],
-.live-session-modal-actions [data-modal-finish-session] { margin-top: 2px; }
-.live-session-modal-actions [data-modal-close-session] { margin-top: 2px; }
-.live-session-modal-open { overflow: hidden; }
-
-.live-workout-editor-modal { z-index: 1700; padding: 14px; }
-.live-workout-editor-dialog {
-  position: relative;
-  width: min(1080px,100%);
-  height: min(94dvh,1050px);
-  overflow: hidden;
-  background: #151a1f;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 14px;
-  box-shadow: 0 24px 70px rgba(0,0,0,.5);
-}
-.live-workout-editor-close { position: absolute; top: 12px; right: 12px; z-index: 3; }
-.live-workout-editor-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
-
-/* Mantém o handle de reordenação e todo o conteúdo do exercício na mesma linha. */
-.live-session-exercise-row {
-  grid-template-columns: 18px 18px 26px minmax(0,1fr) 18px !important;
-}
-
-.live-session-exercise-row::before {
-  content: '≡' !important;
-  display: grid !important;
-  place-items: center;
-  grid-column: 1;
-  grid-row: 1;
-  color: #9aa3af;
-  font-size: .82rem;
-  font-weight: 900;
-  line-height: 1;
-  cursor: grab;
-}
-
-.live-session-exercise-row:active::before { cursor: grabbing; }
-.live-session-exercise-row::after { content: none !important; display: none !important; }
-
-.live-session-exercise-marker {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.live-session-exercise-order {
-  grid-column: 3;
-  grid-row: 1;
-}
-
-.live-session-exercise-copy {
-  grid-column: 4;
-  grid-row: 1;
-}
-
-.live-session-exercise-arrow {
-  grid-column: 5;
-  grid-row: 1;
-  justify-self: end;
-  align-self: center;
-}
-
-@media (max-width: 720px) {
-  .live-students-heading { padding: 17px 18px 13px; }
-  .live-student-row { grid-template-columns: minmax(0,1fr) auto !important; gap: 8px 12px !important; padding: 13px 18px !important; }
-  .live-student-progress { grid-column: 1; margin-left: 22px; }
-  .live-student-arrow { grid-column: 2; grid-row: 1/3; align-self: center; }
-  .live-student-progress .live-progress { display: none; }
-  .live-session-modal,
-  .live-workout-editor-modal { padding: 0; }
-  .live-session-dialog,
-  .live-workout-editor-dialog { width: 100%; height: 100dvh; max-height: none; border-radius: 0; border: 0; }
-  .live-session-modal-header { padding: 16px 18px 13px; }
-  .live-session-modal-header h2 { font-size: 1.28rem; }
-  .live-session-modal-body { padding: 14px 18px 20px; }
-  .live-session-modal .live-chat-thread { max-height: 46dvh; min-height: 220px; }
-  .live-session-modal .live-chat-form { grid-template-columns: 1fr; }
-  .live-session-modal-actions { gap: 9px; }
-  .live-workout-editor-close { top: 10px; right: 10px; }
-
-  body.fsfit-dashboard-modern main.container { overflow: visible !important; }
-
-  /* Estado normal: as abas continuam no fluxo abaixo do cabeçalho. */
-  body.fsfit-dashboard-modern .dashboard-tabs,
-  .dashboard-tabs {
-    position: relative !important;
-    top: auto !important;
-    z-index: 1 !important;
-    width: 100% !important;
-    background: #1a1d23 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+@media (max-width: 520px) {
+  .live-session-modal-actions {
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
   }
 
-  .dashboard-tabs::before { content: none !important; }
-
-  /* O JS já detecta quando a posição original das abas alcança o topo.
-     No iOS usamos esse estado como fallback para fixação real no viewport. */
-  body:has(.dashboard-tabs-safe-cover.is-visible) .dashboard-tabs {
-    position: fixed !important;
-    top: 0 !important;
-    left: 12px !important;
-    right: 12px !important;
-    z-index: 180 !important;
-    width: auto !important;
-    margin: 0 !important;
-    padding-top: calc(var(--safe-area-top) + 4px) !important;
-    border-top: 0 !important;
-    border-radius: 0 0 14px 14px !important;
-    background: #1a1d23 !important;
-    box-shadow: 0 10px 28px rgba(0,0,0,.42) !important;
+  .live-session-modal-actions [data-live-edit-workout],
+  .live-session-modal-actions a[href*="ficha-aluno.html"] {
+    min-height: 92px;
+    padding: 12px 10px !important;
   }
 
-  /* Compensa o espaço removido do fluxo quando a barra passa a ser fixed. */
-  body:has(.dashboard-tabs-safe-cover.is-visible) .dashboard-tab-panel {
-    padding-top: calc(66px + var(--safe-area-top));
+  .live-session-modal-actions [data-live-edit-workout] .btn-action-copy,
+  .live-session-modal-actions a[href*="ficha-aluno.html"] .btn-action-copy {
+    min-width: 0;
   }
 
-  .dashboard-tabs-safe-cover {
-    display: block !important;
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 179;
-    height: calc(var(--safe-area-top) + 1px) !important;
-    pointer-events: none;
-    background: #1a1d23;
-    opacity: 0;
-    transition: opacity .12s ease;
+  .live-session-modal-actions [data-live-edit-workout] .btn-action-title,
+  .live-session-modal-actions a[href*="ficha-aluno.html"] .btn-action-title {
+    font-size: .8rem !important;
   }
 
-  .dashboard-tabs-safe-cover.is-visible { opacity: 1; }
-
-  /* Defesa extra para o shell principal no iOS. */
-  body.fsfit-dashboard-modern .fsfit-bottom-nav,
-  .fsfit-bottom-nav {
-    position: fixed !important;
-    top: auto !important;
-    right: 10px !important;
-    bottom: calc(8px + env(safe-area-inset-bottom,0px)) !important;
-    left: 10px !important;
-    margin: 0 !important;
-    z-index: 140 !important;
-    transform: none !important;
-    will-change: auto !important;
+  .live-session-modal-actions [data-live-edit-workout] .btn-action-description,
+  .live-session-modal-actions a[href*="ficha-aluno.html"] .btn-action-description {
+    font-size: .65rem !important;
+    line-height: 1.3;
   }
 }
