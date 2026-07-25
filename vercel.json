@@ -11,6 +11,14 @@
   },
   "rewrites": [
     {
+      "source": "/sistema-para-personal-trainer",
+      "destination": "/sistema-para-personal-trainer.html"
+    },
+    {
+      "source": "/lp-gads",
+      "destination": "/sistema-para-personal-trainer.html"
+    },
+    {
       "source": "/p/:slug",
       "destination": "/personal.html?u=:slug"
     }
