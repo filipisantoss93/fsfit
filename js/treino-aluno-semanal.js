@@ -184,7 +184,7 @@ function enhancePlanList() {
         row.insertAdjacentElement('afterend', actions);
       }
     } else {
-      row.querySelector('.workout-selected-label')?.remove();
+      row.querySelector('.workout-plan-selected-label')?.remove();
       if (arrow && arrow.textContent !== '›') arrow.textContent = '›';
     }
   });
@@ -297,7 +297,7 @@ function enhancePlanDays() {
         controls.appendChild(add);
       }
       enhanceExerciseRows(section);
-      fragment.appendChild(section);
+      if (needsRebuild) fragment.appendChild(section);
     });
 
     if (needsRebuild) root.replaceChildren(fragment);
