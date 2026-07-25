@@ -220,3 +220,7 @@ document.addEventListener('visibilitychange', () => {
 setupLogoutButton();
 loadNotifications();
 scheduleRefresh();
+
+import('./aluno-push-onboarding.js?v=20260725-push-onboarding1').catch(error => {
+  console.error('Não foi possível carregar a orientação de notificações:', error);
+});
