@@ -1,0 +1,237 @@
+/* Ajustes de conversão e usabilidade para a landing de anúncios no celular. */
+
+.lp-sticky-cta {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+}
+
+.lp-sticky-cta.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.lp-sticky-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-left: -2px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255,255,255,.055);
+  color: #a6b1c2;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  html { scroll-padding-top: 74px; }
+
+  .lp-container { width: min(100% - 32px, 1160px); }
+  .lp-header { background: rgba(7,11,16,.95); }
+  .lp-nav { min-height: 62px; }
+  .lp-logo { gap: 8px; }
+  .lp-logo-mark { width: 38px; height: 38px; border-radius: 12px; }
+  .lp-logo span:last-child { font-size: 1.14rem; }
+  .lp-nav-actions .lp-btn-primary { min-height: 40px; padding: 8px 12px; border-radius: 11px; font-size: .7rem; }
+
+  .lp-hero {
+    gap: 22px;
+    padding: 36px 0 38px;
+  }
+
+  .lp-hero-copy::before {
+    content: "SISTEMA PARA PERSONAL TRAINER";
+    display: block;
+    margin-bottom: 10px;
+    color: #b8f40f;
+    font-size: .64rem;
+    font-weight: 950;
+    letter-spacing: .09em;
+  }
+
+  .lp-eyebrow {
+    margin-bottom: 15px;
+    padding: 7px 10px;
+    font-size: .63rem;
+  }
+
+  .lp-hero h1 {
+    font-size: clamp(2.15rem, 10.6vw, 3.15rem);
+    line-height: 1.02;
+    letter-spacing: -.047em;
+  }
+
+  .lp-hero-lead {
+    margin-top: 17px;
+    font-size: .92rem;
+    line-height: 1.58;
+  }
+
+  .lp-proof-list {
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .lp-proof-list li {
+    font-size: .79rem;
+    line-height: 1.38;
+  }
+
+  .lp-proof-list li:nth-child(4) { display: none; }
+
+  .lp-hero-actions {
+    gap: 9px;
+    margin-top: 22px;
+  }
+
+  .lp-hero-actions .lp-btn { min-height: 50px; }
+
+  .lp-hero-actions .lp-btn-outline {
+    min-height: auto;
+    padding: 5px 0;
+    border: 0;
+    background: transparent;
+    color: #b8f40f;
+    box-shadow: none;
+    font-size: .78rem;
+  }
+
+  .lp-hero-price { margin-top: 12px; }
+  .lp-microcopy { margin-top: 7px; }
+
+  .lp-product-stage {
+    min-height: 455px;
+    margin-top: 2px;
+  }
+
+  .lp-browser {
+    margin: 0 28px 0 0;
+    transform: rotate(-.45deg);
+  }
+
+  .lp-phone {
+    right: -2px;
+    bottom: 0;
+    width: 194px;
+    transform: rotate(1.7deg);
+  }
+
+  .lp-phone-screen { min-height: 420px; }
+  .lp-floating-note { display: none; }
+
+  .lp-trust-item { padding: 18px 10px; }
+  .lp-trust-item strong { font-size: .84rem; }
+  .lp-trust-item span { font-size: .64rem; }
+
+  .lp-section { padding: 58px 0; }
+  .lp-section-head { margin-bottom: 26px; }
+  .lp-section h2,
+  .lp-student-copy h2,
+  .lp-price-copy h2,
+  .lp-signup-copy h2,
+  .lp-faq-copy h2 {
+    font-size: clamp(1.78rem, 8.5vw, 2.55rem);
+    line-height: 1.08;
+    letter-spacing: -.035em;
+  }
+
+  .lp-section-head p,
+  .lp-student-copy > p,
+  .lp-price-copy p,
+  .lp-signup-copy p,
+  .lp-faq-copy p {
+    margin-top: 13px;
+    font-size: .88rem;
+    line-height: 1.56;
+  }
+
+  .lp-compare { gap: 12px; }
+  .lp-compare-card { padding: 20px 18px; border-radius: 17px; }
+  .lp-compare-list { gap: 9px; margin-top: 15px; }
+  .lp-compare-list li { font-size: .78rem; line-height: 1.42; }
+  .lp-compare-list li:nth-child(n+5) { display: none; }
+
+  .lp-feature-grid { gap: 11px; }
+  .lp-feature {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 44px minmax(0,1fr);
+    align-items: center;
+    gap: 0 12px;
+    padding: 17px;
+    border-radius: 16px;
+  }
+
+  .lp-feature-icon {
+    grid-column: 1;
+    grid-row: 1;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .lp-feature h3 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    font-size: .94rem;
+  }
+
+  .lp-feature p {
+    grid-column: 1 / -1;
+    margin: 12px 0 0;
+    font-size: .76rem;
+    line-height: 1.48;
+  }
+
+  .lp-student-layout { gap: 30px; }
+  .lp-student-device { width: min(350px,100%); border-radius: 35px; }
+  .lp-student-device-screen { min-height: 545px; padding: 20px 15px; border-radius: 28px; }
+
+  .lp-live { gap: 24px; padding: 23px 18px; border-radius: 21px; }
+  .lp-live h2 { font-size: 1.85rem; }
+  .lp-live p { font-size: .84rem; }
+
+  .lp-price-card,
+  .lp-auth-card { padding: 22px 17px; }
+
+  .lp-final { padding: 42px 0 52px; }
+  .lp-final-card { padding: 32px 18px; border-radius: 21px; }
+  .lp-final-card h2 { font-size: 1.92rem; }
+
+  .lp-footer { padding-bottom: 34px; }
+
+  .lp-sticky-cta {
+    right: 14px;
+    bottom: calc(88px + env(safe-area-inset-bottom,0px));
+    left: 14px;
+    grid-template-columns: auto 1fr auto;
+    min-height: 58px;
+    padding: 7px 8px;
+    border-radius: 15px;
+  }
+
+  .lp-sticky-copy { min-width: 0; }
+  .lp-sticky-copy strong { font-size: .72rem; }
+  .lp-sticky-copy span { font-size: .58rem; }
+  .lp-sticky-cta .lp-btn { min-height: 42px; padding: 8px 13px; }
+}
+
+@media (max-width: 430px) {
+  .lp-product-stage { min-height: 430px; }
+  .lp-browser { margin-right: 22px; }
+  .lp-phone { width: 178px; }
+  .lp-phone-screen { min-height: 390px; }
+  .lp-final-card h2 { font-size: 1.74rem; }
+}
+
+@media (display-mode: standalone) and (max-width: 720px) {
+  .lp-sticky-cta { bottom: calc(14px + env(safe-area-inset-bottom,0px)); }
+}
