@@ -32,6 +32,11 @@
       "statusCode": 301
     },
     {
+      "source": "/sistema-para-personal-trainer.html",
+      "destination": "/",
+      "statusCode": 301
+    },
+    {
       "source": "/lp-gads",
       "destination": "/",
       "statusCode": 301
@@ -41,10 +46,6 @@
     {
       "source": "/favicon.ico",
       "destination": "/assets/icons/01-web-favicon/favicon.ico"
-    },
-    {
-      "source": "/",
-      "destination": "/sistema-para-personal-trainer.html"
     },
     {
       "source": "/p/:slug",
