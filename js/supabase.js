@@ -119,11 +119,3 @@ if (!globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__) {
       .catch(error => console.warn('Melhorias integradas do aluno indisponíveis:', error));
   });
 }
-
-if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_PLAN_DAY_TABS__) {
-  globalThis.__FSFIT_PLAN_DAY_TABS__ = true;
-  queueMicrotask(() => {
-    import('./treino-plan-day-tabs-stable.js?v=20260725-plan-day-tabs2')
-      .catch(error => console.warn('Abas estáveis dos dias do plano indisponíveis:', error));
-  });
-}
