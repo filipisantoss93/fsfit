@@ -94,6 +94,17 @@ Deno.serve(async (req: Request) => {
       return json({ erro: "Somente cobranças PIX pendentes podem ser canceladas" }, 409);
     }
 
+    const expiresAt = charge.vence_em ? new Date(charge.vence_em).getTime() : Number.NaN;
+    if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) {
+      const { error: expireError } = await admin
+        .from("cobrancas_pix")
+        .update({ status: "expirada", updated_at: new Date().toISOString() })
+        .eq("id", charge.id)
+        .eq("status", "pendente");
+      if (expireError) throw expireError;
+      return json({ sucesso: true, cobranca: { id: charge.id, status: "expirada" } });
+    }
+
     if (!charge.txid) {
       const { error: updateError } = await admin
         .from("cobrancas_pix")
