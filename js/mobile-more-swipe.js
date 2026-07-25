@@ -1,3 +1,5 @@
+import { supabase } from './supabase.js';
+
 function injectBottomNavigationPositionFix() {
   if (document.querySelector('#fsfit-bottom-navigation-position-fix')) return;
 
@@ -36,8 +38,70 @@ function injectBottomNavigationPositionFix() {
 
 injectBottomNavigationPositionFix();
 
+function revealAdminEntry(entry) {
+  if (!(entry instanceof HTMLElement)) return;
+  entry.hidden = false;
+  entry.classList.remove('hidden');
+}
+
+async function resolveAdminEntry(entry) {
+  if (!(entry instanceof HTMLElement) || entry.dataset.adminCheckStarted === '1') return;
+  entry.dataset.adminCheckStarted = '1';
+
+  const desktopAdminEntry = document.querySelector('#admin-nav');
+  if (desktopAdminEntry instanceof HTMLElement && !desktopAdminEntry.classList.contains('hidden')) {
+    revealAdminEntry(entry);
+    return;
+  }
+
+  try {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session?.user?.id) return;
+
+    const { data: admin, error } = await supabase
+      .from('platform_admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (!error && admin) revealAdminEntry(entry);
+  } catch (error) {
+    console.warn('Não foi possível verificar o atalho administrativo:', error);
+  }
+}
+
+function ensureMoreSheetEntries(sheet) {
+  if (!(sheet instanceof HTMLElement)) return;
+  const list = sheet.querySelector('.fsfit-more-list');
+  if (!(list instanceof HTMLElement)) return;
+
+  if (!list.querySelector('[data-fsfit-food-library-entry]')) {
+    const exerciseEntry = list.querySelector('a[href="biblioteca-exercicios.html"]');
+    exerciseEntry?.insertAdjacentHTML('afterend', `
+      <a class="fsfit-more-item" href="biblioteca-alimentar.html" data-fsfit-food-library-entry>
+        <span class="fsfit-more-item-icon" aria-hidden="true">AL</span>
+        <span class="fsfit-more-item-copy"><strong>Biblioteca de alimentos</strong><small>Gerencie alimentos e informações nutricionais</small></span>
+        <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+      </a>`);
+  }
+
+  if (!list.querySelector('[data-fsfit-admin-entry]')) {
+    const logoutEntry = list.querySelector('[data-fsfit-logout]');
+    logoutEntry?.insertAdjacentHTML('beforebegin', `
+      <a class="fsfit-more-item hidden" href="admin.html" data-fsfit-admin-entry hidden>
+        <span class="fsfit-more-item-icon" aria-hidden="true">AD</span>
+        <span class="fsfit-more-item-copy"><strong>Painel administrativo</strong><small>Usuários, assinaturas e faturamento</small></span>
+        <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
+      </a>`);
+  }
+
+  resolveAdminEntry(list.querySelector('[data-fsfit-admin-entry]'));
+}
+
 function bindMoreSheetSwipe(sheet) {
   if (!(sheet instanceof HTMLElement) || sheet.dataset.swipeCloseBound === '1') return;
+
+  ensureMoreSheetEntries(sheet);
 
   const panel = sheet.querySelector('.fsfit-more-panel');
   const backdrop = sheet.querySelector('.fsfit-more-backdrop');
