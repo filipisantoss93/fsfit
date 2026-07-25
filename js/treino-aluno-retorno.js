@@ -100,7 +100,7 @@ function compactWorkoutPage() {
   if (!document.querySelector('link[data-fsfit-workout-compact]')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'css/treino-aluno-compact.css?v=20260720-actionsbar1';
+    link.href = 'css/treino-aluno-compact.css?v=20260725-simple-boot2';
     link.dataset.fsfitWorkoutCompact = 'true';
     document.head.appendChild(link);
   }
@@ -188,6 +188,7 @@ import('./treino-exercise-picker-sheet.js?v=20260721-picker-sheet1').catch(error
   console.error('Falha ao carregar seletor de exercícios do treino estruturado:', error);
 });
 
-import('./treino-aluno-simplificado.js?v=20260725-simple1').catch(error => {
-  console.error('Falha ao carregar o editor simplificado de treinos:', error);
+import('./treino-aluno-app.js?v=20260725-simple-boot2').catch(error => {
+  console.error('Falha ao carregar a página simplificada de treinos:', error);
+  document.body?.classList.add('workout-simple-fallback');
 });
