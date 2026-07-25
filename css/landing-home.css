@@ -1,0 +1,49 @@
+/* Ajustes específicos da landing quando usada como página principal do FS Fit. */
+
+.lp-student-entry-short { display: none; }
+
+.lp-student-portal-cta {
+  margin-top: 22px;
+}
+
+.lp-student-portal-cta .lp-btn {
+  width: fit-content;
+}
+
+@media (max-width: 720px) {
+  .lp-nav-actions {
+    gap: 6px;
+  }
+
+  .lp-nav-actions .lp-student-entry {
+    display: inline-flex !important;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-color: rgba(184, 244, 15, .34);
+    background: rgba(184, 244, 15, .065);
+    color: #b8f40f;
+    font-size: .68rem;
+    white-space: nowrap;
+  }
+
+  .lp-student-entry-long { display: none; }
+  .lp-student-entry-short { display: inline; }
+
+  .lp-student-portal-cta {
+    margin-top: 18px;
+  }
+
+  .lp-student-portal-cta .lp-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .lp-nav-actions .lp-student-entry {
+    padding-inline: 8px;
+  }
+
+  .lp-nav-actions .lp-btn-primary {
+    padding-inline: 9px;
+  }
+}
