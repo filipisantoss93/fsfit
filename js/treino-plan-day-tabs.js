@@ -106,11 +106,9 @@ function exerciseCount(section) {
 }
 
 function chooseDay(days, sections) {
-  if (requestedPlanDay && days.includes(requestedPlanDay)) {
-    const day = requestedPlanDay;
-    requestedPlanDay = null;
-    return day;
-  }
+  const requested = requestedPlanDay;
+  requestedPlanDay = null;
+  if (requested && days.includes(requested)) return requested;
   const today = currentWeekDay();
   if (days.includes(today)) return today;
   const firstWithExercises = days.find(day => exerciseCount(sections.get(day)) > 0);
