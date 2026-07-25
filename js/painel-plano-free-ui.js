@@ -133,13 +133,23 @@ function removeRedirectParameter() {
   window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
+function isNoticeHidden(notice) {
+  return notice.className === 'message'
+    && notice.style.display === 'none'
+    && !notice.hasChildNodes()
+    && !notice.hasAttribute('role')
+    && !notice.hasAttribute('aria-live');
+}
+
 function hideLegacyNotice(notice) {
-  if (!(notice instanceof HTMLElement) || updatingNotice) return;
+  if (!(notice instanceof HTMLElement) || updatingNotice || isNoticeHidden(notice)) return;
+
   updatingNotice = true;
   notice.className = 'message';
   notice.style.display = 'none';
   notice.removeAttribute('role');
   notice.removeAttribute('aria-live');
+  delete notice.dataset.freeRedirectReady;
   notice.replaceChildren();
   updatingNotice = false;
 }
@@ -149,8 +159,16 @@ function dismissRedirectNotice(notice) {
   hideLegacyNotice(notice);
 }
 
+function isRedirectNoticeReady(notice) {
+  return notice.classList.contains('free-access-redirect')
+    && notice.dataset.freeRedirectReady === '1'
+    && Boolean(notice.querySelector('.free-access-redirect-copy'))
+    && Boolean(notice.querySelector('.free-access-redirect-close'));
+}
+
 function renderRedirectNotice(notice) {
-  if (!(notice instanceof HTMLElement) || redirectNoticeDismissed || updatingNotice) return;
+  if (!(notice instanceof HTMLElement) || redirectNoticeDismissed || updatingNotice || isRedirectNoticeReady(notice)) return;
+
   updatingNotice = true;
 
   const pageHeader = document.querySelector('.dashboard-home-header');
@@ -162,6 +180,7 @@ function renderRedirectNotice(notice) {
   notice.style.removeProperty('display');
   notice.setAttribute('role', 'status');
   notice.setAttribute('aria-live', 'polite');
+  notice.dataset.freeRedirectReady = '1';
   notice.innerHTML = `
     <div class="free-access-redirect-copy">
       <strong>Área disponível no plano profissional</strong>
@@ -185,9 +204,7 @@ function configureAccessNotice() {
 
   sync();
 
-  const observer = new MutationObserver(() => {
-    if (!updatingNotice) sync();
-  });
+  const observer = new MutationObserver(() => sync());
   observer.observe(notice, { attributes: true, childList: true, subtree: true });
 
   if (redirectedFromBlockedPage) {
@@ -202,25 +219,30 @@ function isFreePlanCard(card) {
   return card.classList.contains('expired') || label === 'PLANO FREE' || button === 'ativar plano';
 }
 
+function setTextIfChanged(element, text) {
+  if (element && element.textContent !== text) element.textContent = text;
+}
+
 function compactFreePlanCard(card) {
   if (!isFreePlanCard(card)) return;
 
-  card.classList.remove('expired');
-  card.classList.add('free-compact');
+  if (card.classList.contains('expired')) card.classList.remove('expired');
+  if (!card.classList.contains('free-compact')) card.classList.add('free-compact');
 
   const label = card.querySelector('.plan-renewal-copy small');
   const title = card.querySelector('.plan-renewal-copy strong');
   const detail = card.querySelector('.plan-renewal-copy span');
   const action = card.querySelector('#plan-card-action');
 
-  if (label) label.textContent = 'PLANO FREE';
-  if (title) title.textContent = 'Recursos profissionais bloqueados';
-  if (detail) {
-    detail.textContent = action
+  setTextIfChanged(label, 'PLANO FREE');
+  setTextIfChanged(title, 'Recursos profissionais bloqueados');
+  setTextIfChanged(
+    detail,
+    action
       ? 'Ative um plano para liberar as áreas de gestão.'
-      : 'Entre em contato com o suporte para consultar as opções de acesso.';
-  }
-  if (action) action.textContent = 'Ativar plano';
+      : 'Entre em contato com o suporte para consultar as opções de acesso.'
+  );
+  setTextIfChanged(action, 'Ativar plano');
 
   const homePanel = document.querySelector('#dashboard-home-panel');
   if (homePanel && card.parentElement !== homePanel) homePanel.prepend(card);
