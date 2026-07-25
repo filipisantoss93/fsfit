@@ -10,6 +10,7 @@ let subscription = null;
 let publicKey = '';
 let checking = false;
 let lastView = null;
+let activeOnThisDevice = false;
 
 const views = {
   install: {
@@ -88,6 +89,7 @@ function ensureCard() {
 function render(state, feedback = '', feedbackType = '') {
   const view = views[state];
   if (!view) return;
+  activeOnThisDevice = false;
   lastView = { state, feedback, feedbackType };
   const card = ensureCard();
   if (!card) return;
@@ -101,6 +103,12 @@ function render(state, feedback = '', feedbackType = '') {
       ${view.actions ? `<div class="personal-push-actions">${view.actions}</div>` : ''}
       <span class="personal-push-feedback ${feedbackType}">${feedback}</span>
     </div>`;
+}
+
+function hideCard() {
+  activeOnThisDevice = true;
+  lastView = null;
+  document.querySelector('#personal-push-card')?.remove();
 }
 
 function setFeedback(message, type = '') {
@@ -171,7 +179,7 @@ async function activateNotifications() {
       return;
     }
     await ensureSubscription();
-    render('active', 'Notificações ativadas com sucesso.', 'success');
+    hideCard();
   } catch (error) {
     console.error('Falha ao ativar notificações do personal:', error);
     render('activate', error?.message || 'Não foi possível ativar as notificações.', 'error');
@@ -223,7 +231,7 @@ async function loadState() {
       try {
         subscription = subscription || await ensureSubscription();
         await syncSubscription(subscription);
-        render('active');
+        hideCard();
       } catch (error) {
         console.error('Falha ao sincronizar notificações do personal:', error);
         render('activate', 'A permissão existe, mas este aparelho precisa ser reconectado.', 'error');
@@ -247,7 +255,7 @@ document.addEventListener('click', event => {
 
 if (homePanel) {
   new MutationObserver(() => {
-    if (document.querySelector('#personal-push-card')) return;
+    if (activeOnThisDevice || document.querySelector('#personal-push-card')) return;
     if (lastView) render(lastView.state, lastView.feedback, lastView.feedbackType);
     else loadState();
   }).observe(homePanel, { childList: true });
