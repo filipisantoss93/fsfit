@@ -5,6 +5,11 @@
   const url = new URL(window.location.href);
   const current = {};
 
+  const requestedAuthMode = url.searchParams.get('modo');
+  if (requestedAuthMode === 'login' || requestedAuthMode === 'entrar') {
+    document.body.dataset.authDefault = 'login';
+  }
+
   const mobileFixes = document.createElement('link');
   mobileFixes.rel = 'stylesheet';
   mobileFixes.href = MOBILE_FIXES_URL;
