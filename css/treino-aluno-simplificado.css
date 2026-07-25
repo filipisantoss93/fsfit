@@ -1,10 +1,25 @@
+html.workout-simple-preload .workout-plans-card,
+html.workout-simple-preload #active-workout-workspace,
+html.workout-simple-preload .workout-active-card,
+html.workout-simple-preload #workout-editor-view-nav,
+html.workout-simple-preload #workout-week-card,
 body.workout-simple-enabled .workout-plans-card,
 body.workout-simple-enabled #active-workout-workspace,
 body.workout-simple-enabled .workout-active-card,
 body.workout-simple-enabled #workout-editor-view-nav,
 body.workout-simple-enabled #workout-week-card{display:none!important}
+html.workout-simple-preload #student-name{position:relative;min-width:min(520px,70vw);min-height:1.25em;color:transparent!important}
+html.workout-simple-preload #student-name::after{content:'Treino do aluno';position:absolute;inset:0 auto auto 0;color:var(--text);white-space:nowrap}
+html.workout-simple-preload #simple-workout-app{visibility:hidden}
 body.workout-simple-enabled .workout-page{padding-bottom:calc(118px + env(safe-area-inset-bottom))!important}
 body.simple-workout-modal-open{overflow:hidden!important}
+.simple-workout-loading{display:grid;gap:12px;margin-top:10px}
+.simple-workout-loading-tabs{height:60px;border:1px solid var(--border);border-radius:15px;background:linear-gradient(90deg,var(--surface) 25%,rgba(255,255,255,.045) 50%,var(--surface) 75%);background-size:220% 100%;animation:simple-workout-loading 1.25s ease-in-out infinite}
+.simple-workout-loading-panel{display:grid;gap:12px;padding:14px;border:1px solid var(--border);border-radius:18px;background:var(--surface)}
+.simple-workout-loading-days{height:50px;border-radius:14px;background:rgba(255,255,255,.035)}
+.simple-workout-loading-line{height:18px;width:42%;border-radius:999px;background:rgba(255,255,255,.045)}
+.simple-workout-loading-card{height:118px;border:1px dashed rgba(255,255,255,.1);border-radius:13px;background:rgba(255,255,255,.018)}
+@keyframes simple-workout-loading{0%{background-position:100% 0}100%{background-position:-100% 0}}
 .simple-workout-app{display:grid;gap:12px;margin-top:10px}
 .simple-workout-main-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;border:1px solid var(--border);border-radius:15px;background:var(--surface)}
 .simple-workout-main-tabs button{min-height:48px;padding:7px 10px;border:0;border-radius:11px;background:transparent;color:var(--muted);font:inherit;font-size:.87rem;font-weight:900;cursor:pointer}
@@ -69,6 +84,8 @@ button.simple-exercise-main{cursor:pointer}.simple-exercise-main strong,.simple-
 .simple-apply-options{display:grid;gap:7px}.simple-apply-option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.02);color:var(--text);font:inherit;text-align:left;cursor:pointer}.simple-apply-option strong,.simple-apply-option small{display:block}.simple-apply-option strong{font-size:.84rem}.simple-apply-option small{margin-top:3px;color:var(--muted);font-size:.66rem}.simple-apply-option>span:last-child{visibility:hidden;color:var(--primary);font-weight:900}.simple-apply-option.selected{border-color:rgba(50,215,75,.5);background:rgba(50,215,75,.07)}.simple-apply-option.selected>span:last-child{visibility:visible}
 .simple-weekday-tabs.modal-days{margin:0}
 @media(max-width:640px){
+html.workout-simple-preload #student-name{min-width:0;width:100%;min-height:1.25em}
+.simple-workout-loading-panel{padding:12px;border-radius:15px}
 .simple-week-panel,.simple-saved-panel{padding:12px;border-radius:15px}
 .simple-section-head{align-items:center}.simple-section-head p{max-width:230px}.simple-section-head .btn{min-height:38px;padding:0 9px;font-size:.67rem}
 .simple-weekday-tabs{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:5;gap:3px;padding:4px;background:#15191f}.simple-weekday-tabs button{height:38px;font-size:.68rem}
