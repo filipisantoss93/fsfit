@@ -1,18 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
-  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#0f1115">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
-  <title>Acesso do aluno — FS Fit</title>
-  <meta name="description" content="Acesse seus treinos e acompanhamento no FS Fit usando seu WhatsApp cadastrado.">
+
+  <title>Já sou aluno | Acessar meus treinos no FS Fit</title>
+  <meta name="description" content="Já é aluno do FS Fit? Acesse seus treinos, orientações e acompanhamento usando seu WhatsApp cadastrado e seu PIN.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <link rel="canonical" href="https://www.fsfit.com.br/acesso-aluno.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="FS Fit">
+  <meta property="og:title" content="Já sou aluno | Acessar meus treinos no FS Fit">
+  <meta property="og:description" content="Acesse seus treinos, orientações e acompanhamento no FS Fit usando seu WhatsApp cadastrado e seu PIN.">
+  <meta property="og:url" content="https://www.fsfit.com.br/acesso-aluno.html">
+  <meta property="og:image" content="https://www.fsfit.com.br/assets/icons/02-pwa/icon-512x512.png">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Já sou aluno | Acessar meus treinos no FS Fit">
+  <meta name="twitter:description" content="Acesse seus treinos, orientações e acompanhamento no FS Fit.">
+  <meta name="twitter:image" content="https://www.fsfit.com.br/assets/icons/02-pwa/icon-512x512.png">
+
   <link rel="manifest" href="manifest.webmanifest?v=20260722-icons-v4">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
+  <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/02-pwa/icon-192x192.png?v=20260722-icons-v4">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
   <link rel="stylesheet" href="css/style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://www.fsfit.com.br/acesso-aluno.html#webpage",
+    "url": "https://www.fsfit.com.br/acesso-aluno.html",
+    "name": "Já sou aluno | Acessar meus treinos no FS Fit",
+    "description": "Página de acesso dos alunos aos treinos, orientações e acompanhamento no FS Fit.",
+    "isPartOf": {
+      "@id": "https://www.fsfit.com.br/#website"
+    },
+    "inLanguage": "pt-BR"
+  }
+  </script>
+
+  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
   <style>
     .student-access-card { max-width:560px; margin:0 auto; }
     .student-identity { margin:0 0 16px; padding:15px 16px; border:1px solid rgba(50,215,75,.42); border-radius:14px; background:linear-gradient(135deg,rgba(50,215,75,.14),rgba(50,215,75,.06)); }
@@ -27,20 +64,19 @@
     .selected-personal span { margin-top:3px; color:var(--muted); font-size:.8rem; }
     .student-access-actions { display:grid; gap:10px; margin-top:10px; }
     .activation-help { margin:0 0 16px; color:var(--muted); }
+    .student-public-footer { margin:22px auto 0; text-align:center; font-size:.84rem; }
+    .student-public-footer a { color:var(--muted); text-decoration:underline; text-underline-offset:3px; }
   </style>
-  <meta name="apple-mobile-web-app-title" content="FS Fit">
-  <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
 </head>
 <body class="student-page">
   <main class="student-shell">
     <header class="student-header">
-      <a class="auth-logo" href="index.html" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
+      <a class="auth-logo" href="/" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
       <p>Acesso do aluno</p>
     </header>
 
     <section class="card student-access-card">
-      <span class="hero-badge">ÁREA DO ALUNO</span>
+      <span class="hero-badge">JÁ SOU ALUNO</span>
       <h1 style="margin-top:14px">Acesse seus treinos</h1>
       <p id="access-description">Informe seu WhatsApp cadastrado. Se você tiver mais de um personal, poderá escolher qual acompanhamento deseja acessar.</p>
 
@@ -91,6 +127,10 @@
 
       <p style="margin:18px 0 0;color:var(--muted);font-size:.84rem;text-align:center">No primeiro acesso, use o código de ativação fornecido pelo seu personal e crie um PIN de 4 números.</p>
     </section>
+
+    <footer class="student-public-footer">
+      <a href="/">Sou personal trainer — acessar o FS Fit</a>
+    </footer>
   </main>
   <script type="module" src="js/acesso-aluno.js?v=20260722-student-identity1"></script>
 </body>
