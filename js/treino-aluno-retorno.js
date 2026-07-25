@@ -185,3 +185,7 @@ import('./treino-sticky-exercise-save.js?v=20260720-sticky-save1').catch(error =
 import('./treino-exercise-picker-sheet.js?v=20260721-picker-sheet1').catch(error => {
   console.error('Falha ao carregar seletor de exercícios do treino estruturado:', error);
 });
+
+import('./treino-aluno-simplificado.js?v=20260725-simple1').catch(error => {
+  console.error('Falha ao carregar o editor simplificado de treinos:', error);
+});
