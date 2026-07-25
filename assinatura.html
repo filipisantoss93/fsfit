@@ -45,6 +45,9 @@
     .subscription-history-item{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(120px,.8fr) auto auto;gap:14px;align-items:center;padding:13px 4px;border-bottom:1px solid var(--border)}
     .subscription-history-main strong{display:block;font-size:.9rem}.subscription-history-main span{display:block;margin-top:3px;color:var(--muted);font-size:.76rem}
     .subscription-history-date,.subscription-history-value{font-size:.84rem}.subscription-history-value{font-weight:800;white-space:nowrap}
+    .subscription-history-status{display:grid;justify-items:end;gap:7px}
+    .subscription-history-cancel{padding:0;border:0;background:transparent;color:#ff9b9f;font:inherit;font-size:.74rem;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+    .subscription-history-cancel:disabled{opacity:.55;cursor:wait}
     .subscription-empty{padding:24px 10px;text-align:center;color:var(--muted);font-size:.86rem;line-height:1.5}
     .subscription-empty strong{display:block;margin-bottom:5px;color:var(--text)}
 
@@ -66,7 +69,7 @@
       .subscription-plan-title{font-size:1.05rem}
       .subscription-overview-row{padding:10px 0}
       .subscription-history-item{grid-template-columns:minmax(0,1fr) auto;gap:7px 12px;padding:12px 2px}
-      .subscription-history-date{grid-column:1}.subscription-history-value{grid-column:2;grid-row:1;text-align:right}.subscription-history-item>.subscription-status-badge{grid-column:2;grid-row:2;justify-self:end}.subscription-history-main{grid-column:1;grid-row:1 / span 2}
+      .subscription-history-date{grid-column:1}.subscription-history-value{grid-column:2;grid-row:1;text-align:right}.subscription-history-status{grid-column:2;grid-row:2;justify-self:end}.subscription-history-main{grid-column:1;grid-row:1 / span 2}
       .subscription-admin-card{padding:15px}
     }
   </style>
@@ -104,7 +107,7 @@
 
     <section id="subscription-history-section" class="card subscription-section" aria-labelledby="subscription-history-title">
       <div class="subscription-section-header">
-        <div><h2 id="subscription-history-title">Histórico de cobranças</h2><p>Seus pagamentos mais recentes por cartão de crédito e PIX.</p></div>
+        <div><h2 id="subscription-history-title">Histórico de cobranças</h2><p>Pagamentos concluídos e a cobrança PIX pendente mais recente.</p></div>
       </div>
       <div id="subscription-history-list" class="subscription-history-list" aria-live="polite">
         <div class="subscription-empty">Carregando histórico...</div>
@@ -114,13 +117,13 @@
     <details id="subscription-help-section" class="card subscription-help">
       <summary>ⓘ Como funciona o cancelamento?</summary>
       <div class="subscription-help-content">
-        <p>Ao cancelar uma assinatura recorrente no cartão, novas cobranças são interrompidas e o acesso continua ativo até o fim do período já pago. O FS Fit não armazena o número completo do cartão nem o CVV.</p>
+        <p>No cartão, o cancelamento interrompe as próximas renovações e mantém o acesso até o fim do período pago. Uma cobrança PIX pendente também pode ser cancelada antes do pagamento; nesse caso, o QR Code deixa de aceitar pagamento.</p>
       </div>
     </details>
   </main>
 
   <script src="https://cdn.jsdelivr.net/gh/efipay/js-payment-token-efi/dist/payment-token-efi-umd.min.js"></script>
-  <script type="module" src="js/assinatura.js?v=20260720-compact1"></script>
+  <script type="module" src="js/assinatura.js?v=20260725-cancel-pix1"></script>
   <script type="module" src="js/assinatura-gerenciamento.js?v=20260720-compact1"></script>
   <script type="module" src="js/assinatura-experiencia.js?v=20260725-contextual1"></script>
   <script type="module" src="js/pwa-install.js"></script>
