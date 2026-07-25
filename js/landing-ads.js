@@ -1,8 +1,14 @@
 (() => {
   const ATTRIBUTION_KEY = 'fsfit_attribution';
   const TRACKED_PARAMS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid'];
+  const MOBILE_FIXES_URL = '/css/landing-ads-mobile-fixes.css?v=20260725-mobile2';
   const url = new URL(window.location.href);
   const current = {};
+
+  const mobileFixes = document.createElement('link');
+  mobileFixes.rel = 'stylesheet';
+  mobileFixes.href = MOBILE_FIXES_URL;
+  document.head.appendChild(mobileFixes);
 
   TRACKED_PARAMS.forEach(key => {
     const value = url.searchParams.get(key);
@@ -62,6 +68,102 @@
       if (detail.open) track('landing_faq_open', { question: detail.querySelector('summary')?.textContent?.trim() || '' });
     });
   });
+
+  function configureStickyCta() {
+    const sticky = document.querySelector('.lp-sticky-cta');
+    if (!sticky) return;
+
+    sticky.hidden = true;
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'lp-sticky-close';
+    closeButton.setAttribute('aria-label', 'Fechar chamada para cadastro');
+    closeButton.textContent = '×';
+    sticky.prepend(closeButton);
+
+    const sections = {
+      hero: document.querySelector('.lp-hero'),
+      signup: document.querySelector('#cadastro'),
+      final: document.querySelector('.lp-final'),
+      footer: document.querySelector('.lp-footer')
+    };
+
+    const visibility = {
+      hero: true,
+      signup: false,
+      final: false,
+      footer: false
+    };
+
+    let dismissed = sessionStorage.getItem('fsfit_landing_sticky_dismissed') === '1';
+    let updateQueued = false;
+
+    function updateStickyVisibility() {
+      updateQueued = false;
+      const mobile = window.matchMedia('(max-width: 720px)').matches;
+      const blockedSectionVisible = visibility.hero || visibility.signup || visibility.final || visibility.footer;
+      const shouldShow = mobile && !dismissed && !blockedSectionVisible && window.scrollY > 420;
+      sticky.classList.toggle('is-visible', shouldShow);
+      sticky.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    }
+
+    function queueVisibilityUpdate() {
+      if (updateQueued) return;
+      updateQueued = true;
+      requestAnimationFrame(updateStickyVisibility);
+    }
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const key = entry.target.dataset.stickyWatch;
+          if (!key) return;
+          visibility[key] = entry.isIntersecting && entry.intersectionRatio > .04;
+        });
+        queueVisibilityUpdate();
+      }, { threshold: [0, .04, .15] });
+
+      Object.entries(sections).forEach(([key, section]) => {
+        if (!section) return;
+        section.dataset.stickyWatch = key;
+        observer.observe(section);
+      });
+    } else {
+      visibility.hero = false;
+    }
+
+    closeButton.addEventListener('click', () => {
+      dismissed = true;
+      sessionStorage.setItem('fsfit_landing_sticky_dismissed', '1');
+      sticky.classList.remove('is-visible');
+      sticky.setAttribute('aria-hidden', 'true');
+      track('landing_sticky_close');
+    });
+
+    sticky.querySelector('a[href="#cadastro"]')?.addEventListener('click', () => {
+      sticky.classList.remove('is-visible');
+      sticky.setAttribute('aria-hidden', 'true');
+    });
+
+    window.addEventListener('scroll', queueVisibilityUpdate, { passive: true });
+    window.addEventListener('resize', queueVisibilityUpdate, { passive: true });
+    window.visualViewport?.addEventListener('resize', queueVisibilityUpdate, { passive: true });
+
+    const revealAfterStyles = () => {
+      sticky.hidden = false;
+      updateStickyVisibility();
+    };
+
+    if (mobileFixes.sheet) {
+      revealAfterStyles();
+    } else {
+      mobileFixes.addEventListener('load', revealAfterStyles, { once: true });
+      mobileFixes.addEventListener('error', () => { sticky.hidden = true; }, { once: true });
+    }
+  }
+
+  configureStickyCta();
 
   const year = document.querySelector('[data-current-year]');
   if (year) year.textContent = String(new Date().getFullYear());
