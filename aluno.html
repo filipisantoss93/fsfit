@@ -1,37 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
-  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta name="theme-color" content="#0f1115">
+  <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="application-name" content="FS Fit">
-  <title>Meu plano — FS Fit</title>
+  <meta name="apple-mobile-web-app-title" content="FS Fit">
+  <meta name="application-name" content="FS Fit">
+  <title>Minha área — FS Fit</title>
   <link rel="manifest" href="manifest.webmanifest?v=20260722-icons-v4">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
-<link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/02-pwa/icon-192x192.png?v=20260722-icons-v4">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/aluno-midias.css">
   <link rel="stylesheet" href="css/aluno-notificacoes.css?v=20260716-notifications1">
-  <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260721-student-ui1">
+  <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260724-student-home1">
+  <link rel="stylesheet" href="css/aluno-inicio.css?v=20260724-student-home1">
   <link rel="stylesheet" href="css/aluno-perfil.css?v=20260722-student-profile1">
   <link rel="stylesheet" href="css/aulas.css?v=20260721-student-live1">
   <link rel="stylesheet" href="css/aluno-financeiro.css?v=20260717-financeiro1">
-  <meta name="apple-mobile-web-app-title" content="FS Fit">
-  <meta name="application-name" content="FS Fit">
-  <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
+  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
 </head>
 <body class="student-page">
   <main class="student-shell">
     <header class="student-header student-header-bar">
       <div class="student-header-identity">
         <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
-        <p>Portal do aluno</p>
+        <p>Minha área</p>
       </div>
-      <div class="student-header-actions" aria-label="Ações do portal do aluno">
+      <div class="student-header-actions" aria-label="Ações da área do aluno">
         <button id="student-notification-button" class="student-icon-button" type="button" aria-label="Abrir notificações">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
           <span id="student-notification-badge" class="student-notification-badge hidden">0</span>
@@ -42,7 +43,7 @@
       </div>
     </header>
 
-    <section id="loading-state" class="card student-state">Carregando seu plano...</section>
+    <section id="loading-state" class="card student-state">Preparando o seu dia...</section>
     <section id="error-state" class="card student-state hidden"></section>
 
     <div id="student-content" class="hidden">
@@ -53,36 +54,73 @@
         </div>
         <div class="student-profile-summary-copy">
           <h1 id="student-name"></h1>
-          <p>Aluno de <strong id="trainer-name"></strong></p>
+          <p>Com acompanhamento de <strong id="trainer-name"></strong></p>
           <p id="updated-at" class="updated hidden" aria-hidden="true"></p>
         </div>
       </section>
 
-      <section id="student-payment-alert" class="student-payment-alert hidden" aria-live="polite">
-        <div class="student-payment-alert-header">
-          <div>
-            <small>MENSALIDADE</small>
-            <h2 id="student-payment-title">Próximo vencimento</h2>
-            <p id="student-payment-text"></p>
-          </div>
-          <strong id="student-payment-value" class="student-payment-value">R$ 0,00</strong>
-        </div>
-        <div class="student-payment-actions">
-          <button id="student-open-pix" class="btn btn-primary" type="button">Gerar QR Code Pix</button>
-          <button id="student-paid-button" class="btn btn-outline" type="button">Já paguei</button>
-        </div>
-        <span id="student-payment-note" class="student-payment-note"></span>
-      </section>
-
-      <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
-        <button class="student-plan-tab active" type="button" data-student-tab="treino">Treino</button>
+      <nav class="student-plan-tabs" aria-label="Seções da área do aluno">
+        <button class="student-plan-tab active" type="button" data-student-tab="inicio">Hoje</button>
+        <button class="student-plan-tab" type="button" data-student-tab="treino">Treino</button>
         <button class="student-plan-tab" type="button" data-student-tab="dieta">Dieta</button>
-        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Observações</button>
+        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Orientações</button>
       </nav>
 
-      <section class="student-tab-panel active" data-student-panel="treino">
+      <section class="student-tab-panel active" data-student-panel="inicio">
+        <section class="student-today-hero">
+          <small id="student-home-date">HOJE</small>
+          <h2 id="student-home-title">Seu dia no FS Fit</h2>
+          <p id="student-home-subtitle">Carregando o que foi preparado para você.</p>
+        </section>
+
+        <div class="student-today-grid">
+          <button class="student-today-card" type="button" data-student-home-target="treino">
+            <small>TREINO DE HOJE</small>
+            <strong id="student-home-workout-status">Carregando...</strong>
+            <span id="student-home-workout-detail">Veja sua programação</span>
+            <span class="student-today-card-arrow">ABRIR TREINO →</span>
+          </button>
+          <button class="student-today-card" type="button" data-student-home-target="dieta">
+            <small>ALIMENTAÇÃO DE HOJE</small>
+            <strong id="student-home-diet-status">Carregando...</strong>
+            <span id="student-home-diet-detail">Veja seu plano alimentar</span>
+            <span class="student-today-card-arrow">ABRIR DIETA →</span>
+          </button>
+        </div>
+
+        <div class="student-home-primary">
+          <button id="student-home-open-workout" class="btn btn-primary" type="button">Abrir treino de hoje</button>
+          <a id="student-home-whatsapp" class="btn btn-outline student-home-whatsapp" target="_blank" rel="noopener">Falar com meu personal</a>
+        </div>
+
+        <section id="student-home-observation" class="student-home-note hidden">
+          <button type="button" data-student-home-target="observacoes">
+            <small>ORIENTAÇÃO DO PERSONAL</small>
+            <p id="student-home-observation-text"></p>
+            <span>Ver todas as orientações →</span>
+          </button>
+        </section>
+
+        <section id="student-payment-alert" class="student-payment-alert hidden" aria-live="polite">
+          <div class="student-payment-alert-header">
+            <div>
+              <small>MENSALIDADE</small>
+              <h2 id="student-payment-title">Próximo vencimento</h2>
+              <p id="student-payment-text"></p>
+            </div>
+            <strong id="student-payment-value" class="student-payment-value">R$ 0,00</strong>
+          </div>
+          <div class="student-payment-actions">
+            <button id="student-open-pix" class="btn btn-primary" type="button">Gerar QR Code Pix</button>
+            <button id="student-paid-button" class="btn btn-outline" type="button">Já paguei</button>
+          </div>
+          <span id="student-payment-note" class="student-payment-note"></span>
+        </section>
+      </section>
+
+      <section class="student-tab-panel" data-student-panel="treino">
         <div class="student-section-heading">
-          <div><small>AGENDA SEMANAL</small><h2>Treino</h2></div>
+          <div><small>AGENDA SEMANAL</small><h2>Meus treinos</h2></div>
           <span id="workout-plan-name"></span>
         </div>
         <div id="workout-content" class="student-week-agenda"></div>
@@ -90,7 +128,7 @@
 
       <section class="student-tab-panel" data-student-panel="dieta">
         <div class="student-section-heading">
-          <div><small>AGENDA SEMANAL</small><h2>Dieta</h2></div>
+          <div><small>AGENDA SEMANAL</small><h2>Minha alimentação</h2></div>
           <span id="diet-plan-name"></span>
         </div>
         <div id="diet-content" class="student-week-agenda"></div>
@@ -98,8 +136,8 @@
 
       <section class="student-tab-panel" data-student-panel="observacoes">
         <section class="student-observation-card">
-          <small>OBSERVAÇÕES DO PERSONAL</small>
-          <p id="student-observations">Nenhuma observação publicada ainda.</p>
+          <small>ORIENTAÇÕES DO PERSONAL</small>
+          <p id="student-observations">Nenhuma orientação publicada ainda.</p>
         </section>
 
         <section id="student-media-section" class="student-portal-media-section hidden">
@@ -227,7 +265,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script type="module" src="js/aluno.js?v=20260716-student-tabs3"></script>
+  <script type="module" src="js/aluno.js?v=20260724-student-home1"></script>
+  <script type="module" src="js/aluno-inicio.js?v=20260724-student-home1"></script>
   <script type="module" src="js/aluno-perfil.js?v=20260722-student-profile1"></script>
   <script type="module" src="js/aluno-financeiro.js?v=20260717-financeiro1"></script>
   <script type="module" src="js/aluno-notificacoes.js?v=20260716-notifications1"></script>
