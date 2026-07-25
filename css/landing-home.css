@@ -59,6 +59,144 @@ html {
   .lp-student-portal-cta .lp-btn {
     width: 100%;
   }
+
+  /* Demonstração do produto: o celular complementa o painel sem dominar a seção. */
+  body.ads-landing .lp-product-stage {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 148px;
+    grid-template-rows: auto;
+    align-items: end;
+    min-height: 0 !important;
+    margin-top: 16px !important;
+    padding: 0 0 18px;
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  body.ads-landing .lp-browser {
+    position: relative !important;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: start;
+    width: 100%;
+    margin: 0 !important;
+    transform: none !important;
+    z-index: 2;
+  }
+
+  body.ads-landing .lp-phone {
+    position: relative !important;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: end;
+    right: auto !important;
+    bottom: auto !important;
+    width: 148px !important;
+    margin: 0 2px -4px 0;
+    padding: 6px;
+    border-radius: 29px;
+    transform: none !important;
+    z-index: 4;
+  }
+
+  body.ads-landing .lp-phone-screen {
+    min-height: 306px !important;
+    padding: 12px 9px;
+    border-radius: 23px;
+  }
+
+  body.ads-landing .lp-phone-notch {
+    width: 56px;
+    height: 13px;
+    margin: -7px auto 9px;
+    border-radius: 0 0 9px 9px;
+  }
+
+  body.ads-landing .lp-phone .lp-student-top {
+    gap: 6px;
+  }
+
+  body.ads-landing .lp-phone .lp-student-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: .58rem;
+  }
+
+  body.ads-landing .lp-phone .lp-student-top strong {
+    font-size: .64rem;
+  }
+
+  body.ads-landing .lp-phone .lp-student-top small {
+    font-size: .44rem;
+    line-height: 1.25;
+  }
+
+  body.ads-landing .lp-phone .lp-student-card {
+    margin-top: 10px;
+    padding: 9px;
+    border-radius: 11px;
+  }
+
+  body.ads-landing .lp-phone .lp-student-card small {
+    font-size: .46rem;
+  }
+
+  body.ads-landing .lp-phone .lp-student-card h3 {
+    margin-top: 5px;
+    font-size: .84rem;
+    line-height: 1.18;
+  }
+
+  body.ads-landing .lp-phone .lp-student-card p {
+    margin-top: 5px;
+    font-size: .48rem;
+    line-height: 1.35;
+  }
+
+  body.ads-landing .lp-phone .lp-progress {
+    height: 5px;
+    margin-top: 8px;
+  }
+
+  body.ads-landing .lp-phone .lp-student-button {
+    min-height: 31px;
+    margin-top: 8px;
+    border-radius: 8px;
+    font-size: .51rem;
+  }
+
+  body.ads-landing .lp-phone .lp-mini-row {
+    gap: 4px;
+    margin-top: 6px;
+    padding: 6px;
+    border-radius: 8px;
+    font-size: .47rem;
+    line-height: 1.2;
+  }
+
+  body.ads-landing .lp-phone .lp-mini-row span:last-child {
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  body.ads-landing .lp-glow {
+    inset: 8% 4% 4%;
+  }
+}
+
+@media (max-width: 430px) {
+  body.ads-landing .lp-product-stage {
+    grid-template-columns: minmax(0, 1fr) 142px;
+  }
+
+  body.ads-landing .lp-phone {
+    width: 142px !important;
+  }
+
+  body.ads-landing .lp-phone-screen {
+    min-height: 294px !important;
+  }
 }
 
 @media (max-width: 360px) {
@@ -68,5 +206,17 @@ html {
 
   .lp-nav-actions .lp-btn-primary {
     padding-inline: 9px;
+  }
+
+  body.ads-landing .lp-product-stage {
+    grid-template-columns: minmax(0, 1fr) 132px;
+  }
+
+  body.ads-landing .lp-phone {
+    width: 132px !important;
+  }
+
+  body.ads-landing .lp-phone-screen {
+    min-height: 280px !important;
   }
 }
