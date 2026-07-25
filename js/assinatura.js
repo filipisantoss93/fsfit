@@ -136,6 +136,15 @@ function renderSummary(access) {
     </div>`;
 }
 
+function effectiveStatus(item) {
+  const value = String(item?.status || '').toLowerCase();
+  if (item?.method === 'pix' && ['pending', 'pendente', 'waiting', 'new', 'active'].includes(value) && item?.vence_em) {
+    const expiresAt = new Date(item.vence_em).getTime();
+    if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) return 'expirada';
+  }
+  return value;
+}
+
 function normalizeStatus(status) {
   const value = String(status || '').toLowerCase();
   if (['paid', 'paga', 'pago', 'approved', 'settled'].includes(value)) {
@@ -144,33 +153,90 @@ function normalizeStatus(status) {
   if (['pending', 'pendente', 'waiting', 'new', 'active'].includes(value)) {
     return { label: 'Pendente', className: 'pending' };
   }
-  if (['unpaid', 'failed', 'recusada', 'recusado', 'canceled', 'cancelada', 'expired'].includes(value)) {
+  if (['expired', 'expirada'].includes(value)) {
+    return { label: 'Expirada', className: 'failed' };
+  }
+  if (['unpaid', 'failed', 'recusada', 'recusado', 'canceled', 'cancelada'].includes(value)) {
     return { label: value.includes('cancel') ? 'Cancelada' : 'Não pago', className: 'failed' };
   }
   return { label: status || '—', className: '' };
+}
+
+function bindHistoryActions(host) {
+  if (host.dataset.actionsBound === 'true') return;
+  host.dataset.actionsBound = 'true';
+
+  host.addEventListener('click', async event => {
+    const button = event.target.closest('[data-cancel-pix-id]');
+    if (!button) return;
+
+    const confirmed = window.confirm('Cancelar esta cobrança PIX? O QR Code deixará de aceitar pagamento.');
+    if (!confirmed) return;
+
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Cancelando...';
+
+    try {
+      const { data, error } = await supabase.functions.invoke('cancelar-pix-fsfit', {
+        body: { id: button.dataset.cancelPixId }
+      });
+      if (data?.erro) throw new Error(data.erro);
+      if (error) throw error;
+
+      button.closest('.subscription-history-item')?.remove();
+      if (!host.querySelector('.subscription-history-item')) {
+        host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
+      }
+    } catch (cancelError) {
+      console.error('Não foi possível cancelar a cobrança PIX:', cancelError);
+      window.alert(cancelError?.message || 'Não foi possível cancelar esta cobrança PIX agora.');
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  });
 }
 
 function renderHistory(items) {
   const host = document.querySelector('#subscription-history-list');
   if (!host) return;
 
-  if (!items.length) {
+  const visibleItems = [];
+  let pendingPixIncluded = false;
+
+  for (const item of items) {
+    const statusValue = effectiveStatus(item);
+    if (item.method === 'pix' && ['cancelada', 'canceled', 'expirada', 'expired'].includes(statusValue)) continue;
+    if (item.method === 'pix' && ['pending', 'pendente', 'waiting', 'new', 'active'].includes(statusValue)) {
+      if (pendingPixIncluded) continue;
+      pendingPixIncluded = true;
+    }
+    visibleItems.push({ ...item, effective_status: statusValue });
+  }
+
+  if (!visibleItems.length) {
     host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
     return;
   }
 
-  host.innerHTML = items.map(item => {
-    const status = normalizeStatus(item.status);
+  host.innerHTML = visibleItems.map(item => {
+    const status = normalizeStatus(item.effective_status || item.status);
     const date = item.pago_em || item.created_at;
     const method = item.method === 'cartao' ? 'Cartão de crédito' : 'PIX';
+    const canCancel = item.method === 'pix' && status.label === 'Pendente';
     return `
       <article class="subscription-history-item">
         <div class="subscription-history-main"><strong>${method}</strong><span>${formatDate(date, true)}</span></div>
         <div class="subscription-history-date">${formatDate(date)}</div>
         <div class="subscription-history-value">${money(item.valor_centavos)}</div>
-        <span class="subscription-status-badge ${status.className}">${status.label}</span>
+        <div class="subscription-history-status">
+          <span class="subscription-status-badge ${status.className}">${status.label}</span>
+          ${canCancel ? `<button class="subscription-history-cancel" type="button" data-cancel-pix-id="${item.id}">Cancelar cobrança</button>` : ''}
+        </div>
       </article>`;
   }).join('');
+
+  bindHistoryActions(host);
 }
 
 async function loadHistory(userId) {
@@ -186,7 +252,7 @@ async function loadHistory(userId) {
         .limit(20),
       supabase
         .from('cobrancas_pix')
-        .select('id,status,valor_centavos,pago_em,created_at')
+        .select('id,txid,status,valor_centavos,vence_em,pago_em,created_at')
         .eq('personal_id', userId)
         .order('created_at', { ascending: false })
         .limit(20)
