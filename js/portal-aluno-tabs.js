@@ -1,5 +1,6 @@
 let initialized = false;
 let chatObserver = null;
+let liveLabelObserver = null;
 
 function injectStyles() {
   if (document.querySelector('style[data-student-main-tabs]')) return;
@@ -77,6 +78,14 @@ function routeChatCard(root, chatPanel) {
   renderChatEmpty(chatPanel);
 }
 
+function normalizeLiveTabLabel(nav) {
+  const liveButton = nav?.querySelector('[data-student-main-tab="live"]');
+  if (!liveButton) return;
+  if (liveButton.dataset.liveState === 'today' && liveButton.textContent.trim() === 'Hoje') {
+    liveButton.textContent = 'Início';
+  }
+}
+
 function activateTab(root, target) {
   root.querySelectorAll('[data-student-main-tab]').forEach(button => {
     button.classList.toggle('active', button.dataset.studentMainTab === target);
@@ -99,6 +108,7 @@ export function ensureStudentPortalMainTabs() {
   const existingChat = root.querySelector('#student-main-chat');
   const existingNav = root.querySelector('.student-main-tabs');
   if (initialized && existingLive && existingChat && existingNav) {
+    normalizeLiveTabLabel(existingNav);
     return { live: existingLive, agenda: root, chat: existingChat };
   }
 
@@ -140,6 +150,17 @@ export function ensureStudentPortalMainTabs() {
     if (!button) return;
     activateTab(root, button.dataset.studentMainTab);
   });
+
+  liveLabelObserver?.disconnect();
+  liveLabelObserver = new MutationObserver(() => normalizeLiveTabLabel(nav));
+  liveLabelObserver.observe(nav, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ['data-live-state']
+  });
+  normalizeLiveTabLabel(nav);
 
   chatObserver?.disconnect();
   chatObserver = new MutationObserver(() => routeChatCard(root, chatPanel));
