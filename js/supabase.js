@@ -120,6 +120,14 @@ if (!globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__) {
   });
 }
 
+if (currentPage() === 'ficha-aluno.html' && !globalThis.__FSFIT_STUDENT_RECORD_HIERARCHY_LOADER__) {
+  globalThis.__FSFIT_STUDENT_RECORD_HIERARCHY_LOADER__ = true;
+  queueMicrotask(() => {
+    import('./ficha-aluno-hierarquia.js?v=20260725-hierarchy1')
+      .catch(error => console.warn('Hierarquia otimizada da ficha do aluno indisponível:', error));
+  });
+}
+
 if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER_LOADER__) {
   globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER_LOADER__ = true;
   queueMicrotask(() => {
