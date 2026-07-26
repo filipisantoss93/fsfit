@@ -58,6 +58,173 @@
   opacity: .78;
 }
 
+/* Painel inicial: densidade própria para desktop, sem alterar celular e PWA. */
+@media (min-width: 1100px) {
+  main.container {
+    max-width: 1240px;
+  }
+
+  .dashboard-home-header {
+    margin-bottom: 8px !important;
+  }
+
+  .dashboard-tabs {
+    margin-bottom: 12px !important;
+  }
+
+  #dashboard-home-panel {
+    grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr);
+    grid-template-areas:
+      "summary summary"
+      "now day"
+      "upcoming review";
+    align-items: stretch;
+    gap: 12px !important;
+  }
+
+  #dashboard-home-panel > .home-summary-strip {
+    grid-area: summary;
+    min-height: 76px;
+    padding: 10px 14px !important;
+  }
+
+  #dashboard-home-panel > .home-now-card {
+    grid-area: now;
+    min-height: 0;
+    padding: 14px 16px !important;
+  }
+
+  #dashboard-home-panel > .home-day-card {
+    grid-area: day;
+    min-height: 0;
+    padding: 14px !important;
+  }
+
+  #dashboard-home-panel > .home-upcoming-card {
+    grid-area: upcoming;
+    min-height: 118px;
+    padding: 14px 16px 4px !important;
+  }
+
+  #dashboard-home-panel > .home-review-card {
+    grid-area: review;
+    min-height: 118px;
+    align-self: stretch;
+    padding: 14px !important;
+  }
+
+  .home-now-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+    column-gap: 18px;
+    align-items: center;
+  }
+
+  .home-now-content {
+    min-width: 0;
+  }
+
+  .home-now-action {
+    width: 100% !important;
+    min-height: 42px !important;
+    margin: 0 !important;
+    align-self: center;
+  }
+
+  .home-now-icon {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .home-now-copy h2 {
+    font-size: 1.12rem !important;
+  }
+
+  .home-now-person {
+    margin-top: 7px !important;
+  }
+
+  .home-day-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .home-day-summary {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px !important;
+  }
+
+  .home-day-summary span {
+    display: grid !important;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    padding: 9px 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-light);
+    line-height: 1.15;
+  }
+
+  .home-day-summary strong {
+    grid-column: 2;
+    font-size: .92rem;
+  }
+
+  .home-day-progress {
+    height: 5px !important;
+    margin-top: 10px !important;
+  }
+
+  .home-upcoming-empty {
+    padding: 10px 0 12px !important;
+  }
+
+  .home-upcoming-item {
+    min-height: 52px !important;
+    padding: 7px 0 !important;
+  }
+
+  .home-review-leading {
+    align-items: flex-start !important;
+  }
+
+  .home-review-copy span {
+    white-space: normal !important;
+    line-height: 1.35;
+  }
+
+  .home-summary-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .home-summary-item {
+    min-height: 54px;
+  }
+
+  .home-summary-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .home-summary-copy strong {
+    font-size: 1.08rem !important;
+  }
+
+  .home-summary-copy span {
+    font-size: .65rem !important;
+  }
+
+  #dashboard-overview-panel .dashboard-overview-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  #dashboard-overview-panel .attention-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 520px) {
   .live-session-modal-actions {
     grid-template-columns: repeat(2, minmax(0,1fr)) !important;
