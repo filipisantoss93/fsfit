@@ -21,7 +21,6 @@ Garantir que o estado do banco, das funções, políticas, triggers, Edge Functi
 - O Security Advisor também reporta quatro tabelas com RLS habilitada e sem políticas: `aluno_sessoes`, `app_runtime_secrets`, `edge_rate_limits` e `webhook_eventos_efi`.
 - A proteção contra senhas vazadas está desativada no Supabase Auth.
 - O histórico remoto do Supabase contém migrations até `20260726173018_auditar_alteracoes_financeiras_sensiveis`.
-- Não foi localizada estrutura `supabase/` nem a migration mais recente na `main` do GitHub pelos caminhos convencionais.
 
 ## Achados confirmados
 
@@ -29,26 +28,21 @@ Garantir que o estado do banco, das funções, políticas, triggers, Edge Functi
 
 A sobrecarga paginada de `public.fsfit_admin_historico_financeiro` possui `EXECUTE` para `anon`, `authenticated` e `service_role`.
 
-O corpo da função bloqueia chamadas sem `auth.uid()` e exige registro em `public.platform_admins`, portanto não foi confirmada exposição de dados por chamada anônima. Mesmo assim, o grant para `anon` é indevido e aumenta desnecessariamente a superfície pública.
+O corpo da função bloqueia chamadas sem `auth.uid()` e exige registro em `public.platform_admins`, portanto não foi confirmada exposição de dados por chamada anônima. Mesmo assim, o grant para `anon` é indevido.
 
-Correção proposta: revogar `EXECUTE` de `anon` e manter somente os papéis estritamente necessários.
+Correção versionada em:
+
+`supabase/migrations/20260726190000_restringir_execucao_anon_rpc_admin.sql`
+
+A migration ainda não foi aplicada em produção.
 
 ### 2. RPCs administrativas validam administrador internamente
 
 As funções administrativas inspecionadas, incluindo `fsfit_admin_atualizar_plano`, `fsfit_admin_executar_geracao_mensalidades_agora` e `fsfit_admin_historico_financeiro`, validam `auth.uid()` e a associação em `platform_admins` antes das operações privilegiadas.
 
-O grant para `authenticated` é compatível com o frontend atual, desde que toda RPC administrativa mantenha essa validação interna. Ainda é necessário concluir a inspeção de todas as funções `fsfit_admin_*`.
-
 ### 3. RPCs financeiras do personal possuem validação de propriedade
 
-As funções inspecionadas:
-
-- `fsfit_configurar_mensalidade_aluno`;
-- `fsfit_confirmar_pagamento_mensalidade`;
-- `fsfit_cancelar_mensalidade`;
-- `fsfit_gerar_mensalidades_mes`;
-
-validam autenticação e restringem operações pelo `personal_id = auth.uid()` ou pela propriedade do aluno. Não foi encontrada, nessas funções, alteração arbitrária de mensalidade pertencente a outro personal.
+As funções `fsfit_configurar_mensalidade_aluno`, `fsfit_confirmar_pagamento_mensalidade`, `fsfit_cancelar_mensalidade` e `fsfit_gerar_mensalidades_mes` restringem operações ao personal autenticado e aos seus próprios alunos.
 
 ### 4. RLS financeira principal está coerente
 
@@ -58,76 +52,70 @@ As tabelas `assinaturas`, `cobrancas_pix` e `cobrancas_cartao` possuem leitura r
 
 ### 5. Tabelas internas sem políticas
 
-`app_runtime_secrets`, `edge_rate_limits` e `webhook_eventos_efi` permanecem com RLS habilitada e sem políticas. Esse desenho pode ser intencional para negar acesso direto e permitir somente operações via funções privilegiadas ou `service_role`.
+`app_runtime_secrets`, `edge_rate_limits` e `webhook_eventos_efi` permanecem com RLS habilitada e sem políticas. O desenho aparenta ser intencional para negar acesso direto e permitir somente funções privilegiadas ou `service_role`.
 
-`aluno_sessoes` também não possui políticas e é acessada por funções baseadas em token. O modelo precisa ser mantido fechado para acesso direto e validado pela segurança das RPCs.
+`aluno_sessoes` também permanece fechada para acesso direto e é utilizada por RPCs baseadas em token temporário.
 
 ### 6. Automação financeira e operacional existente
 
-Foram encontrados os seguintes cron jobs ativos:
+Foram encontrados cron jobs ativos para:
 
-- limpeza diária de sessões expiradas;
-- limpeza diária de rate limits;
-- limpeza diária de eventos de webhook Efí;
-- processamento de lembretes por Edge Function a cada 2 minutos;
-- processamento de lembretes de WhatsApp a cada 2 minutos;
+- limpeza de sessões expiradas;
+- limpeza de rate limits;
+- limpeza de eventos de webhook Efí;
+- processamento de lembretes;
+- processamento de lembretes de WhatsApp;
 - geração automática de mensalidades no dia 1 de cada mês;
-- limpeza diária do histórico de monitoramento.
-
-A geração mensal automática executa `fsfit_internal.gerar_mensalidades_automaticamente()`.
+- limpeza do histórico de monitoramento.
 
 ### 7. Triggers financeiros relevantes
 
-A tabela `mensalidades_alunos` possui triggers para:
+A tabela `mensalidades_alunos` possui triggers para auditoria, definição e bloqueio do `personal_id`, validação personal–aluno, proteção de transições e controle de operações premium.
 
-- auditoria de INSERT e UPDATE;
-- definição e bloqueio do `personal_id`;
-- validação da relação personal–aluno;
-- proteção de transições de status;
-- proteção de operações premium.
+A tabela `cobrancas_pix` possui trigger para aplicação automática de pagamento.
 
-A tabela `cobrancas_pix` possui trigger para aplicação automática de pagamento após INSERT ou UPDATE.
+## Paridade das Edge Functions financeiras
 
-## Divergência crítica de versionamento
+### `criar-pix-fsfit`
 
-O Supabase registra um histórico extenso de migrations, incluindo diversas migrations P0 aplicadas em 26/07/2026. Entretanto, os caminhos convencionais abaixo não foram encontrados na `main`:
+O arquivo versionado e a versão implantada possuem o mesmo conteúdo funcional e a mesma dependência `@supabase/supabase-js@2.45.4`.
 
-- `supabase/config.toml`;
-- `supabase/migrations/20260726173018_auditar_alteracoes_financeiras_sensiveis.sql`.
+Status: paridade confirmada.
 
-Isso indica forte probabilidade de que o banco de produção esteja à frente do repositório ou que as migrations estejam armazenadas em outro caminho ainda não identificado.
+### `webhook-efi-pix`
 
-Esse é atualmente o principal risco de paridade: o estado operacional do Supabase pode não ser reconstruível pelo GitHub.
+A versão implantada estava à frente do arquivo do GitHub. Produção já possuía:
 
-## Edge Functions encontradas
+- limite de payload;
+- validação de tamanho do token;
+- validação de formato de `txid`;
+- limite de 50 eventos por chamada;
+- idempotência por hash do evento;
+- registro de sucesso ou falha do processamento;
+- headers de segurança adicionais.
 
-- `criar-aluno`
-- `personal-aluno-pin`
-- `aluno-auth`
-- `aluno-push`
-- `processar-lembretes`
-- `verificar-pix-fsfit`
-- `webhook-efi-pix`
-- `criar-pix-fsfit`
-- `chat-push`
-- `configurar-webhook-efi`
-- `config-assinatura-cartao-fsfit`
-- `criar-assinatura-cartao-fsfit`
-- `cancelar-assinatura-cartao-fsfit`
-- `webhook-efi-cobrancas`
-- `atualizar-assinatura-cartao-fsfit`
-- `cancelar-pix-fsfit`
+O arquivo do GitHub foi atualizado para reproduzir exatamente a versão implantada.
+
+Status: paridade restaurada na branch de auditoria.
+
+### `verificar-pix-fsfit`
+
+O arquivo do GitHub está à frente da versão implantada. O código versionado consulta a Efí quando a cobrança ainda não foi processada, identifica status `CONCLUIDA` e atualiza a cobrança local. A versão implantada apenas lê o registro local.
+
+Status: divergência confirmada. O deploy não será feito até validar que a atualização direta mantém a idempotência e não conflita com o webhook.
+
+## Estrutura Supabase criada na branch
+
+Foi adicionado `supabase/config.toml` com a configuração de JWT das quatro Edge Functions PIX auditadas.
 
 ## Próximas etapas
 
-1. Concluir inspeção interna de todas as RPCs administrativas.
-2. Extrair grants completos das funções baseadas em token do aluno.
-3. Comparar cada Edge Function implantada com o GitHub.
-4. localizar o caminho real das migrations, caso exista fora de `supabase/migrations`.
-5. reconstruir e versionar as migrations ausentes.
-6. preparar migration corretiva para grants administrativos indevidos.
-7. executar novamente os advisors de segurança e desempenho.
-8. validar o banco reconstruído em ambiente separado antes de qualquer mudança em produção.
+1. Auditar `verificar-pix-fsfit` contra o trigger `fsfit_aplicar_pagamento_pix` e o webhook antes de decidir o deploy.
+2. Comparar `configurar-webhook-efi` e `cancelar-pix-fsfit` entre GitHub e produção.
+3. Comparar as Edge Functions de assinatura por cartão.
+4. Reconstruir e versionar as migrations ausentes do banco.
+5. Testar a migration de revogação em ambiente separado.
+6. Executar novamente os advisors de segurança e desempenho.
 
 ## Regra desta auditoria
 
