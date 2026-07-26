@@ -4,15 +4,79 @@ const alunoId = new URLSearchParams(location.search).get('id');
 const list = document.querySelector('#workout-history-list');
 const summary = document.querySelector('#workout-history-summary');
 const historyTab = document.querySelector('[data-record-tab="history"]');
+const managementButton = document.querySelector('#delete-student');
+const recordMessage = document.querySelector('#record-message');
 
 let historyLoaded = false;
 let historyLoadingPromise = null;
+let studentStatus = '';
 
 function esc(value = '') {
   const div = document.createElement('div');
   div.textContent = value ?? '';
   return div.innerHTML;
 }
+
+function showManagementMessage(text, type = 'success') {
+  if (!recordMessage) return;
+  recordMessage.textContent = text;
+  recordMessage.className = `message ${type}`;
+}
+
+async function syncStudentManagement() {
+  if (!alunoId || !managementButton) return;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) return;
+
+  const { data, error } = await supabase
+    .from('alunos')
+    .select('status')
+    .eq('id', alunoId)
+    .eq('personal_id', session.user.id)
+    .single();
+
+  if (error) return;
+  studentStatus = String(data.status || 'ativo');
+  const ended = studentStatus === 'encerrado';
+  managementButton.textContent = ended ? 'Reativar acompanhamento' : 'Encerrar acompanhamento';
+  managementButton.classList.toggle('btn-danger', !ended);
+  managementButton.classList.toggle('btn-outline', ended);
+  managementButton.dataset.studentManagementReady = 'true';
+}
+
+managementButton?.addEventListener('click', async event => {
+  if (!managementButton.dataset.studentManagementReady) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  const studentName = document.querySelector('#student-name')?.textContent?.trim() || 'este aluno';
+  const ended = studentStatus === 'encerrado';
+  const confirmation = ended
+    ? `Reativar o acompanhamento de ${studentName}? O acesso será liberado novamente, mas sessões antigas continuarão encerradas.`
+    : `Encerrar o acompanhamento de ${studentName}? O histórico será preservado e o acesso do aluno será desativado.`;
+
+  if (!confirm(confirmation)) return;
+
+  managementButton.disabled = true;
+  try {
+    const rpc = ended ? 'fsfit_reativar_aluno' : 'fsfit_arquivar_aluno';
+    const { error } = await supabase.rpc(rpc, { p_aluno_id: alunoId });
+    if (error) throw error;
+
+    studentStatus = ended ? 'ativo' : 'encerrado';
+    const statusBadge = document.querySelector('#student-status');
+    if (statusBadge) statusBadge.textContent = studentStatus.toUpperCase();
+    managementButton.textContent = ended ? 'Encerrar acompanhamento' : 'Reativar acompanhamento';
+    managementButton.classList.toggle('btn-danger', ended);
+    managementButton.classList.toggle('btn-outline', !ended);
+    showManagementMessage(ended ? 'Acompanhamento reativado com sucesso.' : 'Acompanhamento encerrado. Todo o histórico foi preservado.');
+  } catch (error) {
+    showManagementMessage(error.message || 'Não foi possível atualizar o acompanhamento.', 'error');
+  } finally {
+    managementButton.disabled = false;
+  }
+}, true);
 
 function formatDateTime(value) {
   if (!value) return '—';
@@ -111,3 +175,5 @@ if (alunoId && list) {
     void loadWorkoutHistory();
   }
 }
+
+void syncStudentManagement();
