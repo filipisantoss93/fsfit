@@ -3,8 +3,8 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <title>Alunos — FS Fit</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://jjpijncxlkwutbnkpsaw.supabase.co" crossorigin>
@@ -14,68 +14,8 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/header-menu.css?v=20260717-support2" data-fsfit-header-styles>
   <link rel="stylesheet" href="css/mobile-navigation.css?v=20260722-shell1" data-fsfit-mobile-navigation>
-  <link rel="stylesheet" href="css/alunos.css?v=20260724-header1">
-  <link rel="stylesheet" href="css/alunos-lista-compacta.css?v=20260722-avatar1">
-  <style>
-    .student-actions-cell .actions > button { display: none; }
-
-    #student-form-card:not(.hidden) {
-      position: fixed;
-      inset: 0;
-      z-index: 1200;
-      width: 100%;
-      max-width: none;
-      height: 100dvh;
-      margin: 0;
-      padding: 24px;
-      overflow-y: auto;
-      border: 0;
-      border-radius: 0;
-      background: rgba(10, 14, 18, .97);
-      box-sizing: border-box;
-    }
-
-    #student-form-card:not(.hidden) > * {
-      width: min(760px, 100%);
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    body.student-modal-open { overflow: hidden; }
-
-    body.embed-edit {
-      background: #0f1115;
-      overflow: auto;
-    }
-
-    body.embed-edit #header-container,
-    body.embed-edit .fsfit-bottom-nav,
-    body.embed-edit .students-page-header,
-    body.embed-edit #student-message,
-    body.embed-edit .student-list-card {
-      display: none !important;
-    }
-
-    body.embed-edit .students-page {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    body.embed-edit #student-form-card:not(.hidden) {
-      position: static;
-      width: 100%;
-      min-height: 100dvh;
-      height: auto;
-      padding: 22px 18px 36px;
-      background: #151a1f;
-    }
-
-    @media (max-width: 640px) {
-      #student-form-card:not(.hidden) { padding: 18px 14px 32px; }
-    }
-  </style>
+  <link rel="stylesheet" href="css/alunos.css?v=20260726-ux1">
+  <link rel="stylesheet" href="css/alunos-lista-compacta.css?v=20260726-ux1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -93,94 +33,126 @@
       </nav>
     </header>
   </div>
+
   <main class="container students-page">
     <section class="page-header students-page-header">
-      <div>
-        <h1>Meus Alunos</h1>
-        <p>Cadastre dados físicos e acompanhe a evolução individual.</p>
+      <div class="students-page-heading">
+        <span class="students-eyebrow">GESTÃO DE ALUNOS</span>
+        <h1>Alunos</h1>
+        <p>Visualize quem precisa de atenção e acesse rapidamente cada acompanhamento.</p>
       </div>
-      <div class="students-header-actions">
-        <button id="toggle-student-form" class="btn btn-primary students-add-button" type="button">+ Aluno</button>
-      </div>
+      <button id="toggle-student-form" class="btn btn-primary students-add-button" type="button">
+        <span aria-hidden="true">+</span> Novo aluno
+      </button>
     </section>
 
-    <div id="student-message" class="message"></div>
+    <div id="student-message" class="message" role="status" aria-live="polite"></div>
+
+    <section class="students-summary" aria-label="Resumo dos alunos">
+      <article class="students-summary-card">
+        <span>Total</span>
+        <strong id="student-count">0</strong>
+        <small id="student-count-label">alunos cadastrados</small>
+      </article>
+      <article class="students-summary-card">
+        <span>Em aula agora</span>
+        <strong id="student-in-class-count">0</strong>
+        <small>acompanhamento em andamento</small>
+      </article>
+      <article class="students-summary-card students-summary-card-alert">
+        <span>Sem treino ativo</span>
+        <strong id="student-no-workout-count">0</strong>
+        <small>precisam de configuração</small>
+      </article>
+    </section>
 
     <section class="card student-list-card">
-      <div class="student-section-heading student-list-heading">
+      <div class="student-list-toolbar">
         <div>
-          <small>GESTÃO</small>
-          <h2>Lista de alunos</h2>
+          <h2>Todos os alunos</h2>
+          <p>Busque, filtre e abra a ficha completa.</p>
         </div>
-        <span class="hero-badge"><span id="student-count">0</span>&nbsp;<span id="student-count-label">ALUNOS</span></span>
       </div>
 
       <div class="student-search-wrap">
+        <span class="student-search-icon" aria-hidden="true">⌕</span>
         <input id="student-search" type="search" placeholder="Buscar por nome ou WhatsApp" autocomplete="off" aria-label="Buscar aluno">
+      </div>
+
+      <div id="student-filter-nav" class="student-filter-nav" role="group" aria-label="Filtros da lista de alunos">
+        <button class="student-filter-pill active" type="button" data-student-filter="all" aria-pressed="true">Todos</button>
+        <button class="student-filter-pill" type="button" data-student-filter="in_class" aria-pressed="false">Em aula</button>
+        <button class="student-filter-pill" type="button" data-student-filter="new" aria-pressed="false">Novos</button>
+        <button class="student-filter-pill" type="button" data-student-filter="no_workout" aria-pressed="false">Sem treino</button>
       </div>
 
       <div class="table-wrap responsive-students">
         <table>
           <thead><tr><th>Aluno</th><th aria-label="Abrir ficha"></th></tr></thead>
-          <tbody id="students-list"><tr><td colspan="2">Carregando...</td></tr></tbody>
+          <tbody id="students-list"><tr><td colspan="2" class="student-loading-state">Carregando alunos...</td></tr></tbody>
         </table>
       </div>
     </section>
 
-    <section id="student-form-card" class="card student-form-card hidden">
-      <div class="student-section-heading">
-        <div>
-          <small>CADASTRO</small>
-          <h2 id="form-title">Cadastrar novo aluno</h2>
-        </div>
+    <section id="student-form-card" class="student-modal hidden" role="dialog" aria-modal="true" aria-labelledby="form-title">
+      <div class="student-modal-panel">
+        <header class="student-modal-header">
+          <div>
+            <span class="students-eyebrow">CADASTRO</span>
+            <h2 id="form-title">Cadastrar novo aluno</h2>
+            <p>Preencha somente o necessário. Os demais dados podem ser completados depois na ficha.</p>
+          </div>
+          <button id="close-student-form" class="student-modal-close" type="button" aria-label="Fechar cadastro">×</button>
+        </header>
+
+        <form id="student-form" class="student-modal-form">
+          <div class="student-modal-body">
+            <fieldset class="student-fieldset">
+              <legend>Informações pessoais</legend>
+              <div class="grid grid-2 student-form-grid">
+                <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" autocomplete="name" required></div>
+                <div class="form-group"><label>WhatsApp *</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
+                <div class="form-group"><label>Sexo *</label><select name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
+                <div class="form-group"><label>Data de nascimento</label><input name="data_nascimento" type="text" inputmode="numeric" autocomplete="bday" maxlength="10" placeholder="DD/MM/AAAA" aria-label="Data de nascimento no formato dia mês ano"></div>
+                <div class="form-group"><label>Idade calculada</label><input class="student-age-input" name="idade" readonly placeholder="Calculada automaticamente"></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="student-fieldset">
+              <legend>Agenda</legend>
+              <p class="form-hint">Os dias são definidos pelo treino ativo. Cadastre aqui apenas o horário e o local habituais.</p>
+              <div class="grid grid-3 student-form-grid">
+                <div class="form-group"><label>Período</label><select name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
+                <div class="form-group"><label>Horário</label><input name="horario_aula" type="time" step="60"></div>
+                <div class="form-group"><label>Local da aula</label><input name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="student-fieldset">
+              <legend>Dados físicos iniciais</legend>
+              <div class="grid grid-3 student-physical-grid">
+                <div class="form-group"><label>Altura (cm)</label><input name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
+                <div class="form-group"><label>Peso inicial (kg)</label><input name="peso_inicial_kg" type="number" min="20" max="400" step="0.1" placeholder="Ex.: 82,5"></div>
+                <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura_inicial" type="number" min="1" max="75" step="0.1" placeholder="Ex.: 18,5"></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="student-fieldset student-fieldset-last">
+              <legend>Acompanhamento</legend>
+              <div class="form-group"><label>Objetivo</label><input name="objetivo" maxlength="240" placeholder="Ex.: hipertrofia, emagrecimento, condicionamento"></div>
+              <div class="grid grid-2 student-notes-grid">
+                <div class="form-group"><label>Restrições</label><textarea class="student-textarea" name="restricoes" placeholder="Lesões, limitações, alergias ou cuidados importantes"></textarea></div>
+                <div class="form-group"><label>Observações</label><textarea class="student-textarea" name="observacoes" placeholder="Informações gerais para o acompanhamento"></textarea></div>
+              </div>
+            </fieldset>
+          </div>
+
+          <footer class="student-modal-footer">
+            <button id="cancel-edit" class="btn btn-neutral hidden" type="button">Cancelar edição</button>
+            <button class="btn btn-primary" type="submit">Salvar aluno</button>
+          </footer>
+        </form>
       </div>
-
-      <form id="student-form">
-        <fieldset class="student-fieldset">
-          <legend>Informações pessoais</legend>
-          <div class="grid grid-2 student-form-grid">
-            <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" autocomplete="name" required></div>
-            <div class="form-group"><label>WhatsApp *</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
-            <div class="form-group"><label>Sexo *</label><select name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
-            <div class="form-group"><label>Data de nascimento</label><input name="data_nascimento" type="text" inputmode="numeric" autocomplete="bday" maxlength="10" placeholder="DD/MM/AAAA" aria-label="Data de nascimento no formato dia mês ano"></div>
-            <div class="form-group"><label>Idade calculada</label><input class="student-age-input" name="idade" readonly placeholder="Calculada automaticamente"></div>
-          </div>
-        </fieldset>
-
-        <fieldset class="student-fieldset">
-          <legend>Programação da agenda</legend>
-          <p class="form-hint">Os dias da semana são definidos automaticamente pelo treino ativo do aluno. Aqui você programa apenas o horário e o local de atendimento.</p>
-          <div class="grid grid-3 student-form-grid">
-            <div class="form-group"><label>Período</label><select name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
-            <div class="form-group"><label>Horário</label><input name="horario_aula" type="time" step="60"></div>
-            <div class="form-group"><label>Local da aula</label><input name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
-          </div>
-        </fieldset>
-
-        <fieldset class="student-fieldset">
-          <legend>Dados físicos iniciais</legend>
-          <div class="grid grid-3 student-physical-grid">
-            <div class="form-group"><label>Altura (cm)</label><input name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
-            <div class="form-group"><label>Peso inicial (kg)</label><input name="peso_inicial_kg" type="number" min="20" max="400" step="0.1" placeholder="Ex.: 82,5"></div>
-            <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura_inicial" type="number" min="1" max="75" step="0.1" placeholder="Ex.: 18,5"></div>
-          </div>
-        </fieldset>
-
-        <fieldset class="student-fieldset student-fieldset-last">
-          <legend>Acompanhamento</legend>
-          <div class="form-group"><label>Objetivo</label><input name="objetivo" maxlength="240" placeholder="Ex.: hipertrofia, emagrecimento, condicionamento"></div>
-          <div class="grid grid-2 student-notes-grid">
-            <div class="form-group"><label>Restrições</label><textarea class="student-textarea" name="restricoes" placeholder="Lesões, limitações, alergias ou cuidados importantes"></textarea></div>
-            <div class="form-group"><label>Observações</label><textarea class="student-textarea" name="observacoes" placeholder="Informações gerais para o acompanhamento"></textarea></div>
-          </div>
-        </fieldset>
-
-        <div class="actions student-form-actions">
-          <button class="btn btn-primary" type="submit">Salvar aluno</button>
-          <button id="cancel-edit" class="btn btn-neutral hidden" type="button">Cancelar edição</button>
-          <button id="close-student-form" class="btn btn-neutral" type="button">Fechar</button>
-        </div>
-      </form>
     </section>
   </main>
 
@@ -192,34 +164,38 @@
     <button type="button" tabindex="-1" disabled><span aria-hidden="true">•••</span>Mais</button>
   </nav>
 
-  <script type="module" src="js/alunos.js?v=20260719-agenda-minute1"></script>
-  <script type="module" src="js/alunos-lista-compacta.js?v=20260722-avatar1"></script>
+  <script type="module" src="js/alunos.js?v=20260726-ux1"></script>
+  <script type="module" src="js/alunos-lista-compacta.js?v=20260726-ux1"></script>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
       const embed = params.get('embed') === '1';
-      const formCard = document.querySelector('#student-form-card');
-      const toggle = document.querySelector('#toggle-student-form');
+      const modal = document.querySelector('#student-form-card');
       const close = document.querySelector('#close-student-form');
       const message = document.querySelector('#student-message');
 
       if (embed) document.body.classList.add('embed-edit');
 
       const syncModalState = () => {
-        if (!formCard || embed) return;
-        document.body.classList.toggle('student-modal-open', !formCard.classList.contains('hidden'));
+        if (!modal || embed) return;
+        const open = !modal.classList.contains('hidden');
+        document.body.classList.toggle('student-modal-open', open);
+        if (open) close?.focus({ preventScroll: true });
       };
 
-      toggle?.addEventListener('click', () => setTimeout(syncModalState, 0));
       close?.addEventListener('click', () => {
-        if (embed) {
-          window.parent.postMessage({ type: 'fsfit-close-student-modal' }, location.origin);
-          return;
-        }
-        setTimeout(syncModalState, 0);
+        if (embed) window.parent.postMessage({ type: 'fsfit-close-student-modal' }, location.origin);
       });
 
-      if (formCard) new MutationObserver(syncModalState).observe(formCard, { attributes: true, attributeFilter: ['class'] });
+      modal?.addEventListener('click', event => {
+        if (event.target === modal && !embed) close?.click();
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && modal && !modal.classList.contains('hidden') && !embed) close?.click();
+      });
+
+      if (modal) new MutationObserver(syncModalState).observe(modal, { attributes: true, attributeFilter: ['class'] });
 
       if (embed && message) {
         new MutationObserver(() => {
