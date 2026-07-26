@@ -3,12 +3,13 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <title>Prévia do portal — FS Fit</title>
-<link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/aluno-midias.css">
   <link rel="stylesheet" href="css/aluno-treino-player.css?v=20260716-student-tabs1">
+  <link rel="stylesheet" href="css/aluno-preview-padronizacao.css?v=20260726-preview1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -35,16 +36,18 @@
 
     <div id="student-content" class="hidden">
       <section class="student-profile-summary">
-        <small>ALUNO</small>
-        <h1 id="student-name"></h1>
-        <p>Orientado por <strong id="trainer-name"></strong></p>
-        <p id="updated-at" class="updated"></p>
+        <div>
+          <small>ALUNO</small>
+          <h1 id="student-name"></h1>
+          <p>Orientado por <strong id="trainer-name"></strong></p>
+          <p id="updated-at" class="updated"></p>
+        </div>
       </section>
 
       <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
         <button class="student-plan-tab active" type="button" data-student-tab="treino">Treino</button>
         <button class="student-plan-tab" type="button" data-student-tab="dieta">Dieta</button>
-        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Observações</button>
+        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Orientações</button>
       </nav>
 
       <section class="student-tab-panel active" data-student-panel="treino">
@@ -65,8 +68,8 @@
 
       <section class="student-tab-panel" data-student-panel="observacoes">
         <section class="student-observation-card">
-          <small>OBSERVAÇÕES DO PERSONAL</small>
-          <p id="student-observations">Nenhuma observação publicada ainda.</p>
+          <small>ORIENTAÇÕES DO PERSONAL</small>
+          <p id="student-observations">Nenhuma orientação publicada ainda.</p>
         </section>
 
         <section id="student-media-section" class="student-portal-media-section hidden">
