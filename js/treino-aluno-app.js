@@ -46,10 +46,12 @@ try {
     console.warn('Não foi possível antecipar o nome do aluno:', error);
   });
 
-  // O carregamento direto elimina a dependência de imports tardios e garante que
-  // a rotina semanal esteja pronta antes de revelar a página.
+  // A proteção do estado vazio é registrada antes do módulo que adiciona as
+  // ações avulsas. Assim, remover o último treino de um dia não cria um ciclo
+  // infinito de MutationObserver nem bloqueia a interface.
   await import('./treino-aluno-simplificado.js?v=20260725-simple1');
-  await import('./treino-aluno-exercicios-avulsos.js?v=20260725-day-exercises1');
+  await import('./treino-aluno-empty-state-guard.js?v=20260725-empty-guard1');
+  await import('./treino-aluno-exercicios-avulsos.js?v=20260725-day-exercises2');
   await titlePromise;
 
   revealSimplifiedPage();
