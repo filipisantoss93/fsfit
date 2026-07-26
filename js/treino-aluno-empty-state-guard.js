@@ -4,32 +4,32 @@ if (app && !globalThis.__FSFIT_WORKOUT_EMPTY_STATE_GUARD__) {
   globalThis.__FSFIT_WORKOUT_EMPTY_STATE_GUARD__ = true;
 
   const emptyCopy = 'Adicione um treino salvo ou monte este dia com exercícios individuais.';
-  let scheduled = false;
+  let normalizing = false;
 
   function normalizeEmptyState() {
-    scheduled = false;
-    const empty = app.querySelector('.simple-week-panel .simple-empty-state');
-    if (!empty) return;
+    if (normalizing) return;
+    normalizing = true;
 
-    // O módulo de exercícios avulsos antigo alterava textContent em toda mutação.
-    // Em um dia vazio isso realimentava o MutationObserver indefinidamente e
-    // congelava a página após remover o último treino daquele dia.
-    const legacyCopy = empty.querySelector(':scope > span');
-    if (legacyCopy) {
-      const copy = document.createElement('p');
-      copy.className = 'simple-empty-state-copy';
-      copy.textContent = emptyCopy;
-      legacyCopy.replaceWith(copy);
+    try {
+      const empty = app.querySelector('.simple-week-panel .simple-empty-state');
+      if (!empty) return;
+
+      // Esta proteção precisa executar dentro do próprio callback do observer.
+      // Agendar com requestAnimationFrame permite que outro MutationObserver altere
+      // repetidamente o mesmo span antes do próximo frame, congelando o navegador.
+      const legacyCopy = empty.querySelector(':scope > span');
+      if (legacyCopy) {
+        const copy = document.createElement('p');
+        copy.className = 'simple-empty-state-copy';
+        copy.textContent = emptyCopy;
+        legacyCopy.replaceWith(copy);
+      }
+
+      const duplicateAction = empty.querySelector('[data-open-apply-modal]');
+      if (duplicateAction) duplicateAction.remove();
+    } finally {
+      normalizing = false;
     }
-
-    const duplicateAction = empty.querySelector('[data-open-apply-modal]');
-    if (duplicateAction) duplicateAction.remove();
-  }
-
-  function scheduleNormalization() {
-    if (scheduled) return;
-    scheduled = true;
-    requestAnimationFrame(normalizeEmptyState);
   }
 
   const style = document.createElement('style');
@@ -38,6 +38,10 @@ if (app && !globalThis.__FSFIT_WORKOUT_EMPTY_STATE_GUARD__) {
   document.head.appendChild(style);
 
   normalizeEmptyState();
-  const observer = new MutationObserver(scheduleNormalization);
+
+  // Registrado antes do módulo de exercícios avulsos. Quando a rotina é renderizada
+  // novamente, o span problemático é substituído antes que o observer posterior o
+  // encontre, impedindo a realimentação infinita de mutações.
+  const observer = new MutationObserver(normalizeEmptyState);
   observer.observe(app, { childList: true, subtree: true });
 }
