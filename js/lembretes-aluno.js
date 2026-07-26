@@ -124,6 +124,12 @@ function toLocalInput(value) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+function hideInternalStatusField() {
+  const statusField = form?.status?.closest('.form-group');
+  if (statusField) statusField.hidden = true;
+  if (form?.status) form.status.disabled = true;
+}
+
 async function loadStudent() {
   const { data, error } = await supabase.from('alunos')
     .select('id,nome,telefone')
@@ -161,9 +167,8 @@ async function loadReminders() {
       <td>${esc(recurrenceLabel(item.recorrencia_rrule))}</td>
       <td><span class="badge">${esc(statusLabel(item.status))}</span>${item.erro ? `<br><small>${esc(item.erro)}</small>` : ''}</td>
       <td><div class="actions">
-        <button class="btn btn-outline" data-edit="${item.id}">Editar</button>
-        ${item.status !== 'cancelado' ? `<button class="btn btn-secondary" data-cancel="${item.id}">Cancelar</button>` : ''}
-        <button class="btn btn-danger" data-delete="${item.id}" data-title="${esc(item.titulo)}">Excluir</button>
+        ${item.status === 'agendado' ? `<button class="btn btn-outline" data-edit="${item.id}">Editar</button>` : ''}
+        ${item.status === 'agendado' ? `<button class="btn btn-secondary" data-cancel="${item.id}" data-title="${esc(item.titulo)}">Cancelar lembrete</button>` : ''}
       </div></td>
     </tr>`).join('') : '<tr><td colspan="6" class="empty">Nenhum lembrete programado.</td></tr>';
 }
@@ -176,11 +181,11 @@ function resetForm() {
   const now = new Date(Date.now() + 30 * 60 * 1000);
   form.agendado_para.value = toLocalInput(now.toISOString());
   form.canal.value = 'push';
-  form.status.value = 'agendado';
   form.recorrencia.value = '';
   form.intervalo_valor.value = '30';
   form.intervalo_unidade.value = 'minutes';
   toggleIntervalFields();
+  hideInternalStatusField();
 }
 
 async function editReminder(id) {
@@ -192,6 +197,7 @@ async function editReminder(id) {
     .single();
 
   if (error) return showMessage(message, 'Não foi possível abrir o lembrete.', 'error');
+  if (data.status !== 'agendado') return showMessage(message, 'Somente lembretes agendados podem ser editados.', 'error');
 
   const recurrence = parseRrule(data.recorrencia_rrule);
   editingId = data.id;
@@ -203,7 +209,6 @@ async function editReminder(id) {
   form.recorrencia.value = recurrence.recurrence;
   form.intervalo_valor.value = String(recurrence.intervalValue);
   form.intervalo_unidade.value = recurrence.intervalUnit;
-  form.status.value = ['agendado', 'cancelado'].includes(data.status) ? data.status : 'agendado';
   toggleIntervalFields();
   cancelEdit.classList.remove('hidden');
   form.scrollIntoView({ behavior: 'smooth' });
@@ -235,15 +240,12 @@ form.addEventListener('submit', async event => {
   }
 
   const payload = {
-    personal_id: session.user.id,
     aluno_id: alunoId,
     titulo: form.titulo.value.trim(),
     mensagem: form.mensagem.value.trim(),
     canal: form.canal.value,
     agendado_para: scheduled.toISOString(),
-    recorrencia_rrule: recurrenceRrule,
-    status: form.status.value,
-    erro: null
+    recorrencia_rrule: recurrenceRrule
   };
 
   if (payload.titulo.length < 2 || payload.mensagem.length < 2) {
@@ -275,35 +277,22 @@ document.addEventListener('click', async event => {
   if (edit) return editReminder(edit.dataset.edit);
 
   const cancel = event.target.closest('[data-cancel]');
-  if (cancel) {
-    const { error } = await supabase.from('lembretes')
-      .update({ status: 'cancelado' })
-      .eq('id', cancel.dataset.cancel)
-      .eq('personal_id', session.user.id)
-      .eq('aluno_id', alunoId);
-    if (error) showMessage(message, error.message, 'error');
-    else {
-      showMessage(message, 'Lembrete cancelado.');
-      await loadReminders();
-    }
+  if (!cancel) return;
+  if (!confirm(`Cancelar o lembrete "${cancel.dataset.title || 'selecionado'}"? O histórico será preservado.`)) return;
+
+  cancel.disabled = true;
+  const { error } = await supabase.rpc('fsfit_cancelar_lembrete', { p_lembrete_id: cancel.dataset.cancel });
+  if (error) {
+    cancel.disabled = false;
+    showMessage(message, error.message || 'Não foi possível cancelar o lembrete.', 'error');
     return;
   }
 
-  const remove = event.target.closest('[data-delete]');
-  if (remove && confirm(`Excluir o lembrete "${remove.dataset.title}"?`)) {
-    const { error } = await supabase.from('lembretes')
-      .delete()
-      .eq('id', remove.dataset.delete)
-      .eq('personal_id', session.user.id)
-      .eq('aluno_id', alunoId);
-    if (error) showMessage(message, error.message, 'error');
-    else {
-      showMessage(message, 'Lembrete excluído.');
-      await loadReminders();
-    }
-  }
+  showMessage(message, 'Lembrete cancelado. O histórico foi preservado.');
+  await loadReminders();
 });
 
 await loadStudent();
+hideInternalStatusField();
 resetForm();
 await loadReminders();
