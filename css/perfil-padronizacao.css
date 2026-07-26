@@ -1,0 +1,38 @@
+/* FS Fit — padronização visual da página de Perfil */
+.profile-shell{width:min(100%,940px);max-width:940px;margin:0 auto;padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+.profile-shell>.page-header{margin:8px 0 16px}
+.profile-shell>.page-header h1{letter-spacing:-.035em}
+.profile-shell>.page-header p{max-width:620px;margin-top:6px;font-size:.88rem;line-height:1.45}
+.profile-summary{gap:14px;margin-bottom:12px;padding:15px 16px;border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.012));box-shadow:0 10px 28px rgba(0,0,0,.12)}
+.profile-summary-avatar{width:66px;height:66px;flex-basis:66px;border-radius:16px;background:linear-gradient(145deg,rgba(50,215,75,.18),var(--surface-light));color:var(--primary);font-size:1.05rem}
+.profile-summary-name{font-size:1.08rem}.profile-summary-handle{font-size:.78rem}.profile-summary-meta{margin-top:7px}
+.profile-status{min-height:25px;padding:4px 8px;font-size:.66rem}
+.profile-summary-actions{gap:6px}.profile-summary-actions .btn{min-height:38px;padding:0 11px;font-size:.7rem}
+.profile-tabs{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:20;gap:4px;margin-bottom:12px;padding:4px;border-radius:14px;background:rgba(21,25,31,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.profile-tab{min-height:40px;padding:8px 12px;border-radius:10px;font-size:.75rem}.profile-tab.active{background:rgba(50,215,75,.12);color:var(--primary)}
+.profile-card{border-radius:17px;background:linear-gradient(145deg,rgba(255,255,255,.02),rgba(255,255,255,.01));box-shadow:0 12px 34px rgba(0,0,0,.12)}
+.profile-card-inner{padding:18px}.profile-section-head{margin-bottom:17px;padding-bottom:13px;border-bottom:1px solid var(--border)}
+.profile-section-head h2{font-size:1.08rem}.profile-section-head p{font-size:.78rem;line-height:1.45}
+.profile-card h3{margin:17px 0 10px;font-size:.84rem}
+.upload-row{grid-template-columns:94px minmax(0,1fr);gap:14px;margin-bottom:18px;padding:12px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.018)}
+.upload-preview{width:94px;height:94px;border-radius:13px}.upload-preview.avatar{border-radius:16px}.upload-controls{gap:7px}.upload-controls .btn{min-height:38px;font-size:.72rem}.file-help{font-size:.68rem;line-height:1.4}
+.profile-form-grid{gap:0 12px}.profile-form-grid .form-group{margin-bottom:13px}.profile-form-grid label{font-size:.72rem}.profile-form-grid input,.profile-form-grid textarea,.profile-form-grid select{border-radius:11px}.profile-form-grid input,.profile-form-grid select{min-height:48px}.profile-form-grid textarea{min-height:108px}
+.public-address-row{padding:4px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light)}.public-address-prefix{padding-left:9px;font-size:.73rem}.public-address-row input{min-height:42px;border:0!important;background:transparent!important;box-shadow:none!important}
+.public-link-card,.publish-toggle,.account-block{margin:14px 0;padding:13px;border-radius:13px;background:rgba(255,255,255,.02)}
+.public-link-card-label{font-size:.7rem}.public-link-card a{font-size:.82rem}.public-link-state{font-size:.72rem}.public-link-actions{gap:7px;margin-top:11px}.public-link-actions .btn{min-height:38px;font-size:.7rem}
+.publish-toggle{gap:11px;margin-bottom:18px}.publish-copy strong{font-size:.82rem}.publish-copy small{font-size:.69rem;line-height:1.35}
+.gallery-toolbar{margin-bottom:9px}.gallery-admin{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}.gallery-admin-item{border-radius:11px}
+.account-block h3{font-size:.88rem}.account-block p{font-size:.76rem;line-height:1.45}.danger-section{margin-top:18px;padding:15px;border-radius:13px}.danger-section h2{font-size:1rem}.danger-section p{font-size:.76rem}
+.profile-save-bar{position:sticky;bottom:0;z-index:30;margin:18px -18px -18px;padding:11px 18px calc(11px + env(safe-area-inset-bottom));background:rgba(21,25,31,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.profile-save-bar .btn{min-height:42px}.profile-save-hint{font-size:.72rem}
+.password-modal{padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}.password-modal-card{padding:17px;border-radius:18px}.password-modal-header{margin-bottom:14px}.password-modal-header h2{font-size:1.12rem}
+@media(max-width:700px){
+.profile-shell{width:min(calc(100% - 22px),940px)}
+.profile-shell>.page-header{margin-top:6px}.profile-shell>.page-header h1{font-size:1.65rem}.profile-shell>.page-header p{font-size:.8rem}
+.profile-summary{display:grid;grid-template-columns:58px minmax(0,1fr);align-items:center;padding:12px}.profile-summary-avatar{width:58px;height:58px;flex-basis:58px}.profile-summary-main{min-width:0}.profile-summary-actions{grid-column:1/-1;width:100%;margin-top:0}.profile-summary-actions .btn{flex:1}
+.profile-tabs{top:max(6px,env(safe-area-inset-top));margin-inline:-1px}.profile-tab{flex:1 0 auto;min-height:38px;padding:7px 10px;font-size:.7rem}
+.profile-card-inner{padding:14px}.profile-section-head{margin-bottom:14px;padding-bottom:11px}.upload-row{grid-template-columns:78px minmax(0,1fr);gap:11px;padding:10px}.upload-preview{width:78px;height:78px}.upload-controls .btn{width:100%}
+.profile-form-grid{grid-template-columns:1fr}.profile-form-grid .full-width{grid-column:auto}.profile-form-grid .form-group{margin-bottom:11px}.profile-form-grid input,.profile-form-grid select{min-height:46px}
+.gallery-admin{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.profile-save-bar{position:fixed;left:0;right:0;bottom:0;margin:0;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}.profile-save-bar .btn{width:100%}.profile-save-hint{display:none}body.profile-has-pending-changes main{padding-bottom:104px}
+}
+@media(max-width:430px){.profile-shell{width:min(calc(100% - 18px),940px)}.profile-summary-actions .btn{font-size:.66rem}.gallery-admin{grid-template-columns:repeat(2,minmax(0,1fr))}.public-link-actions{display:grid;grid-template-columns:1fr}.public-link-actions .btn{width:100%}}
