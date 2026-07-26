@@ -1,28 +1,28 @@
 /* Página de alunos — padrão estrutural FS Fit */
-.students-page { max-width: 1120px; }
-.students-page-header { align-items: flex-start; gap: 20px; margin-bottom: 18px; }
+.students-page { width: min(calc(100% - 32px), 1040px); max-width: 1040px; }
+.students-page-header { align-items: flex-start; gap: 18px; margin-bottom: 16px; }
 .students-page-heading { min-width: 0; }
-.students-eyebrow { display: block; margin-bottom: 7px; color: var(--primary); font-size: .7rem; font-weight: 900; letter-spacing: .11em; }
-.students-page-header h1 { margin: 0; letter-spacing: -.035em; }
-.students-page-header p { max-width: 620px; margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
-.students-add-button { width: auto; min-height: 44px; margin-left: auto; padding-inline: 16px; white-space: nowrap; }
-.students-add-button span { margin-right: 5px; font-size: 1.1em; }
+.students-eyebrow { display: block; margin-bottom: 6px; color: var(--primary); font-size: .66rem; font-weight: 900; letter-spacing: .1em; }
+.students-page-header h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.35rem); letter-spacing: -.035em; }
+.students-page-header p { max-width: 620px; margin: 7px 0 0; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+.students-add-button { width: auto; min-height: 42px; margin-left: auto; padding-inline: 15px; white-space: nowrap; }
+.students-add-button span { margin-right: 4px; font-size: 1.05em; }
 
-.students-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 14px; }
-.students-summary-card { min-width: 0; padding: 17px 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
-.students-summary-card > span { display: block; color: var(--muted); font-size: .76rem; font-weight: 800; }
-.students-summary-card strong { display: block; margin: 8px 0 2px; font-size: 1.8rem; line-height: 1; letter-spacing: -.04em; }
-.students-summary-card small { display: block; overflow: hidden; color: var(--muted); font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.students-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 12px; }
+.students-summary-card { min-width: 0; padding: 14px 15px; border: 1px solid rgba(77,94,121,.4); border-radius: 15px; background: linear-gradient(180deg,rgba(18,27,40,.96),rgba(12,19,29,.96)); box-shadow: 0 10px 28px rgba(0,0,0,.14); }
+.students-summary-card > span { display: block; color: var(--muted); font-size: .7rem; font-weight: 800; }
+.students-summary-card strong { display: block; margin: 6px 0 2px; font-size: 1.55rem; line-height: 1; letter-spacing: -.04em; }
+.students-summary-card small { display: block; overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
 .students-summary-card-alert strong { color: #f5c451; }
 
-.student-list-card { margin-top: 0; padding: 20px; }
-.student-list-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 15px; }
-.student-list-toolbar h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; }
-.student-list-toolbar p { margin: 4px 0 0; color: var(--muted); font-size: .84rem; }
-.student-search-wrap { position: relative; margin-bottom: 11px; }
-.student-search-wrap input { width: 100%; min-height: 50px; padding-left: 44px; }
-.student-search-icon { position: absolute; top: 50%; left: 16px; z-index: 1; color: var(--muted); font-size: 1.2rem; transform: translateY(-50%); pointer-events: none; }
-.student-loading-state { padding: 28px 12px !important; color: var(--muted); text-align: center; }
+.student-list-card { margin-top: 0; padding: 16px; border-radius: 18px; border-color: rgba(77,94,121,.42); background: rgba(12,19,29,.94); box-shadow: 0 14px 36px rgba(0,0,0,.18); }
+.student-list-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
+.student-list-toolbar h2 { margin: 0; font-size: 1.08rem; letter-spacing: -.02em; }
+.student-list-toolbar p { margin: 3px 0 0; color: var(--muted); font-size: .78rem; }
+.student-search-wrap { position: relative; margin-bottom: 10px; }
+.student-search-wrap input { width: 100%; min-height: 46px; padding-left: 42px; border-radius: 13px; background: rgba(21,31,45,.96); }
+.student-search-icon { position: absolute; top: 50%; left: 15px; z-index: 1; color: var(--muted); font-size: 1.08rem; transform: translateY(-50%); pointer-events: none; }
+.student-loading-state { padding: 26px 12px !important; color: var(--muted); text-align: center; }
 
 .student-fieldset { margin: 0 0 23px; padding: 0 0 22px; border: 0; border-bottom: 1px solid var(--border); }
 .student-fieldset-last { margin-bottom: 0; padding-bottom: 4px; border-bottom: 0; }
@@ -55,25 +55,29 @@ body.embed-edit .student-modal { position: static; display: block; min-height: 1
 body.embed-edit .student-modal-panel { width: 100%; max-height: none; min-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
 
 @media (max-width: 760px) {
-  .students-summary { grid-template-columns: repeat(3, minmax(140px, 1fr)); overflow-x: auto; padding-bottom: 3px; scroll-snap-type: x proximity; }
+  .students-summary { grid-template-columns: repeat(3, minmax(132px, 1fr)); overflow-x: auto; padding-bottom: 3px; scroll-snap-type: x proximity; }
   .students-summary-card { scroll-snap-align: start; }
   .student-physical-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 620px) {
-  .students-page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 10px; margin-bottom: 16px; }
-  .students-page-header h1 { font-size: 2rem; }
-  .students-page-header p { max-width: 330px; font-size: .9rem; }
-  .students-add-button { min-height: 42px; padding-inline: 12px; font-size: .76rem; }
+  .students-page { width: 100%; padding-inline: 12px; }
+  .students-page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 10px; margin: 10px 0 14px; }
+  .students-page-header h1 { font-size: 1.65rem; }
+  .students-page-header p { max-width: 300px; font-size: .8rem; }
+  .students-add-button { min-height: 40px; padding-inline: 11px; font-size: .73rem; }
   .students-add-button span { margin-right: 2px; }
 
-  .students-summary { margin-inline: -1px; }
-  .students-summary-card { min-width: 150px; padding: 15px; }
-  .students-summary-card strong { font-size: 1.55rem; }
+  .students-summary { gap: 8px; margin-inline: 0; }
+  .students-summary-card { min-width: 138px; padding: 12px 13px; border-radius: 14px; }
+  .students-summary-card strong { font-size: 1.38rem; }
+  .students-summary-card small { font-size: .64rem; }
 
-  .student-list-card { padding: 16px; }
-  .student-list-toolbar { margin-bottom: 13px; }
-  .student-list-toolbar p { font-size: .8rem; }
+  .student-list-card { padding: 12px; border-radius: 16px; }
+  .student-list-toolbar { margin-bottom: 11px; }
+  .student-list-toolbar h2 { font-size: 1rem; }
+  .student-list-toolbar p { font-size: .72rem; }
+  .student-search-wrap input { min-height: 44px; }
 
   .student-modal { place-items: stretch; padding: max(8px, env(safe-area-inset-top)) 0 0; background: #151a1f; backdrop-filter: none; }
   .student-modal-panel { width: 100%; max-height: calc(100dvh - max(8px, env(safe-area-inset-top))); border-right: 0; border-bottom: 0; border-left: 0; border-radius: 18px 18px 0 0; }
@@ -95,6 +99,6 @@ body.embed-edit .student-modal-panel { width: 100%; max-height: none; min-height
 
 @media (max-width: 390px) {
   .students-page-header p { display: none; }
-  .students-add-button { padding-inline: 10px; }
+  .students-add-button { padding-inline: 9px; }
   .student-physical-grid { grid-template-columns: 1fr; }
 }
