@@ -52,6 +52,7 @@ try {
   await import('./treino-aluno-simplificado.js?v=20260725-simple1');
   await import('./treino-aluno-empty-state-guard.js?v=20260725-empty-guard2');
   await import('./treino-aluno-exercicios-avulsos.js?v=20260725-day-exercises2');
+  await import('./treino-modelo-livre.js?v=20260726-modelo-livre1');
   await titlePromise;
 
   revealSimplifiedPage();
