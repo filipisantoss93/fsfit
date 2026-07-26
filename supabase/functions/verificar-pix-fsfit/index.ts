@@ -60,7 +60,7 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
     if (chargeError) return json({ erro: chargeError.message }, 500);
     if (!charge) return json({ erro: "Cobrança não encontrada" }, 404);
-    if (charge.status === "paga" || charge.processada_em) return json({ sucesso: true, cobranca: charge });
+    if (charge.processada_em) return json({ sucesso: true, cobranca: charge });
 
     const { cert, key } = pemParts(decode64(env("EFI_CERT_KEY_PEM_BASE64")));
     const http = Deno.createHttpClient({ cert, key });
@@ -91,7 +91,7 @@ Deno.serve(async (req: Request) => {
             .eq("id", charge.id)
             .eq("personal_id", userData.user.id)
             .maybeSingle();
-          if (!current?.processada_em && current?.status !== "paga") {
+          if (!current?.processada_em) {
             throw new Error("A cobrança foi confirmada na Efí, mas não pôde ser processada no FS Fit");
           }
         }
