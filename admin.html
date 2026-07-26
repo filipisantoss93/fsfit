@@ -57,6 +57,7 @@
       <button class="admin-tab-button active" type="button" role="tab" data-admin-tab="visao-geral" aria-selected="true">Visão geral</button>
       <button class="admin-tab-button" type="button" role="tab" data-admin-tab="clientes" aria-selected="false">Clientes</button>
       <button class="admin-tab-button" type="button" role="tab" data-admin-tab="financeiro" aria-selected="false">Financeiro</button>
+      <button class="admin-tab-button" type="button" role="tab" data-admin-tab="historico-financeiro" aria-selected="false">Histórico financeiro</button>
       <button class="admin-tab-button" type="button" role="tab" data-admin-tab="crescimento" aria-selected="false">Crescimento</button>
     </nav>
 
@@ -190,6 +191,35 @@
       </section>
     </div>
 
+    <div class="admin-tab-panel" data-admin-tab-panel="historico-financeiro" role="tabpanel" hidden>
+      <section class="card admin-section-card admin-financial-history-section">
+        <div class="section-heading admin-financial-history-heading">
+          <div><small>AUDITORIA IMUTÁVEL</small><h2>Histórico Financeiro</h2></div>
+          <div class="admin-financial-history-actions">
+            <button id="admin-financial-history-csv" class="btn btn-outline" type="button">Exportar CSV</button>
+            <button id="admin-financial-history-pdf" class="btn btn-secondary" type="button">Exportar PDF</button>
+          </div>
+        </div>
+        <p class="admin-financial-history-intro">Acompanhe cada criação, alteração, pagamento ou cancelamento registrado automaticamente nas mensalidades.</p>
+        <div id="admin-financial-history-message" class="message"></div>
+        <div class="admin-financial-history-filters">
+          <div class="form-group admin-financial-history-search"><label for="admin-financial-history-search">Pesquisar</label><input id="admin-financial-history-search" placeholder="Aluno, personal, usuário, ação ou competência"></div>
+          <div class="form-group"><label for="admin-financial-history-start">De</label><input id="admin-financial-history-start" type="date"></div>
+          <div class="form-group"><label for="admin-financial-history-end">Até</label><input id="admin-financial-history-end" type="date"></div>
+          <div class="form-group"><label for="admin-financial-history-student">Aluno</label><select id="admin-financial-history-student"><option value="">Todos os alunos</option></select></div>
+          <div class="form-group"><label for="admin-financial-history-trainer">Personal</label><select id="admin-financial-history-trainer"><option value="">Todos os personais</option></select></div>
+          <div class="form-group"><label for="admin-financial-history-action">Tipo da ação</label><select id="admin-financial-history-action"><option value="">Todas as ações</option><option value="criacao">Criação</option><option value="alteracao">Alteração</option><option value="pagamento_informado">Pagamento informado</option><option value="pagamento_confirmado">Pagamento confirmado</option><option value="cancelamento">Cancelamento</option></select></div>
+          <div class="form-group"><label for="admin-financial-history-actor">Usuário executor</label><select id="admin-financial-history-actor"><option value="">Todos os usuários</option></select></div>
+        </div>
+        <div id="admin-financial-history-list" class="admin-financial-history-timeline"><div class="admin-financial-history-empty">Abra esta aba para carregar o histórico.</div></div>
+        <div class="admin-pagination admin-financial-history-pagination">
+          <button id="admin-financial-history-prev" class="btn btn-outline" type="button">Anterior</button>
+          <span id="admin-financial-history-page-info">Página 1 de 1</span>
+          <button id="admin-financial-history-next" class="btn btn-outline" type="button">Próxima</button>
+        </div>
+      </section>
+    </div>
+
     <div class="admin-tab-panel" data-admin-tab-panel="crescimento" role="tabpanel" hidden>
       <section class="card admin-section-card admin-funnel-section">
         <div class="section-heading"><div><small>COMERCIAL</small><h2>Funil de aquisição e conversão</h2></div></div>
@@ -245,5 +275,6 @@
   <script type="module" src="js/admin-funnel.js?v=20260719-admin-funnel1"></script>
   <script type="module" src="js/admin-retention.js?v=20260719-admin-retention1"></script>
   <script type="module" src="js/admin-crm.js?v=20260719-admin-crm1"></script>
+  <script type="module" src="js/admin-financial-history.js?v=20260726-financial-history1"></script>
 </body>
 </html>
