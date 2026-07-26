@@ -143,3 +143,40 @@ if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_EXERCISE_CATEGO
       .catch(error => console.warn('Categorias do seletor de exercícios indisponíveis:', error));
   });
 }
+
+// O portal do aluno usa somente o token temporário de aluno_sessoes.
+// Esta camada mantém compatibilidade com módulos antigos sem devolver access_token persistente ao navegador.
+if (!globalThis.__FSFIT_STUDENT_SESSION_RPC_ADAPTER__) {
+  globalThis.__FSFIT_STUDENT_SESSION_RPC_ADAPTER__ = true;
+  const originalRpc = supabase.rpc.bind(supabase);
+  const studentRpcMap = {
+    get_aluno_portal: ['get_aluno_portal_sessao', {}],
+    get_aluno_sessao_treino: ['get_aluno_sessao_treino_sessao', {}],
+    get_aluno_chat_sessao: ['get_aluno_chat_sessao_token', {}],
+    iniciar_aluno_sessao_treino: ['iniciar_aluno_sessao_treino_token', {}],
+    cancelar_checkin_aluno_sessao: ['cancelar_checkin_aluno_sessao_token', {}],
+    finalizar_aluno_sessao_treino: ['finalizar_aluno_sessao_treino_token', {}],
+    marcar_aluno_exercicio_sessao: ['marcar_aluno_exercicio_sessao_token', {}],
+    enviar_aluno_mensagem_sessao: ['enviar_aluno_mensagem_sessao_token', {}]
+  };
+
+  supabase.rpc = async (name, params = {}, options) => {
+    if (name === 'get_aluno_portal_token') {
+      const sessionToken = params?.p_session_token;
+      const result = await originalRpc('fsfit_validar_sessao_aluno', { p_session_token: sessionToken }, options);
+      return result.error || result.data !== true
+        ? { ...result, data: null }
+        : { ...result, data: sessionToken };
+    }
+
+    const mapped = studentRpcMap[name];
+    if (!mapped || !Object.prototype.hasOwnProperty.call(params || {}, 'p_access_token')) {
+      return originalRpc(name, params, options);
+    }
+
+    const [safeName] = mapped;
+    const safeParams = { ...params, p_session_token: params.p_access_token };
+    delete safeParams.p_access_token;
+    return originalRpc(safeName, safeParams, options);
+  };
+}
