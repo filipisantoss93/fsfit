@@ -76,7 +76,7 @@ function canRunManually(data = {}) {
   return data.estado === 'atrasado' || data.estado === 'erro';
 }
 
-function render(data = {}, feedback = '') {
+function render(data = {}, feedback = '', feedbackType = 'success') {
   const card = ensureCard();
   if (!card) return;
   currentStatus = data;
@@ -87,6 +87,7 @@ function render(data = {}, feedback = '') {
   const cron = data.cron || {};
   const error = execution.erro || (cron.status && cron.status !== 'succeeded' ? cron.mensagem : '');
   const showManualAction = canRunManually(data);
+  const feedbackClass = feedbackType === 'error' ? 'admin-cron-error' : 'admin-cron-success';
 
   card.innerHTML = `
     <div class="admin-cron-monitor-head">
@@ -100,11 +101,11 @@ function render(data = {}, feedback = '') {
       <div><small>COBRANÇAS CRIADAS</small><strong>${Number(execution.cobrancas_criadas || 0)}</strong></div>
     </div>
     ${error ? `<p class="admin-cron-error"><strong>Detalhe:</strong> ${esc(error)}</p>` : ''}
-    ${feedback ? `<p class="admin-cron-success">${esc(feedback)}</p>` : ''}
+    ${feedback ? `<p class="${feedbackClass}">${esc(feedback)}</p>` : ''}
     ${showManualAction ? `<div class="admin-cron-actions"><button class="btn btn-primary" type="button" data-run-monthly-generation ${runningManually ? 'disabled' : ''}>${runningManually ? 'Executando...' : 'Executar geração agora'}</button></div>` : ''}`;
 }
 
-async function loadCronStatus(feedback = '') {
+async function loadCronStatus(feedback = '', feedbackType = 'success') {
   const card = ensureCard();
   if (!card) return;
   const { data, error } = await supabase.rpc('fsfit_admin_status_geracao_mensalidades');
@@ -113,7 +114,7 @@ async function loadCronStatus(feedback = '') {
     render({ estado: 'erro', mensagem: 'Não foi possível consultar o monitoramento da geração mensal.', execucao: { erro: error.message } });
     return;
   }
-  render(data || {}, feedback);
+  render(data || {}, feedback, feedbackType);
 }
 
 async function runGenerationNow(button) {
@@ -129,6 +130,12 @@ async function runGenerationNow(button) {
   try {
     const { data, error } = await supabase.rpc('fsfit_admin_executar_geracao_mensalidades_agora');
     if (error) throw error;
+
+    if (data?.success === false) {
+      await loadCronStatus(data.erro || 'A geração foi interrompida e a falha ficou registrada.', 'error');
+      return;
+    }
+
     const created = Number(data?.cobrancas_criadas || 0);
     const message = created === 1
       ? 'Execução manual concluída. 1 cobrança foi criada.'
@@ -136,9 +143,7 @@ async function runGenerationNow(button) {
     await loadCronStatus(message);
   } catch (error) {
     console.error('Erro ao executar geração manual:', error);
-    render(currentStatus || { estado: 'erro' });
-    const card = ensureCard();
-    card?.insertAdjacentHTML('beforeend', `<p class="admin-cron-error"><strong>Não foi possível executar:</strong> ${esc(error.message || 'Erro desconhecido.')}</p>`);
+    await loadCronStatus(error.message || 'Não foi possível executar a geração manual.', 'error');
   } finally {
     runningManually = false;
   }
