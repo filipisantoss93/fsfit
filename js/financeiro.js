@@ -30,6 +30,7 @@ let payments = [];
 let profile = null;
 let selectedStudentId = null;
 let studentStatusFilter = 'all';
+let cancelPaymentButton = null;
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -62,8 +63,7 @@ function formatDate(value) {
 function formatDateTime(value) {
   if (!value) return '—';
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleString('pt-BR');
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('pt-BR');
 }
 
 function formatCompetence(value) {
@@ -83,20 +83,30 @@ function currentCompetence() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 }
 
-function dueDateForDay(day, competence = currentCompetence()) {
-  const [year, month] = competence.split('-').map(Number);
+function dueDateForDay(day) {
+  const [year, month] = currentCompetence().split('-').map(Number);
   const lastDay = new Date(year, month, 0).getDate();
-  const safeDay = Math.min(Math.max(Number(day || 1), 1), lastDay);
-  return `${year}-${String(month).padStart(2, '0')}-${String(safeDay).padStart(2, '0')}`;
+  return `${year}-${String(month).padStart(2, '0')}-${String(Math.min(Math.max(Number(day || 1), 1), lastDay)).padStart(2, '0')}`;
 }
 
-function paymentForStudent(studentId, competence = currentCompetence()) {
-  return payments.find(item => item.aluno_id === studentId && item.competencia === competence) || null;
+function paymentForStudent(studentId) {
+  return payments.find(item => item.aluno_id === studentId && item.competencia === currentCompetence()) || null;
+}
+
+function statusInfo(payment, student) {
+  if (!student.mensalidade_ativa || !student.mensalidade_valor || !student.mensalidade_dia_vencimento) {
+    return { key: 'not-configured', label: 'Não configurada', className: '' };
+  }
+  if (!payment) return { key: 'pending', label: 'Pendente', className: '' };
+  if (payment.status === 'cancelada') return { key: 'cancelled', label: 'Cancelada', className: '' };
+  if (payment.status === 'pago') return { key: 'paid', label: 'Pago', className: 'paid' };
+  if (payment.status === 'informado') return { key: 'waiting', label: 'Aguardando confirmação', className: 'waiting' };
+  if (payment.vencimento < todayIso()) return { key: 'overdue', label: 'Atrasado', className: 'overdue' };
+  return { key: 'pending', label: 'Pendente', className: '' };
 }
 
 function ensureStudentStatusFilter() {
   if (!studentsToolbar || document.querySelector('#finance-students-status-nav')) return;
-
   const nav = document.createElement('nav');
   nav.id = 'finance-students-status-nav';
   nav.className = 'finance-status-filter-nav';
@@ -109,51 +119,6 @@ function ensureStudentStatusFilter() {
     <button class="finance-status-filter-pill" type="button" data-finance-status-filter="waiting" aria-pressed="false">Aguardando confirmação</button>
     <button class="finance-status-filter-pill" type="button" data-finance-status-filter="not-configured" aria-pressed="false">Não configurada</button>`;
   studentsToolbar.insertAdjacentElement('afterend', nav);
-
-  if (!document.querySelector('#finance-students-status-filter-style')) {
-    const style = document.createElement('style');
-    style.id = 'finance-students-status-filter-style';
-    style.textContent = `
-      .finance-status-filter-nav {
-        display:flex;
-        align-items:center;
-        gap:8px;
-        width:100%;
-        max-width:100%;
-        margin:-6px 0 16px;
-        padding:2px 0 8px;
-        overflow-x:auto;
-        overflow-y:hidden;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:thin;
-        overscroll-behavior-inline:contain;
-      }
-      .finance-status-filter-pill {
-        flex:0 0 auto;
-        min-height:38px;
-        padding:8px 14px;
-        border:1px solid var(--border);
-        border-radius:999px;
-        background:var(--surface-light);
-        color:var(--muted);
-        font:inherit;
-        font-size:.82rem;
-        font-weight:800;
-        white-space:nowrap;
-        cursor:pointer;
-      }
-      .finance-status-filter-pill.active {
-        border-color:var(--primary);
-        color:var(--primary);
-        background:rgba(50,215,75,.08);
-      }
-      @media (max-width:680px) {
-        .finance-status-filter-nav { margin-bottom:12px; }
-        .finance-status-filter-pill { min-height:36px; padding:7px 12px; font-size:.78rem; }
-      }`;
-    document.head.appendChild(style);
-  }
-
   nav.addEventListener('click', event => {
     const button = event.target.closest('[data-finance-status-filter]');
     if (!button) return;
@@ -167,114 +132,61 @@ function ensureStudentStatusFilter() {
   });
 }
 
-function statusInfo(payment, student) {
-  if (!student.mensalidade_ativa || !student.mensalidade_valor || !student.mensalidade_dia_vencimento) {
-    return { key: 'not-configured', label: 'Não configurada', className: '' };
-  }
-  if (!payment) return { key: 'pending', label: 'Pendente', className: '' };
-  if (payment.status === 'pago') return { key: 'paid', label: 'Pago', className: 'paid' };
-  if (payment.status === 'informado') return { key: 'waiting', label: 'Aguardando confirmação', className: 'waiting' };
-  if (payment.vencimento < todayIso()) return { key: 'overdue', label: 'Atrasado', className: 'overdue' };
-  return { key: 'pending', label: 'Pendente', className: '' };
-}
-
 async function fetchPayments() {
   const { data, error } = await supabase
     .from('mensalidades_alunos')
-    .select('id,personal_id,aluno_id,competencia,vencimento,valor,status,informado_em,confirmado_em,created_at,updated_at')
+    .select('id,aluno_id,competencia,vencimento,valor,status,informado_em,confirmado_em,updated_at')
     .eq('personal_id', session.user.id)
     .order('vencimento', { ascending: false });
   if (error) throw error;
   payments = data || [];
 }
 
-async function ensureCurrentCharges() {
-  const competence = currentCompetence();
-  const currentIds = new Set(payments.filter(item => item.competencia === competence).map(item => item.aluno_id));
-  const rows = students
-    .filter(student => student.mensalidade_ativa && Number(student.mensalidade_valor) > 0 && Number(student.mensalidade_dia_vencimento) > 0)
-    .filter(student => !currentIds.has(student.id))
-    .map(student => ({
-      personal_id: session.user.id,
-      aluno_id: student.id,
-      competencia: competence,
-      vencimento: dueDateForDay(student.mensalidade_dia_vencimento, competence),
-      valor: Number(student.mensalidade_valor),
-      status: 'pendente'
-    }));
-
-  if (!rows.length) return;
-
-  const { error } = await supabase
-    .from('mensalidades_alunos')
-    .upsert(rows, { onConflict: 'aluno_id,competencia', ignoreDuplicates: true });
+async function generateCurrentCharges() {
+  const { error } = await supabase.rpc('fsfit_gerar_mensalidades_mes', { p_competencia: currentCompetence() });
   if (error) throw error;
   await fetchPayments();
 }
 
 function renderSummary() {
-  const competence = currentCompetence();
-  const monthPayments = payments.filter(item => item.competencia === competence);
+  const monthPayments = payments.filter(item => item.competencia === currentCompetence() && item.status !== 'cancelada');
+  const received = monthPayments.filter(item => item.status === 'pago');
+  const waiting = monthPayments.filter(item => item.status === 'informado');
+  const overdue = payments.filter(item => item.status === 'pendente' && item.vencimento < todayIso());
   const expected = monthPayments.reduce((sum, item) => sum + Number(item.valor || 0), 0);
-  const receivedRows = monthPayments.filter(item => item.status === 'pago');
-  const waitingRows = monthPayments.filter(item => item.status === 'informado');
-  const overdueRows = payments.filter(item => item.status === 'pendente' && item.vencimento < todayIso());
 
   document.querySelector('#summary-expected').textContent = formatCurrency(expected);
   document.querySelector('#summary-expected-count').textContent = `${monthPayments.length} ${monthPayments.length === 1 ? 'mensalidade' : 'mensalidades'}`;
-  document.querySelector('#summary-received').textContent = formatCurrency(receivedRows.reduce((sum, item) => sum + Number(item.valor || 0), 0));
-  document.querySelector('#summary-received-count').textContent = `${receivedRows.length} ${receivedRows.length === 1 ? 'confirmada' : 'confirmadas'}`;
-  document.querySelector('#summary-waiting').textContent = formatCurrency(waitingRows.reduce((sum, item) => sum + Number(item.valor || 0), 0));
-  document.querySelector('#summary-waiting-count').textContent = `${waitingRows.length} ${waitingRows.length === 1 ? 'pagamento informado' : 'pagamentos informados'}`;
-  document.querySelector('#summary-overdue').textContent = formatCurrency(overdueRows.reduce((sum, item) => sum + Number(item.valor || 0), 0));
-  document.querySelector('#summary-overdue-count').textContent = `${overdueRows.length} ${overdueRows.length === 1 ? 'mensalidade' : 'mensalidades'}`;
+  document.querySelector('#summary-received').textContent = formatCurrency(received.reduce((sum, item) => sum + Number(item.valor || 0), 0));
+  document.querySelector('#summary-received-count').textContent = `${received.length} ${received.length === 1 ? 'confirmada' : 'confirmadas'}`;
+  document.querySelector('#summary-waiting').textContent = formatCurrency(waiting.reduce((sum, item) => sum + Number(item.valor || 0), 0));
+  document.querySelector('#summary-waiting-count').textContent = `${waiting.length} ${waiting.length === 1 ? 'pagamento informado' : 'pagamentos informados'}`;
+  document.querySelector('#summary-overdue').textContent = formatCurrency(overdue.reduce((sum, item) => sum + Number(item.valor || 0), 0));
+  document.querySelector('#summary-overdue-count').textContent = `${overdue.length} ${overdue.length === 1 ? 'mensalidade' : 'mensalidades'}`;
 }
 
 function renderConfirmations() {
-  const waiting = payments
-    .filter(item => item.status === 'informado')
+  const waiting = payments.filter(item => item.status === 'informado')
     .sort((a, b) => new Date(a.informado_em || a.updated_at) - new Date(b.informado_em || b.updated_at));
   const studentMap = new Map(students.map(student => [student.id, student]));
-
   confirmationsCount.textContent = String(waiting.length);
   confirmationsCard.classList.toggle('hidden', waiting.length === 0);
-  confirmationsList.innerHTML = waiting.map(item => {
-    const student = studentMap.get(item.aluno_id);
-    return `<article class="finance-confirmation-item">
-      <div class="finance-confirmation-main">
-        <strong>${esc(student?.nome || 'Aluno')}</strong>
-        <span>Vencimento ${esc(formatDate(item.vencimento))} · informou o pagamento ${item.informado_em ? `em ${esc(new Date(item.informado_em).toLocaleString('pt-BR'))}` : ''}</span>
-      </div>
+  confirmationsList.innerHTML = waiting.map(item => `
+    <article class="finance-confirmation-item">
+      <div class="finance-confirmation-main"><strong>${esc(studentMap.get(item.aluno_id)?.nome || 'Aluno')}</strong><span>Vencimento ${esc(formatDate(item.vencimento))}${item.informado_em ? ` · informado em ${esc(formatDateTime(item.informado_em))}` : ''}</span></div>
       <span class="finance-confirmation-value">${esc(formatCurrency(item.valor))}</span>
       <button class="btn btn-primary" type="button" data-confirm-payment="${esc(item.id)}">Confirmar pagamento</button>
-    </article>`;
-  }).join('');
+    </article>`).join('');
 }
 
 function renderStudents() {
-  if (!students.length) {
-    studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Nenhum aluno ativo cadastrado.</td></tr>';
-    return;
-  }
-
-  const filteredStudents = studentStatusFilter === 'all'
+  const visible = studentStatusFilter === 'all'
     ? students
     : students.filter(student => statusInfo(paymentForStudent(student.id), student).key === studentStatusFilter);
-
-  if (!filteredStudents.length) {
-    studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Nenhum aluno encontrado com este status.</td></tr>';
-    return;
-  }
-
-  studentsList.innerHTML = filteredStudents.map(student => {
-    const payment = paymentForStudent(student.id);
-    const status = statusInfo(payment, student);
-
-    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" data-finance-status="${esc(status.key)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}">
-      <td><div class="finance-student-name"><strong>${esc(student.nome)}</strong></div></td>
-      <td><div class="finance-student-status-cell"><span class="finance-status ${status.className}">${esc(status.label)}</span><span class="finance-student-open" aria-hidden="true">›</span></div></td>
-    </tr>`;
-  }).join('');
+  studentsList.innerHTML = visible.length ? visible.map(student => {
+    const status = statusInfo(paymentForStudent(student.id), student);
+    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}"><td><div class="finance-student-name"><strong>${esc(student.nome)}</strong></div></td><td><div class="finance-student-status-cell"><span class="finance-status ${status.className}">${esc(status.label)}</span><span class="finance-student-open" aria-hidden="true">›</span></div></td></tr>`;
+  }).join('') : '<tr><td colspan="2" class="finance-empty">Nenhum aluno encontrado com este status.</td></tr>';
 }
 
 function fillPixForm() {
@@ -285,140 +197,144 @@ function fillPixForm() {
   pixForm.pix_cidade.value = profile.pix_cidade || '';
 }
 
-function openStudentModal(studentId) {
-  if (!studentModal) return;
-  const student = students.find(item => item.id === studentId);
-  if (!student) return;
+function ensureCancelButton() {
+  if (cancelPaymentButton || !studentModal) return;
+  cancelPaymentButton = document.createElement('button');
+  cancelPaymentButton.type = 'button';
+  cancelPaymentButton.className = 'btn btn-danger hidden';
+  cancelPaymentButton.textContent = 'Cancelar mensalidade';
+  studentModal.querySelector('.finance-modal-actions')?.insertBefore(cancelPaymentButton, studentModalMarkPaid);
+  cancelPaymentButton.addEventListener('click', cancelSelectedPayment);
+}
 
+function openStudentModal(studentId) {
+  const student = students.find(item => item.id === studentId);
+  if (!student || !studentModal) return;
+  ensureCancelButton();
   selectedStudentId = studentId;
   const payment = paymentForStudent(studentId);
   const status = statusInfo(payment, student);
-
   studentModalTitle.textContent = student.nome;
   studentModalStatus.textContent = status.label;
   studentModalStatus.className = `finance-status ${status.className}`;
   studentModalValue.value = student.mensalidade_valor != null ? Number(student.mensalidade_valor).toFixed(2) : '';
   studentModalDay.value = student.mensalidade_dia_vencimento || '';
   studentModalActive.checked = Boolean(student.mensalidade_ativa);
-  studentModalCompetence.textContent = payment ? formatCompetence(payment.competencia) : formatCompetence(currentCompetence());
+  studentModalCompetence.textContent = formatCompetence(payment?.competencia || currentCompetence());
   studentModalDueDate.textContent = payment ? formatDate(payment.vencimento) : (student.mensalidade_dia_vencimento ? formatDate(dueDateForDay(student.mensalidade_dia_vencimento)) : '—');
   studentModalChargeValue.textContent = payment ? formatCurrency(payment.valor) : (student.mensalidade_valor ? formatCurrency(student.mensalidade_valor) : '—');
-  studentModalReportedAt.textContent = payment ? formatDateTime(payment.informado_em) : '—';
-  studentModalConfirmedAt.textContent = payment ? formatDateTime(payment.confirmado_em) : '—';
+  studentModalReportedAt.textContent = formatDateTime(payment?.informado_em);
+  studentModalConfirmedAt.textContent = formatDateTime(payment?.confirmado_em);
 
-  if (payment && payment.status !== 'pago') {
-    studentModalMarkPaid.classList.remove('hidden');
+  const actionable = payment && ['pendente', 'informado'].includes(payment.status);
+  studentModalMarkPaid.classList.toggle('hidden', !actionable);
+  cancelPaymentButton?.classList.toggle('hidden', !actionable);
+  if (actionable) {
     studentModalMarkPaid.dataset.paymentId = payment.id;
+    cancelPaymentButton.dataset.paymentId = payment.id;
     studentModalMarkPaid.textContent = payment.status === 'informado' ? 'Confirmar pagamento' : 'Marcar como pago';
   } else {
-    studentModalMarkPaid.classList.add('hidden');
     studentModalMarkPaid.removeAttribute('data-payment-id');
+    cancelPaymentButton?.removeAttribute('data-payment-id');
   }
-
   studentModal.classList.remove('hidden');
   document.body.classList.add('finance-modal-open');
-  requestAnimationFrame(() => document.querySelector('[data-close-finance-modal]')?.focus());
 }
 
 function closeStudentModal() {
-  if (!studentModal) return;
-  studentModal.classList.add('hidden');
+  studentModal?.classList.add('hidden');
   document.body.classList.remove('finance-modal-open');
   selectedStudentId = null;
 }
 
-async function saveStudentConfig(studentId, value, day, active, button) {
-  if (active && (!(value > 0) || day < 1 || day > 31)) {
-    show('Para ativar a mensalidade, informe um valor maior que zero e um dia de vencimento entre 1 e 31.', 'error');
-    return;
-  }
+async function refreshFinancialUi() {
+  await fetchPayments();
+  renderSummary();
+  renderConfirmations();
+  renderStudents();
+  if (selectedStudentId) openStudentModal(selectedStudentId);
+}
 
-  button.disabled = true;
+async function saveStudentConfig() {
+  if (!selectedStudentId) return;
+  const value = Number(studentModalValue.value || 0);
+  const day = Number(studentModalDay.value || 0);
+  const active = Boolean(studentModalActive.checked);
+  if (active && (!(value > 0) || day < 1 || day > 31)) return show('Informe um valor maior que zero e um dia entre 1 e 31.', 'error');
+
+  studentModalSave.disabled = true;
   try {
-    const { error } = await supabase
-      .from('alunos')
-      .update({
-        mensalidade_valor: value > 0 ? value : null,
-        mensalidade_dia_vencimento: day >= 1 && day <= 31 ? day : null,
-        mensalidade_ativa: active,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', studentId);
+    const { error } = await supabase.rpc('fsfit_configurar_mensalidade_aluno', {
+      p_aluno_id: selectedStudentId,
+      p_valor: value > 0 ? value : null,
+      p_dia_vencimento: day >= 1 && day <= 31 ? day : null,
+      p_ativa: active
+    });
     if (error) throw error;
-
-    const student = students.find(item => item.id === studentId);
+    const student = students.find(item => item.id === selectedStudentId);
     if (student) {
-      student.mensalidade_valor = value > 0 ? value : null;
-      student.mensalidade_dia_vencimento = day >= 1 && day <= 31 ? day : null;
+      student.mensalidade_valor = active ? value : null;
+      student.mensalidade_dia_vencimento = active ? day : null;
       student.mensalidade_ativa = active;
     }
-
-    if (active) {
-      const existing = paymentForStudent(studentId);
-      const payload = {
-        valor: value,
-        vencimento: dueDateForDay(day),
-        updated_at: new Date().toISOString()
-      };
-
-      if (!existing) {
-        const { error: insertError } = await supabase.from('mensalidades_alunos').insert({
-          personal_id: session.user.id,
-          aluno_id: studentId,
-          competencia: currentCompetence(),
-          vencimento: payload.vencimento,
-          valor: payload.valor,
-          status: 'pendente'
-        });
-        if (insertError) throw insertError;
-      } else if (existing.status === 'pendente') {
-        const { error: updateError } = await supabase
-          .from('mensalidades_alunos')
-          .update(payload)
-          .eq('id', existing.id);
-        if (updateError) throw updateError;
-      }
-    }
-
-    await fetchPayments();
-    renderSummary();
-    renderConfirmations();
-    renderStudents();
-    openStudentModal(studentId);
-    show('Mensalidade do aluno atualizada.');
+    await refreshFinancialUi();
+    show(active ? 'Mensalidade atualizada com segurança.' : 'Mensalidade desativada. Cobranças pendentes foram canceladas.');
   } catch (error) {
     console.error(error);
-    show('Não foi possível atualizar a mensalidade deste aluno.', 'error');
+    show(error.message || 'Não foi possível atualizar a mensalidade.', 'error');
+  } finally {
+    studentModalSave.disabled = false;
+  }
+}
+
+async function confirmPayment(paymentId, button) {
+  if (!paymentId) return;
+  button.disabled = true;
+  try {
+    const { error } = await supabase.rpc('fsfit_confirmar_pagamento_mensalidade', { p_mensalidade_id: paymentId });
+    if (error) throw error;
+    await refreshFinancialUi();
+    show('Pagamento confirmado com sucesso.');
+  } catch (error) {
+    console.error(error);
+    show(error.message || 'Não foi possível confirmar o pagamento.', 'error');
   } finally {
     button.disabled = false;
+  }
+}
+
+async function cancelSelectedPayment() {
+  const paymentId = cancelPaymentButton?.dataset.paymentId;
+  const payment = payments.find(item => item.id === paymentId);
+  if (!paymentId || !payment) return;
+  if (!confirm(`Cancelar esta mensalidade de ${formatCurrency(payment.valor)}? O histórico será preservado.`)) return;
+  cancelPaymentButton.disabled = true;
+  try {
+    const { error } = await supabase.rpc('fsfit_cancelar_mensalidade', { p_mensalidade_id: paymentId });
+    if (error) throw error;
+    await refreshFinancialUi();
+    show('Mensalidade cancelada. O histórico foi preservado.');
+  } catch (error) {
+    console.error(error);
+    show(error.message || 'Não foi possível cancelar a mensalidade.', 'error');
+  } finally {
+    cancelPaymentButton.disabled = false;
   }
 }
 
 async function load() {
   if (!session) return;
   await setGreeting(session);
-
   const [profileResult, studentsResult] = await Promise.all([
-    supabase
-      .from('perfis')
-      .select('id,nome,pix_tipo,pix_chave,pix_nome_recebedor,pix_cidade')
-      .eq('id', session.user.id)
-      .single(),
-    supabase
-      .from('alunos')
-      .select('id,nome,status,mensalidade_valor,mensalidade_dia_vencimento,mensalidade_ativa')
-      .eq('status', 'ativo')
-      .order('nome', { ascending: true })
+    supabase.from('perfis').select('id,nome,pix_tipo,pix_chave,pix_nome_recebedor,pix_cidade').eq('id', session.user.id).single(),
+    supabase.from('alunos').select('id,nome,status,mensalidade_valor,mensalidade_dia_vencimento,mensalidade_ativa').eq('status', 'ativo').order('nome')
   ]);
-
   if (profileResult.error) throw profileResult.error;
   if (studentsResult.error) throw studentsResult.error;
-
   profile = profileResult.data;
   students = studentsResult.data || [];
   await fetchPayments();
-  await ensureCurrentCharges();
-
+  await generateCurrentCharges();
   fillPixForm();
   renderSummary();
   renderConfirmations();
@@ -426,39 +342,26 @@ async function load() {
 }
 
 ensureStudentStatusFilter();
+ensureCancelButton();
 
 pixForm?.addEventListener('submit', async event => {
   event.preventDefault();
   const button = document.querySelector('#save-pix-button');
-  const pixTipo = String(pixForm.pix_tipo.value || '').trim();
-  const pixChave = String(pixForm.pix_chave.value || '').trim();
-  const pixNome = String(pixForm.pix_nome_recebedor.value || '').trim();
-  const pixCidade = String(pixForm.pix_cidade.value || '').trim();
-
-  if (pixChave && (!pixTipo || !pixNome || !pixCidade)) {
-    show('Para gerar o QR Code Pix, informe tipo da chave, chave, nome do recebedor e cidade.', 'error');
-    return;
-  }
-
+  const payload = {
+    pix_tipo: String(pixForm.pix_tipo.value || '').trim() || null,
+    pix_chave: String(pixForm.pix_chave.value || '').trim() || null,
+    pix_nome_recebedor: String(pixForm.pix_nome_recebedor.value || '').trim() || null,
+    pix_cidade: String(pixForm.pix_cidade.value || '').trim() || null
+  };
+  if (payload.pix_chave && (!payload.pix_tipo || !payload.pix_nome_recebedor || !payload.pix_cidade)) return show('Preencha todos os dados do Pix.', 'error');
   button.disabled = true;
   try {
-    const { error } = await supabase
-      .from('perfis')
-      .update({
-        pix_tipo: pixTipo || null,
-        pix_chave: pixChave || null,
-        pix_nome_recebedor: pixNome || null,
-        pix_cidade: pixCidade || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', session.user.id);
+    const { error } = await supabase.from('perfis').update(payload).eq('id', session.user.id);
     if (error) throw error;
-
-    profile = { ...profile, pix_tipo: pixTipo, pix_chave: pixChave, pix_nome_recebedor: pixNome, pix_cidade: pixCidade };
-    show(pixChave ? 'Configuração Pix salva. Seus alunos já poderão gerar o QR Code e o Pix Copia e Cola.' : 'Configuração Pix removida.');
+    profile = { ...profile, ...payload };
+    show(payload.pix_chave ? 'Configuração Pix salva.' : 'Configuração Pix removida.');
   } catch (error) {
-    console.error(error);
-    show('Não foi possível salvar a configuração Pix.', 'error');
+    show(error.message || 'Não foi possível salvar o Pix.', 'error');
   } finally {
     button.disabled = false;
   }
@@ -466,73 +369,30 @@ pixForm?.addEventListener('submit', async event => {
 
 studentsList?.addEventListener('click', event => {
   const row = event.target.closest('[data-student-row]');
-  if (!row) return;
-  openStudentModal(row.dataset.studentRow);
+  if (row) openStudentModal(row.dataset.studentRow);
 });
-
 studentsList?.addEventListener('keydown', event => {
-  if (event.key !== 'Enter' && event.key !== ' ') return;
+  if (!['Enter', ' '].includes(event.key)) return;
   const row = event.target.closest('[data-student-row]');
   if (!row) return;
   event.preventDefault();
   openStudentModal(row.dataset.studentRow);
 });
-
 studentModal?.addEventListener('click', event => {
   if (event.target.closest('[data-close-finance-modal]')) closeStudentModal();
 });
-
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !studentModal?.classList.contains('hidden')) closeStudentModal();
 });
-
-studentModalSave?.addEventListener('click', async () => {
-  if (!selectedStudentId) return;
-  const value = Number(studentModalValue.value || 0);
-  const day = Number(studentModalDay.value || 0);
-  const active = Boolean(studentModalActive.checked);
-  await saveStudentConfig(selectedStudentId, value, day, active, studentModalSave);
-});
-
-studentModalMarkPaid?.addEventListener('click', async () => {
-  const paymentId = studentModalMarkPaid.dataset.paymentId;
-  if (!paymentId) return;
-  await confirmPayment(paymentId, studentModalMarkPaid);
-});
-
-confirmationsList?.addEventListener('click', async event => {
+studentModalSave?.addEventListener('click', saveStudentConfig);
+studentModalMarkPaid?.addEventListener('click', () => confirmPayment(studentModalMarkPaid.dataset.paymentId, studentModalMarkPaid));
+confirmationsList?.addEventListener('click', event => {
   const button = event.target.closest('[data-confirm-payment]');
-  if (!button) return;
-  await confirmPayment(button.dataset.confirmPayment, button);
+  if (button) void confirmPayment(button.dataset.confirmPayment, button);
 });
-
-async function confirmPayment(paymentId, button) {
-  button.disabled = true;
-  try {
-    const now = new Date().toISOString();
-    const { error } = await supabase
-      .from('mensalidades_alunos')
-      .update({ status: 'pago', confirmado_em: now, updated_at: now })
-      .eq('id', paymentId)
-      .eq('personal_id', session.user.id);
-    if (error) throw error;
-
-    await fetchPayments();
-    renderSummary();
-    renderConfirmations();
-    renderStudents();
-    if (selectedStudentId) openStudentModal(selectedStudentId);
-    show('Pagamento confirmado com sucesso.');
-  } catch (error) {
-    console.error(error);
-    show('Não foi possível confirmar o pagamento.', 'error');
-  } finally {
-    button.disabled = false;
-  }
-}
 
 load().catch(error => {
   console.error('Erro ao carregar financeiro:', error);
   show('Não foi possível carregar o Financeiro. Atualize a página e tente novamente.', 'error');
-  studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Não foi possível carregar os dados financeiros.</td></tr>';
+  if (studentsList) studentsList.innerHTML = '<tr><td colspan="2" class="finance-empty">Não foi possível carregar os dados financeiros.</td></tr>';
 });
