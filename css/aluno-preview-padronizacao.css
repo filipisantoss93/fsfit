@@ -1,0 +1,35 @@
+.student-page{min-height:100dvh;background:var(--background,#0f1115)}
+.student-page .student-shell{width:min(760px,100%);margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 14px calc(92px + env(safe-area-inset-bottom))}
+.student-page .student-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:4px 2px}
+.student-page .student-header .auth-logo{flex:none}
+.student-page .student-header p{margin:0;color:var(--muted);font-size:.78rem;font-weight:700;text-align:right}
+.student-preview-banner{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:12px 13px;border:1px solid rgba(255,196,0,.3);border-radius:15px;background:rgba(28,25,16,.96);box-shadow:0 12px 28px rgba(0,0,0,.24);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.student-preview-banner div{min-width:0}
+.student-preview-banner strong,.student-preview-banner span{display:block}
+.student-preview-banner strong{color:var(--warning,#ffd60a);font-size:.68rem;letter-spacing:.08em}
+.student-preview-banner span{margin-top:3px;color:var(--muted);font-size:.76rem;line-height:1.35}
+.student-preview-banner .btn{flex:none;min-height:36px;padding:6px 11px;font-size:.74rem}
+.student-page .student-state{display:grid;place-items:center;min-height:160px;text-align:center}
+.student-profile-summary{display:grid;grid-template-columns:54px minmax(0,1fr);gap:12px;align-items:center;margin:0 0 12px;padding:14px;border:1px solid var(--border);border-radius:18px;background:var(--surface)}
+.student-profile-summary:before{content:'A';display:grid;place-items:center;width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--warning));color:#101410;font-size:1.25rem;font-weight:900}
+.student-profile-summary small{display:block;margin:0 0 3px;color:var(--primary);font-size:.64rem;font-weight:900;letter-spacing:.08em}
+.student-profile-summary h1{margin:0;font-size:1.18rem;line-height:1.2}
+.student-profile-summary p{margin:3px 0 0;color:var(--muted);font-size:.78rem;line-height:1.4}
+.student-profile-summary .updated{font-size:.68rem;opacity:.78}
+.student-plan-tabs{position:sticky;top:86px;z-index:15;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0 0 12px;padding:5px;border:1px solid var(--border);border-radius:14px;background:rgba(20,23,28,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.student-plan-tab{min-width:0;min-height:38px;padding:7px 5px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:inherit;font-size:.74rem;font-weight:800;cursor:pointer}
+.student-plan-tab.active{background:var(--surface-light);color:var(--primary);box-shadow:inset 0 0 0 1px rgba(184,229,28,.2)}
+.student-tab-panel{min-height:220px}
+.student-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 0 10px;padding:0 2px}
+.student-section-heading small{display:block;margin-bottom:3px;color:var(--muted);font-size:.63rem;font-weight:900;letter-spacing:.08em}
+.student-section-heading h2{margin:0;font-size:1.15rem}
+.student-section-heading>span{max-width:48%;overflow:hidden;color:var(--primary);font-size:.72rem;font-weight:800;text-align:right;text-overflow:ellipsis;white-space:nowrap}
+.student-week-agenda{display:grid;gap:9px}
+.student-observation-card,.student-portal-media-section{padding:15px;border:1px solid var(--border);border-radius:17px;background:var(--surface)}
+.student-observation-card small,.student-portal-media-heading small{color:var(--primary);font-size:.65rem;font-weight:900;letter-spacing:.08em}
+.student-observation-card p{margin:9px 0 0;color:var(--text);font-size:.86rem;line-height:1.55;white-space:pre-line}
+.student-portal-media-section{margin-top:10px}
+.student-detail-modal{padding-bottom:env(safe-area-inset-bottom)}
+.student-detail-dialog{max-height:calc(100dvh - 18px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto}
+@media(max-width:420px){.student-page .student-shell{padding-left:10px;padding-right:10px}.student-preview-banner{align-items:flex-start}.student-preview-banner span{max-width:210px}.student-profile-summary{grid-template-columns:48px minmax(0,1fr);padding:12px}.student-profile-summary:before{width:48px;height:48px;border-radius:14px}.student-plan-tabs{top:82px}.student-plan-tab{font-size:.7rem}}
+@media(min-width:680px){.student-page .student-shell{padding-left:20px;padding-right:20px}.student-preview-banner{top:12px}.student-plan-tabs{top:88px}}
