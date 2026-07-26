@@ -68,7 +68,7 @@ function ensureCard() {
   ensureStyles();
   monitorCard = document.createElement('section');
   monitorCard.className = 'card admin-section-card admin-cron-monitor';
-  monitorCard.innerHTML = '<div class="admin-cron-monitor-head"><div><small>AUTOMAÇÕES OPERACIONAIS</small><h2>Rotinas financeiras</h2><p>Verificando tarefas automáticas...</p></div><span class="admin-cron-status">Carregando</span></div>';
+  monitorCard.innerHTML = '<div class="admin-cron-monitor-head"><div><small>AUTOMAÇÕES OPERACIONAIS</small><h2>Rotinas financeiras</h2><p>Verificando tarefas automáticas e integridade dos dados...</p></div><span class="admin-cron-status">Carregando</span></div>';
   const attentionSection = overviewPanel.querySelector('.admin-attention-section');
   overviewPanel.insertBefore(monitorCard, attentionSection || overviewPanel.firstElementChild);
   return monitorCard;
@@ -81,8 +81,7 @@ function toneForState(state) {
   return { className: 'is-error', label: 'Atenção' };
 }
 
-function overallState(generationState, cleanupState) {
-  const states = [generationState, cleanupState];
+function overallState(...states) {
   if (states.includes('erro') || states.includes('atrasado')) return 'erro';
   if (states.includes('aguardando')) return 'aguardando';
   return 'saudavel';
@@ -92,16 +91,22 @@ function canRunManually(data = {}) {
   return data.estado === 'atrasado' || data.estado === 'erro';
 }
 
-function render(data = {}, feedback = '', feedbackType = 'success') {
+function sumProblems(problems = {}) {
+  return Object.values(problems).reduce((sum, value) => sum + Number(value || 0), 0);
+}
+
+function render(data = {}, diagnostic = {}, feedback = '', feedbackType = 'success') {
   const card = ensureCard();
   if (!card) return;
   currentStatus = data;
 
   const cleanup = data.limpeza || {};
-  const overall = overallState(data.estado, cleanup.estado);
+  const diagnosticState = diagnostic.estado || 'erro';
+  const overall = overallState(data.estado, cleanup.estado, diagnosticState);
   const tone = toneForState(overall);
   const generationTone = toneForState(data.estado);
   const cleanupTone = toneForState(cleanup.estado);
+  const diagnosticTone = toneForState(diagnosticState);
 
   card.className = `card admin-section-card admin-cron-monitor ${tone.className}`;
 
@@ -115,11 +120,13 @@ function render(data = {}, feedback = '', feedbackType = 'success') {
   const cleanupCron = cleanup.cron || {};
   const cleanupError = cleanupExecution.erro || (cleanupCron.status && cleanupCron.status !== 'succeeded' ? cleanupCron.mensagem : '');
 
+  const problems = diagnostic.problemas || {};
+  const problemCount = sumProblems(problems);
   const showManualAction = canRunManually(data);
   const feedbackClass = feedbackType === 'error' ? 'admin-cron-error' : 'admin-cron-success';
   const headline = overall === 'saudavel'
-    ? 'Geração mensal e limpeza automática funcionando normalmente.'
-    : 'Uma ou mais rotinas automáticas precisam de atenção.';
+    ? 'Rotinas automáticas e dados financeiros funcionando normalmente.'
+    : 'Uma ou mais verificações financeiras precisam de atenção.';
 
   card.innerHTML = `
     <div class="admin-cron-monitor-head">
@@ -153,6 +160,19 @@ function render(data = {}, feedback = '', feedbackType = 'success') {
         </div>
         ${cleanupError ? `<p class="admin-cron-error"><strong>Detalhe:</strong> ${esc(cleanupError)}</p>` : ''}
       </div>
+      <div class="admin-automation-item">
+        <div class="admin-automation-title">
+          <div><strong>Integridade dos dados financeiros</strong><small>${problemCount ? `${problemCount} inconsistência${problemCount === 1 ? '' : 's'} encontrada${problemCount === 1 ? '' : 's'}.` : 'Nenhuma inconsistência encontrada nas mensalidades.'}</small></div>
+          <span class="admin-automation-state ${diagnosticTone.className}">${esc(diagnosticTone.label)}</span>
+        </div>
+        <div class="admin-cron-grid">
+          <div><small>TOTAL DE MENSALIDADES</small><strong>${Number(diagnostic.total_mensalidades || 0)}</strong></div>
+          <div><small>DUPLICIDADES</small><strong>${Number(problems.duplicidades_aluno_competencia || 0)}</strong></div>
+          <div><small>DADOS INVÁLIDOS</small><strong>${Number(problems.valores_invalidos || 0) + Number(problems.sem_vencimento || 0) + Number(problems.sem_competencia || 0) + Number(problems.status_invalidos || 0)}</strong></div>
+          <div><small>VÍNCULOS INCONSISTENTES</small><strong>${Number(problems.sem_aluno || 0) + Number(problems.personal_divergente || 0) + Number(problems.pagos_sem_confirmacao || 0) + Number(problems.nao_pagos_com_confirmacao || 0)}</strong></div>
+        </div>
+        ${problemCount ? `<p class="admin-cron-error"><strong>Atenção:</strong> existem inconsistências financeiras que precisam ser investigadas.</p>` : ''}
+      </div>
     </div>
     ${feedback ? `<p class="${feedbackClass}">${esc(feedback)}</p>` : ''}
     ${showManualAction ? `<div class="admin-cron-actions"><button class="btn btn-primary" type="button" data-run-monthly-generation ${runningManually ? 'disabled' : ''}>${runningManually ? 'Executando...' : 'Executar geração agora'}</button></div>` : ''}`;
@@ -161,13 +181,23 @@ function render(data = {}, feedback = '', feedbackType = 'success') {
 async function loadCronStatus(feedback = '', feedbackType = 'success') {
   const card = ensureCard();
   if (!card) return;
-  const { data, error } = await supabase.rpc('fsfit_admin_status_geracao_mensalidades');
-  if (error) {
-    console.error('Erro ao carregar monitoramento do cron:', error);
-    render({ estado: 'erro', mensagem: 'Não foi possível consultar o monitoramento das rotinas.', execucao: { erro: error.message }, limpeza: { estado: 'erro', mensagem: 'Status indisponível.' } });
+
+  const [statusResult, diagnosticResult] = await Promise.all([
+    supabase.rpc('fsfit_admin_status_geracao_mensalidades'),
+    supabase.rpc('fsfit_admin_diagnostico_financeiro')
+  ]);
+
+  if (statusResult.error || diagnosticResult.error) {
+    const error = statusResult.error || diagnosticResult.error;
+    console.error('Erro ao carregar monitoramento financeiro:', error);
+    render(
+      { estado: 'erro', mensagem: 'Não foi possível consultar o monitoramento das rotinas.', execucao: { erro: error.message }, limpeza: { estado: 'erro', mensagem: 'Status indisponível.' } },
+      { estado: 'erro', problemas: {} }
+    );
     return;
   }
-  render(data || {}, feedback, feedbackType);
+
+  render(statusResult.data || {}, diagnosticResult.data || {}, feedback, feedbackType);
 }
 
 async function runGenerationNow(button) {
