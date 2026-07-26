@@ -46,6 +46,9 @@
     .home-now-action { width:100%; min-height:44px; margin-top:14px; border:0; border-radius:12px; background:var(--primary); color:#07120a; font:inherit; font-size:.78rem; font-weight:950; }
     .home-day-card { padding:14px; }
     .home-section-title { margin:0 0 10px; font-size:.92rem; }
+    .home-section-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .home-section-heading .home-section-title { margin:0; }
+    .home-section-link { color:var(--primary); font-size:.66rem; font-weight:900; text-decoration:none; white-space:nowrap; }
     .home-day-summary { display:flex; flex-wrap:wrap; gap:7px 10px; color:var(--muted); font-size:.68rem; }
     .home-day-summary span { display:inline-flex; align-items:center; gap:5px; }
     .home-day-dot { width:7px; height:7px; border-radius:50%; background:#77808d; }
@@ -137,7 +140,7 @@
     .dashboard-activity-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--surface-light); font-size:.85rem; font-weight:900; }
     .dashboard-activity-copy { min-width:0; }
     .dashboard-activity-copy strong,.dashboard-activity-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .dashboard-activity-copy strong { font-size:.82rem; }
+    .dashboard-activity-copy strong { font-size:.78rem; }
     .dashboard-activity-copy span { margin-top:3px; color:var(--muted); font-size:.7rem; }
     .dashboard-activity-item time { color:var(--muted); font-size:.68rem; font-weight:800; white-space:nowrap; }
     .dashboard-empty { padding:24px 18px; color:var(--muted); text-align:center; }
@@ -171,7 +174,7 @@
     <section class="page-header dashboard-home-header">
       <div>
         <p id="dashboard-user-greeting" class="dashboard-user-greeting hidden"></p>
-        <p class="dashboard-welcome-line">Vamos começar seu dia.</p>
+        <p class="dashboard-welcome-line">Veja o que precisa da sua atenção hoje.</p>
       </div>
     </section>
 
@@ -200,7 +203,7 @@
       </article>
 
       <article class="card home-day-card">
-        <h2 class="home-section-title">Seu dia</h2>
+        <h2 class="home-section-title">Resumo do dia</h2>
         <div class="home-day-summary">
           <span><i class="home-day-dot done"></i><strong id="home-day-completed">0</strong> concluídos</span>
           <span><i class="home-day-dot live"></i><strong id="home-day-live">0</strong> em andamento</span>
@@ -213,7 +216,10 @@
       </article>
 
       <article class="card home-upcoming-card">
-        <h2 class="home-section-title">Próximos da agenda</h2>
+        <div class="home-section-heading">
+          <h2 class="home-section-title">Próximas aulas</h2>
+          <a class="home-section-link" href="agenda.html">Ver agenda completa ›</a>
+        </div>
         <div id="home-upcoming-list" class="home-upcoming-list"><p class="home-upcoming-empty">Carregando próximos atendimentos...</p></div>
       </article>
 
@@ -221,7 +227,7 @@
         <span class="home-review-leading">
           <span class="home-review-icon" aria-hidden="true">▣</span>
           <span class="home-review-copy">
-            <strong id="home-review-title">Itens para revisar</strong>
+            <strong id="home-review-title">Atenção necessária</strong>
             <span id="home-review-detail">Carregando pendências...</span>
           </span>
         </span>
@@ -447,7 +453,7 @@
     })();
   </script>
   <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
-  <script type="module" src="js/painel-visao-geral.js?v=20260720-overview1"></script>
+  <script type="module" src="js/painel-visao-geral.js?v=20260726-home-improvements1"></script>
   <script src="https://cdn.jsdelivr.net/gh/efipay/js-payment-token-efi/dist/payment-token-efi-umd.min.js"></script>
   <script type="module" src="js/renovacao-plano.js?v=20260717-cartao1"></script>
   <script type="module" src="js/assinatura-cartao-status.js?v=20260717-cartao1"></script>
