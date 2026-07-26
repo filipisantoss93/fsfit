@@ -1,8 +1,4 @@
-import { supabase } from './supabase.js';
-
-const alunoId = new URLSearchParams(window.location.search).get('id');
 const loading = document.querySelector('#simple-workout-loading');
-const title = document.querySelector('#student-name');
 
 function revealSimplifiedPage() {
   loading?.remove();
@@ -23,37 +19,16 @@ function restoreLegacyFallback(message) {
   }
 }
 
-async function resolveStudentTitle() {
-  if (!alunoId || !title) return;
-
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError || !session?.user?.id) return;
-
-  const { data, error } = await supabase
-    .from('alunos')
-    .select('nome')
-    .eq('id', alunoId)
-    .eq('personal_id', session.user.id)
-    .maybeSingle();
-
-  if (!error && data?.nome) title.textContent = `Treino · ${data.nome}`;
-}
-
 try {
   document.body.classList.add('workout-simple-enabled');
 
-  const titlePromise = resolveStudentTitle().catch(error => {
-    console.warn('Não foi possível antecipar o nome do aluno:', error);
-  });
-
-  // A proteção é registrada antes do módulo de exercícios avulsos e atua no
-  // mesmo ciclo de mutação. Isso impede o congelamento ao remover o último
-  // treino de qualquer dia da semana.
+  // O nome do aluno já é carregado pelo fluxo principal da página. Evitamos
+  // uma segunda consulta direta à tabela `alunos`, que pode ser bloqueada por
+  // RLS e exibir uma mensagem técnica desnecessária ao usuário.
   await import('./treino-aluno-simplificado.js?v=20260725-simple1');
   await import('./treino-aluno-empty-state-guard.js?v=20260725-empty-guard2');
   await import('./treino-aluno-exercicios-avulsos.js?v=20260725-day-exercises2');
   await import('./treino-modelo-livre.js?v=20260726-modelo-livre1');
-  await titlePromise;
 
   revealSimplifiedPage();
 } catch (error) {
