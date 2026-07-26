@@ -190,16 +190,211 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, .04);
 }
 
-@media (min-width: 861px) {
-  .menu-mobile-btn { display: none; }
-  .nav-header-actions { margin-left: 0; order: 3; }
-  .notification-button { margin-left: 2px; }
-  .nav-menu { order: 2; }
-  .user-greeting { margin-left: auto; }
-  .admin-support-nav-badge { margin-left: 2px; }
+@media (min-width: 721px) {
+  :root { --fsfit-sidebar-width: 76px; }
+
+  body {
+    padding-left: var(--fsfit-sidebar-width);
+  }
+
+  .main-header {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1000;
+    width: var(--fsfit-sidebar-width);
+    min-height: 100dvh;
+    overflow: visible;
+    border-right: 1px solid var(--border);
+    background: rgba(18, 21, 27, .985);
+    box-shadow: 14px 0 32px rgba(0, 0, 0, .22);
+    transition: width .22s ease;
+  }
+
+  .nav-container {
+    display: flex;
+    width: 100%;
+    min-height: 100dvh;
+    padding: 14px 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .logo-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 6px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .logo-nav strong {
+    flex: 0 0 44px;
+  }
+
+  .logo-nav span {
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity .18s ease, transform .18s ease;
+  }
+
+  .user-greeting { display: none !important; }
+  .menu-mobile-btn { display: none !important; }
+
+  .nav-menu {
+    display: flex !important;
+    width: 100%;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .nav-menu li { width: 100%; }
+
+  .nav-menu a,
+  .nav-menu button {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 0 14px !important;
+    overflow: hidden;
+    border-radius: 12px !important;
+    text-align: left !important;
+    white-space: nowrap;
+    font-size: .88rem !important;
+    font-weight: 760 !important;
+  }
+
+  .nav-menu a::before,
+  .nav-menu .logout::before {
+    flex: 0 0 20px;
+    width: 20px;
+    color: #98a2af;
+    text-align: center;
+    font-size: .98rem;
+    line-height: 1;
+  }
+
+  .nav-menu a[data-page="painel"]::before { content: "⌂"; }
+  .nav-menu a[data-page="alunos"]::before { content: "👥"; }
+  .nav-menu a[data-page="exercicios"]::before { content: "🏋"; }
+  .nav-menu a[data-page="alimentacao"]::before { content: "🍎"; }
+  .nav-menu a[data-page="agenda"]::before { content: "▣"; }
+  .nav-menu a[data-page="financeiro"]::before { content: "▤"; }
+  .nav-menu a[data-page="assinatura"]::before { content: "💳"; }
+  .nav-menu a[data-page="perfil"]::before { content: "●"; }
+  .nav-menu a[data-page="contato"]::before { content: "✉"; }
+  .nav-menu a[data-page="admin"]::before { content: "⚙"; }
+  .nav-menu .logout::before { content: "↪"; }
+
+  .nav-menu a:hover,
+  .nav-menu button:hover {
+    background: rgba(255, 255, 255, .045) !important;
+    color: var(--text) !important;
+  }
+
+  .nav-menu a.active {
+    border: 1px solid rgba(50, 215, 75, .18) !important;
+    background: rgba(50, 215, 75, .09) !important;
+    color: var(--text) !important;
+  }
+
+  .nav-menu a.active::after {
+    content: "";
+    position: absolute;
+    top: 9px;
+    bottom: 9px;
+    left: 0;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--primary);
+    box-shadow: 0 0 14px rgba(50, 215, 75, .45);
+  }
+
+  .nav-menu a.active::before { color: var(--primary); }
+
+  .nav-divider {
+    display: block !important;
+    width: auto !important;
+    height: 1px !important;
+    margin: 6px 7px !important;
+    background: var(--border);
+  }
+
+  .nav-admin-item a > span:first-child { display: none; }
+
+  .nav-menu .logout {
+    border: 0 !important;
+    background: transparent !important;
+    color: #ff9da1 !important;
+  }
+
+  .nav-header-actions {
+    margin: 0;
+    flex-direction: column;
+  }
+
+  .notification-shell {
+    width: 100%;
+  }
+
+  .notification-button {
+    width: 100%;
+  }
+
+  .notification-panel {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    left: auto;
+  }
+
+  .admin-support-nav-badge {
+    margin-left: auto;
+  }
 }
 
-@media (max-width: 860px) {
+@media (min-width: 721px) and (max-width: 1279px) {
+  .main-header:hover,
+  .main-header:focus-within {
+    width: 260px;
+  }
+
+  .main-header:hover .logo-nav span,
+  .main-header:focus-within .logo-nav span {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .main-header:hover .nav-menu a,
+  .main-header:hover .nav-menu button,
+  .main-header:focus-within .nav-menu a,
+  .main-header:focus-within .nav-menu button {
+    overflow: visible;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root { --fsfit-sidebar-width: 260px; }
+
+  .logo-nav span {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 720px) {
   body.nav-menu-open { overflow: hidden; }
 
   body.nav-menu-open::before {
@@ -241,9 +436,6 @@
     font-size: 1.25rem;
   }
 
-  /* O menu precisa ficar absoluto dentro do header. Usar position:fixed aqui faz
-     o backdrop-filter do header virar o containing block em alguns WebKit/iOS,
-     colapsando o drawer e deixando somente o primeiro item visível. */
   .nav-menu {
     position: absolute !important;
     top: 76px !important;
@@ -368,48 +560,6 @@
     background: var(--border);
   }
 
-  .nav-divider:nth-child(7) {
-    position: relative;
-    height: 22px !important;
-    margin: 7px 7px 1px !important;
-    background: transparent;
-    border-top: 1px solid var(--border);
-  }
-
-  .nav-divider:nth-child(7)::after {
-    content: "CONTA";
-    position: absolute;
-    top: 7px;
-    left: 5px;
-    color: #7f8996;
-    font-size: .61rem;
-    font-weight: 900;
-    letter-spacing: .11em;
-  }
-
-  .nav-admin-item {
-    position: relative;
-    margin-top: 5px;
-    padding-top: 21px;
-    border-top: 1px solid var(--border);
-  }
-
-  .nav-admin-item::before {
-    content: "ADMIN";
-    position: absolute;
-    top: 7px;
-    left: 11px;
-    color: #7f8996;
-    font-size: .61rem;
-    font-weight: 900;
-    letter-spacing: .11em;
-  }
-
-  .nav-admin-item a {
-    border: 0 !important;
-    background: rgba(59, 130, 246, .055) !important;
-  }
-
   .nav-menu .logout {
     min-height: 46px !important;
     margin-top: 0;
@@ -478,6 +628,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .main-header,
+  .logo-nav span,
   .nav-menu,
   .notification-button,
   .menu-mobile-btn {
