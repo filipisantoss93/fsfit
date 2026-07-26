@@ -1,5 +1,10 @@
 const cepRequests = new WeakMap();
 
+if ((window.location.pathname.split('/').pop() || '') === 'financeiro.html') {
+  import('./financeiro-transicoes-seguras.js?v=20260726-finance-safe1')
+    .catch(error => console.error('Não foi possível carregar as transições financeiras seguras:', error));
+}
+
 function onlyDigits(value) {
   return String(value || '').replace(/\D/g, '');
 }
