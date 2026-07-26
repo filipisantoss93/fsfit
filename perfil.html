@@ -21,159 +21,34 @@
   <main class="container">
     <div class="profile-shell">
       <section class="page-header"><div><h1>Meu Perfil</h1><p>Gerencie seus dados profissionais, sua página pública e a segurança da conta.</p></div></section>
-
       <section class="profile-summary" aria-label="Resumo do perfil">
         <div id="profile-summary-avatar" class="profile-summary-avatar">FS</div>
-        <div class="profile-summary-main">
-          <h2 id="profile-summary-name" class="profile-summary-name">Seu perfil</h2>
-          <p id="profile-summary-handle" class="profile-summary-handle">Carregando...</p>
-          <div class="profile-summary-meta"><span id="profile-summary-status" class="profile-status">Página pública ativa</span></div>
-        </div>
-        <div class="profile-summary-actions">
-          <a id="summary-view-page" class="btn btn-secondary" href="#">Ver página</a>
-          <button id="summary-copy-link" class="btn btn-outline" type="button">Copiar link</button>
-        </div>
+        <div class="profile-summary-main"><h2 id="profile-summary-name" class="profile-summary-name">Seu perfil</h2><p id="profile-summary-handle" class="profile-summary-handle">Carregando...</p><div class="profile-summary-meta"><span id="profile-summary-status" class="profile-status">Página pública ativa</span></div></div>
+        <div class="profile-summary-actions"><a id="summary-view-page" class="btn btn-secondary" href="#">Ver página</a><button id="summary-copy-link" class="btn btn-outline" type="button">Copiar link</button></div>
       </section>
-
-      <nav class="profile-tabs" role="tablist" aria-label="Seções do perfil">
-        <button class="profile-tab active" type="button" role="tab" aria-selected="true" data-profile-tab="perfil">Perfil</button>
-        <button class="profile-tab" type="button" role="tab" aria-selected="false" data-profile-tab="pagina-publica">Página pública</button>
-        <button class="profile-tab" type="button" role="tab" aria-selected="false" data-profile-tab="conta">Conta</button>
-      </nav>
-
-      <section class="card profile-card">
-        <div class="profile-card-inner">
-          <div id="profile-message" class="message"></div>
-          <form id="profile-form" novalidate>
-            <section class="profile-tab-panel active" data-profile-panel="perfil" role="tabpanel">
-              <div class="profile-section-head">
-                <h2>Perfil profissional</h2>
-                <p>Estas informações identificam você e também podem aparecer na sua página pública.</p>
-              </div>
-
-              <h3>Foto de perfil</h3>
-              <div class="upload-row">
-                <div id="avatar-preview" class="upload-preview avatar upload-placeholder">Sem foto</div>
-                <div class="upload-controls">
-                  <input id="avatar-file" class="file-input-hidden" type="file" accept="image/jpeg,image/png,image/webp">
-                  <label class="btn btn-outline" for="avatar-file">Escolher foto</label>
-                  <small class="file-help">JPEG, PNG ou WebP. Máximo 5 MB.</small>
-                </div>
-              </div>
-
-              <div class="profile-form-grid">
-                <div class="form-group"><label>Nome do personal *</label><input name="full_name" autocomplete="name"></div>
-                <div class="form-group"><label>WhatsApp profissional</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="15"></div>
-                <div class="form-group"><label>Local de trabalho</label><input name="local_trabalho" maxlength="120" placeholder="Ex.: Academia FS Center"></div>
-                <div class="form-group"><label>Cidade</label><input name="cidade" maxlength="100" placeholder="Ex.: São Paulo - SP"></div>
-                <div class="form-group full-width"><label>Especialidades</label><input name="especialidades" maxlength="240" placeholder="Ex.: Hipertrofia, emagrecimento e condicionamento"></div>
-                <div class="form-group full-width"><label>Sobre você</label><textarea name="bio" maxlength="800" rows="5" placeholder="Conte brevemente sobre sua experiência e forma de trabalho."></textarea></div>
-                <div class="form-group full-width"><label>Instagram</label><input name="instagram" maxlength="120" placeholder="@seuusuario" autocomplete="off"></div>
-              </div>
-            </section>
-
-            <section class="profile-tab-panel" data-profile-panel="pagina-publica" role="tabpanel">
-              <div class="profile-section-head">
-                <h2>Página pública</h2>
-                <p>Este é o único link que você precisa divulgar. Seus alunos usam o próprio telefone para acessar a área privada.</p>
-              </div>
-
-              <div class="form-group">
-                <label>Endereço público *</label>
-                <div class="public-address-row"><span class="public-address-prefix">fsfit.com.br/p/</span><input name="slug" maxlength="60" placeholder="joao-silva" autocomplete="off"></div>
-                <small>Use letras minúsculas, números e hífen.</small>
-              </div>
-
-              <div class="public-link-card">
-                <span class="public-link-card-label">Seu link público</span>
-                <a id="public-link-url" href="#">Carregando...</a>
-                <span id="public-link-state" class="public-link-state"></span>
-                <div class="public-link-actions">
-                  <button id="copy-public-link" class="btn btn-outline" type="button">Copiar link</button>
-                  <a id="view-public-link" class="btn btn-secondary" href="#">Visualizar página</a>
-                </div>
-              </div>
-
-              <label class="publish-toggle">
-                <input name="publicado" type="checkbox">
-                <span class="publish-switch" aria-hidden="true"></span>
-                <span class="publish-copy"><strong>Deixar minha página pública ativa</strong><small>Quando desativada, o perfil deixa de ficar disponível para visitantes.</small></span>
-              </label>
-
-              <h3>Foto do local de trabalho</h3>
-              <div class="upload-row">
-                <div id="workplace-preview" class="upload-preview upload-placeholder">Sem foto</div>
-                <div class="upload-controls">
-                  <input id="workplace-file" class="file-input-hidden" type="file" accept="image/jpeg,image/png,image/webp">
-                  <label class="btn btn-outline" for="workplace-file">Escolher foto do local</label>
-                  <small class="file-help">Exiba a academia, estúdio ou espaço onde você atende.</small>
-                </div>
-              </div>
-
-              <div class="profile-section-head" style="margin-top:30px">
-                <h2>Fotos do dia a dia</h2>
-                <p>Adicione até 10 fotos para mostrar treinos, rotina e ambiente profissional. Use as setas para reorganizar.</p>
-              </div>
-              <div class="gallery-toolbar">
-                <div>
-                  <input id="gallery-files" class="file-input-hidden" type="file" accept="image/jpeg,image/png,image/webp" multiple>
-                  <label class="btn btn-outline" for="gallery-files">+ Adicionar fotos</label>
-                </div>
-                <small id="gallery-count" class="gallery-count">0 de 10 fotos</small>
-              </div>
-              <div id="gallery-admin" class="gallery-admin"></div>
-            </section>
-
-            <section class="profile-tab-panel" data-profile-panel="conta" role="tabpanel">
-              <div class="profile-section-head">
-                <h2>Conta</h2>
-                <p>Gerencie seu acesso ao FS Fit e as configurações de segurança.</p>
-              </div>
-
-              <div class="form-group"><label>E-mail da conta</label><input name="email" disabled></div>
-
-              <div class="account-block">
-                <h3>Segurança da conta</h3>
-                <p>Altere sua senha informando a senha atual para confirmar sua identidade.</p>
-                <button id="open-password-modal" class="btn btn-outline" type="button">Alterar senha</button>
-              </div>
-
-              <div class="danger-section">
-                <h2>Zona de perigo</h2>
-                <p>A exclusão é permanente e remove o acesso e os dados vinculados ao personal. Por segurança, a solicitação é confirmada pela equipe FS Fit antes do processamento definitivo.</p>
-                <a class="btn btn-danger danger-button" href="contato.html?categoria=outro&amp;assunto=Exclus%C3%A3o%20de%20conta&amp;mensagem=Solicito%20a%20exclus%C3%A3o%20permanente%20da%20minha%20conta%20de%20personal%20no%20FS%20Fit.%20Estou%20ciente%20de%20que%20os%20dados%20vinculados%20%C3%A0%20conta%20ser%C3%A3o%20removidos.">Solicitar exclusão da conta</a>
-              </div>
-            </section>
-
-            <div id="profile-save-bar" class="profile-save-bar" hidden>
-              <span class="profile-save-hint">Você tem alterações não salvas.</span>
-              <button id="profile-save-button" class="btn btn-primary" type="submit">Salvar alterações</button>
-            </div>
-          </form>
-        </div>
-      </section>
+      <nav class="profile-tabs" role="tablist" aria-label="Seções do perfil"><button class="profile-tab active" type="button" role="tab" aria-selected="true" data-profile-tab="perfil">Perfil</button><button class="profile-tab" type="button" role="tab" aria-selected="false" data-profile-tab="pagina-publica">Página pública</button><button class="profile-tab" type="button" role="tab" aria-selected="false" data-profile-tab="conta">Conta</button></nav>
+      <section class="card profile-card"><div class="profile-card-inner"><div id="profile-message" class="message"></div><form id="profile-form" novalidate>
+        <section class="profile-tab-panel active" data-profile-panel="perfil" role="tabpanel">
+          <div class="profile-section-head"><h2>Perfil profissional</h2><p>Estas informações identificam você e também podem aparecer na sua página pública.</p></div>
+          <h3>Foto de perfil</h3><div class="upload-row"><div id="avatar-preview" class="upload-preview avatar upload-placeholder">Sem foto</div><div class="upload-controls"><input id="avatar-file" class="file-input-hidden" type="file" accept="image/jpeg,image/png,image/webp"><label class="btn btn-outline" for="avatar-file">Escolher foto</label><small class="file-help">JPEG, PNG ou WebP. Máximo 5 MB. Você poderá recortar antes de enviar.</small></div></div>
+          <div class="profile-form-grid"><div class="form-group"><label>Nome do personal *</label><input name="full_name" autocomplete="name"></div><div class="form-group"><label>WhatsApp profissional</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="15"></div><div class="form-group"><label>Local de trabalho</label><input name="local_trabalho" maxlength="120" placeholder="Ex.: Academia FS Center"></div><div class="form-group"><label>Cidade</label><input name="cidade" maxlength="100" placeholder="Ex.: São Paulo - SP"></div><div class="form-group full-width"><label>Especialidades</label><input name="especialidades" maxlength="240" placeholder="Ex.: Hipertrofia, emagrecimento e condicionamento"></div><div class="form-group full-width"><label>Sobre você</label><textarea name="bio" maxlength="800" rows="5" placeholder="Conte brevemente sobre sua experiência e forma de trabalho."></textarea></div><div class="form-group full-width"><label>Instagram</label><input name="instagram" maxlength="120" placeholder="@seuusuario" autocomplete="off"></div></div>
+        </section>
+        <section class="profile-tab-panel" data-profile-panel="pagina-publica" role="tabpanel">
+          <div class="profile-section-head"><h2>Página pública</h2><p>Este é o único link que você precisa divulgar. Seus alunos usam o próprio telefone para acessar a área privada.</p></div>
+          <div class="form-group"><label>Endereço público *</label><div class="public-address-row"><span class="public-address-prefix">fsfit.com.br/p/</span><input name="slug" maxlength="60" placeholder="joao-silva" autocomplete="off"></div><small>Use letras minúsculas, números e hífen.</small></div>
+          <div class="public-link-card"><span class="public-link-card-label">Seu link público</span><a id="public-link-url" href="#">Carregando...</a><span id="public-link-state" class="public-link-state"></span><div class="public-link-actions"><button id="copy-public-link" class="btn btn-outline" type="button">Copiar link</button><a id="view-public-link" class="btn btn-secondary" href="#">Visualizar página</a></div></div>
+          <label class="publish-toggle"><input name="publicado" type="checkbox"><span class="publish-switch" aria-hidden="true"></span><span class="publish-copy"><strong>Deixar minha página pública ativa</strong><small>Quando desativada, o perfil deixa de ficar disponível para visitantes.</small></span></label>
+          <h3>Foto do local de trabalho</h3><div class="upload-row"><div id="workplace-preview" class="upload-preview upload-placeholder">Sem foto</div><div class="upload-controls"><input id="workplace-file" class="file-input-hidden" type="file" accept="image/jpeg,image/png,image/webp"><label class="btn btn-outline" for="workplace-file">Escolher foto do local</label><small class="file-help">Exiba a academia, estúdio ou espaço onde você atende. A foto será recortada em formato horizontal.</small></div></div>
+          <div class="profile-section-head" style="margin-top:30px"><h2>Fotos do dia a dia</h2><p>Adicione até 10 fotos para mostrar treinos, rotina e ambiente profissional. Use as setas para reorganizar.</p></div>
+          <div class="gallery-toolbar"><div><input id="gallery-files" class="file-input-hidden" type="file" accept="image/jpeg,image/png,image/webp" multiple><label class="btn btn-outline" for="gallery-files">+ Adicionar fotos</label></div><small id="gallery-count" class="gallery-count">0 de 10 fotos</small></div><div id="gallery-admin" class="gallery-admin"></div>
+        </section>
+        <section class="profile-tab-panel" data-profile-panel="conta" role="tabpanel"><div class="profile-section-head"><h2>Conta</h2><p>Gerencie seu acesso ao FS Fit e as configurações de segurança.</p></div><div class="form-group"><label>E-mail da conta</label><input name="email" disabled></div><div class="account-block"><h3>Segurança da conta</h3><p>Altere sua senha informando a senha atual para confirmar sua identidade.</p><button id="open-password-modal" class="btn btn-outline" type="button">Alterar senha</button></div><div class="danger-section"><h2>Zona de perigo</h2><p>A exclusão é permanente e remove o acesso e os dados vinculados ao personal. Por segurança, a solicitação é confirmada pela equipe FS Fit antes do processamento definitivo.</p><a class="btn btn-danger danger-button" href="contato.html?categoria=outro&amp;assunto=Exclus%C3%A3o%20de%20conta&amp;mensagem=Solicito%20a%20exclus%C3%A3o%20permanente%20da%20minha%20conta%20de%20personal%20no%20FS%20Fit.%20Estou%20ciente%20de%20que%20os%20dados%20vinculados%20%C3%A0%20conta%20ser%C3%A3o%20removidos.">Solicitar exclusão da conta</a></div></section>
+        <div id="profile-save-bar" class="profile-save-bar" hidden><span class="profile-save-hint">Você tem alterações não salvas.</span><button id="profile-save-button" class="btn btn-primary" type="submit">Salvar alterações</button></div>
+      </form></div></section>
     </div>
   </main>
-
-  <div id="password-modal" class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title" aria-hidden="true">
-    <div class="password-modal-card">
-      <div class="password-modal-header">
-        <h2 id="password-modal-title">Alterar senha</h2>
-        <button id="close-password-modal" class="password-modal-close" type="button" aria-label="Fechar">×</button>
-      </div>
-      <div id="password-message" class="message"></div>
-      <form id="password-form">
-        <div class="form-group"><label for="current-password">Senha atual *</label><input id="current-password" name="current_password" type="password" autocomplete="current-password" required></div>
-        <div class="form-group"><label for="new-password">Nova senha *</label><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="6" required></div>
-        <div class="form-group"><label for="confirm-password">Confirmar senha *</label><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="6" required></div>
-        <div class="password-modal-actions">
-          <button id="cancel-password-change" class="btn btn-neutral" type="button">Cancelar</button>
-          <button class="btn btn-primary" type="submit">Salvar nova senha</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
+  <div id="password-modal" class="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title" aria-hidden="true"><div class="password-modal-card"><div class="password-modal-header"><h2 id="password-modal-title">Alterar senha</h2><button id="close-password-modal" class="password-modal-close" type="button" aria-label="Fechar">×</button></div><div id="password-message" class="message"></div><form id="password-form"><div class="form-group"><label for="current-password">Senha atual *</label><input id="current-password" name="current_password" type="password" autocomplete="current-password" required></div><div class="form-group"><label for="new-password">Nova senha *</label><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required></div><div class="form-group"><label for="confirm-password">Confirmar senha *</label><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required></div><div class="password-modal-actions"><button id="cancel-password-change" class="btn btn-neutral" type="button">Cancelar</button><button class="btn btn-primary" type="submit">Salvar nova senha</button></div></form></div></div>
+  <script type="module" src="js/image-cropper.js?v=20260726-crop1"></script>
   <script type="module" src="js/perfil.js"></script>
 </body>
 </html>
