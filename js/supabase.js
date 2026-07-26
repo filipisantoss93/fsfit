@@ -180,3 +180,11 @@ if (!globalThis.__FSFIT_STUDENT_SESSION_RPC_ADAPTER__) {
     return originalRpc(safeName, safeParams, options);
   };
 }
+
+if (currentPage() === 'aluno.html' && !globalThis.__FSFIT_STUDENT_SESSION_CONTROLS__) {
+  globalThis.__FSFIT_STUDENT_SESSION_CONTROLS__ = true;
+  queueMicrotask(() => {
+    import('./aluno-sessao-controles.js?v=20260726-session1')
+      .catch(error => console.warn('Controles de sessão do aluno indisponíveis:', error));
+  });
+}
