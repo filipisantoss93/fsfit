@@ -190,7 +190,7 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, .04);
 }
 
-@media (min-width: 721px) {
+@media (min-width: 861px) {
   :root { --fsfit-sidebar-width: 76px; }
 
   body {
@@ -365,7 +365,7 @@
   }
 }
 
-@media (min-width: 721px) and (max-width: 1279px) {
+@media (min-width: 861px) and (max-width: 1279px) {
   .main-header:hover,
   .main-header:focus-within {
     width: 260px;
@@ -394,7 +394,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 860px) {
   body.nav-menu-open { overflow: hidden; }
 
   body.nav-menu-open::before {
