@@ -28,6 +28,21 @@ function buildMessage(studentName, title, message) {
   ].filter((line, index, items) => !(line === '' && items[index - 1] === '')).join('\n');
 }
 
+async function markAsOpened(reminder) {
+  if (reminder.recorrencia_rrule || reminder.status !== 'whatsapp_pendente') return;
+
+  const { error } = await supabase.rpc('fsfit_marcar_lembrete_whatsapp_aberto', {
+    p_lembrete_id: reminder.id
+  });
+
+  if (error) console.warn('Não foi possível atualizar o status do lembrete:', error);
+}
+
+async function openWhatsApp(reminder, whatsappUrl) {
+  await markAsOpened(reminder);
+  window.location.assign(whatsappUrl);
+}
+
 async function load() {
   if (!reminderId || !/^[0-9a-f-]{36}$/i.test(reminderId)) throw new Error('Lembrete inválido.');
 
@@ -60,19 +75,13 @@ async function load() {
 
   linkButton.href = whatsappUrl;
   linkButton.classList.remove('hidden');
+  linkButton.addEventListener('click', async event => {
+    event.preventDefault();
+    await openWhatsApp(reminder, whatsappUrl);
+  });
+
   status.textContent = `Abrindo a conversa com ${student.nome || 'o aluno'} e preenchendo a mensagem automaticamente.`;
-
-  if (!reminder.recorrencia_rrule && reminder.status === 'whatsapp_pendente') {
-    const { error: updateError } = await supabase
-      .from('lembretes')
-      .update({ status: 'whatsapp_aberto', enviado_em: new Date().toISOString(), erro: null })
-      .eq('id', reminder.id)
-      .eq('personal_id', session.user.id)
-      .eq('status', 'whatsapp_pendente');
-    if (updateError) console.warn('Não foi possível atualizar o status do lembrete:', updateError);
-  }
-
-  window.setTimeout(() => window.location.assign(whatsappUrl), 250);
+  window.setTimeout(() => openWhatsApp(reminder, whatsappUrl), 250);
 }
 
 load().catch(error => {
