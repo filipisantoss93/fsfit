@@ -5,7 +5,7 @@ const session = await requireSession();
 if (!session) throw new Error('Sessão inválida');
 
 const list = document.querySelector('#students-list');
-const searchWrap = document.querySelector('.student-search-wrap');
+const filterNav = document.querySelector('#student-filter-nav');
 
 let activeFilter = 'all';
 let studentMeta = new Map();
@@ -24,20 +24,6 @@ function initials(value = '') {
   return `${parts[0]?.[0] || ''}${parts.length > 1 ? parts[parts.length - 1]?.[0] || '' : ''}`.toUpperCase();
 }
 
-function ensureFilterNav() {
-  if (!searchWrap || document.querySelector('#student-filter-nav')) return;
-  const nav = document.createElement('nav');
-  nav.id = 'student-filter-nav';
-  nav.className = 'student-filter-nav';
-  nav.setAttribute('aria-label', 'Filtros da lista de alunos');
-  nav.innerHTML = `
-    <button class="student-filter-pill active" type="button" data-student-filter="all" aria-pressed="true">Todos</button>
-    <button class="student-filter-pill" type="button" data-student-filter="in_class" aria-pressed="false">Em aula</button>
-    <button class="student-filter-pill" type="button" data-student-filter="new" aria-pressed="false">Novos</button>
-    <button class="student-filter-pill" type="button" data-student-filter="no_workout" aria-pressed="false">Sem treino</button>`;
-  searchWrap.insertAdjacentElement('afterend', nav);
-}
-
 function getStudentId(row) {
   if (row.dataset.studentId) return row.dataset.studentId;
   const link = row.querySelector('a[href*="ficha-aluno.html?id="]');
@@ -49,6 +35,12 @@ function getStudentId(row) {
   }
 }
 
+function isNewStudent(student) {
+  if (!student?.created_at) return false;
+  const created = new Date(student.created_at).getTime();
+  return Number.isFinite(created) && created >= Date.now() - (30 * 24 * 60 * 60 * 1000);
+}
+
 function avatarMarkup(studentId, name) {
   const meta = studentMeta.get(studentId);
   const photoUrl = String(meta?.foto_perfil_url || '').trim();
@@ -58,38 +50,84 @@ function avatarMarkup(studentId, name) {
   </span>`;
 }
 
-function syncStudentAvatars() {
+function statusMarkup(studentId) {
+  const meta = studentMeta.get(studentId);
+  const chips = [];
+  if (inClassIds.has(studentId)) chips.push('<span class="student-status-chip is-live">Em aula</span>');
+  if (!activeWorkoutIds.has(studentId)) chips.push('<span class="student-status-chip is-alert">Sem treino</span>');
+  if (isNewStudent(meta)) chips.push('<span class="student-status-chip is-new">Novo</span>');
+  if (!chips.length) chips.push('<span class="student-status-chip">Acompanhamento ativo</span>');
+  return chips.join('');
+}
+
+function actionsMarkup(studentId, name) {
+  return `<div class="student-row-actions">
+    <button class="student-actions-trigger" type="button" data-student-menu-trigger aria-label="Mais ações para ${esc(name)}" aria-haspopup="menu" aria-expanded="false">•••</button>
+    <div class="student-actions-menu" role="menu" hidden>
+      <button type="button" role="menuitem" data-edit="${esc(studentId)}">Editar cadastro</button>
+      <button type="button" role="menuitem" data-reset-pin="${esc(studentId)}" data-name="${esc(name)}">Alterar PIN</button>
+      <button class="is-danger" type="button" role="menuitem" data-delete="${esc(studentId)}" data-name="${esc(name)}">Excluir aluno</button>
+    </div>
+  </div>`;
+}
+
+function closeActionMenus(except = null) {
+  list?.querySelectorAll('.student-row-actions.is-open').forEach(host => {
+    if (host === except) return;
+    host.classList.remove('is-open');
+    const trigger = host.querySelector('[data-student-menu-trigger]');
+    const menu = host.querySelector('.student-actions-menu');
+    trigger?.setAttribute('aria-expanded', 'false');
+    if (menu) menu.hidden = true;
+  });
+}
+
+function updateSummary() {
+  const total = studentMeta.size || list?.querySelectorAll('tr[data-student-id]').length || 0;
+  const noWorkout = [...studentMeta.keys()].filter(id => !activeWorkoutIds.has(id)).length;
+  const totalNode = document.querySelector('#student-count');
+  const totalLabel = document.querySelector('#student-count-label');
+  const liveNode = document.querySelector('#student-in-class-count');
+  const noWorkoutNode = document.querySelector('#student-no-workout-count');
+
+  if (totalNode) totalNode.textContent = String(total);
+  if (totalLabel) totalLabel.textContent = total === 1 ? 'aluno cadastrado' : 'alunos cadastrados';
+  if (liveNode) liveNode.textContent = String(inClassIds.size);
+  if (noWorkoutNode) noWorkoutNode.textContent = String(noWorkout);
+}
+
+function syncStudentPresentation() {
   if (!list) return;
   list.querySelectorAll('tr[data-student-id]').forEach(row => {
     const id = row.dataset.studentId;
     const name = row.dataset.studentName || 'Aluno';
     const host = row.querySelector('[data-student-avatar]');
-    if (!host) return;
-
+    const metaHost = row.querySelector('[data-student-meta]');
     const meta = studentMeta.get(id);
     const photoUrl = String(meta?.foto_perfil_url || '').trim();
-    let image = host.querySelector('img');
 
-    host.querySelector('.student-list-avatar-fallback').textContent = initials(name);
-
-    if (!photoUrl) {
-      image?.remove();
-      return;
+    if (host) {
+      host.querySelector('.student-list-avatar-fallback').textContent = initials(name);
+      let image = host.querySelector('img');
+      if (!photoUrl) image?.remove();
+      else {
+        if (!image) {
+          image = document.createElement('img');
+          image.alt = '';
+          image.loading = 'lazy';
+          host.appendChild(image);
+        }
+        if (image.dataset.source !== photoUrl) {
+          image.dataset.source = photoUrl;
+          image.src = photoUrl;
+          image.onerror = () => image.remove();
+        }
+      }
     }
 
-    if (!image) {
-      image = document.createElement('img');
-      image.alt = '';
-      image.loading = 'lazy';
-      host.appendChild(image);
-    }
-
-    if (image.dataset.source !== photoUrl) {
-      image.dataset.source = photoUrl;
-      image.src = photoUrl;
-      image.onerror = () => image.remove();
-    }
+    if (metaHost) metaHost.innerHTML = statusMarkup(id);
   });
+  updateSummary();
 }
 
 function transformRows() {
@@ -97,7 +135,7 @@ function transformRows() {
   const table = list.closest('table');
   const header = table?.querySelector('thead tr');
   if (header && !header.dataset.compactStudents) {
-    header.innerHTML = '<th>Aluno</th><th aria-label="Abrir ficha"></th>';
+    header.innerHTML = '<th>Aluno</th><th aria-label="Ações"></th>';
     header.dataset.compactStudents = 'true';
   }
 
@@ -129,22 +167,16 @@ function transformRows() {
           ${avatarMarkup(studentId, name)}
           <span class="student-compact-copy">
             <strong>${esc(name)}</strong>
-            <small>${esc(phone)}</small>
+            <small>${esc(phone || 'WhatsApp não informado')}</small>
+            <span class="student-compact-meta" data-student-meta>${statusMarkup(studentId)}</span>
           </span>
         </div>
       </td>
-      <td class="student-compact-arrow" aria-hidden="true">›</td>`;
+      <td class="student-compact-actions-cell">${actionsMarkup(studentId, name)}<span class="student-compact-arrow" aria-hidden="true">›</span></td>`;
   });
 
-  syncStudentAvatars();
+  syncStudentPresentation();
   applyFilter();
-}
-
-function isNewStudent(student) {
-  if (!student?.created_at) return false;
-  const created = new Date(student.created_at).getTime();
-  if (!Number.isFinite(created)) return false;
-  return created >= Date.now() - (30 * 24 * 60 * 60 * 1000);
 }
 
 function appendRowsInOrder(sorted) {
@@ -153,50 +185,35 @@ function appendRowsInOrder(sorted) {
   list.appendChild(fragment);
 }
 
-function sortRowsAlphabetically(rows) {
-  const sorted = [...rows].sort((a, b) => String(a.dataset.studentName || '').localeCompare(String(b.dataset.studentName || ''), 'pt-BR', { sensitivity: 'base' }));
-  const currentIds = rows.map(row => row.dataset.studentId).join('|');
-  const sortedIds = sorted.map(row => row.dataset.studentId).join('|');
-  if (currentIds === sortedIds) return;
-  appendRowsInOrder(sorted);
-}
-
-function sortRowsByNewest(rows) {
+function sortRows(rows) {
   const sorted = [...rows].sort((a, b) => {
-    const aMeta = studentMeta.get(a.dataset.studentId);
-    const bMeta = studentMeta.get(b.dataset.studentId);
-    const aTime = aMeta?.created_at ? new Date(aMeta.created_at).getTime() : 0;
-    const bTime = bMeta?.created_at ? new Date(bMeta.created_at).getTime() : 0;
-
-    if (bTime !== aTime) return bTime - aTime;
-    return String(bMeta?.created_at || '').localeCompare(String(aMeta?.created_at || ''));
+    if (activeFilter === 'new') {
+      const aTime = new Date(studentMeta.get(a.dataset.studentId)?.created_at || 0).getTime();
+      const bTime = new Date(studentMeta.get(b.dataset.studentId)?.created_at || 0).getTime();
+      if (bTime !== aTime) return bTime - aTime;
+    }
+    return String(a.dataset.studentName || '').localeCompare(String(b.dataset.studentName || ''), 'pt-BR', { sensitivity: 'base' });
   });
-
   const currentIds = rows.map(row => row.dataset.studentId).join('|');
   const sortedIds = sorted.map(row => row.dataset.studentId).join('|');
-  if (currentIds === sortedIds) return;
-  appendRowsInOrder(sorted);
+  if (currentIds !== sortedIds) appendRowsInOrder(sorted);
 }
 
 function applyFilter() {
   if (!list) return;
+  closeActionMenus();
   const rows = [...list.querySelectorAll('tr[data-student-id]')];
-
   rows.forEach(row => {
     const id = row.dataset.studentId;
     const meta = studentMeta.get(id);
     let visible = true;
-
     if (activeFilter === 'in_class') visible = inClassIds.has(id);
     if (activeFilter === 'new') visible = isNewStudent(meta);
     if (activeFilter === 'no_workout') visible = !activeWorkoutIds.has(id);
-
     row.hidden = !visible;
   });
 
-  if (activeFilter === 'new') sortRowsByNewest(rows);
-  else sortRowsAlphabetically(rows);
-
+  sortRows(rows);
   const visibleRows = rows.filter(row => !row.hidden);
   let empty = list.querySelector('.student-filter-empty-row');
   if (!visibleRows.length && rows.length) {
@@ -204,13 +221,11 @@ function applyFilter() {
       empty = document.createElement('tr');
       empty.className = 'student-filter-empty-row';
       empty.dataset.compactStudentReady = 'true';
-      empty.innerHTML = '<td colspan="2" class="empty">Nenhum aluno neste filtro.</td>';
+      empty.innerHTML = '<td colspan="2">Nenhum aluno corresponde a este filtro.</td>';
       list.appendChild(empty);
     }
     empty.hidden = false;
-  } else if (empty) {
-    empty.hidden = true;
-  }
+  } else if (empty) empty.hidden = true;
 }
 
 async function refreshFilterData() {
@@ -220,30 +235,24 @@ async function refreshFilterData() {
     supabase.from('treinos').select('aluno_id').eq('personal_id', session.user.id).eq('status', 'ativo')
   ]);
 
-  if (!studentsResult.error) {
-    studentMeta = new Map((studentsResult.data || []).map(item => [item.id, item]));
-    syncStudentAvatars();
-  }
-  if (!sessionsResult.error) {
-    inClassIds = new Set((sessionsResult.data || []).filter(item => item.status === 'em_aula').map(item => item.aluno_id));
-  }
-  if (!workoutsResult.error) {
-    activeWorkoutIds = new Set((workoutsResult.data || []).map(item => item.aluno_id).filter(Boolean));
-  }
+  if (!studentsResult.error) studentMeta = new Map((studentsResult.data || []).map(item => [item.id, item]));
+  if (!sessionsResult.error) inClassIds = new Set((sessionsResult.data || []).filter(item => item.status === 'em_aula').map(item => item.aluno_id));
+  if (!workoutsResult.error) activeWorkoutIds = new Set((workoutsResult.data || []).map(item => item.aluno_id).filter(Boolean));
+
+  syncStudentPresentation();
   applyFilter();
 }
 
-ensureFilterNav();
 transformRows();
 
 const observer = new MutationObserver(() => queueMicrotask(transformRows));
 if (list) observer.observe(list, { childList: true });
 
-document.querySelector('#student-filter-nav')?.addEventListener('click', event => {
+filterNav?.addEventListener('click', event => {
   const button = event.target.closest('[data-student-filter]');
   if (!button) return;
   activeFilter = button.dataset.studentFilter || 'all';
-  document.querySelectorAll('[data-student-filter]').forEach(item => {
+  filterNav.querySelectorAll('[data-student-filter]').forEach(item => {
     const active = item === button;
     item.classList.toggle('active', active);
     item.setAttribute('aria-pressed', String(active));
@@ -252,16 +261,51 @@ document.querySelector('#student-filter-nav')?.addEventListener('click', event =
 });
 
 list?.addEventListener('click', event => {
+  const trigger = event.target.closest('[data-student-menu-trigger]');
+  if (trigger) {
+    event.preventDefault();
+    event.stopPropagation();
+    const host = trigger.closest('.student-row-actions');
+    const menu = host?.querySelector('.student-actions-menu');
+    const opening = !host?.classList.contains('is-open');
+    closeActionMenus(host);
+    host?.classList.toggle('is-open', opening);
+    trigger.setAttribute('aria-expanded', String(opening));
+    if (menu) menu.hidden = !opening;
+    if (opening) menu?.querySelector('[role="menuitem"]')?.focus();
+    return;
+  }
+
+  if (event.target.closest('.student-actions-menu')) {
+    closeActionMenus();
+    return;
+  }
+
   const row = event.target.closest('tr[data-student-id]');
-  if (!row) return;
-  location.href = `ficha-aluno.html?id=${encodeURIComponent(row.dataset.studentId)}`;
+  if (row) location.href = `ficha-aluno.html?id=${encodeURIComponent(row.dataset.studentId)}`;
 });
 
 list?.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    const openHost = event.target.closest('.student-row-actions.is-open');
+    if (openHost) {
+      event.preventDefault();
+      const trigger = openHost.querySelector('[data-student-menu-trigger]');
+      closeActionMenus();
+      trigger?.focus();
+    }
+    return;
+  }
+
+  if (event.target.closest('.student-row-actions')) return;
   const row = event.target.closest('tr[data-student-id]');
   if (!row || (event.key !== 'Enter' && event.key !== ' ')) return;
   event.preventDefault();
   location.href = `ficha-aluno.html?id=${encodeURIComponent(row.dataset.studentId)}`;
+});
+
+document.addEventListener('click', event => {
+  if (!event.target.closest('.student-row-actions')) closeActionMenus();
 });
 
 await refreshFilterData();
