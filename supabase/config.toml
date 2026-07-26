@@ -1,0 +1,13 @@
+project_id = "jjpijncxlkwutbnkpsaw"
+
+[functions.criar-pix-fsfit]
+verify_jwt = true
+
+[functions.verificar-pix-fsfit]
+verify_jwt = true
+
+[functions.webhook-efi-pix]
+verify_jwt = false
+
+[functions.configurar-webhook-efi]
+verify_jwt = true
