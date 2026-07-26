@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
-  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
-  <title>Recuperar senha — FS Fit</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="theme-color" content="#0f1115">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
+  <title>Recuperar senha — FS Fit</title>
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/recuperar-senha-padronizacao.css?v=20260726-recovery1">
+  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
 </head>
-<body>
-  <header class="main-header"><nav class="nav-container"><a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a></nav></header>
-  <main class="container">
-    <section class="hero" style="grid-template-columns:1fr;min-height:calc(100vh - 140px)">
-      <div class="card auth-card" style="justify-self:center;width:min(470px,100%)">
-        <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
-        <h2>Recuperar senha</h2>
-        <p>Informe o e-mail da sua conta. Você receberá um link para criar uma nova senha.</p>
-        <div id="recovery-message" class="message"></div>
+<body class="password-recovery-page">
+  <main class="password-recovery-shell">
+    <header class="password-recovery-header">
+      <a class="auth-logo" href="index.html" aria-label="FS Fit — início"><strong>FS</strong><span>Fit</span></a>
+    </header>
+
+    <section class="password-recovery-main">
+      <article class="password-recovery-card">
+        <span class="password-recovery-kicker">ACESSO DO PERSONAL</span>
+        <h1>Recupere sua senha</h1>
+        <p class="password-recovery-description">Informe o e-mail usado no cadastro. Enviaremos um link seguro para você criar uma nova senha.</p>
+
+        <div id="recovery-message" class="message" aria-live="polite"></div>
+
         <form id="recovery-form">
           <div class="form-group">
-            <label for="recovery-email">E-mail</label>
-            <input id="recovery-email" name="email" type="email" autocomplete="email" required>
+            <label for="recovery-email">E-mail da sua conta</label>
+            <input id="recovery-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="seuemail@exemplo.com" required>
           </div>
-          <button class="btn btn-primary" type="submit" style="width:100%">Enviar link de recuperação</button>
+          <button class="btn btn-primary password-recovery-submit" type="submit">Enviar link de recuperação</button>
         </form>
-        <div class="auth-switch"><a href="index.html">Voltar para o login</a></div>
-      </div>
+
+        <div class="password-recovery-help">
+          <span class="password-recovery-help-icon" aria-hidden="true">i</span>
+          <div><strong>Confira também o spam</strong><span>O link pode levar alguns minutos para chegar e será enviado somente para o e-mail da conta.</span></div>
+        </div>
+
+        <div class="password-recovery-back"><a href="index.html?modo=login#cadastro">← Voltar para o login</a></div>
+      </article>
     </section>
+
+    <footer class="password-recovery-footer">FS Fit · Gestão profissional para personal trainers</footer>
   </main>
   <script type="module" src="js/recuperar-senha.js"></script>
 </body>
