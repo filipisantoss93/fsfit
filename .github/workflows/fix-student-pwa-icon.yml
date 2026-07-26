@@ -1,0 +1,117 @@
+name: Corrigir ícone PWA do aluno
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.student-icon-v3-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-student-icon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Gerar arquivos e corrigir referências
+        run: |
+          pip install pillow
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+
+          source = Path('assets/icons/student/student-icon-180x180.png')
+          if not source.exists():
+              raise SystemExit('Ícone fonte do aluno não encontrado')
+
+          img = Image.open(source).convert('RGB')
+          out = Path('assets/icons/student')
+          version = '20260726-student-icon3'
+
+          for size in (180, 192, 512):
+              resized = img.resize((size, size), Image.Resampling.LANCZOS)
+              resized.save(out / f'student-app-v3-{size}x{size}.png', 'PNG', optimize=True)
+
+          manifest = {
+              'id': '/fs-fit-aluno',
+              'name': 'FS Fit Aluno',
+              'short_name': 'FS Fit Aluno',
+              'description': 'Portal de treinos e acompanhamento do aluno FS Fit.',
+              'start_url': '/acesso-aluno.html?source=pwa-aluno',
+              'scope': '/',
+              'display': 'standalone',
+              'background_color': '#0f1115',
+              'theme_color': '#0f1115',
+              'icons': [
+                  {
+                      'src': f'/assets/icons/student/student-app-v3-192x192.png?v={version}',
+                      'sizes': '192x192',
+                      'type': 'image/png',
+                      'purpose': 'any'
+                  },
+                  {
+                      'src': f'/assets/icons/student/student-app-v3-512x512.png?v={version}',
+                      'sizes': '512x512',
+                      'type': 'image/png',
+                      'purpose': 'any'
+                  },
+                  {
+                      'src': f'/assets/icons/student/student-app-v3-512x512.png?v={version}',
+                      'sizes': '512x512',
+                      'type': 'image/png',
+                      'purpose': 'maskable'
+                  }
+              ]
+          }
+          Path('manifest-aluno.webmanifest').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          page = Path('acesso-aluno.html')
+          html = page.read_text(encoding='utf-8')
+          start = html.index('  <link rel="manifest"')
+          end = html.index('  <link rel="stylesheet"', start)
+          icon_block = f'''  <link rel="manifest" href="/manifest-aluno.webmanifest?v={version}">\n  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/student/student-app-v3-192x192.png?v={version}">\n  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/student/student-app-v3-180x180.png?v={version}">\n'''
+          html = html[:start] + icon_block + html[end:]
+          html = html.replace('/assets/icons/student/student-icon-512x512.png?v=20260726-student-icon2', f'/assets/icons/student/student-app-v3-512x512.png?v={version}')
+          page.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Validar
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+
+          manifest = json.loads(Path('manifest-aluno.webmanifest').read_text(encoding='utf-8'))
+          assert manifest['id'] == '/fs-fit-aluno'
+          assert manifest['start_url'].startswith('/acesso-aluno.html')
+          for size in (180, 192, 512):
+              path = Path(f'assets/icons/student/student-app-v3-{size}x{size}.png')
+              with Image.open(path) as image:
+                  assert image.size == (size, size)
+          html = Path('acesso-aluno.html').read_text(encoding='utf-8')
+          assert html.count('rel="manifest"') == 1
+          assert html.count('rel="apple-touch-icon"') == 1
+          assert 'apple-touch-icon-precomposed' not in html
+          PY
+
+      - name: Commitar correção
+        run: |
+          rm -f .student-icon-v3-trigger
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add acesso-aluno.html manifest-aluno.webmanifest assets/icons/student .student-icon-v3-trigger
+          git commit -m 'Corrigir identidade e ícones exclusivos do PWA do aluno'
+          git push origin main
