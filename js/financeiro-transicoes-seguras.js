@@ -3,9 +3,15 @@ import { supabase } from './supabase.js';
 const modal = document.querySelector('#student-finance-modal');
 const modalActions = modal?.querySelector('.finance-modal-actions');
 const markPaidButton = document.querySelector('#student-finance-mark-paid');
+const saveButton = document.querySelector('#student-finance-save');
+const valueInput = document.querySelector('#student-finance-value');
+const dayInput = document.querySelector('#student-finance-day');
+const activeInput = document.querySelector('#student-finance-active');
+const studentsList = document.querySelector('#finance-students-list');
 const message = document.querySelector('#finance-message');
 let cancelButton = null;
 let selectedPayment = null;
+let selectedStudentId = null;
 
 function show(text, type = 'success') {
   if (!message) return;
@@ -94,6 +100,43 @@ async function syncModalPayment() {
   cancelButton?.classList.toggle('hidden', !['pendente', 'informado'].includes(data.status));
 }
 
+async function configureMonthlyChargeSafely(button) {
+  if (!selectedStudentId) {
+    show('Não foi possível identificar o aluno selecionado.', 'error');
+    return;
+  }
+
+  const active = Boolean(activeInput?.checked);
+  const value = Number(valueInput?.value || 0);
+  const day = Number(dayInput?.value || 0);
+
+  if (active && (!(value > 0) || day < 1 || day > 31)) {
+    show('Para ativar a mensalidade, informe um valor maior que zero e um dia de vencimento entre 1 e 31.', 'error');
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const { error } = await supabase.rpc('fsfit_configurar_mensalidade_aluno', {
+      p_aluno_id: selectedStudentId,
+      p_valor: active ? value : null,
+      p_dia_vencimento: active ? day : null,
+      p_ativa: active
+    });
+    if (error) throw error;
+
+    show(active
+      ? 'Mensalidade atualizada e cobrança do mês sincronizada.'
+      : 'Mensalidade desativada. Cobranças pendentes do mês foram canceladas.');
+    await refreshSummary();
+    window.setTimeout(() => window.location.reload(), 350);
+  } catch (error) {
+    console.error(error);
+    show(error.message || 'Não foi possível atualizar a mensalidade deste aluno.', 'error');
+    button.disabled = false;
+  }
+}
+
 async function confirmPaymentSafely(button) {
   const paymentId = button.dataset.paymentId || button.dataset.confirmPayment;
   if (!paymentId) return;
@@ -129,7 +172,26 @@ async function cancelPaymentSafely() {
   }
 }
 
+studentsList?.addEventListener('click', event => {
+  const row = event.target.closest('[data-student-row]');
+  if (row) selectedStudentId = row.dataset.studentRow || null;
+}, true);
+
+studentsList?.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const row = event.target.closest('[data-student-row]');
+  if (row) selectedStudentId = row.dataset.studentRow || null;
+}, true);
+
 document.addEventListener('click', event => {
+  const configButton = event.target.closest('#student-finance-save');
+  if (configButton) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void configureMonthlyChargeSafely(configButton);
+    return;
+  }
+
   const confirmButton = event.target.closest('#student-finance-mark-paid,[data-confirm-payment]');
   if (!confirmButton) return;
   event.preventDefault();
