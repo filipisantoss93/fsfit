@@ -236,15 +236,44 @@
   main.container {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas:
+      "notice notice notice notice notice notice notice notice notice notice notice notice"
+      "header header header header header header header header header header header header"
+      "home home home home home home home home home home home home"
+      "agenda agenda agenda agenda agenda agenda agenda live live live live live"
+      "overview overview overview overview overview overview overview overview overview overview overview overview";
     align-items: start;
     gap: 12px;
   }
 
-  main.container > #access-notice,
-  main.container > .dashboard-home-header,
-  main.container > #dashboard-home-panel,
+  main.container > #access-notice {
+    grid-area: notice;
+    width: 100%;
+  }
+
+  main.container > .dashboard-home-header {
+    grid-area: header;
+    width: 100%;
+  }
+
+  main.container > #dashboard-home-panel {
+    grid-area: home;
+    width: 100%;
+  }
+
+  main.container > #dashboard-agenda-panel {
+    grid-area: agenda;
+    width: 100%;
+  }
+
+  main.container > #dashboard-live-panel {
+    grid-area: live;
+    width: 100%;
+    margin: 0 !important;
+  }
+
   main.container > #dashboard-overview-panel {
-    grid-column: 1 / -1;
+    grid-area: overview;
     width: 100%;
   }
 
@@ -267,17 +296,6 @@
   #dashboard-overview-panel > .dashboard-public-link-compact,
   #dashboard-overview-panel > .dashboard-activity-card {
     min-width: 0;
-    margin: 0 !important;
-  }
-
-  main.container > #dashboard-agenda-panel {
-    grid-column: 1 / span 7;
-    width: 100%;
-  }
-
-  main.container > #dashboard-live-panel {
-    grid-column: 8 / -1;
-    width: 100%;
     margin: 0 !important;
   }
 
