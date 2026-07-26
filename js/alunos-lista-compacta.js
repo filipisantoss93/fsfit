@@ -60,6 +60,28 @@ function statusMarkup(studentId) {
   return chips.join('');
 }
 
+function actionsMarkup(studentId, name) {
+  return `<div class="student-row-actions">
+    <button class="student-actions-trigger" type="button" data-student-menu-trigger aria-label="Mais ações para ${esc(name)}" aria-haspopup="menu" aria-expanded="false">•••</button>
+    <div class="student-actions-menu" role="menu" hidden>
+      <button type="button" role="menuitem" data-edit="${esc(studentId)}">Editar cadastro</button>
+      <button type="button" role="menuitem" data-reset-pin="${esc(studentId)}" data-name="${esc(name)}">Alterar PIN</button>
+      <button class="is-danger" type="button" role="menuitem" data-delete="${esc(studentId)}" data-name="${esc(name)}">Excluir aluno</button>
+    </div>
+  </div>`;
+}
+
+function closeActionMenus(except = null) {
+  list?.querySelectorAll('.student-row-actions.is-open').forEach(host => {
+    if (host === except) return;
+    host.classList.remove('is-open');
+    const trigger = host.querySelector('[data-student-menu-trigger]');
+    const menu = host.querySelector('.student-actions-menu');
+    trigger?.setAttribute('aria-expanded', 'false');
+    if (menu) menu.hidden = true;
+  });
+}
+
 function updateSummary() {
   const total = studentMeta.size || list?.querySelectorAll('tr[data-student-id]').length || 0;
   const noWorkout = [...studentMeta.keys()].filter(id => !activeWorkoutIds.has(id)).length;
@@ -113,7 +135,7 @@ function transformRows() {
   const table = list.closest('table');
   const header = table?.querySelector('thead tr');
   if (header && !header.dataset.compactStudents) {
-    header.innerHTML = '<th>Aluno</th><th aria-label="Abrir ficha"></th>';
+    header.innerHTML = '<th>Aluno</th><th aria-label="Ações"></th>';
     header.dataset.compactStudents = 'true';
   }
 
@@ -150,7 +172,7 @@ function transformRows() {
           </span>
         </div>
       </td>
-      <td class="student-compact-arrow" aria-hidden="true">›</td>`;
+      <td class="student-compact-actions-cell">${actionsMarkup(studentId, name)}<span class="student-compact-arrow" aria-hidden="true">›</span></td>`;
   });
 
   syncStudentPresentation();
@@ -179,6 +201,7 @@ function sortRows(rows) {
 
 function applyFilter() {
   if (!list) return;
+  closeActionMenus();
   const rows = [...list.querySelectorAll('tr[data-student-id]')];
   rows.forEach(row => {
     const id = row.dataset.studentId;
@@ -238,15 +261,51 @@ filterNav?.addEventListener('click', event => {
 });
 
 list?.addEventListener('click', event => {
+  const trigger = event.target.closest('[data-student-menu-trigger]');
+  if (trigger) {
+    event.preventDefault();
+    event.stopPropagation();
+    const host = trigger.closest('.student-row-actions');
+    const menu = host?.querySelector('.student-actions-menu');
+    const opening = !host?.classList.contains('is-open');
+    closeActionMenus(host);
+    host?.classList.toggle('is-open', opening);
+    trigger.setAttribute('aria-expanded', String(opening));
+    if (menu) menu.hidden = !opening;
+    if (opening) menu?.querySelector('[role="menuitem"]')?.focus();
+    return;
+  }
+
+  if (event.target.closest('.student-actions-menu')) {
+    closeActionMenus();
+    return;
+  }
+
   const row = event.target.closest('tr[data-student-id]');
   if (row) location.href = `ficha-aluno.html?id=${encodeURIComponent(row.dataset.studentId)}`;
 });
 
 list?.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    const openHost = event.target.closest('.student-row-actions.is-open');
+    if (openHost) {
+      event.preventDefault();
+      const trigger = openHost.querySelector('[data-student-menu-trigger]');
+      closeActionMenus();
+      trigger?.focus();
+    }
+    return;
+  }
+
+  if (event.target.closest('.student-row-actions')) return;
   const row = event.target.closest('tr[data-student-id]');
   if (!row || (event.key !== 'Enter' && event.key !== ' ')) return;
   event.preventDefault();
   location.href = `ficha-aluno.html?id=${encodeURIComponent(row.dataset.studentId)}`;
+});
+
+document.addEventListener('click', event => {
+  if (!event.target.closest('.student-row-actions')) closeActionMenus();
 });
 
 await refreshFilterData();
