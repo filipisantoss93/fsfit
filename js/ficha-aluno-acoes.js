@@ -1,6 +1,7 @@
 (() => {
   const stylesheetId = 'fsfit-student-record-actions-styles';
   const contentStylesheetId = 'fsfit-student-record-content-styles';
+  const mobileHotfixStylesheetId = 'fsfit-student-record-mobile-hotfix';
 
   function appendStylesheet(id, href) {
     if (document.getElementById(id)) return;
@@ -14,6 +15,7 @@
   function ensureStylesheets() {
     appendStylesheet(stylesheetId, 'css/ficha-aluno-acoes.css?v=20260726-ux2');
     appendStylesheet(contentStylesheetId, 'css/ficha-aluno-conteudo.css?v=20260726-ux3');
+    appendStylesheet(mobileHotfixStylesheetId, 'css/ficha-aluno-mobile-hotfix.css?v=20260726-scroll1');
   }
 
   function closeMenu(menu, toggle, { restoreFocus = false } = {}) {
@@ -151,6 +153,20 @@
 
     let previousFocus = null;
 
+    const syncScrollLock = () => {
+      const isOpen = modal.classList.contains('open');
+      document.body.classList.toggle('student-edit-open', isOpen);
+      modal.setAttribute('aria-hidden', String(!isOpen));
+
+      if (!isOpen) {
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('position');
+        document.body.style.removeProperty('top');
+        document.body.style.removeProperty('width');
+        document.documentElement.style.removeProperty('overflow');
+      }
+    };
+
     edit.addEventListener('click', () => {
       previousFocus = document.activeElement;
       requestAnimationFrame(() => close.focus({ preventScroll: true }));
@@ -158,13 +174,19 @@
 
     const observer = new MutationObserver(() => {
       const isOpen = modal.classList.contains('open');
-      modal.setAttribute('aria-hidden', String(!isOpen));
+      syncScrollLock();
       if (!isOpen && previousFocus instanceof HTMLElement) {
         previousFocus.focus({ preventScroll: true });
       }
     });
 
     observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    syncScrollLock();
+
+    window.addEventListener('pageshow', syncScrollLock);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) syncScrollLock();
+    });
 
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal.classList.contains('open')) {
