@@ -41,14 +41,23 @@ function ensureStyles() {
     .admin-cron-monitor.is-healthy .admin-cron-status{background:rgba(50,215,75,.12);color:var(--primary)}
     .admin-cron-monitor.is-warning .admin-cron-status{background:rgba(255,193,7,.13);color:var(--warning)}
     .admin-cron-monitor.is-error .admin-cron-status{background:rgba(255,82,82,.13);color:#ff7676}
-    .admin-cron-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
-    .admin-cron-grid>div{padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light)}
-    .admin-cron-grid small{display:block;margin-bottom:5px;color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.04em}
-    .admin-cron-grid strong{display:block;font-size:.88rem;word-break:break-word}
-    .admin-cron-error{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(255,82,82,.1);color:#ff9a9a;font-size:.8rem}
+    .admin-automation-list{display:grid;gap:12px;margin-top:16px}
+    .admin-automation-item{padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface-light)}
+    .admin-automation-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .admin-automation-title strong{display:block;font-size:.92rem}
+    .admin-automation-title small{display:block;margin-top:3px;color:var(--muted)}
+    .admin-automation-state{font-size:.7rem;font-weight:900;white-space:nowrap}
+    .admin-automation-state.is-healthy{color:var(--primary)}
+    .admin-automation-state.is-warning{color:var(--warning)}
+    .admin-automation-state.is-error{color:#ff7676}
+    .admin-cron-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .admin-cron-grid>div{padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+    .admin-cron-grid small{display:block;margin-bottom:5px;color:var(--muted);font-size:.66rem;font-weight:900;letter-spacing:.04em}
+    .admin-cron-grid strong{display:block;font-size:.84rem;word-break:break-word}
+    .admin-cron-error{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:rgba(255,82,82,.1);color:#ff9a9a;font-size:.8rem}
     .admin-cron-success{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(50,215,75,.1);color:var(--primary);font-size:.8rem}
     .admin-cron-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
-    @media(max-width:760px){.admin-cron-monitor-head{display:grid}.admin-cron-status{justify-self:start}.admin-cron-grid{grid-template-columns:1fr 1fr}.admin-cron-actions{justify-content:stretch}.admin-cron-actions .btn{width:100%}}
+    @media(max-width:760px){.admin-cron-monitor-head,.admin-automation-title{display:grid}.admin-cron-status{justify-self:start}.admin-cron-grid{grid-template-columns:1fr 1fr}.admin-cron-actions{justify-content:stretch}.admin-cron-actions .btn{width:100%}}
     @media(max-width:460px){.admin-cron-grid{grid-template-columns:1fr}}
   `;
   document.head.appendChild(style);
@@ -59,7 +68,7 @@ function ensureCard() {
   ensureStyles();
   monitorCard = document.createElement('section');
   monitorCard.className = 'card admin-section-card admin-cron-monitor';
-  monitorCard.innerHTML = '<div class="admin-cron-monitor-head"><div><small>AUTOMAÇÃO FINANCEIRA</small><h2>Geração mensal de cobranças</h2><p>Verificando execução automática...</p></div><span class="admin-cron-status">Carregando</span></div>';
+  monitorCard.innerHTML = '<div class="admin-cron-monitor-head"><div><small>AUTOMAÇÕES OPERACIONAIS</small><h2>Rotinas financeiras</h2><p>Verificando tarefas automáticas...</p></div><span class="admin-cron-status">Carregando</span></div>';
   const attentionSection = overviewPanel.querySelector('.admin-attention-section');
   overviewPanel.insertBefore(monitorCard, attentionSection || overviewPanel.firstElementChild);
   return monitorCard;
@@ -67,9 +76,16 @@ function ensureCard() {
 
 function toneForState(state) {
   if (state === 'saudavel') return { className: 'is-healthy', label: '✓ Operacional' };
-  if (state === 'aguardando') return { className: 'is-warning', label: 'Aguardando execução' };
-  if (state === 'atrasado') return { className: 'is-error', label: 'Execução atrasada' };
-  return { className: 'is-error', label: 'Atenção necessária' };
+  if (state === 'aguardando') return { className: 'is-warning', label: 'Aguardando' };
+  if (state === 'atrasado') return { className: 'is-error', label: 'Atrasado' };
+  return { className: 'is-error', label: 'Atenção' };
+}
+
+function overallState(generationState, cleanupState) {
+  const states = [generationState, cleanupState];
+  if (states.includes('erro') || states.includes('atrasado')) return 'erro';
+  if (states.includes('aguardando')) return 'aguardando';
+  return 'saudavel';
 }
 
 function canRunManually(data = {}) {
@@ -80,27 +96,64 @@ function render(data = {}, feedback = '', feedbackType = 'success') {
   const card = ensureCard();
   if (!card) return;
   currentStatus = data;
-  const tone = toneForState(data.estado);
+
+  const cleanup = data.limpeza || {};
+  const overall = overallState(data.estado, cleanup.estado);
+  const tone = toneForState(overall);
+  const generationTone = toneForState(data.estado);
+  const cleanupTone = toneForState(cleanup.estado);
+
   card.className = `card admin-section-card admin-cron-monitor ${tone.className}`;
+
   const execution = data.execucao || {};
   const job = data.job || {};
   const cron = data.cron || {};
-  const error = execution.erro || (cron.status && cron.status !== 'succeeded' ? cron.mensagem : '');
+  const generationError = execution.erro || (cron.status && cron.status !== 'succeeded' ? cron.mensagem : '');
+
+  const cleanupExecution = cleanup.execucao || {};
+  const cleanupJob = cleanup.job || {};
+  const cleanupCron = cleanup.cron || {};
+  const cleanupError = cleanupExecution.erro || (cleanupCron.status && cleanupCron.status !== 'succeeded' ? cleanupCron.mensagem : '');
+
   const showManualAction = canRunManually(data);
   const feedbackClass = feedbackType === 'error' ? 'admin-cron-error' : 'admin-cron-success';
+  const headline = overall === 'saudavel'
+    ? 'Geração mensal e limpeza automática funcionando normalmente.'
+    : 'Uma ou mais rotinas automáticas precisam de atenção.';
 
   card.innerHTML = `
     <div class="admin-cron-monitor-head">
-      <div><small>AUTOMAÇÃO FINANCEIRA</small><h2>Geração mensal de cobranças</h2><p>${esc(data.mensagem || 'Status indisponível.')}</p></div>
+      <div><small>AUTOMAÇÕES OPERACIONAIS</small><h2>Rotinas financeiras</h2><p>${esc(headline)}</p></div>
       <span class="admin-cron-status">${esc(tone.label)}</span>
     </div>
-    <div class="admin-cron-grid">
-      <div><small>COMPETÊNCIA</small><strong>${esc(formatCompetence(data.competencia))}</strong></div>
-      <div><small>JOB</small><strong>${job.ativo ? 'Ativo · dia 1 às 03:05' : 'Inativo'}</strong></div>
-      <div><small>ÚLTIMA EXECUÇÃO</small><strong>${esc(formatDateTime(execution.finalizado_em || execution.iniciado_em || cron.fim || cron.inicio))}</strong></div>
-      <div><small>COBRANÇAS CRIADAS</small><strong>${Number(execution.cobrancas_criadas || 0)}</strong></div>
+    <div class="admin-automation-list">
+      <div class="admin-automation-item">
+        <div class="admin-automation-title">
+          <div><strong>Geração mensal de cobranças</strong><small>${esc(data.mensagem || 'Status indisponível.')}</small></div>
+          <span class="admin-automation-state ${generationTone.className}">${esc(generationTone.label)}</span>
+        </div>
+        <div class="admin-cron-grid">
+          <div><small>COMPETÊNCIA</small><strong>${esc(formatCompetence(data.competencia))}</strong></div>
+          <div><small>JOB</small><strong>${job.ativo ? 'Ativo · dia 1 às 03:05' : 'Inativo'}</strong></div>
+          <div><small>ÚLTIMA EXECUÇÃO</small><strong>${esc(formatDateTime(execution.finalizado_em || execution.iniciado_em || cron.fim || cron.inicio))}</strong></div>
+          <div><small>COBRANÇAS CRIADAS</small><strong>${Number(execution.cobrancas_criadas || 0)}</strong></div>
+        </div>
+        ${generationError ? `<p class="admin-cron-error"><strong>Detalhe:</strong> ${esc(generationError)}</p>` : ''}
+      </div>
+      <div class="admin-automation-item">
+        <div class="admin-automation-title">
+          <div><strong>Limpeza dos históricos</strong><small>${esc(cleanup.mensagem || 'Status indisponível.')}</small></div>
+          <span class="admin-automation-state ${cleanupTone.className}">${esc(cleanupTone.label)}</span>
+        </div>
+        <div class="admin-cron-grid">
+          <div><small>JOB</small><strong>${cleanupJob.ativo ? 'Ativo · diariamente às 04:20' : 'Inativo'}</strong></div>
+          <div><small>ÚLTIMA EXECUÇÃO</small><strong>${esc(formatDateTime(cleanupExecution.finalizado_em || cleanupExecution.iniciado_em || cleanupCron.fim || cleanupCron.inicio))}</strong></div>
+          <div><small>LOGS DO CRON REMOVIDOS</small><strong>${Number(cleanupExecution.registros_cron_removidos || 0)}</strong></div>
+          <div><small>HISTÓRICOS REMOVIDOS</small><strong>${Number(cleanupExecution.registros_financeiros_removidos || 0)}</strong></div>
+        </div>
+        ${cleanupError ? `<p class="admin-cron-error"><strong>Detalhe:</strong> ${esc(cleanupError)}</p>` : ''}
+      </div>
     </div>
-    ${error ? `<p class="admin-cron-error"><strong>Detalhe:</strong> ${esc(error)}</p>` : ''}
     ${feedback ? `<p class="${feedbackClass}">${esc(feedback)}</p>` : ''}
     ${showManualAction ? `<div class="admin-cron-actions"><button class="btn btn-primary" type="button" data-run-monthly-generation ${runningManually ? 'disabled' : ''}>${runningManually ? 'Executando...' : 'Executar geração agora'}</button></div>` : ''}`;
 }
@@ -111,7 +164,7 @@ async function loadCronStatus(feedback = '', feedbackType = 'success') {
   const { data, error } = await supabase.rpc('fsfit_admin_status_geracao_mensalidades');
   if (error) {
     console.error('Erro ao carregar monitoramento do cron:', error);
-    render({ estado: 'erro', mensagem: 'Não foi possível consultar o monitoramento da geração mensal.', execucao: { erro: error.message } });
+    render({ estado: 'erro', mensagem: 'Não foi possível consultar o monitoramento das rotinas.', execucao: { erro: error.message }, limpeza: { estado: 'erro', mensagem: 'Status indisponível.' } });
     return;
   }
   render(data || {}, feedback, feedbackType);
