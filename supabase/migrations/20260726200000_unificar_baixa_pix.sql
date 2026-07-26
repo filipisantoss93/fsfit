@@ -1,5 +1,13 @@
 create schema if not exists fsfit_internal;
 
+alter table public.app_runtime_secrets
+  add column if not exists efi_webhook_secret text;
+
+create unique index if not exists cobrancas_pix_e2e_id_unique
+  on public.cobrancas_pix (e2e_id)
+  where e2e_id is not null
+    and btrim(e2e_id) <> '';
+
 create or replace function fsfit_internal.marcar_cobranca_pix_paga(
   p_cobranca_id uuid,
   p_txid text,
@@ -53,7 +61,7 @@ declare
   v_token text;
   v_cobranca_id uuid;
 begin
-  select cron_secret
+  select efi_webhook_secret
     into v_token
     from public.app_runtime_secrets
    where id = 1;
