@@ -1,13 +1,19 @@
 (() => {
   const stylesheetId = 'fsfit-student-record-actions-styles';
+  const contentStylesheetId = 'fsfit-student-record-content-styles';
 
-  function ensureStylesheet() {
-    if (document.getElementById(stylesheetId)) return;
+  function appendStylesheet(id, href) {
+    if (document.getElementById(id)) return;
     const link = document.createElement('link');
-    link.id = stylesheetId;
+    link.id = id;
     link.rel = 'stylesheet';
-    link.href = 'css/ficha-aluno-acoes.css?v=20260726-ux2';
+    link.href = href;
     document.head.append(link);
+  }
+
+  function ensureStylesheets() {
+    appendStylesheet(stylesheetId, 'css/ficha-aluno-acoes.css?v=20260726-ux2');
+    appendStylesheet(contentStylesheetId, 'css/ficha-aluno-conteudo.css?v=20260726-ux3');
   }
 
   function closeMenu(menu, toggle, { restoreFocus = false } = {}) {
@@ -109,6 +115,34 @@
     document.body.classList.add('student-record-header-actions-ready');
   }
 
+  function enhanceInternalContent() {
+    const labels = {
+      overview: 'Resumo',
+      planning: 'Plano',
+      evolution: 'Evolução',
+      history: 'Treinos',
+      access: 'Acesso'
+    };
+
+    document.querySelectorAll('[data-record-tab]').forEach(tab => {
+      const label = labels[tab.dataset.recordTab];
+      if (label) tab.textContent = label;
+    });
+
+    const actionContent = [
+      ['#workout-editor-link', 'Treinos', 'Monte e organize as rotinas de exercícios do aluno.'],
+      ['#diet-editor-link', 'Alimentação', 'Estruture orientações e refeições por horário.'],
+      ['#reminders-link', 'Lembretes', 'Programe avisos e acompanhamentos importantes.']
+    ];
+
+    actionContent.forEach(([selector, title, description]) => {
+      const action = document.querySelector(selector);
+      if (!action || action.dataset.enhanced === 'true') return;
+      action.dataset.enhanced = 'true';
+      action.innerHTML = `<span class="planning-action-title">${title}</span><span class="planning-action-description">${description}</span><span class="planning-action-arrow" aria-hidden="true">→</span>`;
+    });
+  }
+
   function enhanceModal() {
     const modal = document.querySelector('#student-edit-modal');
     const close = document.querySelector('#student-edit-close');
@@ -141,8 +175,9 @@
   }
 
   function init() {
-    ensureStylesheet();
+    ensureStylesheets();
     buildHeaderActions();
+    enhanceInternalContent();
     enhanceModal();
   }
 
