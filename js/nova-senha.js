@@ -10,13 +10,16 @@ function show(text, type = 'error') {
 }
 
 supabase.auth.onAuthStateChange((event) => {
-  if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+  if (event === 'PASSWORD_RECOVERY') {
     recoveryReady = true;
   }
 });
 
+const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+const queryParams = new URLSearchParams(window.location.search);
+const recoveryFlow = hashParams.get('type') === 'recovery' || queryParams.get('type') === 'recovery';
 const { data: { session } } = await supabase.auth.getSession();
-if (session) recoveryReady = true;
+if (session && recoveryFlow) recoveryReady = true;
 
 form?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -24,7 +27,7 @@ form?.addEventListener('submit', async event => {
   const confirmPassword = form.confirm_password.value;
 
   if (password !== confirmPassword) return show('As senhas não coincidem.');
-  if (password.length < 6) return show('A senha deve ter pelo menos 6 caracteres.');
+  if (password.length < 8) return show('A senha deve ter pelo menos 8 caracteres.');
   if (!recoveryReady) return show('Este link de recuperação é inválido ou expirou. Solicite um novo link.');
 
   const button = form.querySelector('[type="submit"]');
