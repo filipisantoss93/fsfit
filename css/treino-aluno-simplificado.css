@@ -94,3 +94,53 @@ html.workout-simple-preload #student-name{min-width:0;width:100%;min-height:1.25
 .simple-workout-modal{padding:6px;padding-bottom:max(6px,env(safe-area-inset-bottom))}.simple-workout-modal-card{padding:15px;border-radius:20px}.simple-form-grid{grid-template-columns:1fr 1fr;gap:8px}.simple-modal-actions{justify-content:stretch}.simple-modal-actions .btn{flex:1;padding:0 8px}.simple-detail-actions{display:grid;grid-template-columns:1fr 1fr}.simple-search-field{top:-15px;margin:-15px -15px 9px!important;padding:12px 15px 9px}.simple-modal-actions.sticky{bottom:-15px;margin:12px -15px -15px;padding:10px 15px calc(10px + env(safe-area-inset-bottom))}
 }
 @media(max-width:380px){.simple-section-head{display:block}.simple-section-head .btn{width:100%;margin-top:10px}.simple-form-grid{grid-template-columns:1fr}.simple-saved-actions{display:grid;grid-template-columns:1fr 1fr}.simple-saved-actions button.danger{grid-column:1/-1;margin-left:0}}
+
+/* FS Fit · consolidação visual da página de treinos · 2026-07-26 */
+body.workout-simple-enabled .workout-page{width:min(calc(100% - 24px),1040px);margin-top:18px}
+body.workout-simple-enabled .workout-page>.page-header{margin-bottom:14px}
+body.workout-simple-enabled .workout-page>.page-header #back-link{min-height:40px;padding:0 13px;border-radius:13px}
+body.workout-simple-enabled .workout-page>.page-header h1{font-size:clamp(1.55rem,4vw,2.05rem);letter-spacing:-.035em}
+.simple-workout-app{gap:14px;margin-top:0}
+.simple-workout-main-tabs{gap:6px;padding:6px;border-color:rgba(77,94,121,.42);border-radius:18px;background:rgba(10,16,25,.94);box-shadow:0 10px 28px rgba(0,0,0,.22)}
+.simple-workout-main-tabs button{min-height:54px;border-radius:13px;font-size:.9rem;transition:background .18s ease,color .18s ease,transform .18s ease}
+.simple-workout-main-tabs button:active{transform:scale(.99)}
+.simple-workout-main-tabs button.active{background:rgba(184,229,28,.11);color:var(--primary);box-shadow:inset 0 0 0 1px rgba(184,229,28,.17)}
+.simple-workout-main-tabs button small{margin-top:3px;color:var(--muted);font-size:.66rem;opacity:1}
+.simple-week-panel,.simple-saved-panel{padding:18px;border-color:rgba(77,94,121,.4);border-radius:20px;background:linear-gradient(180deg,rgba(14,21,32,.98),rgba(9,15,24,.98));box-shadow:0 16px 44px rgba(0,0,0,.25)}
+.simple-weekday-tabs{gap:5px;margin-bottom:18px;padding:6px;border-color:rgba(77,94,121,.38);border-radius:16px;background:rgba(9,15,24,.92)}
+.simple-weekday-tabs button{height:42px;border-radius:11px;font-size:.73rem}
+.simple-weekday-tabs button.active{background:linear-gradient(180deg,#c8f23a 0%,#a9da16 100%);color:#091005;box-shadow:0 7px 18px rgba(184,229,28,.15)}
+.simple-section-head{align-items:center;margin-bottom:14px}
+.simple-section-head small{margin-bottom:4px;color:#8d98a6;font-size:.68rem;letter-spacing:.11em;text-transform:uppercase}
+.simple-section-head h2{font-size:1.15rem;letter-spacing:-.02em}
+.simple-section-head p{font-size:.78rem}
+.simple-section-head .btn{min-height:42px;border-radius:13px;font-size:.76rem}
+.simple-assignment-list,.simple-saved-list,.simple-exercise-list{gap:10px}
+.simple-assignment-card,.simple-saved-card{border-color:rgba(77,94,121,.38);border-radius:15px;background:linear-gradient(180deg,rgba(21,31,45,.94),rgba(17,25,37,.94));box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.simple-assignment-main,.simple-saved-main{min-height:68px;padding:14px 15px}
+.simple-assignment-main strong,.simple-saved-main strong{font-size:.95rem}
+.simple-assignment-main small,.simple-saved-main small{font-size:.72rem}
+.simple-card-menu{padding:0 14px;border-left-color:rgba(77,94,121,.38);font-size:.68rem}
+.simple-saved-actions{gap:7px;padding:0 12px 12px}
+.simple-saved-actions button{min-height:36px;padding:6px 10px;border-radius:10px;font-size:.68rem}
+.simple-empty-state{gap:8px;padding:28px 16px;border-color:rgba(77,94,121,.42);border-radius:15px;background:rgba(255,255,255,.018)}
+.simple-empty-state strong{font-size:.96rem}
+.simple-empty-state span{font-size:.77rem;line-height:1.45}
+.simple-workout-modal-card{border-color:rgba(77,94,121,.48);background:#111925}
+.simple-modal-actions.sticky,.simple-search-field{background:#111925}
+.simple-exercise-card,.simple-picker-option,.simple-apply-option{border-color:rgba(77,94,121,.38);background:rgba(21,31,45,.78)}
+@media(max-width:640px){
+body.workout-simple-enabled .workout-page{width:100%;margin-top:10px;padding-inline:12px}
+body.workout-simple-enabled .workout-page>.page-header{margin-bottom:12px}
+body.workout-simple-enabled .workout-page>.page-header h1{font-size:1.42rem}
+.simple-workout-app{gap:12px}
+.simple-workout-main-tabs{padding:5px;border-radius:16px}
+.simple-workout-main-tabs button{min-height:50px;padding:6px 8px;font-size:.84rem}
+.simple-week-panel,.simple-saved-panel{padding:14px;border-radius:18px}
+.simple-weekday-tabs{top:max(8px,env(safe-area-inset-top));margin-bottom:15px;padding:5px;border-radius:14px}
+.simple-weekday-tabs button{height:39px;font-size:.68rem}
+.simple-section-head{align-items:flex-start}
+.simple-section-head .btn{min-height:40px;padding:0 10px}
+.simple-assignment-main,.simple-saved-main{min-height:62px;padding:12px 13px}
+.simple-card-menu{padding:0 11px}
+}
