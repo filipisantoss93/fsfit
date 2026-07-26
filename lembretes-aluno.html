@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#0f1115">
   <title>Lembretes do aluno — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/lembretes-aluno-padronizacao.css?v=20260726-ds1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -15,7 +16,7 @@
 </head>
 <body>
   <div id="header-container"></div>
-  <main class="container">
+  <main class="container reminders-page">
     <section class="page-header">
       <div>
         <a id="back-link" class="btn btn-outline" href="alunos.html">← Voltar para ficha</a>
@@ -27,8 +28,8 @@
 
     <div id="reminder-message" class="message"></div>
 
-    <section class="grid grid-2" style="align-items:start">
-      <article class="card">
+    <section class="reminders-layout">
+      <article class="card reminders-form-card">
         <h2 id="form-title">Novo lembrete</h2>
         <form id="reminder-form">
           <div class="form-group">
@@ -98,7 +99,7 @@
         </form>
       </article>
 
-      <article class="card">
+      <article class="card reminders-help-card">
         <h2>Como funciona</h2>
         <p>O lembrete fica vinculado exclusivamente a este aluno e ao personal autenticado.</p>
         <p><strong>Recorrência:</strong> além das opções diárias e semanais, você pode repetir em intervalos personalizados, como a cada 30 minutos, 3 horas ou 3 dias.</p>
@@ -108,11 +109,11 @@
       </article>
     </section>
 
-    <section class="card" style="margin-top:20px">
+    <section class="card reminders-list-card">
       <div class="section-heading compact">
         <div><small>Agenda</small><strong>Lembretes programados</strong></div>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap reminders-table-wrap">
         <table>
           <thead><tr><th>Quando</th><th>Lembrete</th><th>Canal</th><th>Recorrência</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="reminders-list"><tr><td colspan="6">Carregando...</td></tr></tbody>
