@@ -148,11 +148,239 @@
   margin-top: 16px;
 }
 
+/* Estrutura principal da ficha */
+.student-record-container {
+  width: min(1180px, calc(100% - 32px));
+  margin-inline: auto;
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+}
+
+.student-record-header {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 22px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(31, 38, 46, .96), rgba(20, 24, 29, .98));
+  box-shadow: 0 18px 46px rgba(0,0,0,.22);
+}
+
+.record-back-link {
+  width: fit-content;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.record-back-link:hover { color: #fff; }
+
+.student-record-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.student-record-title h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.student-record-title p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.hero-badge {
+  flex: 0 0 auto;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid rgba(50, 215, 75, .34);
+  border-radius: 999px;
+  background: rgba(50, 215, 75, .1);
+  color: #75e99a;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .09em;
+}
+
+.student-preview-action {
+  margin: 12px 0 20px;
+}
+
+.student-preview-action .btn {
+  min-height: 48px;
+  width: 100%;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 15px;
+}
+
+.record-tabs {
+  position: sticky;
+  top: var(--safe-area-top, 0px);
+  z-index: 90;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 20px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  background: rgba(20, 23, 29, .97);
+  box-shadow: 0 14px 34px rgba(0,0,0,.24);
+}
+
+.record-tab {
+  min-width: 0;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.record-tab:hover { color: #fff; background: rgba(255,255,255,.045); }
+.record-tab.active {
+  background: rgba(50, 215, 75, .14);
+  color: #8af0a7;
+  box-shadow: inset 0 0 0 1px rgba(50, 215, 75, .18);
+}
+
+.record-tab-panel { display: none; }
+.record-tab-panel.active { display: block; }
+
+.record-overview-grid,
+.evolution-entry-grid {
+  align-items: start;
+  gap: 18px;
+}
+
+.student-record-page .card,
+.student-record-page .sub-card {
+  border-color: rgba(255,255,255,.085);
+  box-shadow: 0 14px 34px rgba(0,0,0,.14);
+}
+
+.student-record-page .section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.student-record-page .section-heading small {
+  display: block;
+  margin-bottom: 6px;
+  color: #8d98a6;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.student-record-page .section-heading h2 {
+  margin: 0;
+  font-size: 1.12rem;
+  letter-spacing: -.015em;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metric-card {
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 15px;
+  background: rgba(255,255,255,.025);
+}
+
+.metric-card span,
+.metric-card small { color: var(--muted); }
+.metric-card span { font-size: .78rem; font-weight: 700; }
+.metric-card strong { font-size: 1.45rem; }
+.metric-card small { font-size: .72rem; }
+
+.profile-card .actions,
+.planning-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.planning-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.profile-card .actions .btn,
+.planning-actions .btn { width: 100%; justify-content: center; box-sizing: border-box; }
+
+.workout-history-list { display: grid; gap: 14px; }
+.workout-history-item {
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 18px;
+  background: rgba(255,255,255,.025);
+  padding: 18px;
+}
+.workout-history-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.workout-history-head small { color: #9aa4b2; }
+.workout-history-head h3 { margin: 5px 0 0; }
+.workout-history-status { color: #69e39b; background: rgba(42,184,105,.14); border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+.workout-history-metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.workout-history-metrics div { background: #232a33; border-radius: 14px; padding: 12px; }
+.workout-history-metrics span { display: block; color: #9aa4b2; font-size: 12px; margin-bottom: 4px; }
+.workout-history-metrics strong { font-size: 17px; }
+.workout-history-progress { height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 14px; }
+.workout-history-progress span { display: block; height: 100%; background: #2bd957; border-radius: inherit; }
+.workout-history-times { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; color: #9aa4b2; font-size: 13px; margin-top: 12px; }
+
+@media (max-width: 820px) {
+  .student-record-container { width: min(100% - 24px, 760px); }
+  .record-overview-grid,
+  .evolution-entry-grid { grid-template-columns: 1fr; }
+  .planning-actions { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 700px) {
   .media-create-grid,
   .student-media-grid { grid-template-columns: 1fr; }
   .media-form { padding: 15px; }
 
+  .student-record-container {
+    width: 100%;
+    padding-inline: 12px;
+  }
+
+  .student-record-header {
+    margin-top: 10px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .student-record-title { align-items: center; }
+  .student-record-title h1 { font-size: 1.65rem; }
+  .hero-badge { min-height: 30px; padding-inline: 10px; }
+
+  .record-tabs,
   .record-tabs.record-tabs-compact {
     top: var(--safe-area-top) !important;
     z-index: 90;
@@ -160,6 +388,7 @@
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 4px !important;
     overflow: visible !important;
+    border-radius: 16px;
     box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
   }
   .record-tabs.record-tabs-compact.is-stuck::before {
@@ -173,23 +402,39 @@
     pointer-events: none;
     background: #14171d;
   }
+  .record-tabs .record-tab,
   .record-tabs.record-tabs-compact .record-tab {
     min-width: 0 !important;
-    padding: 12px 4px !important;
-    font-size: .75rem !important;
+    min-height: 42px;
+    padding: 10px 3px !important;
+    font-size: .7rem !important;
     white-space: nowrap;
   }
+
+  .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-card .actions { grid-template-columns: 1fr; }
 
   .student-activation-heading { align-items: center; }
   .student-activation-overview-card { padding: 18px; }
   .student-activation-actions { display: grid; }
   .student-activation-actions .btn { width: 100%; }
 
-  /* Safari/iOS: evita múltiplas superfícies sticky com blur simultâneo. */
   .record-tabs,
   .fsfit-student-quick-actions {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     background: #14171d !important;
   }
+}
+
+@media (max-width: 420px) {
+  .student-record-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .metric-grid { grid-template-columns: 1fr; }
+  .record-tabs .record-tab,
+  .record-tabs.record-tabs-compact .record-tab { font-size: .66rem !important; }
 }
