@@ -181,24 +181,48 @@ body.student-edit-open {
 }
 
 @media (max-width: 700px) {
+  .student-record-header-enhanced {
+    padding-bottom: 64px !important;
+  }
+
   .student-record-header-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 44px;
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    z-index: 25;
+    display: block;
+    margin: 0;
   }
 
   .student-record-primary-action {
-    width: 100%;
-    min-width: 0;
+    display: none !important;
+  }
+
+  .student-record-menu-toggle {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    border-radius: 13px;
   }
 
   .student-record-menu-popover {
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    top: auto;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    width: auto;
-    border-radius: 18px;
+    position: absolute;
+    left: auto;
+    right: 0;
+    top: calc(100% + 8px);
+    bottom: auto;
+    width: min(248px, calc(100vw - 48px));
+    max-height: min(280px, calc(100dvh - 190px));
+    overflow-y: auto;
+    border-radius: 16px;
+    background: #1a1f26;
+    box-shadow: 0 20px 45px rgba(0,0,0,.48);
+  }
+
+  .student-record-menu-action {
+    min-height: 46px;
+    padding: 0 13px;
+    font-size: .9rem;
   }
 
   .student-edit-modal {
