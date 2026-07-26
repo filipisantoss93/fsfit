@@ -1,0 +1,172 @@
+.student-workflow-card.student-workflow-priority{
+  border-color:rgba(50,215,75,.2);
+  background:linear-gradient(150deg,rgba(26,39,32,.72),rgba(20,24,30,.98));
+}
+.student-workflow-priority .student-workflow-heading{
+  margin-bottom:15px;
+}
+.student-workflow-priority .student-workflow-progress.has-pending{
+  border-color:rgba(255,198,52,.34);
+  background:rgba(255,198,52,.09);
+  color:#ffd66b;
+}
+.student-workflow-priority .student-workflow-progress.is-complete{
+  border-color:rgba(50,215,75,.34);
+  background:rgba(50,215,75,.1);
+  color:var(--primary);
+}
+.student-attention-list{
+  margin-top:14px!important;
+  gap:8px!important;
+}
+.student-attention-list .student-workflow-step{
+  min-height:58px;
+  padding:11px 12px;
+  border-color:rgba(255,198,52,.18);
+  background:rgba(255,198,52,.035);
+}
+.student-attention-list .student-workflow-step-icon{
+  background:rgba(255,198,52,.11);
+  color:#ffd66b;
+}
+.student-attention-list .student-workflow-step a,
+.student-attention-list .student-workflow-step button{
+  color:#d9f77b;
+}
+.student-all-set{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:64px;
+  padding:13px 14px;
+  border:1px solid rgba(50,215,75,.2);
+  border-radius:14px;
+  background:rgba(50,215,75,.055);
+}
+.student-all-set>span{
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:rgba(50,215,75,.14);
+  color:var(--primary);
+  font-size:1rem;
+  font-weight:900;
+}
+.student-all-set strong,
+.student-all-set small{
+  display:block;
+}
+.student-all-set strong{
+  font-size:.88rem;
+}
+.student-all-set small{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:.73rem;
+  line-height:1.4;
+}
+.student-setup-details{
+  margin-top:12px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;
+  background:rgba(255,255,255,.018);
+}
+.student-setup-details summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:46px;
+  padding:10px 13px;
+  color:var(--muted);
+  font-size:.78rem;
+  font-weight:800;
+  cursor:pointer;
+  list-style:none;
+}
+.student-setup-details summary::-webkit-details-marker{display:none}
+.student-setup-details summary::after{
+  content:'›';
+  flex:0 0 auto;
+  color:var(--primary);
+  font-size:1.2rem;
+  line-height:1;
+  transition:transform .18s ease;
+}
+.student-setup-details[open] summary::after{transform:rotate(90deg)}
+.student-setup-details summary span{min-width:0;flex:1}
+.student-setup-details summary small{
+  flex:0 0 auto;
+  color:var(--muted);
+  font-size:.68rem;
+  font-weight:700;
+}
+.student-setup-details-body{
+  display:grid;
+  gap:7px;
+  padding:0 11px 11px;
+}
+.student-setup-details-body .student-workflow-step{
+  min-height:48px;
+  padding:9px 10px;
+  background:rgba(255,255,255,.02);
+}
+.evolution-priority-panel .weight-history-card{
+  margin-top:0;
+  margin-bottom:20px;
+}
+.evolution-entry-heading{
+  margin:0 0 13px;
+}
+.evolution-entry-heading small{
+  display:block;
+  margin-bottom:4px;
+  color:var(--primary);
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.09em;
+}
+.evolution-entry-heading h2{
+  margin:0;
+  font-size:1.34rem;
+  letter-spacing:-.025em;
+}
+.evolution-entry-heading p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:.8rem;
+  line-height:1.45;
+}
+@media(max-width:700px){
+  .student-workflow-priority .student-workflow-heading{
+    align-items:flex-start;
+  }
+  .student-workflow-priority .student-workflow-progress{
+    min-height:28px;
+    padding-inline:9px;
+    font-size:.68rem;
+  }
+  .student-attention-list .student-workflow-step{
+    align-items:center;
+  }
+  .student-attention-list .student-workflow-step a,
+  .student-attention-list .student-workflow-step button{
+    padding-top:0;
+  }
+  .student-setup-details summary{
+    padding-inline:12px;
+  }
+  .student-setup-details summary small{
+    display:none;
+  }
+  .evolution-priority-panel .weight-history-card{
+    margin-bottom:16px;
+  }
+  .evolution-entry-heading h2{
+    font-size:1.22rem;
+  }
+}
