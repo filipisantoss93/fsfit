@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { requireSession } from './layout.js';
+import './admin-cron-monitor.js?v=20260726-cron-monitor1';
 
 const session = await requireSession();
 if (!session) throw new Error('Sessão inválida');
