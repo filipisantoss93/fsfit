@@ -1,0 +1,252 @@
+.student-record-page .planning-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.student-record-page .planning-actions .btn {
+  min-height: 128px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  text-align: left;
+  padding: 18px;
+  border-radius: 18px;
+  gap: 8px;
+  white-space: normal;
+}
+
+.student-record-page .planning-action-title {
+  display: block;
+  color: #f7f9fb;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.student-record-page .planning-action-description {
+  display: block;
+  color: #9aa4b2;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.student-record-page .planning-action-arrow {
+  margin-top: auto;
+  color: #69e39b;
+  font-size: 18px;
+}
+
+.student-record-page .assessment-group {
+  padding: 14px 0;
+}
+
+.student-record-page .assessment-group + .assessment-group {
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.student-record-page .student-media-section {
+  padding-bottom: 20px;
+}
+
+.student-record-page .media-create-grid {
+  align-items: start;
+}
+
+.student-record-page .media-form {
+  padding: 16px;
+}
+
+.student-record-page .student-media-card {
+  display: grid;
+  grid-template-columns: minmax(150px, 42%) minmax(0, 1fr);
+  min-height: 160px;
+}
+
+.student-record-page .student-media-preview {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.student-record-page .student-media-body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.student-record-page .student-media-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.student-record-page .student-media-actions {
+  margin-top: auto;
+}
+
+.student-record-page .student-media-actions a {
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.student-record-page .student-media-actions .btn-danger {
+  min-height: 36px;
+  background: transparent;
+}
+
+.student-record-page .workout-history-list {
+  gap: 12px;
+}
+
+.student-record-page .workout-history-item,
+.student-record-page .weight-history-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 240px;
+}
+
+.student-record-page .workout-history-item {
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.student-record-page .workout-history-metrics {
+  margin-top: 12px;
+}
+
+.student-record-page .workout-history-metrics div {
+  padding: 10px 12px;
+}
+
+.student-record-page .workout-history-times {
+  margin-top: 10px;
+}
+
+@media (max-width: 760px) {
+  .student-record-page .planning-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .student-record-page .planning-actions .btn {
+    min-height: 104px;
+    padding: 16px;
+  }
+
+  .student-record-page .evolution-entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-record-page .assessment-card form,
+  .student-record-page .weight-history-card {
+    font-size: 14px;
+  }
+
+  .student-record-page .responsive-history table,
+  .student-record-page .responsive-history tbody,
+  .student-record-page .responsive-history tr,
+  .student-record-page .responsive-history td {
+    display: block;
+    width: 100%;
+  }
+
+  .student-record-page .responsive-history thead {
+    display: none;
+  }
+
+  .student-record-page .responsive-history tr {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .student-record-page .responsive-history td {
+    border: 0;
+    padding: 4px 0;
+  }
+
+  .student-record-page .responsive-history td::before {
+    display: inline-block;
+    min-width: 92px;
+    margin-right: 8px;
+    color: #9aa4b2;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .student-record-page .responsive-history td:nth-child(1)::before { content: 'Data'; }
+  .student-record-page .responsive-history td:nth-child(2)::before { content: 'Peso'; }
+  .student-record-page .responsive-history td:nth-child(3)::before { content: 'Variação'; }
+  .student-record-page .responsive-history td:nth-child(4)::before { content: 'Observações'; }
+
+  .student-record-page .media-create-grid,
+  .student-record-page .student-media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-record-page .student-media-card {
+    grid-template-columns: 112px minmax(0, 1fr);
+    min-height: 128px;
+  }
+
+  .student-record-page .student-media-body {
+    padding: 12px;
+  }
+
+  .student-record-page .student-media-actions {
+    align-items: flex-end;
+  }
+
+  .student-record-page .student-media-actions a {
+    font-size: .78rem;
+  }
+
+  .student-record-page .workout-history-head {
+    gap: 8px;
+  }
+
+  .student-record-page .workout-history-status {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .student-record-page .workout-history-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .student-record-page .workout-history-metrics div {
+    padding: 9px 8px;
+  }
+
+  .student-record-page .workout-history-metrics span {
+    font-size: 10px;
+  }
+
+  .student-record-page .workout-history-metrics strong {
+    font-size: 14px;
+  }
+
+  .student-record-page .workout-history-times {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .student-record-page .student-media-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .student-record-page .student-media-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .student-record-page .student-media-actions .btn,
+  .student-record-page .student-media-actions a {
+    width: 100%;
+    text-align: center;
+  }
+}
