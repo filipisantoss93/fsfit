@@ -223,6 +223,75 @@
   #dashboard-overview-panel .attention-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* Dashboard contínuo: abas apenas no mobile/PWA. */
+  .dashboard-tabs {
+    display: none !important;
+  }
+
+  body main.container .dashboard-tab-panel[hidden] {
+    display: block !important;
+  }
+
+  main.container {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+  }
+
+  main.container > #access-notice,
+  main.container > .dashboard-home-header,
+  main.container > #dashboard-home-panel,
+  main.container > #dashboard-overview-panel {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  #dashboard-overview-panel {
+    display: grid !important;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: 12px;
+  }
+
+  #dashboard-overview-panel > .attention-card,
+  #dashboard-overview-panel > .dashboard-overview-summary {
+    display: none !important;
+  }
+
+  #dashboard-overview-panel > .admin-cron-monitor {
+    grid-column: 1 / -1;
+    margin: 0 !important;
+  }
+
+  #dashboard-overview-panel > .dashboard-public-link-compact,
+  #dashboard-overview-panel > .dashboard-activity-card {
+    min-width: 0;
+    margin: 0 !important;
+  }
+
+  main.container > #dashboard-agenda-panel {
+    grid-column: 1 / span 7;
+    width: 100%;
+  }
+
+  main.container > #dashboard-live-panel {
+    grid-column: 8 / -1;
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  #dashboard-agenda-panel .today-card,
+  #dashboard-live-panel {
+    height: 100%;
+  }
+
+  #dashboard-agenda-panel .dashboard-empty,
+  #dashboard-live-panel .empty {
+    min-height: 92px;
+    display: grid;
+    place-items: center;
+  }
 }
 
 @media (max-width: 520px) {
