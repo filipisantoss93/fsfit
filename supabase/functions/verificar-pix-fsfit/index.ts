@@ -76,17 +76,25 @@ Deno.serve(async (req: Request) => {
       if (String(efi?.status || "").toUpperCase() === "CONCLUIDA") {
         const pix = Array.isArray(efi?.pix) && efi.pix.length ? efi.pix[0] : null;
         const admin = createClient(url, env("SUPABASE_SERVICE_ROLE_KEY"));
-        const { error: updateError } = await admin
-          .from("cobrancas_pix")
-          .update({
-            status: "paga",
-            pago_em: typeof pix?.horario === "string" ? pix.horario : new Date().toISOString(),
-            e2e_id: typeof pix?.endToEndId === "string" ? pix.endToEndId : null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", charge.id)
-          .eq("personal_id", userData.user.id);
-        if (updateError) throw updateError;
+        const { data: processed, error: processError } = await admin.rpc("fsfit_baixar_pix_verificacao", {
+          p_cobranca_id: charge.id,
+          p_txid: charge.txid,
+          p_personal_id: userData.user.id,
+          p_pago_em: typeof pix?.horario === "string" ? pix.horario : new Date().toISOString(),
+          p_e2e_id: typeof pix?.endToEndId === "string" ? pix.endToEndId : null,
+        });
+        if (processError) throw processError;
+        if (processed !== true) {
+          const { data: current } = await client
+            .from("cobrancas_pix")
+            .select("status,processada_em")
+            .eq("id", charge.id)
+            .eq("personal_id", userData.user.id)
+            .maybeSingle();
+          if (!current?.processada_em && current?.status !== "paga") {
+            throw new Error("A cobrança foi confirmada na Efí, mas não pôde ser processada no FS Fit");
+          }
+        }
       }
 
       const { data: updated, error: readError } = await client
