@@ -1,0 +1,27 @@
+/* FS Fit — padronização da página pública de acesso do aluno */
+.student-page{min-height:100dvh;background:radial-gradient(circle at 50% -15%,rgba(50,215,75,.1),transparent 34%),var(--background,#0f1115)}
+.student-shell{width:min(calc(100% - 24px),540px);min-height:100dvh;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom));box-sizing:border-box}
+.student-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 2px 18px;padding:0}
+.student-header .auth-logo{display:inline-flex;align-items:baseline;gap:3px;text-decoration:none}.student-header .auth-logo strong{font-size:1.35rem}.student-header .auth-logo span{color:var(--primary);font-size:1.35rem;font-weight:900}.student-header p{margin:0;color:var(--muted);font-size:.75rem;font-weight:800;letter-spacing:.04em}
+.student-access-card{width:100%;max-width:none!important;margin:0!important;padding:22px!important;border-radius:22px!important;background:linear-gradient(145deg,rgba(28,33,40,.98),rgba(20,24,29,.98))!important;box-shadow:0 22px 70px rgba(0,0,0,.32)!important}
+.student-access-card>.hero-badge{min-height:27px;padding:0 9px;font-size:.61rem}
+.student-access-card h1{margin:13px 0 7px!important;font-size:clamp(1.7rem,8vw,2.1rem);letter-spacing:-.035em;line-height:1.06}
+.student-access-card>#access-description{margin:0 0 18px;color:var(--muted);font-size:.83rem;line-height:1.5}
+.student-access-card form{min-width:0}.student-access-card .form-group{min-width:0;margin-bottom:13px}.student-access-card label{font-size:.72rem;font-weight:800}.student-access-card input{display:block;width:100%;max-width:100%;min-width:0;min-height:52px;box-sizing:border-box;border-radius:13px;font-size:1rem}
+.student-access-card input[type='password']{font-size:1.25rem;letter-spacing:.25em;text-align:center}
+.student-access-card .btn{width:100%;min-height:48px;justify-content:center;border-radius:13px;font-size:.78rem}
+.student-identity{margin:0 0 13px!important;padding:13px 14px!important;border-radius:13px!important}.student-identity strong{font-size:1rem!important}.student-identity span{font-size:.74rem!important}
+.selected-personal{margin:0 0 13px!important;padding:10px 12px!important;border-radius:13px!important}.selected-personal-avatar{width:44px!important;height:44px!important;flex-basis:44px!important;border-radius:12px!important}.selected-personal strong{font-size:.86rem}.selected-personal span{font-size:.7rem!important}
+.student-access-actions{gap:7px!important;margin-top:6px!important}.student-access-actions .btn-neutral{min-height:43px;font-size:.7rem}
+.activation-help{margin:0 0 14px!important;padding:11px 12px;border:1px solid rgba(59,130,246,.24);border-radius:12px;background:rgba(59,130,246,.07);font-size:.76rem;line-height:1.45}
+.student-access-card>p:last-of-type{margin:15px 0 0!important;padding-top:13px;border-top:1px solid var(--border);font-size:.71rem!important;line-height:1.45!important}
+.student-public-footer{margin:18px auto 0!important;font-size:.74rem!important}.student-public-footer a{text-underline-offset:4px!important}
+.student-access-card .message{margin:0 0 12px}
+.student-access-card .hidden{display:none!important}
+@media(max-width:480px){
+.student-shell{width:min(calc(100% - 18px),540px);padding-top:max(12px,env(safe-area-inset-top))}
+.student-header{margin-bottom:12px}.student-header p{font-size:.68rem}
+.student-access-card{padding:17px!important;border-radius:18px!important}.student-access-card h1{font-size:1.72rem}.student-access-card>#access-description{font-size:.77rem;margin-bottom:15px}
+.student-access-card input{min-height:50px}.student-access-card .btn{min-height:47px}
+}
+@media(max-height:700px){.student-shell{padding-top:max(8px,env(safe-area-inset-top))}.student-header{margin-bottom:9px}.student-access-card{padding:16px!important}.student-access-card h1{font-size:1.55rem}.student-access-card>#access-description{margin-bottom:12px}.student-access-card .form-group{margin-bottom:10px}.student-access-card>p:last-of-type{display:none}}
