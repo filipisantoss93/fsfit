@@ -81,6 +81,17 @@ Este documento é a referência oficial para a evolução do FS Fit.
 
 **Status:** concluída em `css/alunos.css` e `css/alunos-lista-compacta.css`.
 
+### Fase 5 — Ficha do aluno
+- [x] Alinhar cabeçalho, status e ação de visualização ao Design System.
+- [x] Padronizar abas sticky e reduzir o peso visual do estado ativo.
+- [x] Unificar cards de resumo físico, perfil, planejamento e evolução.
+- [x] Padronizar superfícies de métricas, formulários, mídias e histórico.
+- [x] Remover gradientes e sombras decorativas desnecessárias.
+- [x] Refinar histórico de peso e treinos para leitura responsiva.
+- [x] Preservar fluxo mobile, safe area e densidade compacta.
+
+**Status:** concluída em `css/ficha-aluno-padronizacao.css`.
+
 ## Checklist geral
 - [x] Base visual global padronizada
 - [x] Componentes compartilhados padronizados
