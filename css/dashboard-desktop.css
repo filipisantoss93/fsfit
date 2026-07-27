@@ -21,7 +21,7 @@
   .fs-dashboard-panel-heading p{margin:4px 0 0;color:var(--fs-text-muted,var(--muted));font-size:.73rem;line-height:1.4}
   .fs-dashboard-count{display:grid;place-items:center;min-width:30px;height:30px;padding:0 8px;border-radius:999px;background:var(--fs-primary-soft,rgba(131,189,69,.1));color:var(--fs-primary,var(--primary));font-size:.75rem;font-weight:900}
 
-  .fs-dashboard-donut{display:grid;place-items:center;width:130px;height:130px;margin:4px auto 18px;border-radius:50%;background:conic-gradient(var(--fs-primary,var(--primary)) 0 var(--dashboard-active,0%),var(--fs-warning,var(--warning)) var(--dashboard-active,0%) var(--dashboard-live,0%),var(--fs-danger,var(--danger)) var(--dashboard-live,0%) 100%);position:relative}
+  .fs-dashboard-donut{display:grid;place-items:center;width:130px;height:130px;margin:4px auto 18px;border-radius:50%;background:conic-gradient(var(--fs-primary,var(--primary)) 0 var(--dashboard-active,0%),var(--fs-danger,var(--danger)) var(--dashboard-active,0%) 100%);position:relative}
   .fs-dashboard-donut::after{content:"";position:absolute;inset:17px;border-radius:50%;background:var(--fs-surface,var(--surface))}
   .fs-dashboard-donut-copy{position:relative;z-index:1;text-align:center}
   .fs-dashboard-donut-copy strong{display:block;font-size:1.55rem;line-height:1}
@@ -29,6 +29,7 @@
   .fs-dashboard-legend{display:grid;gap:8px}
   .fs-dashboard-legend-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--fs-border,var(--border));border-radius:10px;background:rgba(255,255,255,.02)}
   .fs-dashboard-legend-dot{width:8px;height:8px;border-radius:50%;background:var(--fs-primary,var(--primary))}
+  .fs-dashboard-legend-dot.is-info{background:#4f91ff}
   .fs-dashboard-legend-dot.is-warning{background:var(--fs-warning,var(--warning))}
   .fs-dashboard-legend-dot.is-danger{background:var(--fs-danger,var(--danger))}
   .fs-dashboard-legend-row span{color:var(--fs-text-muted,var(--muted));font-size:.72rem}
