@@ -9,6 +9,9 @@ const isStandalone = () =>
   window.navigator.standalone === true;
 
 const isIos = () => /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+const isMobileDevice = () =>
+  /android|iphone|ipad|ipod|mobile/i.test(window.navigator.userAgent) ||
+  window.matchMedia('(max-width: 860px)').matches;
 
 const isDismissed = () => {
   const until = Number(localStorage.getItem(DISMISS_KEY) || 0);
@@ -43,6 +46,17 @@ function showModal() {
   if (!deferredPrompt && !isIos()) return;
 
   const ios = isIos();
+  const mobile = isMobileDevice();
+  const kicker = mobile ? 'FS FIT NO SEU CELULAR' : 'FS FIT NA ÁREA DE TRABALHO';
+  const title = ios
+    ? 'Instale o FS Fit no seu iPhone'
+    : mobile
+      ? 'Instale o FS Fit no seu celular'
+      : 'Instale o FS Fit no seu computador';
+  const description = mobile
+    ? 'Acesse seus alunos, treinos e agenda direto pela Tela de Início, com uma experiência mais rápida e parecida com um aplicativo.'
+    : 'Abra seus alunos, treinos e agenda diretamente pela área de trabalho, em uma janela própria e sem depender de uma aba do navegador.';
+
   const modal = document.createElement('div');
   modal.id = 'fsfit-pwa-install-modal';
   modal.innerHTML = `
@@ -52,11 +66,11 @@ function showModal() {
       <div class="pwa-install-heading">
         <span class="pwa-install-brand" aria-hidden="true">FS</span>
         <div>
-          <span class="pwa-install-kicker">FS FIT NO SEU CELULAR</span>
-          <h2 id="pwa-install-title">${ios ? 'Instale o FS Fit no seu iPhone' : 'Instale o FS Fit no seu celular'}</h2>
+          <span class="pwa-install-kicker">${kicker}</span>
+          <h2 id="pwa-install-title">${title}</h2>
         </div>
       </div>
-      <p class="pwa-install-description">Acesse seus alunos, treinos e agenda direto pela Tela de Início, com uma experiência mais rápida e parecida com um aplicativo.</p>
+      <p class="pwa-install-description">${description}</p>
       ${ios ? `
         <div class="pwa-install-guide">
           <img class="pwa-install-guide-media" src="${IOS_GUIDE_GIF}" alt="Demonstração de como adicionar o FS Fit à Tela de Início do iPhone">
@@ -65,7 +79,9 @@ function showModal() {
             <div><span>2</span><p>Escolha <strong>Adicionar à Tela de Início</strong>.</p></div>
           </div>
         </div>` : `
-        <div class="pwa-install-android-note">Toque em <strong>Instalar FS Fit</strong> para adicionar o aplicativo à sua Tela de Início.</div>`}
+        <div class="pwa-install-android-note">${mobile
+          ? 'Toque em <strong>Instalar FS Fit</strong> para adicionar o aplicativo à sua Tela de Início.'
+          : 'Clique em <strong>Instalar FS Fit</strong> para adicionar o aplicativo ao Chrome e criar um atalho na área de trabalho.'}</div>`}
       <div class="pwa-install-actions">
         <button class="btn btn-primary" type="button" id="pwa-install-confirm">${ios ? 'Entendi' : 'Instalar FS Fit'}</button>
         <button class="btn btn-secondary" type="button" id="pwa-install-later">Agora não</button>
