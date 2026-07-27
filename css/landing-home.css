@@ -29,6 +29,507 @@ html {
   width: fit-content;
 }
 
+/*
+ * Refatoração SaaS 2026
+ * Hierarquia editorial, menor contraste, verde moderado e geometrias mais sóbrias.
+ */
+body.ads-landing {
+  --lp-bg: #0b0f14;
+  --lp-surface: #111820;
+  --lp-surface-2: #161e28;
+  --lp-border: rgba(231, 237, 243, .105);
+  --lp-text: #eef2f5;
+  --lp-muted: #929da9;
+  --lp-primary: #83bd45;
+  --lp-primary-strong: #70a93a;
+  --lp-blue: #6e94bd;
+  --lp-shadow: 0 24px 64px rgba(0, 0, 0, .34);
+  background:
+    radial-gradient(circle at 78% 3%, rgba(131, 189, 69, .035), transparent 25%),
+    var(--lp-bg);
+}
+
+body.ads-landing main {
+  display: flex;
+  flex-direction: column;
+}
+
+body.ads-landing .lp-hero { order: 1; }
+body.ads-landing .lp-trust { order: 2; }
+body.ads-landing #transformacao { order: 3; }
+body.ads-landing section:has(.lp-live) { order: 4; }
+body.ads-landing #recursos { order: 5; }
+body.ads-landing #experiencia-aluno { order: 6; }
+body.ads-landing #preco { order: 7; }
+body.ads-landing #cadastro { order: 8; }
+body.ads-landing #duvidas { order: 9; }
+body.ads-landing .lp-final { order: 10; }
+
+body.ads-landing .lp-header {
+  background: rgba(11, 15, 20, .9);
+  border-bottom-color: rgba(255, 255, 255, .065);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body.ads-landing .lp-logo-mark {
+  width: 39px;
+  height: 39px;
+  border-radius: 8px;
+  color: #a5cf70;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-menu {
+  color: #98a2ad;
+  font-weight: 650;
+}
+
+body.ads-landing .lp-btn {
+  min-height: 46px;
+  border-radius: 7px;
+  font-weight: 800;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-btn-primary {
+  background: var(--lp-primary);
+  color: #0d1409;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-btn-primary:hover {
+  background: #91c75a;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-btn-outline {
+  background: transparent;
+  border-color: rgba(255, 255, 255, .12);
+  color: #d7dde2;
+}
+
+body.ads-landing .lp-btn-soft {
+  border-color: rgba(131, 189, 69, .24);
+  background: rgba(131, 189, 69, .06);
+  color: #a9ce7d;
+}
+
+body.ads-landing .lp-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(410px, .9fr);
+  gap: 54px;
+  padding-top: 72px;
+  padding-bottom: 52px;
+}
+
+body.ads-landing .lp-eyebrow,
+body.ads-landing .hero-badge {
+  margin-bottom: 17px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #a5cf70;
+  letter-spacing: .1em;
+}
+
+body.ads-landing .lp-eyebrow::before {
+  width: 6px;
+  height: 6px;
+  background: #83bd45;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-hero h1 {
+  max-width: 650px;
+  font-size: clamp(2.45rem, 4.4vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -.045em;
+}
+
+body.ads-landing .lp-hero h1 em {
+  color: #9bc96a;
+}
+
+body.ads-landing .lp-hero-lead {
+  max-width: 590px;
+  margin-top: 20px;
+  color: #9aa5b0;
+  font-size: clamp(.98rem, 1.45vw, 1.1rem);
+  line-height: 1.62;
+}
+
+body.ads-landing .lp-proof-list {
+  margin-top: 24px;
+  gap: 9px 18px;
+}
+
+body.ads-landing .lp-proof-list li {
+  color: #ccd3d9;
+  font-size: .84rem;
+  font-weight: 600;
+}
+
+body.ads-landing .lp-proof-list li::before {
+  display: block;
+  width: auto;
+  height: auto;
+  flex-basis: auto;
+  border-radius: 0;
+  background: transparent;
+  color: #91c75a;
+}
+
+body.ads-landing .lp-hero-actions {
+  margin-top: 27px;
+}
+
+body.ads-landing .lp-hero-price {
+  margin-top: 17px;
+}
+
+body.ads-landing .lp-product-stage {
+  min-height: 555px;
+}
+
+body.ads-landing .lp-glow {
+  opacity: .28;
+}
+
+body.ads-landing .lp-browser {
+  margin-top: 14px;
+  border-radius: 12px;
+  transform: none;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, .38);
+}
+
+body.ads-landing .lp-browser-bar,
+body.ads-landing .lp-stat,
+body.ads-landing .lp-agenda-card,
+body.ads-landing .lp-agenda-row,
+body.ads-landing .lp-student-card,
+body.ads-landing .lp-mini-row,
+body.ads-landing .lp-live-card,
+body.ads-landing .lp-auth-card {
+  border-radius: 8px;
+}
+
+body.ads-landing .lp-stat.primary strong,
+body.ads-landing .lp-agenda-title span,
+body.ads-landing .lp-agenda-row time,
+body.ads-landing .lp-mini-row span:last-child,
+body.ads-landing .lp-student-card small {
+  color: #9bc96a;
+}
+
+body.ads-landing .lp-agenda-status {
+  background: rgba(131, 189, 69, .08);
+  color: #9bc96a;
+}
+
+body.ads-landing .lp-phone {
+  width: 218px;
+  border-radius: 29px;
+  transform: rotate(2deg);
+}
+
+body.ads-landing .lp-phone-screen {
+  min-height: 445px;
+  border-radius: 23px;
+}
+
+body.ads-landing .lp-floating-note {
+  display: none;
+}
+
+body.ads-landing .lp-trust {
+  background: #0e1319;
+}
+
+body.ads-landing .lp-trust-grid {
+  max-width: 920px;
+}
+
+body.ads-landing .lp-trust-item {
+  padding: 18px 14px;
+}
+
+body.ads-landing .lp-trust-item strong {
+  font-size: .88rem;
+}
+
+body.ads-landing .lp-trust-item span {
+  font-size: .68rem;
+}
+
+body.ads-landing .lp-section {
+  padding: 78px 0;
+}
+
+body.ads-landing .lp-section-head {
+  max-width: 680px;
+  margin: 0 auto 38px;
+  text-align: center;
+}
+
+body.ads-landing .lp-section-kicker {
+  color: #9bc96a;
+}
+
+body.ads-landing .lp-section h2 {
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  line-height: 1.12;
+  letter-spacing: -.032em;
+}
+
+body.ads-landing .lp-section-head p {
+  max-width: 620px;
+  margin: 14px auto 0;
+  color: #929da9;
+  font-size: .95rem;
+}
+
+body.ads-landing .lp-compare {
+  max-width: 980px;
+  margin-inline: auto;
+  gap: 0;
+  border-block: 1px solid var(--lp-border);
+}
+
+body.ads-landing .lp-compare-card {
+  padding: 30px 36px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+body.ads-landing .lp-compare-card + .lp-compare-card {
+  border-left: 1px solid var(--lp-border);
+}
+
+body.ads-landing .lp-compare-card.good,
+body.ads-landing .lp-compare-card.bad {
+  background: transparent;
+}
+
+body.ads-landing .lp-compare-card.good h3 {
+  color: #a5cf70;
+}
+
+body.ads-landing section:has(.lp-live) {
+  background: #10161d;
+  border-block: 1px solid var(--lp-border);
+}
+
+body.ads-landing .lp-live {
+  gap: 58px;
+}
+
+body.ads-landing .lp-live > div:first-child {
+  max-width: 520px;
+}
+
+body.ads-landing .lp-live-tags span {
+  border-radius: 5px;
+  border-color: rgba(131, 189, 69, .18);
+  background: rgba(131, 189, 69, .045);
+  color: #c3cbd2;
+}
+
+body.ads-landing .lp-live-card {
+  border-color: rgba(255, 255, 255, .1);
+  background: #131b24;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-live-head small,
+body.ads-landing .lp-live-head span,
+body.ads-landing .lp-live-check {
+  color: #9bc96a;
+}
+
+body.ads-landing .lp-progress span {
+  background: #83bd45;
+}
+
+body.ads-landing .lp-feature-grid {
+  gap: 12px;
+}
+
+body.ads-landing .lp-feature {
+  min-height: 195px;
+  padding: 23px;
+  border-radius: 9px;
+  background: #10161d;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+body.ads-landing .lp-feature:hover {
+  transform: none;
+  border-color: rgba(131, 189, 69, .22);
+  background: #121a22;
+}
+
+body.ads-landing .lp-feature-icon {
+  width: 39px;
+  height: 39px;
+  border-radius: 6px;
+  background: rgba(131, 189, 69, .075);
+  color: #a5cf70;
+}
+
+body.ads-landing .lp-feature h3 {
+  font-size: .98rem;
+}
+
+body.ads-landing .lp-feature p {
+  color: #929da9;
+  font-size: .8rem;
+}
+
+body.ads-landing .lp-student-section {
+  background: #0e141a;
+  border-block: 1px solid var(--lp-border);
+}
+
+body.ads-landing .lp-student-device {
+  border-radius: 31px;
+  box-shadow: 0 24px 58px rgba(0, 0, 0, .34);
+}
+
+body.ads-landing .lp-student-device-screen {
+  border-radius: 23px;
+}
+
+body.ads-landing .lp-student-copy h2,
+body.ads-landing .lp-price-copy h2,
+body.ads-landing .lp-signup-copy h2,
+body.ads-landing .lp-faq-copy h2 {
+  font-size: clamp(1.85rem, 3.1vw, 2.65rem);
+}
+
+body.ads-landing .lp-value-number {
+  color: #91c75a;
+}
+
+body.ads-landing .lp-pricing {
+  display: block;
+  max-width: 760px;
+  text-align: center;
+}
+
+body.ads-landing .lp-price-copy {
+  max-width: 650px;
+  margin: 0 auto 34px;
+}
+
+body.ads-landing .lp-price-copy p {
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+body.ads-landing .lp-price-card {
+  max-width: 430px;
+  margin-inline: auto;
+  border-radius: 10px;
+  border-color: rgba(131, 189, 69, .34);
+  background: #111820;
+  box-shadow: none;
+  text-align: left;
+}
+
+body.ads-landing .lp-price-badge {
+  color: #a5cf70;
+}
+
+body.ads-landing .lp-price-value strong {
+  color: #eef2f5;
+}
+
+body.ads-landing .lp-signup {
+  align-items: center;
+}
+
+body.ads-landing .lp-auth-card {
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, .11);
+  background: #111820;
+}
+
+body.ads-landing .lp-auth-card input {
+  border-radius: 7px;
+  background: #0c1117;
+}
+
+body.ads-landing .lp-auth-card #auth-submit {
+  border-radius: 7px;
+  background: #83bd45;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-faq {
+  max-width: 820px;
+  display: block;
+}
+
+body.ads-landing .lp-faq-copy {
+  max-width: 650px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+body.ads-landing .lp-faq-list details {
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid var(--lp-border);
+  background: transparent;
+}
+
+body.ads-landing .lp-final-card {
+  max-width: 850px;
+  border-radius: 10px;
+  border-color: rgba(255, 255, 255, .1);
+  background: #10161d;
+  box-shadow: none;
+}
+
+body.ads-landing .lp-sticky-cta {
+  background: rgba(11, 15, 20, .95);
+  border-top-color: rgba(255, 255, 255, .09);
+}
+
+@media (max-width: 900px) {
+  body.ads-landing .lp-hero {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+
+  body.ads-landing .lp-hero-copy {
+    max-width: 720px;
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  body.ads-landing .lp-hero-lead,
+  body.ads-landing .lp-proof-list {
+    margin-inline: auto;
+  }
+
+  body.ads-landing .lp-hero-actions,
+  body.ads-landing .lp-hero-price {
+    justify-content: center;
+  }
+
+  body.ads-landing .lp-microcopy {
+    text-align: center;
+  }
+
+  body.ads-landing .lp-product-stage {
+    width: min(680px, 100%);
+    margin-inline: auto;
+  }
+}
+
 @media (max-width: 720px) {
   html {
     scroll-padding-top: calc(74px + var(--lp-safe-top));
@@ -42,9 +543,9 @@ html {
     display: inline-flex !important;
     min-height: 40px;
     padding: 8px 10px;
-    border-color: rgba(184, 244, 15, .34);
-    background: rgba(184, 244, 15, .065);
-    color: #b8f40f;
+    border-color: rgba(131, 189, 69, .24);
+    background: transparent;
+    color: #a5cf70;
     font-size: .68rem;
     white-space: nowrap;
   }
@@ -58,6 +559,75 @@ html {
 
   .lp-student-portal-cta .lp-btn {
     width: 100%;
+  }
+
+  body.ads-landing .lp-section {
+    padding: 58px 0;
+  }
+
+  body.ads-landing .lp-hero {
+    padding-top: 46px;
+    padding-bottom: 40px;
+  }
+
+  body.ads-landing .lp-hero h1 {
+    font-size: clamp(2.15rem, 10vw, 3rem);
+  }
+
+  body.ads-landing .lp-proof-list {
+    grid-template-columns: 1fr;
+    max-width: 430px;
+    text-align: left;
+  }
+
+  body.ads-landing .lp-hero-actions .lp-btn {
+    width: 100%;
+  }
+
+  body.ads-landing .lp-trust-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  body.ads-landing .lp-trust-item:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .07);
+  }
+
+  body.ads-landing .lp-trust-item:nth-child(4) {
+    border-top: 1px solid rgba(255, 255, 255, .07);
+  }
+
+  body.ads-landing .lp-compare {
+    grid-template-columns: 1fr;
+  }
+
+  body.ads-landing .lp-compare-card {
+    padding: 25px 6px;
+  }
+
+  body.ads-landing .lp-compare-card + .lp-compare-card {
+    border-left: 0;
+    border-top: 1px solid var(--lp-border);
+  }
+
+  body.ads-landing .lp-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.ads-landing .lp-feature {
+    min-height: 0;
+  }
+
+  body.ads-landing .lp-live,
+  body.ads-landing .lp-student-layout,
+  body.ads-landing .lp-signup {
+    gap: 38px;
+  }
+
+  body.ads-landing .lp-live > div:first-child,
+  body.ads-landing .lp-student-copy,
+  body.ads-landing .lp-signup-copy {
+    text-align: left;
   }
 
   /* Demonstração do produto: o celular complementa o painel sem dominar a seção. */
@@ -95,7 +665,7 @@ html {
     width: 148px !important;
     margin: 0 2px -4px 0;
     padding: 6px;
-    border-radius: 29px;
+    border-radius: 24px;
     transform: none !important;
     z-index: 4;
   }
@@ -103,7 +673,7 @@ html {
   body.ads-landing .lp-phone-screen {
     min-height: 306px !important;
     padding: 12px 9px;
-    border-radius: 23px;
+    border-radius: 18px;
   }
 
   body.ads-landing .lp-phone-notch {
@@ -135,7 +705,7 @@ html {
   body.ads-landing .lp-phone .lp-student-card {
     margin-top: 10px;
     padding: 9px;
-    border-radius: 11px;
+    border-radius: 7px;
   }
 
   body.ads-landing .lp-phone .lp-student-card small {
@@ -162,7 +732,7 @@ html {
   body.ads-landing .lp-phone .lp-student-button {
     min-height: 31px;
     margin-top: 8px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: .51rem;
   }
 
@@ -170,7 +740,7 @@ html {
     gap: 4px;
     margin-top: 6px;
     padding: 6px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: .47rem;
     line-height: 1.2;
   }
