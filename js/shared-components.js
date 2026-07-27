@@ -22,7 +22,7 @@ function ensureSharedStyles() {
   if (!document.querySelector('link[data-fsfit-pull-refresh]')) {
     const refreshStyles = document.createElement('link');
     refreshStyles.rel = 'stylesheet';
-    refreshStyles.href = 'css/pull-to-refresh.css?v=20260727-ptr1';
+    refreshStyles.href = 'css/pull-to-refresh.css?v=20260727-ptr2';
     refreshStyles.dataset.fsfitPullRefresh = 'true';
     document.head.appendChild(refreshStyles);
   }
@@ -60,7 +60,7 @@ function unlockDocumentScroll() {
 function syncSharedOverlayState() {
   const hasOpenSheet = Boolean(document.querySelector('.fsfit-more-sheet.is-open'));
   const hasOpenMenu = document.body.classList.contains('nav-menu-open');
-  const hasOpenModal = Boolean(document.querySelector('.modal.show, .modal.open, .modal[aria-hidden="false"], .workout-modal.open, .workout-modal[aria-hidden="false"], dialog[open]'));
+  const hasOpenModal = Boolean(document.querySelector('.modal.show, .modal.open, .modal[aria-hidden="false"], .workout-modal.open, .workout-modal[aria-hidden="false"], .live-session-modal.open, .live-workout-editor-modal.open, .student-sheet[aria-hidden="false"], .student-pix-modal[aria-hidden="false"], .student-detail-modal[aria-hidden="false"], dialog[open]'));
   if (hasOpenSheet || hasOpenMenu || hasOpenModal) {
     if (!document.documentElement.classList.contains('fsfit-scroll-locked')) lockDocumentScroll();
   } else if (document.documentElement.classList.contains('fsfit-scroll-locked')) {
@@ -99,9 +99,23 @@ function initializePullToRefresh() {
     label.textContent = 'Puxe para atualizar';
   };
 
+  const isInsideOverlay = target => Boolean(target.closest('.modal, .workout-modal, .live-session-modal, .live-workout-editor-modal, .student-sheet, .student-pix-modal, .student-detail-modal, .fsfit-more-panel, dialog'));
+
+  const hasScrollableAncestor = target => {
+    let element = target instanceof Element ? target : null;
+    while (element && element !== document.body) {
+      const style = getComputedStyle(element);
+      const canScroll = /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+      if (canScroll) return true;
+      element = element.parentElement;
+    }
+    return false;
+  };
+
   document.addEventListener('touchstart', event => {
     if (refreshing || window.scrollY > 0 || document.documentElement.classList.contains('fsfit-scroll-locked')) return;
-    if (event.touches.length !== 1 || event.target.closest('input, textarea, select, [contenteditable="true"], .modal, .workout-modal, .fsfit-more-panel')) return;
+    if (event.touches.length !== 1 || event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    if (isInsideOverlay(event.target) || hasScrollableAncestor(event.target)) return;
     startY = event.touches[0].clientY;
     tracking = true;
   }, { passive: true });
