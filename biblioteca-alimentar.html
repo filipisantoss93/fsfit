@@ -3,14 +3,15 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0f1115">
   <title>Biblioteca alimentar — FS Fit</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-prescricao1">
   <link rel="stylesheet" href="css/biblioteca-alimentar.css?v=20260720-action-bar2">
   <link rel="stylesheet" href="css/library-compact.css?v=20260720-row1">
   <link rel="stylesheet" href="css/biblioteca-alimentar-padronizacao.css?v=20260726-ds1">
+  <link rel="stylesheet" href="css/library-dashboard-desktop.css?v=20260727-library-dashboard1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -30,6 +31,25 @@
     </section>
 
     <div id="food-library-message" class="message"></div>
+
+    <section class="fs-library-dashboard" data-library-dashboard="foods" aria-label="Resumo da biblioteca alimentar">
+      <div class="fs-library-kpis">
+        <article class="fs-library-kpi"><small>Total de alimentos</small><strong id="library-dashboard-total">—</strong><span>disponíveis na biblioteca</span></article>
+        <article class="fs-library-kpi is-info"><small>Meus alimentos</small><strong id="library-dashboard-personal">—</strong><span>criados ou personalizados</span></article>
+        <article class="fs-library-kpi"><small>Categorias</small><strong id="library-dashboard-categories">—</strong><span>grupos disponíveis</span></article>
+        <article class="fs-library-kpi is-warning"><small>Refeições salvas</small><strong id="library-dashboard-saved">—</strong><span>modelos reutilizáveis</span></article>
+      </div>
+      <div class="fs-library-overview">
+        <article class="fs-library-panel">
+          <div class="fs-library-panel-heading"><div><small>Distribuição</small><h2>Alimentos por categoria</h2></div></div>
+          <div id="library-dashboard-distribution" class="fs-library-distribution"><div class="fs-library-empty">Carregando resumo...</div></div>
+        </article>
+        <article class="fs-library-panel">
+          <div class="fs-library-panel-heading"><div><small>Personalizados</small><h2>Meus alimentos</h2><p>Acesso rápido aos itens criados pelo personal.</p></div></div>
+          <div id="library-dashboard-personal-list" class="fs-library-personal-list"><div class="fs-library-empty">Carregando alimentos...</div></div>
+        </article>
+      </div>
+    </section>
 
     <section class="food-action-bar" aria-label="Ações da biblioteca alimentar">
       <button id="open-food-category-modal" class="btn btn-outline food-action-button" type="button">+ Categoria</button>
@@ -119,5 +139,6 @@
   <script src="js/library-row-click.js?v=20260720-row1"></script>
   <script type="module" src="js/biblioteca-alimentar.js?v=20260716-1"></script>
   <script type="module" src="js/biblioteca-refeicoes-enhancements.js?v=20260718-meals1"></script>
+  <script type="module" src="js/library-dashboard-desktop.js?v=20260727-library-dashboard1"></script>
 </body>
 </html>
