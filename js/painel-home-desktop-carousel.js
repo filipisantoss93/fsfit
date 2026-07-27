@@ -181,8 +181,11 @@ function injectStyles() {
 
     @media(min-width:721px){
       .home-now-card.has-desktop-student-navigation .home-now-desktop-nav{display:grid!important}
-      .home-now-card.has-desktop-student-navigation .home-now-copy{padding-inline:64px}
-      .home-now-card.has-desktop-student-navigation .home-now-action{width:calc(100% - 128px);margin-left:64px}
+      .home-now-card.has-desktop-student-navigation .home-now-content{padding-left:64px}
+      .home-now-card.has-desktop-student-navigation .home-now-action{
+        width:auto!important;
+        margin:0 64px 0 0!important;
+      }
     }
   `;
   document.head.appendChild(style);
