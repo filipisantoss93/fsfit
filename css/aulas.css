@@ -59,3 +59,36 @@ body.student-page:has(#student-main-live .live-class-card) .student-payment-aler
 .live-exercise input[type="checkbox"]:active{transform:scale(.92)}
 .live-exercise input[type="checkbox"]:focus-visible{outline:3px solid rgba(59,130,246,.38);outline-offset:3px}
 .live-exercise input[type="checkbox"]:disabled{opacity:.58;cursor:wait;transform:none}
+
+/* Ações da aula ativa: compactas e consistentes */
+.live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn){
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px!important;
+  margin-top:16px!important;
+  padding-top:14px!important;
+  border-top:1px solid rgba(255,255,255,.09);
+}
+.live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) .btn{
+  width:100%!important;
+  min-width:0!important;
+  min-height:48px!important;
+  height:auto!important;
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  font-size:.82rem!important;
+  line-height:1.15!important;
+  white-space:normal!important;
+}
+.live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) .btn-danger,
+.live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) [data-clear-live-session],
+.live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) [data-end-live-session]{
+  min-height:46px!important;
+}
+@media(max-width:720px){
+  .live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn){grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+  .live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) .btn{min-height:44px!important;padding:9px 6px!important;font-size:.74rem!important}
+  .live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) .btn-danger,
+  .live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) [data-clear-live-session],
+  .live-session-modal :is(.live-session-actions,.live-class-actions,.live-session-controls,.live-session-footer,.actions):has(> .btn) [data-end-live-session]{grid-column:auto!important}
+}
