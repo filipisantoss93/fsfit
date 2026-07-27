@@ -50,10 +50,16 @@
 body.student-modal-open { overflow: hidden; touch-action: none; overscroll-behavior: none; }
 
 body.embed-edit { overflow: auto; background: var(--fs-bg, #0b0f14); }
-body.embed-edit #header-container, body.embed-edit .fsfit-bottom-nav, body.embed-edit .students-page-header, body.embed-edit #student-message, body.embed-edit .students-summary, body.embed-edit .student-list-card { display: none !important; }
+body.embed-edit #header-container, body.embed-edit .fsfit-bottom-nav, body.embed-edit .students-page-header, body.embed-edit #student-message, body.embed-edit .students-summary, body.embed-edit #students-dashboard, body.embed-edit .student-list-card { display: none !important; }
 body.embed-edit .students-page { width: 100%; max-width: none; margin: 0; padding: 0; }
 body.embed-edit .student-modal { position: static; display: block; min-height: 100dvh; padding: 0; background: var(--fs-surface, #111820); backdrop-filter: none; }
 body.embed-edit .student-modal-panel { width: 100%; max-height: none; min-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
+
+@media (min-width: 1100px) {
+  .students-page { width: min(calc(100% - 48px), 1320px); max-width: 1320px; }
+  .students-summary { display: none; }
+  .student-list-card { padding: 18px; }
+}
 
 @media (max-width: 760px) {
   .students-summary { grid-template-columns: repeat(3, minmax(132px, 1fr)); overflow-x: auto; padding-bottom: 3px; scroll-snap-type: x proximity; scrollbar-width: none; }
