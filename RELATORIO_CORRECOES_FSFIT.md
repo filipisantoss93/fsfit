@@ -50,18 +50,20 @@ Este documento é a referência oficial para a evolução do FS Fit.
 **Status:** concluída em `css/fsfit-design-system.css`.
 
 ### Fase 2 — Componentes compartilhados
-- [ ] Aplicar o Design System aos componentes compartilhados reais.
-- [ ] Unificar navegação superior e inferior.
-- [ ] Unificar cabeçalhos utilizados pelas páginas.
-- [ ] Unificar modais e bloqueio de rolagem.
-- [ ] Unificar toasts, loaders e estados vazios.
+- [x] Aplicar o Design System aos componentes compartilhados reais.
+- [x] Unificar navegação superior e inferior.
+- [x] Unificar cabeçalhos utilizados pelas páginas.
+- [x] Unificar modais e bloqueio de rolagem.
+- [x] Unificar toasts, loaders e estados vazios.
+
+**Status:** concluída em `css/shared-components.css`, `js/shared-components.js` e integração em `js/layout.js`.
 
 ## Checklist geral
 - [x] Base visual global padronizada
-- [ ] Componentes compartilhados padronizados
-- [ ] Navegação unificada
+- [x] Componentes compartilhados padronizados
+- [x] Navegação unificada
 - [ ] UX mobile refinada em todas as páginas
-- [ ] Estados de loading/erro/vazio aplicados
+- [x] Estados de loading/erro/vazio aplicados
 - [ ] Performance percebida revisada
 - [ ] Microinterações revisadas
 - [ ] Auditoria final
