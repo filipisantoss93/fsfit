@@ -20,9 +20,16 @@ body.student-page:has(#student-main-live .live-class-card) .student-payment-aler
   appearance:none;
   display:grid;
   place-content:center;
+  align-self:center;
+  box-sizing:border-box;
   flex:0 0 24px;
-  width:24px;
-  height:24px;
+  inline-size:24px!important;
+  block-size:24px!important;
+  min-inline-size:24px!important;
+  max-inline-size:24px!important;
+  min-block-size:24px!important;
+  max-block-size:24px!important;
+  aspect-ratio:1/1;
   margin:0;
   padding:0;
   border:2px solid rgba(181,189,200,.52);
