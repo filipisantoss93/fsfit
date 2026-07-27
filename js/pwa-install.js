@@ -226,4 +226,15 @@ if (document.querySelector('#today-list') || document.querySelector('#live-stude
   import('./painel-agenda-modal-avatar.js?v=20260723-agenda-avatar3').catch(error => {
     console.error('Falha ao carregar a foto do aluno no modal da agenda de hoje:', error);
   });
+
+  if (window.matchMedia('(min-width: 1100px)').matches) {
+    const dashboardStyles = document.createElement('link');
+    dashboardStyles.rel = 'stylesheet';
+    dashboardStyles.href = 'css/painel-resumo-geral.css?v=20260727-general1';
+    dashboardStyles.dataset.fsfitGeneralDashboard = 'true';
+    document.head.appendChild(dashboardStyles);
+    import('./painel-resumo-geral.js?v=20260727-general1').catch(error => {
+      console.error('Falha ao carregar o resumo geral do painel:', error);
+    });
+  }
 }
