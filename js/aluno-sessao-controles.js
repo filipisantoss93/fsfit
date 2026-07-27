@@ -3,6 +3,7 @@ import { supabase } from './supabase.js';
 const TOKEN_KEY = 'fsfit_aluno_token';
 const EXPIRES_KEY = 'fsfit_aluno_token_expira_em';
 const PERSONAL_KEY = 'fsfit_personal_slug';
+const LOADING_TIMEOUT_MS = 15000;
 
 function clearStudentSession() {
   localStorage.removeItem(TOKEN_KEY);
@@ -56,8 +57,40 @@ function mountLogoutButton() {
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', mountLogoutButton, { once: true });
-} else {
+function mountLoadingWatchdog() {
+  const loading = document.querySelector('#loading-state');
+  const errorState = document.querySelector('#error-state');
+  const content = document.querySelector('#student-content');
+  if (!loading || !errorState || !content) return;
+
+  window.setTimeout(() => {
+    const stillLoading = !loading.classList.contains('hidden') && content.classList.contains('hidden');
+    if (!stillLoading) return;
+
+    console.error('Tempo limite excedido ao carregar o portal do aluno.');
+    loading.classList.add('hidden');
+    errorState.innerHTML = `
+      <strong>Não foi possível carregar sua área.</strong>
+      <p style="margin:10px 0 0">A conexão demorou mais que o esperado. Verifique a internet e tente novamente.</p>
+      <div class="actions" style="justify-content:center;margin-top:16px">
+        <button id="student-retry-load" class="btn btn-primary" type="button">Tentar novamente</button>
+        <a class="btn btn-outline" href="acesso-aluno.html">Entrar novamente</a>
+      </div>`;
+    errorState.classList.remove('hidden');
+
+    errorState.querySelector('#student-retry-load')?.addEventListener('click', () => {
+      window.location.reload();
+    });
+  }, LOADING_TIMEOUT_MS);
+}
+
+function initializeStudentSessionControls() {
   mountLogoutButton();
+  mountLoadingWatchdog();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeStudentSessionControls, { once: true });
+} else {
+  initializeStudentSessionControls();
 }
