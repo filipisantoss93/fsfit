@@ -217,3 +217,67 @@ body.fsfit-saas .today-card-header,
 body.fsfit-saas .dashboard-activity-heading {
   padding: var(--fs-space-4, 16px) !important;
 }
+
+/* Padronização global das ações de página */
+body.fsfit-saas .page-header > .actions,
+body.fsfit-saas .page-header .library-top-actions,
+body.fsfit-saas .page-actions,
+body.fsfit-saas .library-action-bar {
+  gap: var(--fs-space-2, 8px) !important;
+}
+
+body.fsfit-saas .page-header > .actions .btn,
+body.fsfit-saas .page-header .library-top-actions .btn,
+body.fsfit-saas .page-actions .btn,
+body.fsfit-saas .library-action-bar .btn {
+  min-height: 44px !important;
+  padding: 10px 16px !important;
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  body.fsfit-saas .page-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--fs-space-4, 16px) !important;
+  }
+
+  body.fsfit-saas .page-header > div:first-child {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.fsfit-saas .page-header > .actions,
+  body.fsfit-saas .page-header .library-top-actions {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  body.fsfit-saas .page-header > .actions .btn,
+  body.fsfit-saas .page-header .library-top-actions .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.fsfit-saas .library-top-actions:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body.fsfit-saas .page-header > .actions .btn,
+  body.fsfit-saas .page-header .library-top-actions .btn,
+  body.fsfit-saas .page-actions .btn,
+  body.fsfit-saas .library-action-bar .btn {
+    min-height: 42px !important;
+    padding: 9px 10px !important;
+    font-size: .84rem !important;
+  }
+}
