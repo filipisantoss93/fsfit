@@ -21,15 +21,29 @@
   --fs-danger: #d76d73;
   --fs-success: #83bd45;
 
-  --fs-radius-xs: 5px;
-  --fs-radius-sm: 7px;
-  --fs-radius-md: 9px;
-  --fs-radius-lg: 12px;
-  --fs-radius-device: 28px;
+  --fs-radius-xs: 4px;
+  --fs-radius-sm: 6px;
+  --fs-radius-md: 8px;
+  --fs-radius-lg: 10px;
+  --fs-radius-device: 24px;
+
+  --fs-space-1: 4px;
+  --fs-space-2: 8px;
+  --fs-space-3: 12px;
+  --fs-space-4: 16px;
+  --fs-space-5: 20px;
+  --fs-space-6: 24px;
+  --fs-space-8: 32px;
+
+  --fs-control-height-sm: 36px;
+  --fs-control-height: 42px;
+  --fs-control-height-lg: 48px;
 
   --fs-shadow-sm: 0 8px 24px rgba(0, 0, 0, .18);
   --fs-shadow-md: 0 18px 48px rgba(0, 0, 0, .28);
   --fs-focus-ring: 0 0 0 3px rgba(131, 189, 69, .16);
+  --fs-transition-fast: 140ms ease;
+  --fs-transition-base: 220ms ease;
 
   /* Compatibilidade com páginas que usam os tokens antigos */
   --primary: var(--fs-primary);
@@ -76,22 +90,65 @@ body.fsfit-saas .text-muted {
   color: var(--fs-text-muted);
 }
 
+body.fsfit-saas :where(button, a, input, select, textarea) {
+  transition:
+    background-color var(--fs-transition-fast),
+    border-color var(--fs-transition-fast),
+    color var(--fs-transition-fast),
+    box-shadow var(--fs-transition-fast),
+    opacity var(--fs-transition-fast);
+}
+
+body.fsfit-saas :where(button, a, input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: var(--fs-focus-ring);
+}
+
+/* Cabeçalhos */
+body.fsfit-saas .page-header,
+body.fsfit-saas .section-header,
+body.fsfit-saas .card-header,
+body.fsfit-saas .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fs-space-4);
+}
+
+body.fsfit-saas .page-header,
+body.fsfit-saas .section-header {
+  margin-bottom: var(--fs-space-6);
+}
+
+body.fsfit-saas .page-header h1,
+body.fsfit-saas .page-header h2,
+body.fsfit-saas .section-header h2,
+body.fsfit-saas .section-header h3 {
+  margin: 0;
+}
+
 /* Superfícies */
 body.fsfit-saas .card,
 body.fsfit-saas .panel,
 body.fsfit-saas .modal-content,
 body.fsfit-saas .sheet {
-  border-color: var(--fs-border);
+  border: 1px solid var(--fs-border);
   border-radius: var(--fs-radius-lg);
   background: var(--fs-surface);
   box-shadow: none;
+}
+
+body.fsfit-saas .card,
+body.fsfit-saas .panel,
+body.fsfit-saas .sheet {
+  padding: var(--fs-space-5);
 }
 
 body.fsfit-saas .sub-card,
 body.fsfit-saas .metric-card,
 body.fsfit-saas .list-item,
 body.fsfit-saas .tile {
-  border-color: var(--fs-border);
+  border: 1px solid var(--fs-border);
   border-radius: var(--fs-radius-md);
   background: var(--fs-surface-raised);
   box-shadow: none;
@@ -99,10 +156,22 @@ body.fsfit-saas .tile {
 
 /* Botões */
 body.fsfit-saas .btn {
-  min-height: 42px;
+  min-height: var(--fs-control-height);
+  padding: 0 var(--fs-space-4);
   border-radius: var(--fs-radius-sm);
   box-shadow: none;
   font-weight: 750;
+  line-height: 1;
+}
+
+body.fsfit-saas .btn-sm {
+  min-height: var(--fs-control-height-sm);
+  padding-inline: var(--fs-space-3);
+}
+
+body.fsfit-saas .btn-lg {
+  min-height: var(--fs-control-height-lg);
+  padding-inline: var(--fs-space-5);
 }
 
 body.fsfit-saas .btn-primary {
@@ -139,15 +208,32 @@ body.fsfit-saas .btn-danger {
   box-shadow: none;
 }
 
+body.fsfit-saas .btn:disabled,
+body.fsfit-saas .btn[aria-disabled="true"] {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
 /* Campos */
 body.fsfit-saas input,
 body.fsfit-saas select,
 body.fsfit-saas textarea {
-  border-color: var(--fs-border);
+  min-height: var(--fs-control-height);
+  border: 1px solid var(--fs-border);
   border-radius: var(--fs-radius-sm);
   background: var(--fs-surface-raised);
   color: var(--fs-text);
   box-shadow: none;
+}
+
+body.fsfit-saas textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+body.fsfit-saas input::placeholder,
+body.fsfit-saas textarea::placeholder {
+  color: var(--fs-text-subtle);
 }
 
 body.fsfit-saas input:focus,
@@ -181,17 +267,58 @@ body.fsfit-saas .segment.active {
   background: var(--fs-surface-raised);
 }
 
+/* Modais */
+body.fsfit-saas .modal-content {
+  width: min(92vw, 680px);
+  max-height: min(88vh, 820px);
+  overflow: auto;
+  padding: var(--fs-space-5);
+}
+
+body.fsfit-saas .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--fs-space-3);
+  padding-top: var(--fs-space-5);
+}
+
 /* Selos e estados: o verde orienta, não domina */
 body.fsfit-saas .badge,
 body.fsfit-saas .status,
 body.fsfit-saas .tag {
-  border-color: var(--fs-primary-border);
+  border: 1px solid var(--fs-primary-border);
   border-radius: 999px;
   background: var(--fs-primary-soft);
   color: #a9ce7d;
 }
 
+body.fsfit-saas .badge-info,
+body.fsfit-saas .status-info {
+  border-color: rgba(110, 148, 189, .28);
+  background: rgba(110, 148, 189, .10);
+  color: #a9c0d8;
+}
+
+body.fsfit-saas .badge-warning,
+body.fsfit-saas .status-warning {
+  border-color: rgba(212, 173, 83, .28);
+  background: rgba(212, 173, 83, .10);
+  color: #e1c47d;
+}
+
+body.fsfit-saas .badge-danger,
+body.fsfit-saas .status-danger {
+  border-color: rgba(215, 109, 115, .28);
+  background: rgba(215, 109, 115, .10);
+  color: #eca2a7;
+}
+
 /* Tabelas e listas */
+body.fsfit-saas table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 body.fsfit-saas th {
   color: var(--fs-text-subtle);
   font-weight: 750;
@@ -201,6 +328,38 @@ body.fsfit-saas th,
 body.fsfit-saas td,
 body.fsfit-saas .list-item {
   border-color: var(--fs-border);
+}
+
+body.fsfit-saas th,
+body.fsfit-saas td {
+  padding: var(--fs-space-3) var(--fs-space-4);
+}
+
+/* Estados */
+body.fsfit-saas .empty-state,
+body.fsfit-saas .error-state,
+body.fsfit-saas .loading-state {
+  padding: var(--fs-space-8) var(--fs-space-5);
+  border: 1px dashed var(--fs-border-strong);
+  border-radius: var(--fs-radius-md);
+  background: var(--fs-surface);
+  text-align: center;
+}
+
+body.fsfit-saas .skeleton {
+  border-radius: var(--fs-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--fs-surface-raised) 0%,
+    var(--fs-surface-soft) 50%,
+    var(--fs-surface-raised) 100%
+  );
+  background-size: 200% 100%;
+  animation: fsfit-skeleton 1.35s linear infinite;
+}
+
+@keyframes fsfit-skeleton {
+  to { background-position: -200% 0; }
 }
 
 /* Menos movimento e contraste decorativo */
@@ -213,6 +372,14 @@ body.fsfit-saas .quick-action:hover {
 }
 
 @media (max-width: 620px) {
+  body.fsfit-saas .page-header,
+  body.fsfit-saas .section-header,
+  body.fsfit-saas .card-header,
+  body.fsfit-saas .modal-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   body.fsfit-saas .card,
   body.fsfit-saas .panel,
   body.fsfit-saas .modal-content,
@@ -220,8 +387,34 @@ body.fsfit-saas .quick-action:hover {
     border-radius: var(--fs-radius-md);
   }
 
+  body.fsfit-saas .card,
+  body.fsfit-saas .panel,
+  body.fsfit-saas .sheet,
+  body.fsfit-saas .modal-content {
+    padding: var(--fs-space-4);
+  }
+
   body.fsfit-saas .btn {
     min-height: 41px;
     border-radius: var(--fs-radius-sm);
+  }
+
+  body.fsfit-saas .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  body.fsfit-saas .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.fsfit-saas *,
+  body.fsfit-saas *::before,
+  body.fsfit-saas *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
