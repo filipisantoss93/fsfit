@@ -58,6 +58,17 @@ Este documento é a referência oficial para a evolução do FS Fit.
 
 **Status:** concluída em `css/shared-components.css`, `js/shared-components.js` e integração em `js/layout.js`.
 
+### Fase 3 — Painel
+- [x] Ativar o Design System global no shell carregado pelo layout.
+- [x] Atualizar o cache das folhas de estilo compartilhadas.
+- [x] Reduzir raios das abas, indicadores e ações do painel.
+- [x] Remover gradientes decorativos dos cards principais.
+- [x] Uniformizar superfícies e bordas dos cards de atenção.
+- [x] Reduzir o peso visual dos indicadores e barras de progresso.
+- [x] Padronizar espaçamentos dos blocos de agenda e atividade.
+
+**Status:** concluída para `painel.html` por meio dos componentes globais compartilhados.
+
 ## Checklist geral
 - [x] Base visual global padronizada
 - [x] Componentes compartilhados padronizados
