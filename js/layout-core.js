@@ -48,9 +48,27 @@ function ensureHeaderStyles() {
   if (document.querySelector('link[data-fsfit-header-styles]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/header-menu.css?v=20260717-support2';
+  link.href = 'css/header-menu.css?v=20260727-desktop-sidebar2';
   link.dataset.fsfitHeaderStyles = 'true';
   document.head.appendChild(link);
+}
+
+function icon(name) {
+  const paths = {
+    home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    dumbbell: '<path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/>',
+    apple: '<path d="M12 7c-1.8-2.2-5.7-1.7-7.3.5C2.1 11 4.2 20 8.2 21c1.5.4 2.6-.7 3.8-.7s2.3 1.1 3.8.7c4-1 6.1-10 3.5-13.5C17.7 5.3 13.8 4.8 12 7Z"/><path d="M12 7c0-2.6 1.6-4.8 4-6"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>',
+    finance: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+    card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3h4a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9A1.7 1.7 0 0 0 21 10h.1v4H21a1.7 1.7 0 0 0-1.6 1Z"/>',
+    bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
+    logout: '<path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-6"/>',
+    chevron: '<path d="m9 18 6-6-6-6"/>'
+  };
+  return `<svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${paths[name] || paths.home}</svg>`;
 }
 
 export function renderHeader(active = '') {
@@ -64,26 +82,31 @@ export function renderHeader(active = '') {
         <a class="logo-nav" href="painel.html" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
         <span id="user-greeting" class="user-greeting"></span>
         <ul id="nav-menu" class="nav-menu" aria-label="Menu principal">
-          <li><a data-page="painel" href="painel.html">Início</a></li>
-          <li><a data-page="alunos" href="alunos.html">Alunos</a></li>
-          <li><a data-page="exercicios" href="biblioteca-exercicios.html">Exercícios</a></li>
-          <li><a data-page="alimentacao" href="biblioteca-alimentar.html">Alimentação</a></li>
-          <li><a data-page="agenda" href="agenda.html">Agenda</a></li>
-          <li><a data-page="financeiro" href="financeiro.html">Financeiro</a></li>
+          <li><a data-page="painel" href="painel.html">${icon('home')}<span>Início</span></a></li>
+          <li><a data-page="alunos" href="alunos.html">${icon('users')}<span>Alunos</span></a></li>
+          <li><a data-page="exercicios" href="biblioteca-exercicios.html">${icon('dumbbell')}<span>Exercícios</span></a></li>
+          <li><a data-page="alimentacao" href="biblioteca-alimentar.html">${icon('apple')}<span>Alimentação</span></a></li>
+          <li><a data-page="agenda" href="agenda.html">${icon('calendar')}<span>Agenda</span></a></li>
+          <li><a data-page="financeiro" href="financeiro.html">${icon('finance')}<span>Financeiro</span></a></li>
           <li class="nav-divider" aria-hidden="true"></li>
-          <li><a data-page="perfil" href="perfil.html">Perfil</a></li>
-          <li><a data-page="assinatura" href="assinatura.html">Assinatura</a></li>
-          <li><a data-page="contato" href="contato.html">Contato</a></li>
-          <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html"><span aria-hidden="true">⚙</span><span>Administração</span><span class="admin-support-nav-badge hidden" data-admin-support-badge>0</span></a></li>
-          <li class="nav-divider" aria-hidden="true"></li>
-          <li><button id="logout-button" class="logout" type="button">SAIR</button></li>
+          <li><a data-page="assinatura" href="assinatura.html">${icon('card')}<span>Assinatura</span></a></li>
+          <li><a data-page="contato" href="contato.html">${icon('mail')}<span>Contato</span></a></li>
+          <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html">${icon('settings')}<span>Administração</span><span class="admin-support-nav-badge hidden" data-admin-support-badge>0</span></a></li>
         </ul>
+        <div class="nav-footer">
+          <a id="sidebar-profile" class="sidebar-profile" href="perfil.html" data-page="perfil">
+            <span id="sidebar-profile-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span>
+            <span class="sidebar-profile-copy"><strong id="sidebar-profile-name">Personal</strong><small>Meu perfil</small></span>
+            ${icon('chevron')}
+          </a>
+          <button id="logout-button" class="sidebar-logout" type="button">${icon('logout')}<span>Sair</span></button>
+        </div>
         <div class="nav-header-actions">
           <div class="notification-shell">
-            <button id="notification-button" class="notification-button" type="button" aria-label="Abrir notificações" aria-expanded="false" aria-controls="notification-panel"><span class="notification-bell" aria-hidden="true">🔔</span><span id="notification-badge" class="notification-badge hidden">0</span></button>
+            <button id="notification-button" class="notification-button" type="button" aria-label="Abrir notificações" aria-expanded="false" aria-controls="notification-panel">${icon('bell')}<span id="notification-badge" class="notification-badge hidden">0</span></button>
             <section id="notification-panel" class="notification-panel" aria-label="Notificações" hidden>
-              <div class="notification-panel-header"><div><small>CENTRAL</small><strong>Notificações</strong></div><div class="notification-panel-actions"><button id="notification-mark-all" type="button" class="notification-mark-all hidden">Marcar todas como lidas</button><button id="notification-clear-all" type="button" class="notification-clear-all hidden">Limpar notificações</button></div></div>
-              <div id="notification-list" class="notification-list"><p class="notification-empty">Nenhuma notificação.</p></div>
+              <div class="notification-panel-header"><div><small>CENTRAL</small><strong>Notificações</strong></div><div class="notification-panel-actions"><button id="notification-mark-all" type="button" class="notification-mark-all hidden">Marcar todas como lidas</button><button id="notification-clear-all" type="button" class="notification-clear-all hidden">Limpar</button></div></div>
+              <div id="notification-list" class="notification-list"><div class="notification-empty"><strong>Nenhuma notificação nova</strong><span>As atualizações dos seus alunos aparecerão aqui.</span></div></div>
             </section>
           </div>
           <button id="menu-button" class="menu-mobile-btn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">☰</button>
@@ -348,7 +371,7 @@ async function loadNotifications(session) {
     const notifications = notificationsResult.data || [];
     const unreadCount = Number(unreadResult.count || 0);
     const supportUnreadCount = Number(supportUnreadResult.count || 0);
-    badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+    badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
     badge.classList.toggle('hidden', unreadCount === 0);
     markAll?.classList.toggle('hidden', unreadCount === 0);
     clearAll?.classList.toggle('hidden', notifications.length === 0);
@@ -358,9 +381,9 @@ async function loadNotifications(session) {
       ? notifications.map(item => {
           const link = safeNotificationLink(item.link);
           const tag = link ? `a href="${escapeNotificationHtml(link)}"` : 'div';
-          return `<${tag} class="notification-item ${item.lida ? '' : 'unread'}" data-notification-id="${item.id}"><span class="notification-dot" aria-hidden="true"></span><span class="notification-copy"><strong>${escapeNotificationHtml(item.titulo || 'Notificação')}</strong><span>${escapeNotificationHtml(item.mensagem || '')}</span><small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small></span></${link ? 'a' : 'div'}>`;
+          return `<${tag} class="notification-item ${item.lida ? '' : 'unread'}" data-notification-id="${item.id}"><span class="notification-dot" aria-hidden="true"></span><span class="notification-copy"><strong>${escapeNotificationHtml(item.titulo || 'Notificação')}</strong><span>${escapeNotificationHtml(item.mensagem || '')}</span><small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small></span><span class="notification-chevron" aria-hidden="true">›</span></${link ? 'a' : 'div'}>`;
         }).join('')
-      : '<p class="notification-empty">Nenhuma notificação.</p>';
+      : '<div class="notification-empty"><strong>Nenhuma notificação nova</strong><span>As atualizações dos seus alunos aparecerão aqui.</span></div>';
 
     list.querySelectorAll('[data-notification-id]').forEach(item => {
       item.addEventListener('click', async event => {
@@ -405,7 +428,7 @@ async function loadNotifications(session) {
     markAll?.classList.add('hidden');
     clearAll?.classList.add('hidden');
     updateAdminSupportBadges(0);
-    list.innerHTML = '<p class="notification-empty">Nenhuma notificação.</p>';
+    list.innerHTML = '<div class="notification-empty"><strong>Nenhuma notificação nova</strong><span>As atualizações dos seus alunos aparecerão aqui.</span></div>';
   }
 }
 
@@ -440,10 +463,24 @@ export async function setGreeting(session) {
   const text = `Olá, ${resolvedName}`;
   const headerGreeting = document.querySelector('#user-greeting');
   const dashboardGreeting = document.querySelector('#dashboard-user-greeting');
+  const sidebarName = document.querySelector('#sidebar-profile-name');
+  const sidebarAvatar = document.querySelector('#sidebar-profile-avatar');
   if (headerGreeting) headerGreeting.textContent = text;
   if (dashboardGreeting) {
     dashboardGreeting.textContent = text;
     dashboardGreeting.classList.remove('hidden');
+  }
+  if (sidebarName) sidebarName.textContent = resolvedName;
+  if (sidebarAvatar) {
+    const initials = resolvedName.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join('') || 'PF';
+    const avatarUrl = session.user?.user_metadata?.avatar_url || session.user?.user_metadata?.picture || '';
+    if (avatarUrl) {
+      sidebarAvatar.style.backgroundImage = `url("${String(avatarUrl).replace(/"/g, '%22')}")`;
+      sidebarAvatar.textContent = '';
+      sidebarAvatar.classList.add('has-image');
+    } else {
+      sidebarAvatar.textContent = initials;
+    }
   }
 
   try {
