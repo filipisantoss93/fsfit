@@ -156,3 +156,64 @@ body.nav-menu-open {
 .fsfit-toast.is-success { border-color: var(--fs-primary-border, rgba(131, 189, 69, .24)); }
 .fsfit-toast.is-error { border-color: rgba(215, 109, 115, .32); }
 .fsfit-toast.is-warning { border-color: rgba(212, 173, 83, .32); }
+
+/* Fase 3 · Painel */
+body.fsfit-saas .dashboard-tabs {
+  gap: var(--fs-space-1, 4px) !important;
+  padding: var(--fs-space-1, 4px) !important;
+  border-radius: var(--fs-radius-md, 8px) !important;
+  background: var(--fs-surface, #111820) !important;
+}
+
+body.fsfit-saas .dashboard-tab {
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  font-weight: 800 !important;
+  transform: none !important;
+}
+
+body.fsfit-saas .dashboard-tab[aria-selected="true"] {
+  background: var(--fs-primary, #83bd45) !important;
+  color: #0d1409 !important;
+}
+
+body.fsfit-saas .home-now-card,
+body.fsfit-saas .home-review-card {
+  background: var(--fs-surface, #111820) !important;
+  box-shadow: none !important;
+}
+
+body.fsfit-saas .home-now-card {
+  border-left-color: var(--fs-primary, #83bd45) !important;
+}
+
+body.fsfit-saas .home-now-icon,
+body.fsfit-saas .home-review-icon,
+body.fsfit-saas .home-summary-icon {
+  border-radius: var(--fs-radius-md, 8px) !important;
+}
+
+body.fsfit-saas .home-now-action,
+body.fsfit-saas .attention-total,
+body.fsfit-saas .attention-item,
+body.fsfit-saas .today-count {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+}
+
+body.fsfit-saas .attention-item {
+  background: var(--fs-surface-raised, #161e28) !important;
+}
+
+body.fsfit-saas .dashboard-summary-card {
+  border-top-width: 2px !important;
+}
+
+body.fsfit-saas .home-day-progress {
+  height: 5px !important;
+}
+
+body.fsfit-saas .today-card-header,
+body.fsfit-saas .dashboard-activity-heading {
+  padding: var(--fs-space-4, 16px) !important;
+}
