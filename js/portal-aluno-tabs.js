@@ -82,9 +82,8 @@ function normalizeLiveTabLabel(nav) {
   const liveButton = nav?.querySelector('[data-student-main-tab="live"]');
   if (!liveButton) return;
   const state = liveButton.dataset.liveState || 'today';
-  if (state === 'active') liveButton.textContent = 'Em aula';
-  else if (state === 'waiting') liveButton.textContent = 'Check-in';
-  else liveButton.textContent = 'Aula';
+  const label = state === 'active' ? 'Em aula' : state === 'waiting' ? 'Check-in' : 'Aula';
+  if (liveButton.textContent.trim() !== label) liveButton.textContent = label;
 }
 
 function activateTab(root, target) {
