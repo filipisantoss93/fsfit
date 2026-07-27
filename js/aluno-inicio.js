@@ -1,3 +1,5 @@
+import './shared-components.js';
+
 const content = document.querySelector('#student-content');
 const studentName = document.querySelector('#student-name');
 const trainerName = document.querySelector('#trainer-name');
