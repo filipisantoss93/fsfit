@@ -69,6 +69,18 @@ Este documento é a referência oficial para a evolução do FS Fit.
 
 **Status:** concluída para `painel.html` por meio dos componentes globais compartilhados.
 
+### Fase 4 — Alunos
+- [x] Alinhar cabeçalho, resumo e área de busca ao Design System.
+- [x] Reduzir raios e remover gradientes decorativos dos cards.
+- [x] Padronizar filtros e estados ativos.
+- [x] Refinar a lista compacta e os estados semânticos dos alunos.
+- [x] Padronizar avatar, menu de ações e estado vazio.
+- [x] Refinar modal de cadastro e edição.
+- [x] Preservar safe area, bloqueio de rolagem e comportamento mobile.
+- [x] Melhorar leitura e densidade da página em telas pequenas.
+
+**Status:** concluída em `css/alunos.css` e `css/alunos-lista-compacta.css`.
+
 ## Checklist geral
 - [x] Base visual global padronizada
 - [x] Componentes compartilhados padronizados
