@@ -1,10 +1,21 @@
 /* FS Fit · Componentes compartilhados · Fase 2 */
 
+function ensureDesignSystemStyles() {
+  if (!document.querySelector('link[data-fsfit-design-system]')) {
+    const designSystem = document.createElement('link');
+    designSystem.rel = 'stylesheet';
+    designSystem.href = 'css/fsfit-design-system.css?v=20260726-phase3';
+    designSystem.dataset.fsfitDesignSystem = 'true';
+    document.head.appendChild(designSystem);
+  }
+  document.body?.classList.add('fsfit-saas');
+}
+
 function ensureSharedStyles() {
   if (document.querySelector('link[data-fsfit-shared-components]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/shared-components.css?v=20260726-phase2';
+  link.href = 'css/shared-components.css?v=20260726-phase3';
   link.dataset.fsfitSharedComponents = 'true';
   document.head.appendChild(link);
 }
@@ -59,6 +70,7 @@ function observeSharedComponents() {
 }
 
 export function initializeSharedComponents() {
+  ensureDesignSystemStyles();
   ensureSharedStyles();
   normalizeSharedStates();
   observeSharedComponents();
