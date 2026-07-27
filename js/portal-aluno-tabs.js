@@ -81,9 +81,10 @@ function routeChatCard(root, chatPanel) {
 function normalizeLiveTabLabel(nav) {
   const liveButton = nav?.querySelector('[data-student-main-tab="live"]');
   if (!liveButton) return;
-  if (liveButton.dataset.liveState === 'today' && liveButton.textContent.trim() === 'Hoje') {
-    liveButton.textContent = 'Início';
-  }
+  const state = liveButton.dataset.liveState || 'today';
+  if (state === 'active') liveButton.textContent = 'Em aula';
+  else if (state === 'waiting') liveButton.textContent = 'Check-in';
+  else liveButton.textContent = 'Aula';
 }
 
 function activateTab(root, target) {
@@ -125,14 +126,14 @@ export function ensureStudentPortalMainTabs() {
   nav.className = 'student-main-tabs';
   nav.setAttribute('aria-label', 'Áreas do portal do aluno');
   nav.innerHTML = `
-    <button class="student-main-tab active" type="button" data-student-main-tab="live" data-live-state="today">Início</button>
-    <button class="student-main-tab" type="button" data-student-main-tab="agenda">Agenda</button>
+    <button class="student-main-tab active" type="button" data-student-main-tab="agenda">Início</button>
+    <button class="student-main-tab" type="button" data-student-main-tab="live" data-live-state="today">Aula</button>
     <button class="student-main-tab" type="button" data-student-main-tab="chat">Chat</button>
   `;
 
   const livePanel = document.createElement('section');
   livePanel.id = 'student-main-live';
-  livePanel.className = 'student-main-panel active';
+  livePanel.className = 'student-main-panel';
   livePanel.dataset.studentMainPanel = 'live';
 
   const chatPanel = document.createElement('section');
@@ -167,7 +168,7 @@ export function ensureStudentPortalMainTabs() {
   chatObserver.observe(root, { childList: true, subtree: true });
   routeChatCard(root, chatPanel);
 
-  activateTab(root, 'live');
+  activateTab(root, 'agenda');
   initialized = true;
   return { live: livePanel, agenda: root, chat: chatPanel };
 }
