@@ -3,36 +3,38 @@
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#0b0f14">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Escolha seu personal — FS Fit</title>
   <meta name="description" content="Escolha qual acompanhamento do FS Fit deseja acessar.">
   <link rel="manifest" href="manifest.webmanifest?v=20260722-icons-v4">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
-<link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/fsfit-design-system.css?v=20260726-saas1">
   <style>
     .personal-picker-shell { width:min(760px,calc(100% - 26px)); margin:36px auto; }
     .personal-picker-header { margin-bottom:22px; text-align:center; }
     .personal-picker-header .auth-logo { margin-bottom:8px; }
     .personal-picker-header p { color:var(--muted); }
-    .personal-picker-intro { margin-bottom:18px; text-align:center; }
+    .personal-picker-intro { max-width:620px; margin:0 auto 22px; text-align:center; }
     .personal-picker-intro h1 { margin:10px 0 8px; }
     .personal-picker-intro p { margin:0; color:var(--muted); }
-    .personal-picker-list { display:grid; gap:14px; }
-    .personal-picker-card { display:grid; grid-template-columns:76px minmax(0,1fr); gap:16px; align-items:start; padding:18px; border:1px solid var(--border); border-radius:18px; background:var(--surface); box-shadow:var(--shadow); }
-    .personal-picker-avatar { width:76px; height:76px; border-radius:20px; object-fit:cover; background:var(--surface-light); }
-    .personal-picker-placeholder { display:grid; place-items:center; color:#101410; font-size:1.7rem; font-weight:900; background:linear-gradient(135deg,var(--primary),var(--warning)); }
+    .personal-picker-list { display:grid; gap:12px; }
+    .personal-picker-card { display:grid; grid-template-columns:72px minmax(0,1fr); gap:15px; align-items:start; padding:17px; border:1px solid var(--border); border-radius:var(--fs-radius-lg); background:var(--surface); box-shadow:none; }
+    .personal-picker-avatar { width:72px; height:72px; border-radius:var(--fs-radius-md); object-fit:cover; background:var(--surface-light); }
+    .personal-picker-placeholder { display:grid; place-items:center; color:#0d1409; font-size:1.55rem; font-weight:900; background:var(--fs-primary); }
     .personal-picker-content { min-width:0; }
-    .personal-picker-content h2 { margin:0 0 5px; font-size:1.2rem; }
-    .personal-picker-location { margin:0 0 8px; color:var(--primary); font-size:.84rem; font-weight:800; }
-    .personal-picker-description { display:-webkit-box; margin:0 0 14px; overflow:hidden; color:var(--muted); font-size:.9rem; line-height:1.5; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
+    .personal-picker-content h2 { margin:0 0 5px; font-size:1.14rem; }
+    .personal-picker-location { margin:0 0 8px; color:#a9ce7d; font-size:.82rem; font-weight:800; }
+    .personal-picker-description { display:-webkit-box; margin:0 0 14px; overflow:hidden; color:var(--muted); font-size:.88rem; line-height:1.5; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
     .personal-picker-card .btn { width:100%; }
     .personal-picker-back { width:100%; margin-top:16px; }
     @media (max-width:520px) {
-      .personal-picker-card { grid-template-columns:58px minmax(0,1fr); gap:12px; padding:15px; }
-      .personal-picker-avatar { width:58px; height:58px; border-radius:16px; }
+      .personal-picker-shell { margin-top:26px; }
+      .personal-picker-card { grid-template-columns:56px minmax(0,1fr); gap:12px; padding:14px; }
+      .personal-picker-avatar { width:56px; height:56px; border-radius:var(--fs-radius-sm); }
     }
   </style>
   <link rel="stylesheet" href="css/selecionar-personal-padronizacao.css?v=20260726-picker1">
@@ -42,7 +44,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
 </head>
-<body class="student-page">
+<body class="fsfit-saas student-page">
   <main class="personal-picker-shell">
     <header class="personal-picker-header">
       <a class="auth-logo" href="index.html" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
