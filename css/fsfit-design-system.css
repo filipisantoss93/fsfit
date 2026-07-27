@@ -1,0 +1,227 @@
+:root {
+  /* Identidade SaaS FS Fit */
+  --fs-bg: #0b0f14;
+  --fs-surface: #111820;
+  --fs-surface-raised: #161e28;
+  --fs-surface-soft: #1a232e;
+  --fs-border: rgba(231, 237, 243, .105);
+  --fs-border-strong: rgba(231, 237, 243, .16);
+  --fs-text: #eef2f5;
+  --fs-text-muted: #929da9;
+  --fs-text-subtle: #73808d;
+
+  --fs-primary: #83bd45;
+  --fs-primary-hover: #91c75a;
+  --fs-primary-strong: #70a93a;
+  --fs-primary-soft: rgba(131, 189, 69, .09);
+  --fs-primary-border: rgba(131, 189, 69, .24);
+
+  --fs-info: #6e94bd;
+  --fs-warning: #d4ad53;
+  --fs-danger: #d76d73;
+  --fs-success: #83bd45;
+
+  --fs-radius-xs: 5px;
+  --fs-radius-sm: 7px;
+  --fs-radius-md: 9px;
+  --fs-radius-lg: 12px;
+  --fs-radius-device: 28px;
+
+  --fs-shadow-sm: 0 8px 24px rgba(0, 0, 0, .18);
+  --fs-shadow-md: 0 18px 48px rgba(0, 0, 0, .28);
+  --fs-focus-ring: 0 0 0 3px rgba(131, 189, 69, .16);
+
+  /* Compatibilidade com páginas que usam os tokens antigos */
+  --primary: var(--fs-primary);
+  --primary-dark: var(--fs-primary-strong);
+  --primary-soft: var(--fs-primary-soft);
+  --secondary: var(--fs-info);
+  --warning: var(--fs-warning);
+  --danger: var(--fs-danger);
+  --text: var(--fs-text);
+  --muted: var(--fs-text-muted);
+  --surface: var(--fs-surface);
+  --surface-light: var(--fs-surface-raised);
+  --background: var(--fs-bg);
+  --border: var(--fs-border);
+  --shadow: var(--fs-shadow-md);
+  --radius: var(--fs-radius-lg);
+}
+
+/* Fundamentos */
+body.fsfit-saas {
+  color: var(--fs-text);
+  background: var(--fs-bg);
+}
+
+body.fsfit-saas h1,
+body.fsfit-saas h2,
+body.fsfit-saas h3 {
+  color: var(--fs-text);
+  letter-spacing: -.025em;
+}
+
+body.fsfit-saas h1 {
+  font-size: clamp(1.65rem, 4vw, 2.25rem);
+  line-height: 1.12;
+}
+
+body.fsfit-saas h2 {
+  font-size: clamp(1.18rem, 3vw, 1.5rem);
+  line-height: 1.2;
+}
+
+body.fsfit-saas p,
+body.fsfit-saas .text-muted {
+  color: var(--fs-text-muted);
+}
+
+/* Superfícies */
+body.fsfit-saas .card,
+body.fsfit-saas .panel,
+body.fsfit-saas .modal-content,
+body.fsfit-saas .sheet {
+  border-color: var(--fs-border);
+  border-radius: var(--fs-radius-lg);
+  background: var(--fs-surface);
+  box-shadow: none;
+}
+
+body.fsfit-saas .sub-card,
+body.fsfit-saas .metric-card,
+body.fsfit-saas .list-item,
+body.fsfit-saas .tile {
+  border-color: var(--fs-border);
+  border-radius: var(--fs-radius-md);
+  background: var(--fs-surface-raised);
+  box-shadow: none;
+}
+
+/* Botões */
+body.fsfit-saas .btn {
+  min-height: 42px;
+  border-radius: var(--fs-radius-sm);
+  box-shadow: none;
+  font-weight: 750;
+}
+
+body.fsfit-saas .btn-primary {
+  color: #0d1409;
+  border-color: transparent;
+  background: var(--fs-primary);
+  box-shadow: none;
+}
+
+body.fsfit-saas .btn-primary:hover {
+  background: var(--fs-primary-hover);
+  box-shadow: none;
+}
+
+body.fsfit-saas .btn-secondary {
+  color: var(--fs-text);
+  border-color: var(--fs-border-strong);
+  background: var(--fs-surface-raised);
+  box-shadow: none;
+}
+
+body.fsfit-saas .btn-outline,
+body.fsfit-saas .btn-neutral {
+  color: #d7dde2;
+  border-color: var(--fs-border-strong);
+  background: transparent;
+  box-shadow: none;
+}
+
+body.fsfit-saas .btn-danger {
+  color: #f2c4c7;
+  border-color: rgba(215, 109, 115, .32);
+  background: rgba(215, 109, 115, .08);
+  box-shadow: none;
+}
+
+/* Campos */
+body.fsfit-saas input,
+body.fsfit-saas select,
+body.fsfit-saas textarea {
+  border-color: var(--fs-border);
+  border-radius: var(--fs-radius-sm);
+  background: var(--fs-surface-raised);
+  color: var(--fs-text);
+  box-shadow: none;
+}
+
+body.fsfit-saas input:focus,
+body.fsfit-saas select:focus,
+body.fsfit-saas textarea:focus {
+  border-color: var(--fs-primary);
+  box-shadow: var(--fs-focus-ring);
+}
+
+/* Navegação, abas e filtros */
+body.fsfit-saas .tabs,
+body.fsfit-saas .record-tabs,
+body.fsfit-saas .filters-bar,
+body.fsfit-saas .segmented-control {
+  border-color: var(--fs-border);
+  border-radius: var(--fs-radius-md);
+  background: var(--fs-surface);
+  box-shadow: none;
+}
+
+body.fsfit-saas .tab,
+body.fsfit-saas .record-tab,
+body.fsfit-saas .segment {
+  border-radius: var(--fs-radius-sm);
+}
+
+body.fsfit-saas .tab.active,
+body.fsfit-saas .record-tab.active,
+body.fsfit-saas .segment.active {
+  color: var(--fs-text);
+  background: var(--fs-surface-raised);
+}
+
+/* Selos e estados: o verde orienta, não domina */
+body.fsfit-saas .badge,
+body.fsfit-saas .status,
+body.fsfit-saas .tag {
+  border-color: var(--fs-primary-border);
+  border-radius: 999px;
+  background: var(--fs-primary-soft);
+  color: #a9ce7d;
+}
+
+/* Tabelas e listas */
+body.fsfit-saas th {
+  color: var(--fs-text-subtle);
+  font-weight: 750;
+}
+
+body.fsfit-saas th,
+body.fsfit-saas td,
+body.fsfit-saas .list-item {
+  border-color: var(--fs-border);
+}
+
+/* Menos movimento e contraste decorativo */
+body.fsfit-saas .card:hover,
+body.fsfit-saas .tile:hover,
+body.fsfit-saas .quick-action:hover {
+  transform: none;
+  border-color: var(--fs-border-strong);
+  box-shadow: none;
+}
+
+@media (max-width: 620px) {
+  body.fsfit-saas .card,
+  body.fsfit-saas .panel,
+  body.fsfit-saas .modal-content,
+  body.fsfit-saas .sheet {
+    border-radius: var(--fs-radius-md);
+  }
+
+  body.fsfit-saas .btn {
+    min-height: 41px;
+    border-radius: var(--fs-radius-sm);
+  }
+}
