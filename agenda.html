@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/header-menu.css?v=20260717-support2" data-fsfit-header-styles>
   <link rel="stylesheet" href="css/mobile-navigation.css?v=20260722-shell1" data-fsfit-mobile-navigation>
   <link rel="stylesheet" href="css/agenda.css?v=20260724-agenda-header1">
-  <link rel="stylesheet" href="css/agenda-padronizacao.css?v=20260726-design1">
+  <link rel="stylesheet" href="css/agenda-padronizacao.css?v=20260727-dashboard1">
   <style>
     .agenda-loading-card{display:grid;gap:11px;overflow:hidden}
     .agenda-loading-line{height:12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.055) 20%,rgba(255,255,255,.11) 40%,rgba(255,255,255,.055) 60%);background-size:220% 100%;animation:agendaSkeleton 1.25s ease-in-out infinite}
@@ -44,33 +44,63 @@
     <section class="page-header agenda-header">
       <div>
         <h1>Agenda</h1>
-        <p>Consulte seus atendimentos do dia.</p>
+        <p>Consulte e organize seus atendimentos do dia.</p>
       </div>
       <div class="agenda-header-actions">
         <button id="open-schedule-modal" class="btn btn-primary agenda-schedule-button" type="button">+ Agendar</button>
       </div>
     </section>
 
-    <section class="card agenda-toolbar" aria-label="Selecionar dia da agenda">
-      <button id="agenda-prev-day" class="btn btn-neutral agenda-nav-btn" type="button" aria-label="Dia anterior">←</button>
-      <div class="agenda-date-picker-wrap">
-        <button id="agenda-date-display" class="agenda-date-display" type="button" aria-label="Escolher data da agenda">Selecionar data</button>
-        <input id="agenda-date" class="agenda-date-input" type="date" aria-label="Data da agenda">
-      </div>
-      <button id="agenda-next-day" class="btn btn-neutral agenda-nav-btn" type="button" aria-label="Próximo dia">→</button>
-      <div id="agenda-today-row" class="agenda-today-row" hidden>
-        <button id="agenda-today" class="btn btn-outline" type="button">Voltar para hoje</button>
-      </div>
+    <section class="agenda-dashboard-summary" aria-label="Resumo da agenda selecionada">
+      <article class="card agenda-summary-card"><small>ATENDIMENTOS</small><strong id="agenda-summary-total">—</strong><span>no dia selecionado</span></article>
+      <article class="card agenda-summary-card"><small>EM AULA</small><strong id="agenda-summary-live">—</strong><span>em acompanhamento agora</span></article>
+      <article class="card agenda-summary-card"><small>PRÓXIMO</small><strong id="agenda-summary-next">—</strong><span id="agenda-summary-next-name">próximo horário</span></article>
+      <article class="card agenda-summary-card"><small>SEM HORÁRIO</small><strong id="agenda-summary-no-time">—</strong><span>precisam de ajuste</span></article>
     </section>
 
-    <div id="agenda-message" class="message"></div>
-    <section id="agenda-grid" class="agenda-grid" aria-live="polite">
-      <article class="card agenda-loading-card" aria-label="Carregando agenda">
-        <span class="agenda-loading-line"></span>
-        <span class="agenda-loading-line"></span>
-        <span class="agenda-loading-line"></span>
-      </article>
-    </section>
+    <div class="agenda-dashboard-layout">
+      <aside class="agenda-dashboard-sidebar" aria-label="Visão do mês e distribuição do dia">
+        <section class="card agenda-calendar-card">
+          <div class="agenda-panel-heading"><div><small>VISÃO MENSAL</small><h2 id="agenda-calendar-title">Calendário</h2></div><button id="agenda-calendar-today" class="btn btn-neutral" type="button">Hoje</button></div>
+          <div class="agenda-calendar-weekdays" aria-hidden="true"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+          <div id="agenda-calendar-grid" class="agenda-calendar-grid" aria-label="Calendário do mês"></div>
+        </section>
+
+        <section class="card agenda-distribution-card">
+          <div class="agenda-panel-heading"><div><small>DISTRIBUIÇÃO DO DIA</small><h2>Horários</h2></div></div>
+          <div class="agenda-distribution-total"><strong id="agenda-distribution-total">—</strong><span>Total</span></div>
+          <div class="agenda-distribution-list">
+            <div><span>Manhã</span><strong id="agenda-period-morning">—</strong></div>
+            <div><span>Tarde</span><strong id="agenda-period-afternoon">—</strong></div>
+            <div><span>Noite</span><strong id="agenda-period-evening">—</strong></div>
+            <div><span>Sem horário</span><strong id="agenda-period-unscheduled">—</strong></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="agenda-dashboard-main">
+        <section class="card agenda-toolbar" aria-label="Selecionar dia da agenda">
+          <button id="agenda-prev-day" class="btn btn-neutral agenda-nav-btn" type="button" aria-label="Dia anterior">←</button>
+          <div class="agenda-date-picker-wrap">
+            <button id="agenda-date-display" class="agenda-date-display" type="button" aria-label="Escolher data da agenda">Selecionar data</button>
+            <input id="agenda-date" class="agenda-date-input" type="date" aria-label="Data da agenda">
+          </div>
+          <button id="agenda-next-day" class="btn btn-neutral agenda-nav-btn" type="button" aria-label="Próximo dia">→</button>
+          <div id="agenda-today-row" class="agenda-today-row" hidden>
+            <button id="agenda-today" class="btn btn-outline" type="button">Voltar para hoje</button>
+          </div>
+        </section>
+
+        <div id="agenda-message" class="message"></div>
+        <section id="agenda-grid" class="agenda-grid" aria-live="polite">
+          <article class="card agenda-loading-card" aria-label="Carregando agenda">
+            <span class="agenda-loading-line"></span>
+            <span class="agenda-loading-line"></span>
+            <span class="agenda-loading-line"></span>
+          </article>
+        </section>
+      </section>
+    </div>
   </main>
 
   <nav class="fsfit-bottom-nav" data-fsfit-shell-placeholder aria-hidden="true">
@@ -83,5 +113,83 @@
 
   <script type="module" src="js/agenda.js?v=20260721-schedule1"></script>
   <script type="module" src="js/agenda-student-search.js?v=20260722-student-search2"></script>
+  <script>
+    (() => {
+      const dateInput = document.querySelector('#agenda-date');
+      const agendaGrid = document.querySelector('#agenda-grid');
+      const calendarGrid = document.querySelector('#agenda-calendar-grid');
+      const calendarTitle = document.querySelector('#agenda-calendar-title');
+      const calendarToday = document.querySelector('#agenda-calendar-today');
+      if (!dateInput || !agendaGrid || !calendarGrid) return;
+
+      const parseDate = value => {
+        const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : new Date();
+      };
+      const iso = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+      const sameDay = (a,b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+      function buildCalendar() {
+        const selected = parseDate(dateInput.value);
+        const today = new Date();
+        const year = selected.getFullYear();
+        const month = selected.getMonth();
+        calendarTitle.textContent = new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric'}).format(selected);
+        const first = new Date(year, month, 1);
+        const start = new Date(year, month, 1 - first.getDay());
+        const days = Array.from({length:42},(_,index) => {
+          const day = new Date(start);
+          day.setDate(start.getDate() + index);
+          const outside = day.getMonth() !== month;
+          return `<button type="button" class="agenda-calendar-day${outside?' is-outside':''}${sameDay(day,today)?' is-today':''}${sameDay(day,selected)?' is-selected':''}" data-agenda-date="${iso(day)}" aria-label="${day.toLocaleDateString('pt-BR')}">${day.getDate()}</button>`;
+        });
+        calendarGrid.innerHTML = days.join('');
+      }
+
+      function syncDashboard() {
+        const rows = [...agendaGrid.querySelectorAll('.agenda-entry')];
+        if (!rows.length && agendaGrid.querySelector('.agenda-loading-card')) return;
+        const total = rows.length;
+        const live = rows.filter(row => row.classList.contains('is-in-class')).length;
+        const next = rows.find(row => row.classList.contains('is-next'));
+        const noTime = rows.filter(row => row.querySelector('.agenda-time')?.textContent.trim() === '—').length;
+        const period = {morning:0,afternoon:0,evening:0,unscheduled:0};
+        rows.forEach(row => {
+          const value = row.querySelector('.agenda-time')?.textContent.trim() || '';
+          const hour = Number(value.split(':')[0]);
+          if (!/^\d{2}:\d{2}$/.test(value)) period.unscheduled += 1;
+          else if (hour < 12) period.morning += 1;
+          else if (hour < 18) period.afternoon += 1;
+          else period.evening += 1;
+        });
+        document.querySelector('#agenda-summary-total').textContent = String(total);
+        document.querySelector('#agenda-summary-live').textContent = String(live);
+        document.querySelector('#agenda-summary-next').textContent = next?.querySelector('.agenda-time')?.textContent.trim() || '—';
+        document.querySelector('#agenda-summary-next-name').textContent = next?.querySelector('.agenda-entry-main strong')?.textContent.trim() || 'nenhum próximo horário';
+        document.querySelector('#agenda-summary-no-time').textContent = String(noTime);
+        document.querySelector('#agenda-distribution-total').textContent = String(total);
+        document.querySelector('#agenda-period-morning').textContent = String(period.morning);
+        document.querySelector('#agenda-period-afternoon').textContent = String(period.afternoon);
+        document.querySelector('#agenda-period-evening').textContent = String(period.evening);
+        document.querySelector('#agenda-period-unscheduled').textContent = String(period.unscheduled);
+        buildCalendar();
+      }
+
+      calendarGrid.addEventListener('click', event => {
+        const button = event.target.closest('[data-agenda-date]');
+        if (!button) return;
+        dateInput.value = button.dataset.agendaDate;
+        dateInput.dispatchEvent(new Event('change',{bubbles:true}));
+      });
+      calendarToday?.addEventListener('click', () => {
+        dateInput.value = iso(new Date());
+        dateInput.dispatchEvent(new Event('change',{bubbles:true}));
+      });
+      dateInput.addEventListener('change', () => requestAnimationFrame(buildCalendar));
+      new MutationObserver(syncDashboard).observe(agendaGrid,{childList:true,subtree:true});
+      buildCalendar();
+      syncDashboard();
+    })();
+  </script>
 </body>
 </html>
