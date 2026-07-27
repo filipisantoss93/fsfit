@@ -1,41 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
-<meta charset="UTF-8">
-<meta name="theme-color" content="#0f1115">
+  <meta name="theme-color" content="#0f1115">
   <title>Nova senha — FS Fit</title>
+  <meta name="description" content="Crie uma nova senha para acessar sua conta do FS Fit.">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/nova-senha-padronizacao.css?v=20260726-reset1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/01-web-favicon/favicon-32x32.png?v=20260722-icons-v4">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
 </head>
-<body>
-  <header class="main-header"><nav class="nav-container"><a class="logo-nav" href="index.html"><strong>FS</strong><span>Fit</span></a></nav></header>
-  <main class="container">
-    <section class="hero" style="grid-template-columns:1fr;min-height:calc(100vh - 140px)">
-      <div class="card auth-card" style="justify-self:center;width:min(470px,100%)">
+<body class="password-reset-page">
+  <header class="main-header">
+    <nav class="nav-container">
+      <a class="logo-nav" href="index.html" aria-label="FS Fit — Início"><strong>FS</strong><span>Fit</span></a>
+    </nav>
+  </header>
+
+  <main class="password-reset-main">
+    <section class="password-reset-card" aria-labelledby="password-reset-title">
+      <div class="password-reset-icon" aria-hidden="true">✓</div>
+
+      <div class="password-reset-copy">
         <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
-        <h2>Crie sua nova senha</h2>
-        <div id="password-message" class="message"></div>
-        <form id="password-form">
-          <div class="form-group">
-            <label for="new-password">Nova senha</label>
-            <input id="new-password" name="password" type="password" minlength="8" autocomplete="new-password" required>
-          </div>
-          <div class="form-group">
-            <label for="confirm-new-password">Confirmar nova senha</label>
-            <input id="confirm-new-password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" required>
-          </div>
-          <button class="btn btn-primary" type="submit" style="width:100%">Salvar nova senha</button>
-        </form>
-        <div class="auth-switch"><a href="index.html">Voltar para o login</a></div>
+        <h1 id="password-reset-title">Crie sua nova senha</h1>
+        <p>Use uma senha exclusiva para proteger sua conta e os dados dos seus alunos.</p>
       </div>
+
+      <div id="recovery-status" class="password-reset-status" role="status" aria-live="polite">Validando seu link de recuperação...</div>
+      <div id="password-message" class="message" role="alert" aria-live="assertive"></div>
+
+      <form id="password-form" class="password-reset-form">
+        <div class="form-group">
+          <label for="new-password">Nova senha</label>
+          <input id="new-password" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" disabled required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-new-password">Confirme a nova senha</label>
+          <input id="confirm-new-password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" placeholder="Digite a mesma senha novamente" disabled required>
+        </div>
+
+        <button class="btn btn-primary" type="submit" disabled>Salvar nova senha</button>
+      </form>
+
+      <div class="password-guidance" aria-label="Requisitos recomendados para a senha">
+        <strong>Para uma senha mais segura:</strong>
+        <span>Use pelo menos 8 caracteres</span>
+        <span>Evite nome, telefone ou sequências simples</span>
+      </div>
+
+      <div class="password-reset-back"><a href="recuperar-senha.html">Solicitar outro link</a></div>
     </section>
   </main>
-  <script type="module" src="js/nova-senha.js"></script>
+
+  <script type="module" src="js/nova-senha.js?v=20260726-reset1"></script>
 </body>
 </html>
