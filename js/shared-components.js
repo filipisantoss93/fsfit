@@ -15,7 +15,7 @@ function ensureSharedStyles() {
   if (document.querySelector('link[data-fsfit-shared-components]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/shared-components.css?v=20260727-buttons1';
+  link.href = 'css/shared-components.css?v=20260727-sticky-tabs1';
   link.dataset.fsfitSharedComponents = 'true';
   document.head.appendChild(link);
 }
