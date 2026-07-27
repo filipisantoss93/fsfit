@@ -14,7 +14,8 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/header-menu.css?v=20260717-support2" data-fsfit-header-styles>
   <link rel="stylesheet" href="css/mobile-navigation.css?v=20260722-shell1" data-fsfit-mobile-navigation>
-  <link rel="stylesheet" href="css/alunos.css?v=20260726-ux1">
+  <link rel="stylesheet" href="css/dashboard-desktop.css?v=20260727-dashboard1">
+  <link rel="stylesheet" href="css/alunos.css?v=20260727-dashboard1">
   <link rel="stylesheet" href="css/alunos-lista-compacta.css?v=20260726-ux1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
@@ -47,6 +48,70 @@
     </section>
 
     <div id="student-message" class="message" role="status" aria-live="polite"></div>
+
+    <section id="students-dashboard" class="fs-dashboard-only" aria-label="Dashboard de alunos">
+      <div class="fs-dashboard-kpis">
+        <article class="fs-dashboard-kpi">
+          <small>Total de alunos</small>
+          <strong id="students-dashboard-total">0</strong>
+          <span>alunos ativos cadastrados</span>
+        </article>
+        <article class="fs-dashboard-kpi is-info">
+          <small>Em aula agora</small>
+          <strong id="students-dashboard-live">0</strong>
+          <span>acompanhamentos em andamento</span>
+        </article>
+        <article class="fs-dashboard-kpi">
+          <small>Com treino ativo</small>
+          <strong id="students-dashboard-active-workout">0</strong>
+          <span>alunos com planejamento ativo</span>
+        </article>
+        <article class="fs-dashboard-kpi is-warning">
+          <small>Sem treino ativo</small>
+          <strong id="students-dashboard-no-workout">0</strong>
+          <span>precisam de configuração</span>
+        </article>
+        <article class="fs-dashboard-kpi is-info">
+          <small>Novos em 30 dias</small>
+          <strong id="students-dashboard-new">0</strong>
+          <span>cadastros recentes</span>
+        </article>
+      </div>
+
+      <div class="fs-dashboard-overview">
+        <article class="fs-dashboard-panel">
+          <div class="fs-dashboard-panel-heading">
+            <div>
+              <small>Visão geral</small>
+              <h2>Distribuição dos alunos</h2>
+              <p>Resumo calculado com os dados atuais da plataforma.</p>
+            </div>
+          </div>
+          <div id="students-dashboard-donut" class="fs-dashboard-donut" style="--dashboard-active:0%;--dashboard-live:0%">
+            <div class="fs-dashboard-donut-copy"><strong id="students-dashboard-donut-total">0</strong><span>Total</span></div>
+          </div>
+          <div class="fs-dashboard-legend">
+            <div class="fs-dashboard-legend-row"><span class="fs-dashboard-legend-dot"></span><span>Com treino ativo</span><strong id="students-dashboard-legend-active">0</strong></div>
+            <div class="fs-dashboard-legend-row"><span class="fs-dashboard-legend-dot is-warning"></span><span>Em aula agora</span><strong id="students-dashboard-legend-live">0</strong></div>
+            <div class="fs-dashboard-legend-row"><span class="fs-dashboard-legend-dot is-danger"></span><span>Sem treino ativo</span><strong id="students-dashboard-legend-no-workout">0</strong></div>
+          </div>
+        </article>
+
+        <article class="fs-dashboard-panel">
+          <div class="fs-dashboard-panel-heading">
+            <div>
+              <small>Atenção necessária</small>
+              <h2>Alunos sem treino ativo</h2>
+              <p>Acesse a ficha para criar ou ativar um planejamento.</p>
+            </div>
+            <span id="students-dashboard-attention-count" class="fs-dashboard-count">0</span>
+          </div>
+          <div id="students-dashboard-attention-list" class="fs-dashboard-attention-list">
+            <div class="fs-dashboard-empty">Carregando alunos...</div>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <section class="students-summary" aria-label="Resumo dos alunos">
       <article class="students-summary-card">
@@ -166,6 +231,7 @@
 
   <script type="module" src="js/alunos.js?v=20260726-ux1"></script>
   <script type="module" src="js/alunos-lista-compacta.js?v=20260726-ux1"></script>
+  <script type="module" src="js/alunos-dashboard.js?v=20260727-dashboard1"></script>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
