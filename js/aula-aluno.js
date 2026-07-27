@@ -267,7 +267,7 @@ function exerciseSummary(item) {
 }
 
 function renderIdle(state = {}) {
-  setLiveTab('Hoje', 'today');
+  setLiveTab('Aula', 'today');
   const completion = recentCompletion();
   box.innerHTML = `
     ${completion ? '<div class="live-completed-banner"><strong>Treino concluído hoje</strong><span>Seu progresso foi salvo. Você pode consultar a agenda ou iniciar outra sessão quando necessário.</span></div>' : ''}
@@ -281,13 +281,13 @@ function renderIdle(state = {}) {
     <div class="live-class-actions ${personalLinkHtml() ? '' : 'single'}">
       <button id="start-live-class" class="btn btn-primary" type="button">Fazer check-in</button>
       ${personalLinkHtml()}
-    </div>
-    ${dayOverviewHtml()}`;
+    </div>`;
   bindRenderedActions();
 }
 
 function renderWaiting(state) {
-  setLiveTab('Aguardando', 'waiting');
+  setLiveTab('Check-in', 'waiting');
+  showStudentPortalTab('live');
   const elapsed = formatElapsed(state.checkin_at);
   box.innerHTML = `
     <div class="live-class-header">
@@ -301,13 +301,13 @@ function renderWaiting(state) {
     <div class="live-class-actions ${personalLinkHtml() ? '' : 'single'}">
       <button id="cancel-live-checkin" class="btn btn-outline" type="button">Cancelar check-in</button>
       ${personalLinkHtml()}
-    </div>
-    ${dayOverviewHtml()}`;
+    </div>`;
   bindRenderedActions();
 }
 
 function renderCompleted(state = {}) {
-  setLiveTab('Hoje', 'today');
+  setLiveTab('Aula', 'today');
+  showStudentPortalTab('agenda');
   box.innerHTML = `
     <div class="live-class-header">
       <div><small>TREINO FINALIZADO</small><h2>Treino concluído 🎉</h2></div>
@@ -318,13 +318,13 @@ function renderCompleted(state = {}) {
     <div class="live-class-actions ${personalLinkHtml() ? '' : 'single'}">
       <button class="btn btn-primary" type="button" data-live-go="inicio">Voltar para meu dia</button>
       ${personalLinkHtml()}
-    </div>
-    ${dayOverviewHtml()}`;
+    </div>`;
   bindRenderedActions();
 }
 
 function renderActive(state) {
   setLiveTab('Em aula', 'active');
+  showStudentPortalTab('live');
   const items = Array.isArray(state.exercicios) ? state.exercicios : [];
   const done = items.filter(item => item.concluido).length;
   const total = items.length;
@@ -457,6 +457,7 @@ async function cancelCheckin() {
     if (cancelled !== true) throw new Error('O check-in não está mais aguardando confirmação.');
     sessionState = null;
     render();
+    showStudentPortalTab('agenda');
   } catch (error) {
     console.error(error);
     await loadSession().catch(console.error);
