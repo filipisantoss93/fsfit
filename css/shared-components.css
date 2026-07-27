@@ -1,0 +1,158 @@
+/* FS Fit · Componentes compartilhados · Fase 2 */
+
+:root {
+  --fs-shared-panel-bg: rgba(17, 24, 32, .98);
+  --fs-shared-panel-border: rgba(231, 237, 243, .12);
+  --fs-shared-overlay: rgba(4, 7, 11, .68);
+}
+
+.main-header,
+.notification-panel,
+.fsfit-more-panel,
+.fsfit-bottom-nav,
+.nav-menu {
+  border-color: var(--fs-shared-panel-border) !important;
+}
+
+.notification-button,
+.menu-mobile-btn,
+.fsfit-more-close {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+}
+
+.notification-panel,
+.fsfit-more-panel,
+.nav-menu {
+  border-radius: var(--fs-radius-lg, 10px) !important;
+  background: var(--fs-shared-panel-bg) !important;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, .38) !important;
+}
+
+.notification-panel-header,
+.fsfit-more-heading {
+  gap: var(--fs-space-3, 12px);
+}
+
+.notification-item,
+.fsfit-more-item {
+  border-color: var(--fs-border, rgba(231, 237, 243, .105)) !important;
+  border-radius: var(--fs-radius-md, 8px) !important;
+  background: var(--fs-surface-raised, #161e28) !important;
+  box-shadow: none !important;
+}
+
+.notification-item:hover,
+.fsfit-more-item:hover {
+  border-color: var(--fs-border-strong, rgba(231, 237, 243, .16)) !important;
+  background: var(--fs-surface-soft, #1a232e) !important;
+  transform: none !important;
+}
+
+.fsfit-more-item-icon {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09)) !important;
+  color: var(--fs-primary, #83bd45) !important;
+}
+
+.fsfit-more-close {
+  border: 1px solid var(--fs-border, rgba(231, 237, 243, .105)) !important;
+  background: var(--fs-surface-raised, #161e28) !important;
+  color: var(--fs-text-muted, #929da9) !important;
+}
+
+.fsfit-more-backdrop,
+body.nav-menu-open::before {
+  background: var(--fs-shared-overlay) !important;
+}
+
+@media (min-width: 861px) {
+  .main-header {
+    background: rgba(11, 15, 20, .985) !important;
+    box-shadow: 10px 0 26px rgba(0, 0, 0, .18) !important;
+  }
+
+  .nav-menu a,
+  .nav-menu button {
+    border-radius: var(--fs-radius-sm, 6px) !important;
+  }
+
+  .nav-menu a.active {
+    border-color: var(--fs-primary-border, rgba(131, 189, 69, .24)) !important;
+    background: var(--fs-primary-soft, rgba(131, 189, 69, .09)) !important;
+  }
+
+  .nav-menu a.active::after {
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .nav-menu {
+    border-radius: var(--fs-radius-lg, 10px) !important;
+  }
+
+  .fsfit-bottom-nav {
+    left: 8px !important;
+    right: 8px !important;
+    border-radius: var(--fs-radius-lg, 10px) var(--fs-radius-lg, 10px) 0 0 !important;
+    background: rgba(11, 15, 20, .985) !important;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .28) !important;
+  }
+
+  .fsfit-bottom-nav a,
+  .fsfit-bottom-nav button {
+    border-radius: var(--fs-radius-sm, 6px) !important;
+  }
+
+  .fsfit-bottom-nav a.active,
+  .fsfit-bottom-nav button.active,
+  .fsfit-bottom-nav button.is-open {
+    background: var(--fs-primary-soft, rgba(131, 189, 69, .09)) !important;
+    color: var(--fs-primary, #83bd45) !important;
+  }
+
+  .fsfit-more-panel {
+    border-radius: var(--fs-radius-lg, 10px) var(--fs-radius-lg, 10px) 0 0 !important;
+    padding-bottom: calc(var(--fs-space-5, 20px) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+html.fsfit-sheet-open,
+html.fsfit-sheet-open body,
+body.nav-menu-open {
+  overscroll-behavior: none;
+}
+
+.fsfit-shared-empty,
+.fsfit-shared-error,
+.fsfit-shared-loading {
+  padding: var(--fs-space-8, 32px) var(--fs-space-5, 20px);
+  border: 1px dashed var(--fs-border-strong, rgba(231, 237, 243, .16));
+  border-radius: var(--fs-radius-md, 8px);
+  background: var(--fs-surface, #111820);
+  color: var(--fs-text-muted, #929da9);
+  text-align: center;
+}
+
+.fsfit-toast-region {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 3000;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.fsfit-toast {
+  padding: 12px 14px;
+  border: 1px solid var(--fs-border, rgba(231, 237, 243, .105));
+  border-radius: var(--fs-radius-md, 8px);
+  background: var(--fs-surface-raised, #161e28);
+  color: var(--fs-text, #eef2f5);
+  box-shadow: var(--fs-shadow-sm, 0 8px 24px rgba(0, 0, 0, .18));
+}
+
+.fsfit-toast.is-success { border-color: var(--fs-primary-border, rgba(131, 189, 69, .24)); }
+.fsfit-toast.is-error { border-color: rgba(215, 109, 115, .32); }
+.fsfit-toast.is-warning { border-color: rgba(212, 173, 83, .32); }
