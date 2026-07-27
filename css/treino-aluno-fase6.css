@@ -1,0 +1,221 @@
+/* FS Fit · Fase 6 — Treinos */
+
+.workout-page {
+  width: min(calc(100% - 28px), 1040px);
+  max-width: 1040px;
+  padding-bottom: calc(124px + env(safe-area-inset-bottom, 0px));
+}
+
+.workout-page > .page-header {
+  margin: 16px 0 14px;
+  padding: 0;
+  background: transparent;
+}
+
+.workout-page .card,
+.workout-day-section,
+.workout-plan-row,
+.workout-plan-summary > div,
+.workout-exercise-row,
+.exercise-checkbox-option,
+.selected-exercise-card,
+.workout-detail {
+  border-color: var(--fs-border, var(--border));
+  background: var(--fs-surface, var(--surface));
+  box-shadow: none;
+}
+
+.workout-plans-card,
+.workout-active-card {
+  border-color: var(--fs-border, var(--border));
+  background: var(--fs-surface, var(--surface));
+}
+
+.workout-plan-row,
+.workout-day-section,
+.selected-exercise-card {
+  border-radius: var(--fs-radius-md, 8px) !important;
+}
+
+.workout-plan-row.active {
+  border-color: var(--fs-primary-border, rgba(131, 189, 69, .24));
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09));
+  box-shadow: inset 3px 0 0 var(--fs-primary, var(--primary));
+}
+
+.workout-plan-row-title em,
+.workout-active-badge,
+.selected-exercises-heading > span {
+  border: 1px solid var(--fs-primary-border, rgba(131, 189, 69, .24));
+  border-radius: 999px;
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09));
+  color: var(--fs-primary, var(--primary));
+  box-shadow: none;
+}
+
+.workout-workspace {
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.workout-active-card {
+  margin-top: 12px;
+}
+
+.workout-day-section {
+  margin-top: 10px;
+  padding: 14px;
+}
+
+.workout-exercise-row {
+  border-radius: var(--fs-radius-md, 8px) !important;
+  transition: border-color var(--fs-transition-fast, 140ms ease), background var(--fs-transition-fast, 140ms ease);
+}
+
+.workout-exercise-row:hover,
+.workout-exercise-row:focus-visible {
+  transform: none;
+  border-color: var(--fs-primary-border, rgba(131, 189, 69, .24));
+  background: var(--fs-surface-raised, var(--surface-light));
+}
+
+.workout-exercise-order,
+.selected-exercise-order {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09));
+  color: var(--fs-primary, var(--primary));
+}
+
+.workout-weekday-nav {
+  position: sticky;
+  top: max(8px, env(safe-area-inset-top, 0px));
+  z-index: 15;
+  gap: 4px;
+  padding: 4px;
+  border-color: var(--fs-border, var(--border));
+  border-radius: var(--fs-radius-md, 8px);
+  background: var(--fs-surface, var(--surface));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+}
+
+.workout-weekday-button {
+  min-height: 40px;
+  border-radius: var(--fs-radius-sm, 6px);
+}
+
+.workout-weekday-button.active {
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09));
+  color: var(--fs-primary, var(--primary));
+  box-shadow: inset 0 0 0 1px var(--fs-primary-border, rgba(131, 189, 69, .24));
+}
+
+.workout-modal-card,
+.workout-exercise-builder-modal {
+  border-color: var(--fs-border, var(--border));
+  border-radius: var(--fs-radius-lg, 10px);
+  background: var(--fs-surface, #111820);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .42);
+}
+
+.workout-modal-close,
+.selected-exercise-remove {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  background: var(--fs-surface-raised, var(--surface-light));
+}
+
+.workout-modal-backdrop {
+  background: rgba(4, 7, 11, .72);
+}
+
+.workout-modal-actions {
+  position: sticky;
+  bottom: calc(-24px + env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  margin: 20px -24px -24px;
+  padding: 14px 24px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--fs-border, var(--border));
+  background: var(--fs-surface, #111820);
+}
+
+.exercise-checkbox-option.selected {
+  border-color: var(--fs-primary-border, rgba(131, 189, 69, .24));
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09));
+}
+
+.workout-plan-empty,
+.workout-day-empty-message,
+.exercise-checkbox-list .empty,
+#workout-days > p {
+  color: var(--fs-text-muted, var(--muted));
+}
+
+@media (max-width: 640px) {
+  .workout-page {
+    width: 100%;
+    padding-inline: 10px;
+    padding-bottom: calc(144px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .workout-page > .page-header {
+    margin-top: 10px;
+  }
+
+  .workout-plans-toolbar,
+  .workout-active-compact-heading {
+    gap: 8px;
+  }
+
+  .workout-plan-row {
+    padding: 11px !important;
+  }
+
+  .workout-day-section {
+    padding: 10px !important;
+  }
+
+  .workout-weekday-nav {
+    top: max(6px, env(safe-area-inset-top, 0px));
+    overflow-x: auto;
+    grid-template-columns: repeat(7, minmax(42px, 1fr));
+    scrollbar-width: none;
+  }
+
+  .workout-weekday-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .workout-modal {
+    align-items: flex-end;
+    padding: max(8px, env(safe-area-inset-top, 0px)) 0 0;
+  }
+
+  .workout-modal-card,
+  .workout-exercise-builder-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top, 0px)));
+    padding: 18px 14px;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: var(--fs-radius-lg, 10px) var(--fs-radius-lg, 10px) 0 0;
+  }
+
+  .workout-modal-actions {
+    bottom: -18px;
+    margin: 16px -14px -18px;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .workout-modal-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-exercise-row,
+  .workout-plan-row,
+  .exercise-checkbox-option {
+    transition: none !important;
+  }
+}
