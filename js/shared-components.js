@@ -12,12 +12,20 @@ function ensureDesignSystemStyles() {
 }
 
 function ensureSharedStyles() {
-  if (document.querySelector('link[data-fsfit-shared-components]')) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'css/shared-components.css?v=20260727-sticky-tabs1';
-  link.dataset.fsfitSharedComponents = 'true';
-  document.head.appendChild(link);
+  if (!document.querySelector('link[data-fsfit-shared-components]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'css/shared-components.css?v=20260727-sticky-tabs1';
+    link.dataset.fsfitSharedComponents = 'true';
+    document.head.appendChild(link);
+  }
+  if (!document.querySelector('link[data-fsfit-pull-refresh]')) {
+    const refreshStyles = document.createElement('link');
+    refreshStyles.rel = 'stylesheet';
+    refreshStyles.href = 'css/pull-to-refresh.css?v=20260727-ptr1';
+    refreshStyles.dataset.fsfitPullRefresh = 'true';
+    document.head.appendChild(refreshStyles);
+  }
 }
 
 function ensurePagePolishStyles() {
@@ -66,6 +74,75 @@ function normalizeSharedStates() {
   document.querySelectorAll('.loading-state').forEach(el => el.classList.add('fsfit-shared-loading'));
 }
 
+function initializePullToRefresh() {
+  if (!('ontouchstart' in window) || document.querySelector('.fsfit-pull-refresh')) return;
+
+  const indicator = document.createElement('div');
+  indicator.className = 'fsfit-pull-refresh';
+  indicator.setAttribute('role', 'status');
+  indicator.setAttribute('aria-live', 'polite');
+  indicator.innerHTML = '<span class="fsfit-pull-refresh-icon">↻</span><span class="fsfit-pull-refresh-label">Puxe para atualizar</span>';
+  document.body.appendChild(indicator);
+
+  const label = indicator.querySelector('.fsfit-pull-refresh-label');
+  const threshold = 76;
+  let startY = 0;
+  let distance = 0;
+  let tracking = false;
+  let refreshing = false;
+
+  const reset = () => {
+    tracking = false;
+    distance = 0;
+    indicator.classList.remove('is-visible', 'is-ready');
+    indicator.style.transform = 'translate(-50%, -70px)';
+    label.textContent = 'Puxe para atualizar';
+  };
+
+  document.addEventListener('touchstart', event => {
+    if (refreshing || window.scrollY > 0 || document.documentElement.classList.contains('fsfit-scroll-locked')) return;
+    if (event.touches.length !== 1 || event.target.closest('input, textarea, select, [contenteditable="true"], .modal, .workout-modal, .fsfit-more-panel')) return;
+    startY = event.touches[0].clientY;
+    tracking = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', event => {
+    if (!tracking || refreshing || event.touches.length !== 1) return;
+    const delta = event.touches[0].clientY - startY;
+    if (delta <= 0) {
+      reset();
+      return;
+    }
+
+    distance = Math.min(delta * .55, 110);
+    if (distance < 8) return;
+    event.preventDefault();
+
+    indicator.classList.add('is-visible');
+    indicator.classList.toggle('is-ready', distance >= threshold);
+    indicator.style.transform = `translate(-50%, ${Math.min(distance - 58, 22)}px)`;
+    label.textContent = distance >= threshold ? 'Solte para atualizar' : 'Puxe para atualizar';
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!tracking || refreshing) return;
+    if (distance < threshold) {
+      reset();
+      return;
+    }
+
+    refreshing = true;
+    tracking = false;
+    indicator.classList.remove('is-ready');
+    indicator.classList.add('is-visible', 'is-refreshing');
+    label.textContent = 'Atualizando...';
+    if (navigator.vibrate) navigator.vibrate(20);
+    window.setTimeout(() => window.location.reload(), 320);
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', reset, { passive: true });
+}
+
 function observeSharedComponents() {
   const observer = new MutationObserver(() => {
     normalizeSharedStates();
@@ -84,6 +161,7 @@ export function initializeSharedComponents() {
   ensureSharedStyles();
   ensurePagePolishStyles();
   normalizeSharedStates();
+  initializePullToRefresh();
   observeSharedComponents();
   window.addEventListener('pageshow', syncSharedOverlayState);
   window.addEventListener('resize', syncSharedOverlayState);
