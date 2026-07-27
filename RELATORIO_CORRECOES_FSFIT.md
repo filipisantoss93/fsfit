@@ -92,6 +92,18 @@ Este documento é a referência oficial para a evolução do FS Fit.
 
 **Status:** concluída em `css/ficha-aluno-padronizacao.css`.
 
+### Fase 6 — Treinos
+- [x] Alinhar a página de planos ao Design System global.
+- [x] Padronizar cards de planos, resumo ativo e exercícios por dia.
+- [x] Reduzir gradientes, sombras e raios decorativos.
+- [x] Refinar seleção semanal com navegação sticky e estado ativo discreto.
+- [x] Padronizar listas de exercícios, ordem e estados selecionados.
+- [x] Refinar modais de plano, exercícios e detalhes com rodapé de ações fixo.
+- [x] Integrar bloqueio de rolagem dos modais ao componente compartilhado.
+- [x] Preservar safe area, densidade compacta e leitura mobile.
+
+**Status:** concluída em `css/treino-aluno-fase6.css` e integração em `js/shared-components.js`.
+
 ## Checklist geral
 - [x] Base visual global padronizada
 - [x] Componentes compartilhados padronizados
