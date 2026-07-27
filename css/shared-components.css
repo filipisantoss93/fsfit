@@ -281,3 +281,71 @@ body.fsfit-saas .library-action-bar .btn {
     font-size: .84rem !important;
   }
 }
+
+/* Abas sticky padronizadas */
+@media (max-width: 860px) {
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  ) {
+    position: sticky !important;
+    top: max(0px, env(safe-area-inset-top, 0px)) !important;
+    z-index: 900 !important;
+    width: 100% !important;
+    margin-inline: 0 !important;
+    padding: 6px !important;
+    border: 1px solid var(--fs-border, rgba(231, 237, 243, .105)) !important;
+    border-radius: var(--fs-radius-md, 8px) !important;
+    background: rgba(17, 24, 32, .98) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .24) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  )::-webkit-scrollbar { display: none; }
+
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  ) > :is(button, a, [role="tab"]) {
+    flex: 1 0 auto !important;
+    min-height: 42px !important;
+    padding: 9px 14px !important;
+    border-radius: var(--fs-radius-sm, 6px) !important;
+    white-space: nowrap !important;
+  }
+}
