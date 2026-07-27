@@ -28,6 +28,22 @@ function ensureSharedStyles() {
   }
 }
 
+function ensureAppContainerStyles() {
+  if (document.querySelector('style[data-fsfit-app-container]')) return;
+  const style = document.createElement('style');
+  style.dataset.fsfitAppContainer = 'true';
+  style.textContent = `
+    @media (min-width: 1100px) {
+      body.fsfit-saas main.container {
+        width: min(calc(100% - 48px), 1320px) !important;
+        max-width: 1320px !important;
+        margin-inline: auto !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function ensurePagePolishStyles() {
   const page = window.location.pathname.split('/').pop() || '';
   if (page !== 'treino-aluno.html' || document.querySelector('link[data-fsfit-workout-phase6]')) return;
@@ -173,6 +189,7 @@ function observeSharedComponents() {
 export function initializeSharedComponents() {
   ensureDesignSystemStyles();
   ensureSharedStyles();
+  ensureAppContainerStyles();
   ensurePagePolishStyles();
   normalizeSharedStates();
   initializePullToRefresh();
