@@ -297,6 +297,29 @@ html.fsfit-sheet-open body {
   .fsfit-more-sheet {
     display: none !important;
   }
+
+  /* O backdrop-filter do cabeçalho criava um containing block para elementos fixed,
+     fazendo a central de notificações usar a sidebar como viewport. */
+  .main-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .nav-header-actions {
+    position: fixed !important;
+    top: 20px !important;
+    right: 24px !important;
+    left: auto !important;
+  }
+
+  .notification-panel {
+    position: fixed !important;
+    top: 74px !important;
+    right: 24px !important;
+    left: auto !important;
+    width: min(410px, calc(100vw - 48px)) !important;
+    max-width: calc(100vw - 48px) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
