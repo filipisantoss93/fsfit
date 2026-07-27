@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/biblioteca-exercicios.css?v=20260716-clean1">
   <link rel="stylesheet" href="css/library-compact.css?v=20260720-action-bar2">
   <link rel="stylesheet" href="css/exercise-picker-horizontal-scroll-fix.css?v=20260723-scroll1">
-  <link rel="stylesheet" href="css/biblioteca-exercicios-padronizacao.css?v=20260726-ds1">
+  <link rel="stylesheet" href="css/biblioteca-exercicios-padronizacao.css?v=20260727-structure2">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -24,17 +24,22 @@
       <div>
         <a class="btn btn-outline" href="alunos.html">← Voltar</a>
         <h1>Biblioteca de exercícios</h1>
-        <p>Selecione uma categoria e gerencie os exercícios disponíveis.</p>
+        <p>Organize exercícios por categorias e monte treinos reutilizáveis em poucos cliques.</p>
       </div>
-      <div class="actions library-top-actions">
-        <button id="open-category-modal" class="btn btn-outline" type="button">+ Categoria</button>
-        <button id="open-library-modal" class="btn btn-primary" type="button">+ Exercício</button>
-      </div>
+      <span class="hero-badge">EXERCÍCIOS</span>
     </section>
+
     <div id="library-message" class="message"></div>
+
+    <section class="exercise-action-bar" aria-label="Ações da biblioteca de exercícios">
+      <button id="open-category-modal" class="btn btn-outline exercise-action-button" type="button">+ Categoria</button>
+      <button id="open-library-modal" class="btn btn-outline exercise-action-button" type="button">+ Exercício</button>
+    </section>
+
     <section id="library-exercises-section" class="card library-list-card">
       <div class="library-list-heading">
-        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar em todas as categorias" aria-label="Buscar exercício em todas as categorias"></div>
+        <div><small>EXERCÍCIOS</small><h2>Exercícios</h2></div>
+        <div class="form-group library-search"><input id="exercise-search" type="search" placeholder="Buscar nesta categoria" aria-label="Buscar exercício nesta categoria"></div>
       </div>
       <div class="library-category-nav-wrap"><div id="library-category-nav" class="library-category-nav" aria-label="Categorias de exercícios"></div></div>
       <div id="active-category-actions" class="library-active-category-actions hidden"></div>
@@ -79,6 +84,6 @@
   <script type="module" src="js/biblioteca-treinos.js?v=20260720-workout-builder2"></script>
   <script type="module" src="js/biblioteca-treinos-multiselect.js?v=20260721-picker-sheet2"></script>
   <script src="js/exercise-picker-horizontal-scroll-fix.js?v=20260723-scroll2"></script>
-  <script type="module" src="js/biblioteca-treinos-layout.js?v=20260721-sticky-actions1"></script>
+  <script type="module" src="js/biblioteca-treinos-layout.js?v=20260727-actionbar1"></script>
 </body>
 </html>
