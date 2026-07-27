@@ -239,8 +239,8 @@
     grid-template-areas:
       "notice notice notice notice notice notice notice notice notice notice notice notice"
       "header header header header header header header header header header header header"
-      "home home home home home home home home home home home home"
       "agenda agenda agenda agenda agenda agenda agenda live live live live live"
+      "home home home home home home home home home home home home"
       "overview overview overview overview overview overview overview overview overview overview overview overview";
     align-items: start;
     gap: 12px;
@@ -302,6 +302,36 @@
   #dashboard-agenda-panel .today-card,
   #dashboard-live-panel {
     height: 100%;
+  }
+
+  /* Mantém agenda e acompanhamento no topo sem permitir que listas longas deformem a página. */
+  #dashboard-agenda-panel .today-list,
+  #dashboard-live-panel .live-students-list {
+    max-height: 330px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  #dashboard-agenda-panel .today-card-header,
+  #dashboard-live-panel .live-students-heading {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+  }
+
+  #dashboard-agenda-panel .today-list::-webkit-scrollbar,
+  #dashboard-live-panel .live-students-list::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #dashboard-agenda-panel .today-list::-webkit-scrollbar-thumb,
+  #dashboard-live-panel .live-students-list::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(181,189,200,.28);
+    background-clip: padding-box;
   }
 
   #dashboard-agenda-panel .dashboard-empty,
