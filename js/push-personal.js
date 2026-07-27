@@ -1,7 +1,9 @@
 import { supabase } from './supabase.js';
 
 const homePanel = document.querySelector('#dashboard-home-panel');
-const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+const userAgent = navigator.userAgent || '';
+
+const isIos = () => /iphone|ipad|ipod/i.test(userAgent);
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const supportsPush = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 
@@ -12,38 +14,57 @@ let checking = false;
 let lastView = null;
 let activeOnThisDevice = false;
 
-const views = {
-  install: {
-    kicker: 'NOTIFICAÇÕES NO IPHONE',
-    title: 'Abra o FS Fit pelo ícone instalado',
-    description: 'No iPhone, notificações funcionam somente no PWA adicionado à Tela de Início. No Safari, toque em Compartilhar → Adicionar à Tela de Início.',
-    actions: '<button id="personal-push-refresh" class="btn btn-outline" type="button">Já instalei, verificar</button>'
-  },
-  activate: {
-    kicker: 'NÃO PERCA CHECK-INS',
-    title: 'Ative as notificações neste aparelho',
-    description: 'Receba check-ins e mensagens dos alunos mesmo com o FS Fit fechado.',
-    actions: '<button id="personal-push-enable" class="btn btn-primary" type="button">Ativar notificações</button><button id="personal-push-refresh" class="btn btn-outline" type="button">Verificar novamente</button>'
-  },
-  blocked: {
-    kicker: 'NOTIFICAÇÕES BLOQUEADAS',
-    title: 'O iPhone está impedindo os avisos',
-    description: 'Abra Ajustes do iPhone → Notificações → FS Fit e ative “Permitir Notificações”. Depois volte ao app e verifique novamente.',
-    actions: '<button id="personal-push-refresh" class="btn btn-outline" type="button">Verificar novamente</button>'
-  },
-  active: {
-    kicker: 'NOTIFICAÇÕES ATIVAS',
-    title: 'Este aparelho está conectado',
-    description: 'O FS Fit está pronto para avisar sobre check-ins e mensagens dos alunos.',
-    actions: '<button id="personal-push-test" class="btn btn-primary" type="button">Enviar notificação de teste</button><button id="personal-push-refresh" class="btn btn-outline" type="button">Verificar</button>'
-  },
-  unsupported: {
-    kicker: 'RECURSO INDISPONÍVEL',
-    title: 'Este navegador não oferece notificações',
-    description: 'Use o FS Fit instalado como aplicativo em um iPhone ou Android compatível.',
-    actions: ''
+function getPlatformCopy() {
+  if (isIos()) {
+    return {
+      blockedTitle: 'As notificações estão bloqueadas no iPhone',
+      blockedDescription: 'Abra Ajustes do iPhone → Notificações → FS Fit e ative “Permitir Notificações”. Depois volte ao app e verifique novamente.',
+      unsupportedDescription: 'No iPhone, use o FS Fit instalado pela Tela de Início em uma versão compatível do iOS.'
+    };
   }
-};
+
+  return {
+    blockedTitle: 'As notificações estão bloqueadas neste navegador',
+    blockedDescription: 'Abra as configurações do navegador, localize as permissões deste site e permita notificações para o FS Fit. Depois recarregue a página.',
+    unsupportedDescription: 'Este navegador ou dispositivo não oferece suporte às notificações do FS Fit. Use uma versão atualizada do Chrome, Edge, Safari ou o aplicativo instalado.'
+  };
+}
+
+function getViews() {
+  const platform = getPlatformCopy();
+  return {
+    install: {
+      kicker: 'NOTIFICAÇÕES NO IPHONE',
+      title: 'Abra o FS Fit pelo ícone instalado',
+      description: 'No iPhone, notificações funcionam somente no PWA adicionado à Tela de Início. No Safari, toque em Compartilhar → Adicionar à Tela de Início.',
+      actions: '<button id="personal-push-refresh" class="btn btn-outline" type="button">Já instalei, verificar</button>'
+    },
+    activate: {
+      kicker: 'ATIVAR NOTIFICAÇÕES',
+      title: 'Receba avisos importantes neste aparelho',
+      description: 'Ative notificações para receber check-ins, mensagens e alertas dos alunos mesmo com o FS Fit fechado.',
+      actions: '<button id="personal-push-enable" class="btn btn-primary" type="button">Ativar notificações</button><button id="personal-push-refresh" class="btn btn-outline" type="button">Verificar novamente</button>'
+    },
+    blocked: {
+      kicker: 'NOTIFICAÇÕES BLOQUEADAS',
+      title: platform.blockedTitle,
+      description: platform.blockedDescription,
+      actions: '<button id="personal-push-refresh" class="btn btn-outline" type="button">Verificar novamente</button>'
+    },
+    active: {
+      kicker: 'NOTIFICAÇÕES ATIVAS',
+      title: 'Este aparelho está conectado',
+      description: 'O FS Fit está pronto para avisar sobre check-ins, mensagens e atualizações dos alunos.',
+      actions: '<button id="personal-push-test" class="btn btn-primary" type="button">Enviar notificação de teste</button><button id="personal-push-refresh" class="btn btn-outline" type="button">Verificar</button>'
+    },
+    unsupported: {
+      kicker: 'RECURSO INDISPONÍVEL',
+      title: 'Notificações indisponíveis neste aparelho',
+      description: platform.unsupportedDescription,
+      actions: ''
+    }
+  };
+}
 
 function urlBase64ToUint8Array(value) {
   const padding = '='.repeat((4 - (value.length % 4)) % 4);
@@ -87,7 +108,7 @@ function ensureCard() {
 }
 
 function render(state, feedback = '', feedbackType = '') {
-  const view = views[state];
+  const view = getViews()[state];
   if (!view) return;
   activeOnThisDevice = false;
   lastView = { state, feedback, feedbackType };
