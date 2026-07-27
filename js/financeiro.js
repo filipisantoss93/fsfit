@@ -4,26 +4,27 @@ import { renderHeader, requireSession, setGreeting } from './layout.js';
 renderHeader('financeiro');
 const session = await requireSession();
 
-const message = document.querySelector('#finance-message');
-const pixForm = document.querySelector('#pix-config-form');
-const studentsList = document.querySelector('#finance-students-list');
-const studentsToolbar = document.querySelector('.finance-students-toolbar');
-const confirmationsCard = document.querySelector('#payment-confirmations-card');
-const confirmationsList = document.querySelector('#payment-confirmations-list');
-const confirmationsCount = document.querySelector('#payment-confirmations-count');
-const studentModal = document.querySelector('#student-finance-modal');
-const studentModalTitle = document.querySelector('#student-finance-modal-title');
-const studentModalStatus = document.querySelector('#student-finance-modal-status');
-const studentModalValue = document.querySelector('#student-finance-value');
-const studentModalDay = document.querySelector('#student-finance-day');
-const studentModalActive = document.querySelector('#student-finance-active');
-const studentModalCompetence = document.querySelector('#student-finance-competence');
-const studentModalDueDate = document.querySelector('#student-finance-due-date');
-const studentModalChargeValue = document.querySelector('#student-finance-charge-value');
-const studentModalReportedAt = document.querySelector('#student-finance-reported-at');
-const studentModalConfirmedAt = document.querySelector('#student-finance-confirmed-at');
-const studentModalSave = document.querySelector('#student-finance-save');
-const studentModalMarkPaid = document.querySelector('#student-finance-mark-paid');
+const $ = selector => document.querySelector(selector);
+const message = $('#finance-message');
+const pixForm = $('#pix-config-form');
+const studentsList = $('#finance-students-list');
+const studentsToolbar = $('.finance-students-toolbar');
+const confirmationsCard = $('#payment-confirmations-card');
+const confirmationsList = $('#payment-confirmations-list');
+const confirmationsCount = $('#payment-confirmations-count');
+const studentModal = $('#student-finance-modal');
+const studentModalTitle = $('#student-finance-modal-title');
+const studentModalStatus = $('#student-finance-modal-status');
+const studentModalValue = $('#student-finance-value');
+const studentModalDay = $('#student-finance-day');
+const studentModalActive = $('#student-finance-active');
+const studentModalCompetence = $('#student-finance-competence');
+const studentModalDueDate = $('#student-finance-due-date');
+const studentModalChargeValue = $('#student-finance-charge-value');
+const studentModalReportedAt = $('#student-finance-reported-at');
+const studentModalConfirmedAt = $('#student-finance-confirmed-at');
+const studentModalSave = $('#student-finance-save');
+const studentModalMarkPaid = $('#student-finance-mark-paid');
 
 let students = [];
 let payments = [];
@@ -42,8 +43,8 @@ function show(text, type = 'success') {
   if (!message) return;
   message.textContent = text;
   message.className = `message show ${type}`;
-  window.clearTimeout(show.timer);
-  show.timer = window.setTimeout(() => {
+  clearTimeout(show.timer);
+  show.timer = setTimeout(() => {
     message.textContent = '';
     message.className = 'message';
   }, 4500);
@@ -106,7 +107,7 @@ function statusInfo(payment, student) {
 }
 
 function ensureStudentStatusFilter() {
-  if (!studentsToolbar || document.querySelector('#finance-students-status-nav')) return;
+  if (!studentsToolbar || $('#finance-students-status-nav')) return;
   const nav = document.createElement('nav');
   nav.id = 'finance-students-status-nav';
   nav.className = 'finance-status-filter-nav';
@@ -132,6 +133,45 @@ function ensureStudentStatusFilter() {
   });
 }
 
+function ensureDesktopDashboard() {
+  const page = $('.finance-page');
+  const summary = $('.finance-summary-grid');
+  const list = $('.finance-students-card');
+  const pix = $('#pix-config-details');
+  if (!page || !summary || !list || !pix || $('.finance-dashboard')) return;
+
+  const dashboard = document.createElement('section');
+  dashboard.className = 'finance-dashboard';
+  dashboard.setAttribute('aria-label', 'Dashboard financeiro');
+  const insights = document.createElement('div');
+  insights.className = 'finance-dashboard-insights';
+  const movements = document.createElement('div');
+  movements.className = 'finance-dashboard-movements';
+
+  const trend = document.createElement('article');
+  trend.className = 'card finance-analytics-card';
+  trend.innerHTML = `
+    <div class="finance-analytics-heading"><div><small>HISTÓRICO</small><h2>Receita dos últimos 6 meses</h2></div></div>
+    <div id="finance-revenue-chart" class="finance-revenue-chart" aria-label="Gráfico de receita recebida nos últimos seis meses"></div>`;
+
+  const distribution = document.createElement('article');
+  distribution.className = 'card finance-analytics-card';
+  distribution.innerHTML = `
+    <div class="finance-analytics-heading"><div><small>VISÃO DO MÊS</small><h2>Situação das mensalidades</h2></div></div>
+    <div id="finance-status-distribution" class="finance-status-distribution"></div>`;
+
+  const report = document.createElement('article');
+  report.className = 'card finance-report-card';
+  report.innerHTML = `<div><small>RELATÓRIO</small><strong>Exporte os dados financeiros</strong><span>Gere uma planilha CSV com alunos, vencimentos, valores e status.</span></div><button id="finance-export-csv" class="btn btn-primary" type="button">Gerar relatório</button>`;
+
+  page.insertBefore(dashboard, summary);
+  dashboard.append(insights, movements);
+  insights.append(summary, trend, distribution, report, pix);
+  if (confirmationsCard) movements.append(confirmationsCard);
+  movements.append(list);
+  $('#finance-export-csv')?.addEventListener('click', exportCsv);
+}
+
 async function fetchPayments() {
   const { data, error } = await supabase
     .from('mensalidades_alunos')
@@ -155,14 +195,48 @@ function renderSummary() {
   const overdue = payments.filter(item => item.status === 'pendente' && item.vencimento < todayIso());
   const expected = monthPayments.reduce((sum, item) => sum + Number(item.valor || 0), 0);
 
-  document.querySelector('#summary-expected').textContent = formatCurrency(expected);
-  document.querySelector('#summary-expected-count').textContent = `${monthPayments.length} ${monthPayments.length === 1 ? 'mensalidade' : 'mensalidades'}`;
-  document.querySelector('#summary-received').textContent = formatCurrency(received.reduce((sum, item) => sum + Number(item.valor || 0), 0));
-  document.querySelector('#summary-received-count').textContent = `${received.length} ${received.length === 1 ? 'confirmada' : 'confirmadas'}`;
-  document.querySelector('#summary-waiting').textContent = formatCurrency(waiting.reduce((sum, item) => sum + Number(item.valor || 0), 0));
-  document.querySelector('#summary-waiting-count').textContent = `${waiting.length} ${waiting.length === 1 ? 'pagamento informado' : 'pagamentos informados'}`;
-  document.querySelector('#summary-overdue').textContent = formatCurrency(overdue.reduce((sum, item) => sum + Number(item.valor || 0), 0));
-  document.querySelector('#summary-overdue-count').textContent = `${overdue.length} ${overdue.length === 1 ? 'mensalidade' : 'mensalidades'}`;
+  $('#summary-expected').textContent = formatCurrency(expected);
+  $('#summary-expected-count').textContent = `${monthPayments.length} ${monthPayments.length === 1 ? 'mensalidade' : 'mensalidades'}`;
+  $('#summary-received').textContent = formatCurrency(received.reduce((sum, item) => sum + Number(item.valor || 0), 0));
+  $('#summary-received-count').textContent = `${received.length} ${received.length === 1 ? 'confirmada' : 'confirmadas'}`;
+  $('#summary-waiting').textContent = formatCurrency(waiting.reduce((sum, item) => sum + Number(item.valor || 0), 0));
+  $('#summary-waiting-count').textContent = `${waiting.length} ${waiting.length === 1 ? 'pagamento informado' : 'pagamentos informados'}`;
+  $('#summary-overdue').textContent = formatCurrency(overdue.reduce((sum, item) => sum + Number(item.valor || 0), 0));
+  $('#summary-overdue-count').textContent = `${overdue.length} ${overdue.length === 1 ? 'mensalidade' : 'mensalidades'}`;
+  renderAnalytics();
+}
+
+function renderAnalytics() {
+  const chart = $('#finance-revenue-chart');
+  const distribution = $('#finance-status-distribution');
+  if (!chart || !distribution) return;
+
+  const months = [];
+  const now = new Date();
+  for (let offset = 5; offset >= 0; offset -= 1) {
+    const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+    months.push({ key, label: date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''), value: 0 });
+  }
+  payments.filter(item => item.status === 'pago').forEach(item => {
+    const month = months.find(entry => entry.key === item.competencia);
+    if (month) month.value += Number(item.valor || 0);
+  });
+  const max = Math.max(...months.map(item => item.value), 1);
+  chart.innerHTML = months.map(item => `<div class="finance-chart-column"><span class="finance-chart-value">${esc(formatCurrency(item.value))}</span><div class="finance-chart-track"><i style="height:${Math.max(4, (item.value / max) * 100)}%"></i></div><small>${esc(item.label)}</small></div>`).join('');
+
+  const current = payments.filter(item => item.competencia === currentCompetence() && item.status !== 'cancelada');
+  const groups = [
+    ['Recebido', current.filter(item => item.status === 'pago'), 'paid'],
+    ['Aguardando confirmação', current.filter(item => item.status === 'informado'), 'waiting'],
+    ['Pendente', current.filter(item => item.status === 'pendente' && item.vencimento >= todayIso()), 'pending'],
+    ['Atrasado', current.filter(item => item.status === 'pendente' && item.vencimento < todayIso()), 'overdue']
+  ];
+  const total = Math.max(current.length, 1);
+  distribution.innerHTML = groups.map(([label, items, type]) => {
+    const amount = items.reduce((sum, item) => sum + Number(item.valor || 0), 0);
+    return `<div class="finance-distribution-row"><span class="finance-distribution-dot ${type}"></span><div><strong>${esc(label)}</strong><small>${items.length} ${items.length === 1 ? 'mensalidade' : 'mensalidades'}</small></div><b>${esc(formatCurrency(amount))}</b><em>${Math.round((items.length / total) * 100)}%</em></div>`;
+  }).join('');
 }
 
 function renderConfirmations() {
@@ -173,9 +247,9 @@ function renderConfirmations() {
   confirmationsCard.classList.toggle('hidden', waiting.length === 0);
   confirmationsList.innerHTML = waiting.map(item => `
     <article class="finance-confirmation-item">
-      <div class="finance-confirmation-main"><strong>${esc(studentMap.get(item.aluno_id)?.nome || 'Aluno')}</strong><span>Vencimento ${esc(formatDate(item.vencimento))}${item.informado_em ? ` · informado em ${esc(formatDateTime(item.informado_em))}` : ''}</span></div>
+      <div class="finance-confirmation-main"><strong>${esc(studentMap.get(item.aluno_id)?.nome || 'Aluno')}</strong><span>Pix informado · vencimento ${esc(formatDate(item.vencimento))}${item.informado_em ? ` · ${esc(formatDateTime(item.informado_em))}` : ''}</span></div>
       <span class="finance-confirmation-value">${esc(formatCurrency(item.valor))}</span>
-      <button class="btn btn-primary" type="button" data-confirm-payment="${esc(item.id)}">Confirmar pagamento</button>
+      <button class="btn btn-primary" type="button" data-confirm-payment="${esc(item.id)}">Confirmar</button>
     </article>`).join('');
 }
 
@@ -184,8 +258,10 @@ function renderStudents() {
     ? students
     : students.filter(student => statusInfo(paymentForStudent(student.id), student).key === studentStatusFilter);
   studentsList.innerHTML = visible.length ? visible.map(student => {
-    const status = statusInfo(paymentForStudent(student.id), student);
-    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}"><td><div class="finance-student-name"><strong>${esc(student.nome)}</strong></div></td><td><div class="finance-student-status-cell"><span class="finance-status ${status.className}">${esc(status.label)}</span><span class="finance-student-open" aria-hidden="true">›</span></div></td></tr>`;
+    const payment = paymentForStudent(student.id);
+    const status = statusInfo(payment, student);
+    const meta = payment ? `${formatDate(payment.vencimento)} · ${formatCurrency(payment.valor)}` : 'Mensalidade ainda não gerada';
+    return `<tr class="finance-student-row" data-student-row="${esc(student.id)}" tabindex="0" role="button" aria-label="Abrir mensalidade de ${esc(student.nome)}"><td><div class="finance-student-name"><span class="finance-student-avatar">${esc(student.nome.split(/\s+/).slice(0,2).map(part => part[0]).join('').toUpperCase())}</span><span class="finance-student-copy"><strong>${esc(student.nome)}</strong><small>${esc(meta)}</small></span></div></td><td><div class="finance-student-status-cell"><span class="finance-status ${status.className}">${esc(status.label)}</span><span class="finance-student-open" aria-hidden="true">›</span></div></td></tr>`;
   }).join('') : '<tr><td colspan="2" class="finance-empty">Nenhum aluno encontrado com este status.</td></tr>';
 }
 
@@ -247,6 +323,21 @@ function closeStudentModal() {
   selectedStudentId = null;
 }
 
+function exportCsv() {
+  const studentMap = new Map(students.map(student => [student.id, student.nome]));
+  const rows = [['Aluno', 'Competência', 'Vencimento', 'Valor', 'Status', 'Informado em', 'Confirmado em']];
+  payments.filter(item => item.status !== 'cancelada').forEach(item => rows.push([
+    studentMap.get(item.aluno_id) || 'Aluno', formatCompetence(item.competencia), formatDate(item.vencimento), Number(item.valor || 0).toFixed(2).replace('.', ','), item.status, formatDateTime(item.informado_em), formatDateTime(item.confirmado_em)
+  ]));
+  const csv = rows.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
+  const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `fsfit-financeiro-${todayIso()}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 async function refreshFinancialUi() {
   await fetchPayments();
   renderSummary();
@@ -261,22 +352,12 @@ async function saveStudentConfig() {
   const day = Number(studentModalDay.value || 0);
   const active = Boolean(studentModalActive.checked);
   if (active && (!(value > 0) || day < 1 || day > 31)) return show('Informe um valor maior que zero e um dia entre 1 e 31.', 'error');
-
   studentModalSave.disabled = true;
   try {
-    const { error } = await supabase.rpc('fsfit_configurar_mensalidade_aluno', {
-      p_aluno_id: selectedStudentId,
-      p_valor: value > 0 ? value : null,
-      p_dia_vencimento: day >= 1 && day <= 31 ? day : null,
-      p_ativa: active
-    });
+    const { error } = await supabase.rpc('fsfit_configurar_mensalidade_aluno', { p_aluno_id: selectedStudentId, p_valor: value > 0 ? value : null, p_dia_vencimento: day >= 1 && day <= 31 ? day : null, p_ativa: active });
     if (error) throw error;
     const student = students.find(item => item.id === selectedStudentId);
-    if (student) {
-      student.mensalidade_valor = active ? value : null;
-      student.mensalidade_dia_vencimento = active ? day : null;
-      student.mensalidade_ativa = active;
-    }
+    if (student) Object.assign(student, { mensalidade_valor: active ? value : null, mensalidade_dia_vencimento: active ? day : null, mensalidade_ativa: active });
     await refreshFinancialUi();
     show(active ? 'Mensalidade atualizada com segurança.' : 'Mensalidade desativada. Cobranças pendentes foram canceladas.');
   } catch (error) {
@@ -336,6 +417,7 @@ async function load() {
   await fetchPayments();
   await generateCurrentCharges();
   fillPixForm();
+  ensureDesktopDashboard();
   renderSummary();
   renderConfirmations();
   renderStudents();
@@ -346,7 +428,7 @@ ensureCancelButton();
 
 pixForm?.addEventListener('submit', async event => {
   event.preventDefault();
-  const button = document.querySelector('#save-pix-button');
+  const button = $('#save-pix-button');
   const payload = {
     pix_tipo: String(pixForm.pix_tipo.value || '').trim() || null,
     pix_chave: String(pixForm.pix_chave.value || '').trim() || null,
