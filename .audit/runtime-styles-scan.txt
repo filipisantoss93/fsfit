@@ -1,0 +1,429 @@
+# FS Fit runtime style scan
+
+Ordered by structural runtime CSS markers, then total style mutations.
+
+## js/mobile-more-swipe.js | structural=4 | total=19 | lines=387
+create-style=2, style-text=2, append-style=2, style-property=13
+  L40: create-style :: const style = document.createElement('style');
+  L42: style-text :: style.textContent = `
+  L72: append-style :: document.head.appendChild(style);
+  L147: create-style :: const style = document.createElement('style');
+  L149: style-text :: style.textContent = `
+  L177: append-style :: document.head.appendChild(style);
+  L273: style-property :: panel.style.transition = 'transform .24s cubic-bezier(.22,.75,.22,1)';
+  L274: style-property :: panel.style.transform = 'translateY(0)';
+  L276: style-property :: backdrop.style.transition = 'opacity .2s ease';
+  L277: style-property :: backdrop.style.opacity = '1';
+  L284: style-property :: panel.style.transition = 'transform .2s ease';
+  L285: style-property :: panel.style.transform = `translateY(${distance}px)`;
+  L287: style-property :: backdrop.style.transition = 'opacity .18s ease';
+  L288: style-property :: backdrop.style.opacity = '0';
+  L324: style-property :: panel.style.transition = 'none';
+  L325: style-property :: panel.style.willChange = 'transform';
+  L326: style-property :: if (backdrop instanceof HTMLElement) backdrop.style.transition = 'none';
+  L332: style-property :: panel.style.transform = `translateY(${visualDistance}px)`;
+  L336: style-property :: backdrop.style.opacity = String(Math.max(.12, 1 - progress));
+
+## js/treino-aluno-retorno.js | structural=3 | total=4 | lines=194
+create-style=1, style-text=1, append-style=1, create-link=1
+  L18: create-style :: const style = document.createElement('style');
+  L20: style-text :: style.textContent = `
+  L94: append-style :: document.head.appendChild(style);
+  L101: create-link :: const link = document.createElement('link');
+
+## js/mobile-experience.js | structural=2 | total=6 | lines=426
+create-link=2, style-property=3, object-assign-style=1
+  L16: create-link :: const link = document.createElement('link');
+  L160: create-link :: const link = document.createElement('link');
+  L217: style-property :: indicator.style.transform = `translate(-50%, ${visual - 48}px)`;
+  L227: style-property :: indicator.style.transform = 'translate(-50%, 0)';
+  L232: style-property :: indicator.style.transform = 'translate(-50%, -58px)';
+  L332: object-assign-style :: Object.assign(node.style, {
+
+## js/painel-plano-free-ui.js | structural=2 | total=5 | lines=327
+create-style=1, style-text=1, append-style=1, style-property=2
+  L15: create-style :: const style = document.createElement('style');
+  L17: style-text :: style.textContent = `
+  L138: append-style :: document.head.appendChild(style);
+  L150: style-property :: && notice.style.display === 'none'
+  L161: style-property :: notice.style.display = 'none';
+
+## js/aulas-painel-quick-actions.js | structural=2 | total=4 | lines=626
+create-style=1, style-text=1, append-style=1, style-property=1
+  L525: style-property :: if (progressBar) progressBar.style.width = `${total ? Math.round(done / total * 100) : 0}%`;
+  L571: create-style :: const style = document.createElement('style');
+  L573: style-text :: style.textContent = `
+  L625: append-style :: document.head.appendChild(style);
+
+## js/renovacao-plano.js | structural=2 | total=4 | lines=596
+create-style=1, style-text=1, append-style=1, inline-style-template=1
+  L13: create-style :: const style = document.createElement('style');
+  L15: style-text :: style.textContent = `
+  L40: append-style :: document.head.appendChild(style);
+  L547: inline-style-template :: content.innerHTML = `<div class="card-error">${escapeHtml(getErrorMessage(error, 'Não foi possível gerar a cobrança PIX.'))}</div><button id="retry-plan-button" class="btn btn-secondary" type="button" style="margin-top:1
+
+## js/treino-multidias.js | structural=2 | total=4 | lines=507
+create-style=1, style-text=1, append-style=1, style-property=1
+  L34: style-property :: originalDaySelect.style.display = 'none';
+  L483: create-style :: const style = document.createElement('style');
+  L485: style-text :: style.textContent = `
+  L506: append-style :: document.head.appendChild(style);
+
+## js/aulas-painel-delete-controls.js | structural=2 | total=4 | lines=428
+create-style=1, style-text=1, append-style=1, style-property=1
+  L320: style-property :: if (progressBar) progressBar.style.width = `${total ? Math.round(done / total * 100) : 0}%`;
+  L405: create-style :: const style = document.createElement('style');
+  L407: style-text :: style.textContent = `
+  L427: append-style :: document.head.appendChild(style);
+
+## js/treino-plan-day-tabs-stable.js | structural=2 | total=4 | lines=313
+create-style=1, style-text=1, append-style=1, style-set-property=1
+  L40: create-style :: const style = document.createElement('style');
+  L42: style-text :: style.textContent = `
+  L88: append-style :: document.head.appendChild(style);
+  L165: style-set-property :: nav.style.setProperty('--plan-day-count', String(days.length));
+
+## js/treino-plan-day-tabs.js | structural=2 | total=4 | lines=265
+create-style=1, style-text=1, append-style=1, style-set-property=1
+  L39: create-style :: const style = document.createElement('style');
+  L41: style-text :: style.textContent = `
+  L82: append-style :: document.head.appendChild(style);
+  L166: style-set-property :: nav.style.setProperty('--plan-day-count', String(days.length));
+
+## js/aulas-painel-editor.js | structural=2 | total=3 | lines=542
+create-style=1, style-text=1, append-style=1
+  L66: create-style :: const style = document.createElement('style');
+  L68: style-text :: style.textContent = `
+  L143: append-style :: document.head.appendChild(style);
+
+## js/treino-dia-personalizacao.js | structural=2 | total=3 | lines=420
+create-style=1, style-text=1, append-style=1
+  L403: create-style :: const style = document.createElement('style');
+  L405: style-text :: style.textContent = `
+  L418: append-style :: document.head.appendChild(style);
+
+## js/painel-agenda-modal.js | structural=2 | total=3 | lines=417
+create-style=1, style-text=1, append-style=1
+  L371: create-style :: const style = document.createElement('style');
+  L373: style-text :: style.textContent = `
+  L416: append-style :: document.head.appendChild(style);
+
+## js/student-workflow-improvements.js | structural=2 | total=3 | lines=413
+create-style=1, style-text=1, append-style=1
+  L52: create-style :: const style = document.createElement('style');
+  L54: style-text :: style.textContent = `
+  L88: append-style :: document.head.appendChild(style);
+
+## js/student-avatars-personal.js | structural=2 | total=3 | lines=347
+create-style=1, style-text=1, append-style=1
+  L106: create-style :: const style = document.createElement('style');
+  L108: style-text :: style.textContent = `
+  L156: append-style :: document.head.appendChild(style);
+
+## js/aulas-painel-exercise-categories.js | structural=2 | total=3 | lines=345
+create-style=1, style-text=1, append-style=1
+  L213: create-style :: const style = document.createElement('style');
+  L215: style-text :: style.textContent = `
+  L344: append-style :: document.head.appendChild(style);
+
+## js/exercicio-drag-order.js | structural=2 | total=3 | lines=293
+create-style=1, style-text=1, append-style=1
+  L20: create-style :: const style = document.createElement('style');
+  L22: style-text :: style.textContent = `
+  L88: append-style :: document.head.appendChild(style);
+
+## js/push-personal.js | structural=2 | total=3 | lines=289
+create-style=1, style-text=1, append-style=1
+  L77: create-style :: const style = document.createElement('style');
+  L79: style-text :: style.textContent = `
+  L94: append-style :: document.head.appendChild(style);
+
+## js/painel-compact-enhancements.js | structural=2 | total=3 | lines=252
+create-style=1, style-text=1, append-style=1
+  L200: create-style :: const style = document.createElement('style');
+  L202: style-text :: style.textContent = `
+  L251: append-style :: document.head.appendChild(style);
+
+## js/biblioteca-refeicoes-enhancements.js | structural=2 | total=3 | lines=250
+create-style=1, style-text=1, append-style=1
+  L22: create-style :: const style = document.createElement('style');
+  L23: style-text :: style.textContent = `
+  L40: append-style :: document.head.appendChild(style);
+
+## js/admin-cron-monitor.js | structural=2 | total=3 | lines=247
+create-style=1, style-text=1, append-style=1
+  L30: create-style :: const style = document.createElement('style');
+  L32: style-text :: style.textContent = `
+  L63: append-style :: document.head.appendChild(style);
+
+## js/ficha-treinos-salvos.js | structural=2 | total=3 | lines=247
+create-style=1, style-text=1, append-style=1
+  L51: create-style :: const style = document.createElement('style');
+  L53: style-text :: style.textContent = `
+  L201: append-style :: document.head.appendChild(style);
+
+## js/aulas-painel-exercise-controls.js | structural=2 | total=3 | lines=235
+create-style=1, style-text=1, append-style=1
+  L20: create-style :: const style = document.createElement('style');
+  L22: style-text :: style.textContent = `
+  L36: append-style :: document.head.appendChild(style);
+
+## js/treino-busca-exercicios.js | structural=2 | total=3 | lines=218
+create-style=1, style-text=1, append-style=1
+  L15: create-style :: const style = document.createElement('style');
+  L17: style-text :: style.textContent = `
+  L81: append-style :: document.head.appendChild(style);
+
+## js/iniciar-treino-personal.js | structural=2 | total=3 | lines=211
+create-style=1, style-text=1, append-style=1
+  L12: create-style :: const style = document.createElement('style');
+  L13: style-text :: style.textContent = `
+  L29: append-style :: document.head.appendChild(style);
+
+## js/assinatura-experiencia.js | structural=2 | total=3 | lines=193
+create-style=1, style-text=1, append-style=1
+  L7: create-style :: const style = document.createElement('style');
+  L9: style-text :: style.textContent = `
+  L49: append-style :: document.head.appendChild(style);
+
+## js/aluno-push-onboarding.js | structural=2 | total=3 | lines=167
+create-style=1, style-text=1, append-style=1
+  L14: create-style :: const style = document.createElement('style');
+  L16: style-text :: style.textContent = `
+  L35: append-style :: document.head.appendChild(style);
+
+## js/painel-agenda-modal-avatar.js | structural=2 | total=3 | lines=167
+create-style=1, style-text=1, append-style=1
+  L33: create-style :: const style = document.createElement('style');
+  L35: style-text :: style.textContent = `
+  L48: append-style :: document.head.appendChild(style);
+
+## js/treino-sticky-exercise-save.js | structural=2 | total=3 | lines=122
+create-style=1, style-text=1, append-style=1
+  L70: create-style :: const style = document.createElement('style');
+  L72: style-text :: style.textContent = `
+  L121: append-style :: document.head.appendChild(style);
+
+## js/aulas-painel-delete-layout-fix.js | structural=2 | total=3 | lines=70
+create-style=1, style-text=1, append-style=1
+  L25: create-style :: const style = document.createElement('style');
+  L27: style-text :: style.textContent = `
+  L69: append-style :: document.head.appendChild(style);
+
+## js/treino-aluno-empty-state-guard.js | structural=2 | total=3 | lines=47
+create-style=1, style-text=1, append-style=1
+  L35: create-style :: const style = document.createElement('style');
+  L37: style-text :: style.textContent = '.simple-empty-state-copy{margin:0;color:var(--muted);font-size:.74rem;line-height:1.4;text-align:center}';
+  L38: append-style :: document.head.appendChild(style);
+
+## js/treino-modelo-livre.js | structural=2 | total=2 | lines=183
+create-style=1, style-text=1
+  L24: create-style :: const style = document.createElement('style');
+  L26: style-text :: style.textContent = `
+
+## js/admin-tabs.js | structural=2 | total=2 | lines=81
+create-link=2
+  L10: create-link :: const favicon = document.createElement('link');
+  L17: create-link :: const appleTouchIcon = document.createElement('link');
+
+## js/aula-aluno.js | structural=1 | total=2 | lines=499
+create-link=1, inline-style-template=1
+  L10: create-link :: const link = document.createElement('link');
+  L316: inline-style-template :: <div class="live-progress" aria-label="Progresso do treino"><span style="width:${percent}%"></span></div>
+
+## js/treino-aluno-simplificado.js | structural=1 | total=1 | lines=744
+create-link=1
+  L50: create-link :: const link = document.createElement('link');
+
+## js/treino-aluno-exercicios-avulsos.js | structural=1 | total=1 | lines=522
+create-link=1
+  L57: create-link :: const link = document.createElement('link');
+
+## js/treino-aluno-semanal.js | structural=1 | total=1 | lines=518
+create-link=1
+  L57: create-link :: const link = document.createElement('link');
+
+## js/landing-ads.js | structural=1 | total=1 | lines=196
+create-link=1
+  L13: create-link :: const mobileFixes = document.createElement('link');
+
+## js/ficha-aluno-hierarquia.js | structural=1 | total=1 | lines=169
+create-link=1
+  L29: create-link :: const link = document.createElement('link');
+
+## js/treino-exercicio-categorias.js | structural=1 | total=1 | lines=156
+create-link=1
+  L41: create-link :: const link = document.createElement('link');
+
+## js/mobile-experience-fixes.js | structural=1 | total=1 | lines=127
+create-link=1
+  L5: create-link :: const link = document.createElement('link');
+
+## js/zoom-lock.js | structural=0 | total=37 | lines=341
+style-property=37
+  L75: style-property :: root.style.touchAction = 'pan-x pan-y';
+  L76: style-property :: root.style.webkitTextSizeAdjust = '100%';
+  L77: style-property :: root.style.overflowX = 'clip';
+  L78: style-property :: root.style.maxWidth = '100%';
+  L79: style-property :: root.style.width = '100%';
+  L80: style-property :: root.style.overscrollBehaviorX = 'none';
+  L83: style-property :: document.body.style.touchAction = 'pan-x pan-y';
+  L84: style-property :: document.body.style.webkitTextSizeAdjust = '100%';
+  L85: style-property :: document.body.style.overflowX = 'clip';
+  L86: style-property :: document.body.style.maxWidth = '100%';
+  L87: style-property :: document.body.style.width = '100%';
+  L88: style-property :: document.body.style.overscrollBehaviorX = 'none';
+  L92: style-property :: element.style.touchAction = 'pan-x pan-y';
+  L93: style-property :: element.style.webkitOverflowScrolling = 'touch';
+  L94: style-property :: element.style.overscrollBehaviorX = 'contain';
+  L98: style-property :: element.style.webkitOverflowScrolling = 'touch';
+  L99: style-property :: element.style.overscrollBehaviorY = 'contain';
+  L175: style-property :: root.style.overflow = 'hidden';
+  L176: style-property :: root.style.overscrollBehavior = 'none';
+  L177: style-property :: body.style.position = 'fixed';
+  L178: style-property :: body.style.top = `-${modalScrollY}px`;
+  L179: style-property :: body.style.left = '0';
+  L180: style-property :: body.style.right = '0';
+  L181: style-property :: body.style.width = '100%';
+  L182: style-property :: body.style.overflow = 'hidden';
+  L183: style-property :: body.style.overscrollBehavior = 'none';
+  L196: style-property :: root.style.overflow = savedRootStyles.overflow;
+  L197: style-property :: root.style.overscrollBehavior = savedRootStyles.overscrollBehavior;
+  L200: style-property :: body.style.position = savedBodyStyles.position;
+  L201: style-property :: body.style.top = savedBodyStyles.top;
+  L202: style-property :: body.style.left = savedBodyStyles.left;
+  L203: style-property :: body.style.right = savedBodyStyles.right;
+  L204: style-property :: body.style.width = savedBodyStyles.width;
+  L205: style-property :: body.style.overflow = savedBodyStyles.overflow;
+  L206: style-property :: body.style.overscrollBehavior = savedBodyStyles.overscrollBehavior;
+  L223: style-property :: element.style.webkitOverflowScrolling = 'touch';
+  L224: style-property :: element.style.overscrollBehaviorY = 'contain';
+
+## js/shared-components.js | structural=0 | total=8 | lines=148
+style-property=8
+  L11: style-property :: document.body.style.position = 'fixed';
+  L12: style-property :: document.body.style.top = `-${scrollY}px`;
+  L13: style-property :: document.body.style.width = '100%';
+  L19: style-property :: document.body.style.position = '';
+  L20: style-property :: document.body.style.top = '';
+  L21: style-property :: document.body.style.width = '';
+  L64: style-property :: indicator.style.transform = 'translate(-50%, -70px)';
+  L103: style-property :: indicator.style.transform = `translate(-50%, ${Math.min(distance - 58, 22)}px)`;
+
+## js/aluno-notificacoes.js | structural=0 | total=7 | lines=226
+style-property=7
+  L65: style-property :: button.style.width = '100%';
+  L66: style-property :: button.style.marginTop = '4px';
+  L67: style-property :: button.style.background = '#e53935';
+  L68: style-property :: button.style.border = '1px solid #ff5c5c';
+  L69: style-property :: button.style.color = '#ffffff';
+  L70: style-property :: button.style.fontWeight = '800';
+  L71: style-property :: button.style.boxShadow = '0 8px 22px rgba(229,57,53,.18)';
+
+## js/image-cropper.js | structural=0 | total=4 | lines=180
+inline-style-template=1, style-property=3
+  L39: inline-style-template :: <div class="fsfit-cropper-stage ${config.shape === 'circle' ? 'circle' : ''}" style="--crop-aspect:${config.aspect}">
+  L78: style-property :: preview.style.width = `${img.naturalWidth * baseScale}px`;
+  L79: style-property :: preview.style.height = `${img.naturalHeight * baseScale}px`;
+  L80: style-property :: preview.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
+
+## js/admin-funnel.js | structural=0 | total=3 | lines=106
+inline-style-template=3
+  L50: inline-style-template :: <div class="admin-funnel-stage" style="--funnel-width:${Math.max(4, Math.min(100, (stage.value / maxStage) * 100))}%">
+  L82: inline-style-template :: <span class="admin-funnel-bar signups" style="height:${signupHeight}%"></span>
+  L83: inline-style-template :: <span class="admin-funnel-bar conversions" style="height:${conversionHeight}%"></span>
+
+## js/exercise-picker-horizontal-scroll-fix.js | structural=0 | total=3 | lines=38
+style-property=3
+  L12: style-property :: element.style.touchAction = 'pan-x pan-y';
+  L13: style-property :: element.style.webkitOverflowScrolling = 'touch';
+  L14: style-property :: element.style.overscrollBehaviorX = 'contain';
+
+## js/perfil.js | structural=0 | total=2 | lines=624
+style-property=2
+  L309: style-property :: document.body.style.top = `-${lockedScrollY}px`;
+  L315: style-property :: document.body.style.top = '';
+
+## js/painel-home-redesign.js | structural=0 | total=2 | lines=590
+style-property=2
+  L180: style-property :: if (completedBar) completedBar.style.width = `${completedPercent}%`;
+  L181: style-property :: if (liveBar) liveBar.style.width = `${livePercent}%`;
+
+## js/painel-visao-geral.js | structural=0 | total=2 | lines=553
+style-property=2
+  L254: style-property :: topCover.style.height = '0px';
+  L264: style-property :: topCover.style.height = stuck ? `${Math.max(0, Math.ceil(rect.top))}px` : '0px';
+
+## js/admin.js | structural=0 | total=2 | lines=550
+inline-style-template=2
+  L127: inline-style-template :: document.body.innerHTML = '<main class="container"><section class="card" style="margin-top:40px;text-align:center"><h1>Acesso restrito</h1><p>Esta área é exclusiva da administração da plataforma.</p><a class="btn btn-pri
+  L168: inline-style-template :: <div class="admin-trend-track"><div class="admin-trend-bar" style="height:${height}%"></div></div>
+
+## js/aluno-financeiro.js | structural=0 | total=2 | lines=258
+inline-style-template=2
+  L179: inline-style-template :: qrHost.innerHTML = '<p style="color:#111;text-align:center">QR Code indisponível. Use o Pix Copia e Cola abaixo.</p>';
+  L183: inline-style-template :: qrHost.innerHTML = '<p style="color:#111;text-align:center">QR Code indisponível. Use o Pix Copia e Cola abaixo.</p>';
+
+## js/painel.js | structural=0 | total=2 | lines=207
+inline-style-template=1, style-property=1
+  L54: style-property :: notice.style.display = 'block';
+  L115: inline-style-template :: ? '<span style="color:var(--muted);font-weight:700">Bloqueado</span>'
+
+## js/painel-resumo-geral.js | structural=0 | total=2 | lines=186
+inline-style-template=1, style-property=1
+  L67: style-property :: avatarHost.style.backgroundImage = '';
+  L167: inline-style-template :: return `<div class="dashboard-revenue-column"><span class="dashboard-revenue-value">${esc(currency(total))}</span><div class="dashboard-revenue-bar-wrap"><span class="dashboard-revenue-bar" style="height:${height}%"></sp
+
+## js/alunos-dashboard.js | structural=0 | total=2 | lines=131
+style-set-property=2
+  L109: style-set-property :: donut.style.setProperty('--dashboard-active', `${activePercent}%`);
+  L110: style-set-property :: donut.style.setProperty('--dashboard-live', `${Math.min(activePercent + livePercent, 100)}%`);
+
+## js/aluno-sessao-controles.js | structural=0 | total=2 | lines=96
+inline-style-template=2
+  L74: inline-style-template :: <p style="margin:10px 0 0">A conexão demorou mais que o esperado. Verifique a internet e tente novamente.</p>
+  L75: inline-style-template :: <div class="actions" style="justify-content:center;margin-top:16px">
+
+## js/layout-core.js | structural=0 | total=1 | lines=512
+style-property=1
+  L469: style-property :: sidebarAvatar.style.backgroundImage = `url("${String(avatarUrl).replace(/"/g, '%22')}")`;
+
+## js/financeiro.js | structural=0 | total=1 | lines=480
+inline-style-template=1
+  L226: inline-style-template :: chart.innerHTML = months.map(item => `<div class="finance-chart-column"><span class="finance-chart-value">${esc(formatCurrency(item.value))}</span><div class="finance-chart-track"><i style="height:${Math.max(4, (item.val
+
+## js/painel-dashboard.js | structural=0 | total=1 | lines=412
+style-property=1
+  L60: style-property :: notice.style.display = 'block';
+
+## js/aulas-painel.js | structural=0 | total=1 | lines=400
+inline-style-template=1
+  L314: inline-style-template :: <div class="live-progress" aria-label="${percent}% concluído"><span style="width:${percent}%"></span></div>
+
+## js/aluno.js | structural=0 | total=1 | lines=380
+inline-style-template=1
+  L378: inline-style-template :: errorState.innerHTML = `${esc(error.message || 'Não foi possível carregar seu plano.')}<div class="actions" style="justify-content:center;margin-top:16px"><a class="btn btn-primary" href="acesso-aluno.html">Entrar novame
+
+## js/admin-contatos.js | structural=0 | total=1 | lines=333
+inline-style-template=1
+  L63: inline-style-template :: document.body.innerHTML = '<main class="container"><section class="card" style="margin-top:40px;text-align:center"><h1>Acesso restrito</h1><p>Esta área é exclusiva da administração da plataforma.</p><a class="btn btn-pri
+
+## js/visualizar-aluno.js | structural=0 | total=1 | lines=331
+inline-style-template=1
+  L329: inline-style-template :: errorState.innerHTML = `${esc(error.message || 'Não foi possível carregar a visão do aluno.')}<div class="actions" style="justify-content:center;margin-top:16px"><a class="btn btn-primary" href="alunos.html">Voltar para 
+
+## js/painel-day-summary.js | structural=0 | total=1 | lines=279
+style-property=1
+  L242: style-property :: if (element.style.width !== normalized) element.style.width = normalized;
+
+## js/treino-exercise-picker-sheet.js | structural=0 | total=1 | lines=243
+style-property=1
+  L177: style-property :: input.style.display = 'none';
+
+## js/historico-treinos-aluno.js | structural=0 | total=1 | lines=179
+inline-style-template=1
+  L153: inline-style-template :: <div class="workout-history-progress" aria-label="${percent}% concluído"><span style="width:${percent}%"></span></div>
+
+## js/treino-aluno-app.js | structural=0 | total=1 | lines=61
+style-set-property=1
+  L17: style-set-property :: element.style.setProperty('display', 'none', 'important');
