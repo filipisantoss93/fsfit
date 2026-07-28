@@ -9,7 +9,6 @@ if (homePanel) {
 }
 
 async function initializeDaySummary(session) {
-  injectStyles();
   configureSummaryMarkup();
 
   let currentSummary = { completed: 0, live: 0, overdue: 0 };
@@ -258,17 +257,6 @@ function formatDateValue(date) {
 
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function injectStyles() {
-  if (document.querySelector('#painel-day-summary-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'painel-day-summary-styles';
-  style.textContent = `
-    .home-day-dot.overdue{background:#ff5f67!important}
-    .home-day-progress-overdue{display:block;height:100%;background:#ff5f67}
-  `;
-  document.head.appendChild(style);
 }
 
 function waitForElement(selector, timeout = 5000) {
