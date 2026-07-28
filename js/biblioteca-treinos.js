@@ -258,13 +258,11 @@ if (!exerciseSection) {
     renderDraft();
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
   }
 
   function closeModal() {
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
     editingTemplateId = null;
     resetItemEditor();
   }

@@ -17,6 +17,11 @@
     '.modal.active',
     '.modal-overlay.open',
     '.modal-overlay.show',
+    '[class*="-modal"].open',
+    '[class*="-modal"].show',
+    '[class*="-modal"].active',
+    '[class*="-modal"]:not(.hidden)[aria-hidden="false"]',
+    '[class*="-sheet"].open',
     '[data-modal-root].open',
     '[data-modal-root][aria-hidden="false"]',
     '[role="dialog"][aria-modal="true"]'
@@ -30,6 +35,12 @@
     '.modal-body',
     '.modal-content',
     '.modal-dialog',
+    '[class*="-modal-card"]',
+    '[class*="-modal-body"]',
+    '[class*="-modal-content"]',
+    '[class*="-modal-dialog"]',
+    '[class*="-modal-panel"]',
+    '[class*="-sheet-panel"]',
     '[data-modal-scroll]',
     '[role="dialog"][aria-modal="true"]'
   ].join(',');
@@ -44,6 +55,7 @@
   let modalSyncScheduled = false;
   let savedBodyStyles = null;
   let savedRootStyles = null;
+  const manualModalLocks = new Set();
 
   function ensureFloatingNotificationStyles() {
     if (document.querySelector('style[data-fsfit-floating-notifications]')) return;
@@ -99,96 +111,6 @@
     document.head.appendChild(style);
   }
 
-  function ensureModalStyles() {
-    if (document.querySelector('style[data-fsfit-modal-behavior]')) return;
-
-    const style = document.createElement('style');
-    style.dataset.fsfitModalBehavior = 'true';
-    style.textContent = `
-      html.fsfit-modal-open,
-      body.fsfit-modal-open{
-        overscroll-behavior:none!important;
-      }
-
-      body.fsfit-modal-open{
-        overflow:hidden!important;
-      }
-
-      .live-session-modal,
-      .live-workout-editor-modal,
-      .password-modal,
-      .modal,
-      .modal-overlay,
-      [data-modal-root]{
-        overscroll-behavior:contain;
-      }
-
-      .live-session-modal-body,
-      .live-session-dialog,
-      .password-modal-card,
-      #student-form-card:not(.hidden),
-      .modal-body,
-      .modal-content,
-      .modal-dialog,
-      [data-modal-scroll],
-      [role="dialog"][aria-modal="true"]{
-        overscroll-behavior:contain;
-        -webkit-overflow-scrolling:touch;
-      }
-
-      .live-session-modal-body,
-      .password-modal-card,
-      #student-form-card:not(.hidden),
-      .modal-body,
-      [data-modal-scroll]{
-        touch-action:pan-y;
-      }
-
-      @media(max-width:720px){
-        .live-session-modal,
-        .live-workout-editor-modal{
-          box-sizing:border-box!important;
-          padding-top:env(safe-area-inset-top, 0px)!important;
-          padding-right:env(safe-area-inset-right, 0px)!important;
-          padding-bottom:env(safe-area-inset-bottom, 0px)!important;
-          padding-left:env(safe-area-inset-left, 0px)!important;
-        }
-
-        .live-session-dialog,
-        .live-workout-editor-dialog{
-          height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))!important;
-          max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))!important;
-        }
-
-        #student-form-card:not(.hidden){
-          box-sizing:border-box!important;
-          height:100dvh!important;
-          padding-top:calc(18px + env(safe-area-inset-top, 0px))!important;
-          padding-right:calc(14px + env(safe-area-inset-right, 0px))!important;
-          padding-bottom:calc(32px + env(safe-area-inset-bottom, 0px))!important;
-          padding-left:calc(14px + env(safe-area-inset-left, 0px))!important;
-        }
-
-        body.embed-edit #student-form-card:not(.hidden){
-          height:auto!important;
-          min-height:100dvh!important;
-        }
-
-        .password-modal{
-          box-sizing:border-box!important;
-          padding-top:calc(12px + env(safe-area-inset-top, 0px))!important;
-          padding-right:calc(12px + env(safe-area-inset-right, 0px))!important;
-          padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))!important;
-          padding-left:calc(12px + env(safe-area-inset-left, 0px))!important;
-        }
-
-        .password-modal-card{
-          max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px)!important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
 
   function applyViewportLock() {
     let viewport = document.querySelector('meta[name="viewport"]');
@@ -261,7 +183,25 @@
   }
 
   function hasOpenModal() {
+    if (manualModalLocks.size) return true;
     return Array.from(document.querySelectorAll(MODAL_CANDIDATE_SELECTOR)).some(isVisibleModalCandidate);
+  }
+
+  function acquireModalLock(key = Symbol('fsfit-modal-lock')) {
+    manualModalLocks.add(key);
+    scheduleModalStateSync();
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      manualModalLocks.delete(key);
+      scheduleModalStateSync();
+    };
+  }
+
+  function releaseModalLock(key) {
+    manualModalLocks.delete(key);
+    scheduleModalStateSync();
   }
 
   function lockPageForModal() {
@@ -346,6 +286,15 @@
     requestAnimationFrame(synchronizeModalState);
   }
 
+  window.FSFitModalManager = Object.freeze({
+    acquire: acquireModalLock,
+    release: releaseModalLock,
+    sync: scheduleModalStateSync,
+    get locked() {
+      return modalLocked;
+    }
+  });
+
   function observeModalState() {
     const observer = new MutationObserver(scheduleModalStateSync);
     observer.observe(document.documentElement, {
@@ -407,7 +356,6 @@
   }
 
   ensureFloatingNotificationStyles();
-  ensureModalStyles();
   applyViewportLock();
 
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(type => {
@@ -443,8 +391,7 @@
 
   window.addEventListener('pageshow', () => {
     ensureFloatingNotificationStyles();
-    ensureModalStyles();
-    applyViewportLock();
+      applyViewportLock();
     applyTouchLock();
     scheduleModalStateSync();
   });
