@@ -31,6 +31,7 @@ let manualAppointments = [];
 let cancelledStudentIds = new Set();
 let liveStudentIds = new Set();
 let studentRecords = [];
+let scheduleReturnFocus = null;
 
 const scheduleUi = ensureScheduleUi();
 const scheduleModal = scheduleUi.modal;
@@ -318,19 +319,23 @@ function updateWorkoutOptions(studentId) {
 }
 
 function openScheduleModal() {
+  scheduleReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const selectedDate = dateInput.value || formatDateValue(new Date());
   scheduleForm.reset();
   scheduleDate.value = selectedDate;
   scheduleWorkout.innerHTML = '<option value="">Usar treino ativo do aluno</option>';
   scheduleModal.classList.add('open');
   scheduleModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('agenda-modal-open');
+  window.FSFitModalManager?.sync();
+  requestAnimationFrame(() => scheduleModal.querySelector('.agenda-modal-close')?.focus());
 }
 
 function closeScheduleModal() {
   scheduleModal.classList.remove('open');
   scheduleModal.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('agenda-modal-open');
+  window.FSFitModalManager?.sync();
+  scheduleReturnFocus?.focus({ preventScroll: true });
+  scheduleReturnFocus = null;
 }
 
 async function saveAppointment(event) {
@@ -421,10 +426,11 @@ function ensureScheduleUi() {
     modal = document.createElement('div');
     modal.id = 'schedule-modal';
     modal.className = 'agenda-modal';
+    modal.dataset.modalRoot = 'true';
     modal.setAttribute('aria-hidden', 'true');
     modal.innerHTML = `
       <div class="agenda-modal-backdrop" data-close-schedule-modal></div>
-      <section class="agenda-modal-card" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
+      <section class="agenda-modal-card" data-modal-scroll role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
         <button class="agenda-modal-close" type="button" data-close-schedule-modal aria-label="Fechar">×</button>
         <div class="agenda-modal-kicker">AGENDA</div>
         <h2 id="schedule-modal-title">Agendar aluno</h2>
@@ -445,6 +451,9 @@ function ensureScheduleUi() {
       </section>`;
     document.body.appendChild(modal);
   }
+
+  modal.dataset.modalRoot = 'true';
+  modal.querySelector('.agenda-modal-card')?.setAttribute('data-modal-scroll', '');
 
   const form = modal.querySelector('#schedule-form');
   openButton?.addEventListener('click', openScheduleModal);

@@ -39,7 +39,6 @@
 .agenda-arrow { color: var(--muted); font-size: 1.55rem; line-height: 1; text-align: right; }
 .agenda-empty { margin: 0; padding: 18px 4px; color: var(--muted); }
 
-body.agenda-modal-open { overflow: hidden; }
 .agenda-modal { position: fixed; inset: 0; z-index: 1100; display: none; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
 .agenda-modal.open { display: flex; }
 .agenda-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
