@@ -18,34 +18,6 @@ if (!exerciseSection) {
   let editingItemIndex = null;
   let draftItems = [];
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .workout-library-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0 0;padding:6px;border:1px solid var(--border);border-radius:16px;background:rgba(26,29,35,.94)}
-    .workout-library-tab{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 14px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-weight:850;cursor:pointer}
-    .workout-library-tab.active{background:var(--surface-light);color:var(--text)}
-    .workout-library-tab .view-count{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:rgba(59,130,246,.14);color:var(--secondary);font-size:.7rem;font-weight:900}
-    .workout-library-tab.active .view-count{background:rgba(50,215,75,.13);color:var(--primary)}
-    .workout-library-hidden{display:none!important}
-    .saved-workout-section{margin-top:20px}
-    .saved-workout-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-    .saved-workout-list{display:grid;gap:10px}
-    .saved-workout-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px;border:1px solid var(--border);border-radius:15px;background:var(--surface-light)}
-    .saved-workout-card h3{margin:0 0 5px;font-size:1rem}.saved-workout-card p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.4}
-    .saved-workout-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.saved-workout-meta span{padding:4px 7px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:.68rem;font-weight:800}
-    .saved-workout-actions{display:flex;gap:7px;flex-wrap:wrap}.saved-workout-actions .btn{min-height:38px;padding:0 11px;font-size:.78rem}
-    .saved-workout-modal{position:fixed;inset:0;z-index:22000;display:none;align-items:flex-end;justify-content:center;padding:14px;background:rgba(4,7,10,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-    .saved-workout-modal.open{display:flex}.saved-workout-dialog{width:min(820px,100%);max-height:92dvh;overflow:auto;padding:20px;border:1px solid var(--border);border-radius:22px;background:#171b21;box-shadow:0 28px 80px rgba(0,0,0,.58)}
-    .saved-workout-modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}.saved-workout-modal-head h2{margin:0}.saved-workout-close{width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:var(--surface-light);color:var(--text);font-size:1.4rem}
-    .saved-workout-days{display:flex;gap:7px;flex-wrap:wrap}.saved-workout-days label{margin:0}.saved-workout-days input{position:absolute;opacity:0;pointer-events:none}.saved-workout-days span{display:inline-grid;place-items:center;min-width:46px;min-height:38px;padding:0 9px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:.78rem;font-weight:800}.saved-workout-days input:checked+span{border-color:var(--primary);color:var(--primary);background:rgba(50,215,75,.1)}
-    .saved-workout-days-note{margin:9px 0 0;color:var(--muted);font-size:.76rem;line-height:1.4}
-    .saved-workout-item-form{margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:15px;background:rgba(255,255,255,.025)}
-    .saved-workout-item-grid{display:grid;grid-template-columns:repeat(4,minmax(95px,1fr));gap:10px}.saved-workout-item-grid .form-group{margin:0}.saved-workout-item-grid .exercise-search-field,.saved-workout-item-grid .category-field{grid-column:span 2}.saved-workout-item-grid .exercise-field,.saved-workout-item-grid .wide{grid-column:1/-1}
-    .saved-workout-draft{display:grid;gap:8px;margin-top:14px}.saved-workout-draft-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light)}
-    .saved-workout-draft-row>span{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:rgba(50,215,75,.1);color:var(--primary);font-size:.72rem;font-weight:900}.saved-workout-draft-row strong{display:block;font-size:.9rem}.saved-workout-draft-row small{display:block;margin-top:3px;color:var(--muted);font-size:.72rem}.saved-workout-draft-actions{display:flex;gap:6px}.saved-workout-draft-actions button{min-height:34px;padding:0 9px;font-size:.72rem}
-    .saved-workout-modal-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
-    @media(max-width:720px){.workout-library-tabs{position:sticky;top:calc(82px + var(--safe-area-top));z-index:18}.saved-workout-card{grid-template-columns:1fr}.saved-workout-actions{width:100%}.saved-workout-actions .btn{flex:1}.saved-workout-item-grid{grid-template-columns:1fr 1fr}.saved-workout-item-grid .exercise-search-field,.saved-workout-item-grid .category-field,.saved-workout-item-grid .exercise-field,.saved-workout-item-grid .wide{grid-column:1/-1}.saved-workout-dialog{padding:16px}.saved-workout-modal{padding:8px}.saved-workout-draft-row{grid-template-columns:38px minmax(0,1fr)}.saved-workout-draft-actions{grid-column:1/-1}.saved-workout-draft-actions button{flex:1}}
-  `;
-  document.head.appendChild(style);
 
   const tabs = document.createElement('nav');
   tabs.className = 'workout-library-tabs';
@@ -58,7 +30,7 @@ if (!exerciseSection) {
   savedSection.className = 'card saved-workout-section workout-library-hidden';
   savedSection.innerHTML = `
     <div class="saved-workout-toolbar">
-      <div><small>TREINOS SALVOS</small><h2 style="margin:4px 0 0">Minha biblioteca de treinos</h2></div>
+      <div><small>TREINOS SALVOS</small><h2 class="saved-workout-toolbar-title">Minha biblioteca de treinos</h2></div>
       <button id="new-saved-workout" class="btn btn-primary" type="button">+ Novo treino salvo</button>
     </div>
     <div id="saved-workout-list" class="saved-workout-list"><p class="empty">Carregando treinos salvos...</p></div>`;
@@ -88,7 +60,7 @@ if (!exerciseSection) {
             <div class="form-group"><label>Descanso</label><input id="saved-item-rest" type="number" min="0" step="1" placeholder="seg"></div>
             <div class="form-group wide"><label>Observações</label><input id="saved-item-notes" maxlength="240" placeholder="Orientação opcional"></div>
           </div>
-          <div class="actions" style="margin-top:12px"><button id="saved-item-add" class="btn btn-outline" type="button">+ Adicionar exercício</button><button id="saved-item-cancel-edit" class="btn btn-outline hidden" type="button">Cancelar edição</button></div>
+          <div class="actions saved-workout-item-actions"><button id="saved-item-add" class="btn btn-outline" type="button">+ Adicionar exercício</button><button id="saved-item-cancel-edit" class="btn btn-outline hidden" type="button">Cancelar edição</button></div>
         </section>
         <div id="saved-workout-draft" class="saved-workout-draft"></div>
         <div class="saved-workout-modal-actions"><button class="btn btn-outline" type="button" data-close-saved-workout>Cancelar</button><button id="save-saved-workout" class="btn btn-primary" type="submit">Salvar treino</button></div>
