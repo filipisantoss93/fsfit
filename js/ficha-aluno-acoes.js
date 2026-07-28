@@ -1,22 +1,4 @@
 (() => {
-  const contentStylesheetId = 'fsfit-student-record-content-styles';
-  const mobileHotfixStylesheetId = 'fsfit-student-record-mobile-hotfix';
-
-  function appendStylesheet(id, href) {
-    if (document.getElementById(id)) return;
-    const link = document.createElement('link');
-    link.id = id;
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.append(link);
-  }
-
-  function ensureSupplementalStylesheets() {
-    // ficha-aluno-acoes.css já é carregado estaticamente em ficha-aluno.html.
-    appendStylesheet(contentStylesheetId, 'css/ficha-aluno-conteudo.css?v=20260726-ux3');
-    appendStylesheet(mobileHotfixStylesheetId, 'css/ficha-aluno-mobile-hotfix.css?v=20260726-scroll1');
-  }
-
   function closeMenu(menu, toggle, { restoreFocus = false } = {}) {
     if (!menu || !toggle) return;
     menu.classList.remove('open');
@@ -196,7 +178,6 @@
   }
 
   function init() {
-    ensureSupplementalStylesheets();
     buildHeaderActions();
     enhanceInternalContent();
     enhanceModal();
