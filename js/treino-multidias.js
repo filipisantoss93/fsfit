@@ -67,7 +67,6 @@ if (distanceInput) {
 }
 durationField.parentElement?.insertBefore(distanceField, durationField.nextSibling);
 
-injectCompactConfigStyles();
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -478,30 +477,3 @@ try {
   showMessage(message, 'Não foi possível carregar a biblioteca de exercícios.', 'error');
 }
 
-function injectCompactConfigStyles() {
-  if (document.querySelector('#selected-exercise-compact-config-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'selected-exercise-compact-config-styles';
-  style.textContent = `
-    .selected-exercise-card-head{grid-template-columns:34px minmax(0,1fr) 34px!important;margin-bottom:0!important}
-    .selected-exercise-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
-    .selected-exercise-title{display:block;min-width:0}
-    .selected-exercise-title strong,.selected-exercise-title small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .selected-exercise-title strong{font-size:.9rem}
-    .selected-exercise-title small{margin-top:3px;color:var(--muted);font-size:.72rem;font-weight:600}
-    .selected-exercise-chevron{flex:0 0 auto;color:var(--secondary);font-size:1.35rem;transition:transform .18s ease}
-    .selected-exercise-card.expanded .selected-exercise-chevron{transform:rotate(90deg)}
-    .selected-exercise-config-panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-    .selected-exercise-config-panel[hidden]{display:none!important}
-    .selected-exercise-card.expanded{border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.035)}
-    @media(max-width:640px){
-      .selected-exercise-card{padding:10px!important}
-      .selected-exercise-card-head{grid-template-columns:32px minmax(0,1fr) 32px!important;gap:8px!important}
-      .selected-exercise-order{width:30px!important;height:30px!important}
-      .selected-exercise-remove{width:32px!important;height:32px!important}
-      .selected-exercise-title strong{font-size:.84rem}
-      .selected-exercise-title small{font-size:.68rem}
-    }
-  `;
-  document.head.appendChild(style);
-}
