@@ -12,8 +12,6 @@ if (isDashboard) {
     const photoByStudentId = new Map();
     let loading = false;
 
-    injectStyles();
-
     function initials(value = '') {
       const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
       return (parts.slice(0, 2).map(part => part.charAt(0)).join('') || 'A').toUpperCase();
@@ -140,35 +138,6 @@ if (isDashboard) {
 
     await refreshSessions();
   }
-}
-
-function injectStyles() {
-  if (document.querySelector('#painel-home-avatar-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'painel-home-avatar-styles';
-  style.textContent = `
-    .home-now-icon.has-student-avatar{
-      overflow:hidden;
-      padding:0;
-      border:2px solid rgba(177,255,0,.32);
-      background:linear-gradient(145deg,rgba(177,255,0,.17),rgba(59,130,246,.12)),var(--surface-light);
-      color:var(--text);
-      font-size:.82rem;
-      letter-spacing:-.03em;
-    }
-    .home-now-icon.has-profile-photo{
-      border-color:rgba(177,255,0,.52);
-      box-shadow:0 0 0 4px rgba(177,255,0,.06),inset 0 0 0 1px rgba(255,255,255,.08);
-    }
-    .home-now-icon.has-profile-photo img{
-      display:block;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      object-position:center;
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 function waitForElement(selector, timeout = 8000) {
