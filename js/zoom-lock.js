@@ -57,61 +57,6 @@
   let savedRootStyles = null;
   const manualModalLocks = new Set();
 
-  function ensureFloatingNotificationStyles() {
-    if (document.querySelector('style[data-fsfit-floating-notifications]')) return;
-
-    const style = document.createElement('style');
-    style.dataset.fsfitFloatingNotifications = 'true';
-    style.textContent = `
-      .message.show:not(#public-link-box):not(#access-notice){
-        position:fixed!important;
-        top:calc(env(safe-area-inset-top, 0px) + 12px)!important;
-        left:50%!important;
-        right:auto!important;
-        bottom:auto!important;
-        z-index:30000!important;
-        display:block!important;
-        width:min(560px,calc(100vw - 24px))!important;
-        max-width:calc(100vw - 24px)!important;
-        margin:0!important;
-        padding:14px 18px!important;
-        border-radius:14px!important;
-        transform:translateX(-50%)!important;
-        box-shadow:0 18px 55px rgba(0,0,0,.52)!important;
-        backdrop-filter:blur(18px)!important;
-        -webkit-backdrop-filter:blur(18px)!important;
-        animation:fsfitFloatingNotificationIn .22s ease-out both;
-      }
-      .message.show.success:not(#public-link-box){
-        background:rgba(24,66,35,.97)!important;
-        border-color:rgba(50,215,75,.62)!important;
-        color:#d7ffdd!important;
-      }
-      .message.show.error:not(#access-notice){
-        background:rgba(68,30,34,.97)!important;
-        border-color:rgba(255,90,95,.65)!important;
-        color:#ffd1d3!important;
-      }
-      @keyframes fsfitFloatingNotificationIn{
-        from{opacity:0;transform:translate(-50%,-10px)}
-        to{opacity:1;transform:translate(-50%,0)}
-      }
-      @media(max-width:620px){
-        .message.show:not(#public-link-box):not(#access-notice){
-          top:calc(env(safe-area-inset-top, 0px) + 8px)!important;
-          width:calc(100vw - 16px)!important;
-          max-width:calc(100vw - 16px)!important;
-          padding:13px 15px!important;
-          border-radius:13px!important;
-          font-size:.9rem!important;
-          line-height:1.4!important;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-
   function applyViewportLock() {
     let viewport = document.querySelector('meta[name="viewport"]');
     if (!viewport) {
@@ -355,7 +300,6 @@
     keepHorizontalPositionLocked();
   }
 
-  ensureFloatingNotificationStyles();
   applyViewportLock();
 
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(type => {
@@ -390,8 +334,7 @@
   }
 
   window.addEventListener('pageshow', () => {
-    ensureFloatingNotificationStyles();
-      applyViewportLock();
+    applyViewportLock();
     applyTouchLock();
     scheduleModalStateSync();
   });
