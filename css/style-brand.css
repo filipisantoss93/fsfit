@@ -1,0 +1,202 @@
+.logo-nav span,
+.auth-logo span {
+  color: var(--text);
+  font-weight: 760;
+  letter-spacing: -.025em;
+}
+
+.card {
+  border-color: rgba(77,94,121,.44);
+  background: linear-gradient(180deg,rgba(14,21,32,.98),rgba(9,15,24,.98));
+  box-shadow: 0 18px 52px rgba(0,0,0,.32);
+}
+
+.metric-card,
+.sub-card,
+.attention-item {
+  border-color: rgba(77,94,121,.4);
+  background: linear-gradient(180deg,rgba(21,31,45,.96),rgba(17,25,37,.96));
+}
+
+input,
+select,
+textarea {
+  border-color: rgba(73,89,113,.6);
+  background: #111a27;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(184,229,28,.14);
+}
+
+.hero-badge,
+.badge {
+  border-color: rgba(184,229,28,.34);
+  background: rgba(184,229,28,.1);
+}
+
+.btn-primary {
+  color: #091005;
+  border-color: rgba(204,241,66,.62);
+  background: linear-gradient(180deg,#c8f23a 0%,#a9da16 100%);
+  box-shadow: 0 10px 28px rgba(184,229,28,.18);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg,#d3f75a 0%,#b7e525 100%);
+  box-shadow: 0 13px 32px rgba(184,229,28,.22);
+}
+
+.btn-primary .btn-action-description {
+  color: rgba(9,16,5,.7);
+}
+
+.message.success {
+  color: #efffc2;
+  border-color: rgba(184,229,28,.36);
+  background: rgba(184,229,28,.1);
+}
+
+.student-page {
+  background:
+    radial-gradient(circle at 50% 0,rgba(184,229,28,.12),transparent 36%),
+    var(--background);
+}
+
+.record-tabs,
+.dashboard-tabs {
+  border-color: rgba(77,94,121,.42);
+  background: rgba(10,16,25,.94);
+}
+
+.record-tab.active {
+  background: rgba(184,229,28,.11);
+  color: var(--primary);
+}
+
+body.fsfit-dashboard-modern .dashboard-tabs {
+  border-color: rgba(77,94,121,.4);
+  background: rgba(9,15,24,.86);
+  box-shadow: 0 10px 28px rgba(0,0,0,.24);
+}
+
+body.fsfit-dashboard-modern .dashboard-summary-card.is-revenue {
+  --summary-accent: var(--primary);
+}
+
+body.fsfit-dashboard-modern .attention-card {
+  border-color: rgba(77,94,121,.44);
+  background: linear-gradient(180deg,rgba(14,21,32,.98),rgba(9,15,24,.98));
+  box-shadow: 0 16px 44px rgba(0,0,0,.3);
+}
+
+body.fsfit-dashboard-modern .attention-card::before {
+  background: var(--primary);
+  opacity: .72;
+}
+
+body.fsfit-dashboard-modern .attention-item {
+  border-color: rgba(77,94,121,.4);
+  background: linear-gradient(180deg,rgba(21,31,45,.96),rgba(17,25,37,.96));
+}
+
+body.fsfit-dashboard-modern a.attention-item:hover {
+  border-color: rgba(184,229,28,.22);
+  background: rgba(24,35,50,.98);
+}
+
+body.fsfit-dashboard-modern .quick-action {
+  border-color: rgba(77,94,121,.36);
+  background: rgba(12,19,29,.9);
+}
+
+body.fsfit-dashboard-modern .quick-action:hover {
+  border-color: rgba(79,140,255,.42);
+  background: rgba(18,27,40,.96);
+}
+
+body.fsfit-dashboard-modern .dashboard-public-link-compact,
+body.fsfit-dashboard-modern .dashboard-activity-card {
+  border-color: rgba(77,94,121,.38);
+}
+
+@media (max-width: 720px) {
+  .dashboard-tabs {
+    border-color: rgba(77,94,121,.42);
+    background: rgba(9,15,24,.97);
+    box-shadow: 0 10px 28px rgba(0,0,0,.28);
+  }
+}
+
+@media (max-width: 420px) {
+  .logo-nav strong {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+  }
+}
+
+/* FS Fit · hierarquia cromática de ações alinhada à marca · 2026-07-23
+   Verde-lima identifica ações; azul permanece reservado a estados e informação. */
+.btn:focus-visible {
+  outline-color: rgba(184,229,28,.34);
+}
+
+.btn-secondary {
+  color: var(--primary);
+  border-color: rgba(184,229,28,.46);
+  background: linear-gradient(180deg,rgba(184,229,28,.105),rgba(184,229,28,.055));
+  box-shadow: 0 8px 22px rgba(184,229,28,.065);
+}
+
+.btn-secondary:hover {
+  color: #d9fa5a;
+  border-color: rgba(204,241,66,.68);
+  background: rgba(184,229,28,.14);
+  box-shadow: 0 10px 26px rgba(184,229,28,.1);
+}
+
+.btn-secondary .btn-action-description {
+  color: var(--muted);
+}
+
+.btn-outline {
+  color: var(--primary);
+  border-color: rgba(184,229,28,.66);
+  background: rgba(184,229,28,.018);
+}
+
+.btn-outline:hover {
+  color: #d9fa5a;
+  border-color: rgba(204,241,66,.82);
+  background: rgba(184,229,28,.09);
+}
+
+.auth-switch button,
+.record-back-link,
+.record-secondary-link {
+  color: var(--primary);
+}
+
+.quick-action:hover,
+body.fsfit-dashboard-modern .quick-action:hover {
+  border-color: rgba(184,229,28,.36);
+}
+
+.public-link-actions .btn-secondary,
+.profile-summary-actions .btn-secondary {
+  color: #091005;
+  border-color: rgba(204,241,66,.62);
+  background: linear-gradient(180deg,#c8f23a 0%,#a9da16 100%);
+  box-shadow: 0 10px 28px rgba(184,229,28,.18);
+}
+
+.public-link-actions .btn-secondary:hover,
+.profile-summary-actions .btn-secondary:hover {
+  color: #091005;
+  background: linear-gradient(180deg,#d3f75a 0%,#b7e525 100%);
+  box-shadow: 0 13px 32px rgba(184,229,28,.22);
+}
