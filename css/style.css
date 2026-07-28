@@ -2,9 +2,10 @@
  * FS Fit — estilos globais
  *
  * Os tokens visuais são declarados exclusivamente em fsfit-design-system.css.
- * A ordem das camadas abaixo preserva a cascata existente:
- * base → painel → identidade visual.
+ * A ordem abaixo garante tokens disponíveis desde a primeira renderização e
+ * preserva a cascata existente: base → painel → identidade visual.
  */
+@import url('./fsfit-design-system.css?v=20260728-tokens2');
 @import url('./style-base.css?v=20260728-tokens2');
 @import url('./style-dashboard.css?v=20260728-tokens2');
 @import url('./style-brand.css?v=20260728-tokens2');
