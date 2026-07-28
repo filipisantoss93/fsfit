@@ -1,0 +1,46 @@
+name: FS Fit audit runtime CSS 21
+
+on:
+  push:
+    branches:
+      - audit/correcao-21-runtime-css
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/correcao-21-runtime-css
+          fetch-depth: 0
+
+      - name: Scan runtime CSS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          rows = []
+          for path in sorted(Path('js').glob('*.js')):
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              style_creations = len(re.findall(r"createElement\(['\"]style['\"]\)", text))
+              link_creations = len(re.findall(r"createElement\(['\"]link['\"]\)", text))
+              inline_style = len(re.findall(r"style=['\"]", text))
+              template_blocks = len(re.findall(r"\.textContent\s*=\s*`", text))
+              if style_creations or link_creations or inline_style:
+                  rows.append((style_creations + link_creations + inline_style, style_creations, link_creations, inline_style, template_blocks, str(path)))
+
+          rows.sort(reverse=True)
+          lines = ['score\tstyle_tags\tlink_tags\tinline_style\ttemplate_blocks\tfile']
+          lines.extend('\t'.join(map(str, row)) for row in rows)
+          Path('.audit-runtime-css-21.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .audit-runtime-css-21.txt
+          git commit -m "Registrar mapa temporário de CSS dinâmico"
+          git push origin HEAD:audit/correcao-21-runtime-css
