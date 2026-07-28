@@ -19,26 +19,6 @@ if (!foodSection || !mealSection || !mealList || !mealForm) {
   const userId = session?.user?.id || null;
   let editContext = null;
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .food-library-view-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0 0;padding:6px;border:1px solid var(--border);border-radius:16px;background:rgba(26,29,35,.94)}
-    .food-library-view-tab{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 14px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-weight:850;cursor:pointer}
-    .food-library-view-tab.active{background:var(--surface-light);color:var(--text);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
-    .food-library-view-tab .view-count{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:rgba(59,130,246,.14);color:var(--secondary);font-size:.7rem;font-weight:900}
-    .food-library-view-tab.active .view-count{background:rgba(50,215,75,.13);color:var(--primary)}
-    .food-library-panel-hidden{display:none!important}
-    .meal-library-section{margin-top:20px}
-    .meal-library-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .meal-library-actions .btn{min-height:40px;padding:0 13px;font-size:.82rem}
-    @media(max-width:560px){
-      .food-library-view-tabs{position:sticky;top:calc(82px + var(--safe-area-top));z-index:18;margin-inline:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-      .food-library-view-tab{min-height:44px;padding:0 9px;font-size:.82rem}
-      .meal-library-actions{width:100%}
-      .meal-library-actions .btn{flex:1 1 auto}
-    }
-  `;
-  document.head.appendChild(style);
-
   const tabs = document.createElement('nav');
   tabs.className = 'food-library-view-tabs';
   tabs.setAttribute('role', 'tablist');
