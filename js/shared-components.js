@@ -1,64 +1,7 @@
 /* FS Fit · Componentes compartilhados · Fase 2 */
 
-function ensureDesignSystemStyles() {
-  if (!document.querySelector('link[data-fsfit-design-system]')) {
-    const designSystem = document.createElement('link');
-    designSystem.rel = 'stylesheet';
-    designSystem.href = 'css/fsfit-design-system.css?v=20260726-phase3';
-    designSystem.dataset.fsfitDesignSystem = 'true';
-    document.head.appendChild(designSystem);
-  }
+function applySharedBodyClass() {
   document.body?.classList.add('fsfit-saas');
-}
-
-function ensureSharedStyles() {
-  if (!document.querySelector('link[data-fsfit-shared-components]')) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'css/shared-components.css?v=20260727-sticky-tabs1';
-    link.dataset.fsfitSharedComponents = 'true';
-    document.head.appendChild(link);
-  }
-  if (!document.querySelector('link[data-fsfit-pull-refresh]')) {
-    const refreshStyles = document.createElement('link');
-    refreshStyles.rel = 'stylesheet';
-    refreshStyles.href = 'css/pull-to-refresh.css?v=20260727-ptr2';
-    refreshStyles.dataset.fsfitPullRefresh = 'true';
-    document.head.appendChild(refreshStyles);
-  }
-  if (!document.querySelector('link[data-fsfit-sidebar-avatar-fix]')) {
-    const avatarFix = document.createElement('link');
-    avatarFix.rel = 'stylesheet';
-    avatarFix.href = 'css/sidebar-profile-avatar-fix.css?v=20260727-avatar-fix1';
-    avatarFix.dataset.fsfitSidebarAvatarFix = 'true';
-    document.head.appendChild(avatarFix);
-  }
-}
-
-function ensureAppContainerStyles() {
-  if (document.querySelector('style[data-fsfit-app-container]')) return;
-  const style = document.createElement('style');
-  style.dataset.fsfitAppContainer = 'true';
-  style.textContent = `
-    @media (min-width: 1100px) {
-      body.fsfit-saas main.container {
-        width: min(calc(100% - 48px), 1320px) !important;
-        max-width: 1320px !important;
-        margin-inline: auto !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-function ensurePagePolishStyles() {
-  const page = window.location.pathname.split('/').pop() || '';
-  if (page !== 'treino-aluno.html' || document.querySelector('link[data-fsfit-workout-phase6]')) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'css/treino-aluno-fase6.css?v=20260727-phase6';
-  link.dataset.fsfitWorkoutPhase6 = 'true';
-  document.head.appendChild(link);
 }
 
 function lockDocumentScroll() {
@@ -194,10 +137,7 @@ function observeSharedComponents() {
 }
 
 export function initializeSharedComponents() {
-  ensureDesignSystemStyles();
-  ensureSharedStyles();
-  ensureAppContainerStyles();
-  ensurePagePolishStyles();
+  applySharedBodyClass();
   normalizeSharedStates();
   initializePullToRefresh();
   observeSharedComponents();
