@@ -8,5 +8,5 @@
 @import url('./fsfit-design-system.css?v=20260728-tokens2');
 @import url('./style-base.css?v=20260728-tokens2');
 @import url('./style-dashboard.css?v=20260728-tokens2');
-@import url('./style-brand.css?v=20260728-tokens2');
-@import url('./app-shell.css?v=20260728-static-shell1');
+@import url('./style-brand.css?v=20260728-components1');
+@import url('./app-shell.css?v=20260728-components1');

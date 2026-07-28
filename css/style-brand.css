@@ -200,3 +200,348 @@ body.fsfit-dashboard-modern .quick-action:hover {
   background: linear-gradient(180deg,#d3f75a 0%,#b7e525 100%);
   box-shadow: 0 13px 32px rgba(184,229,28,.22);
 }
+
+/* Componentes globais consolidados da antiga camada compartilhada. */
+.main-header,
+.notification-panel,
+.fsfit-more-panel,
+.fsfit-bottom-nav,
+.nav-menu {
+  border-color: rgba(231, 237, 243, .12) !important;
+}
+
+.notification-button,
+.menu-mobile-btn,
+.fsfit-more-close {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+}
+
+.notification-panel,
+.fsfit-more-panel,
+.nav-menu {
+  border-radius: var(--fs-radius-lg, 10px) !important;
+  background: rgba(17, 24, 32, .98) !important;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, .38) !important;
+}
+
+.notification-panel-header,
+.fsfit-more-heading {
+  gap: var(--fs-space-3, 12px);
+}
+
+.notification-item,
+.fsfit-more-item {
+  border-color: var(--fs-border, rgba(231, 237, 243, .105)) !important;
+  border-radius: var(--fs-radius-md, 8px) !important;
+  background: var(--fs-surface-raised, #161e28) !important;
+  box-shadow: none !important;
+}
+
+.notification-item:hover,
+.fsfit-more-item:hover {
+  border-color: var(--fs-border-strong, rgba(231, 237, 243, .16)) !important;
+  background: var(--fs-surface-soft, #1a232e) !important;
+  transform: none !important;
+}
+
+.fsfit-more-item-icon {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  background: var(--fs-primary-soft, rgba(131, 189, 69, .09)) !important;
+  color: var(--fs-primary, #83bd45) !important;
+}
+
+.fsfit-more-close {
+  border: 1px solid var(--fs-border, rgba(231, 237, 243, .105)) !important;
+  background: var(--fs-surface-raised, #161e28) !important;
+  color: var(--fs-text-muted, #929da9) !important;
+}
+
+.fsfit-more-backdrop,
+body.nav-menu-open::before {
+  background: rgba(4, 7, 11, .68) !important;
+}
+
+@media (min-width: 861px) {
+  .main-header {
+    background: rgba(11, 15, 20, .985) !important;
+    box-shadow: 10px 0 26px rgba(0, 0, 0, .18) !important;
+  }
+
+  .nav-menu a,
+  .nav-menu button {
+    border-radius: var(--fs-radius-sm, 6px) !important;
+  }
+
+  .nav-menu a.active {
+    border-color: var(--fs-primary-border, rgba(131, 189, 69, .24)) !important;
+    background: var(--fs-primary-soft, rgba(131, 189, 69, .09)) !important;
+  }
+
+  .nav-menu a.active::after {
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .nav-menu {
+    border-radius: var(--fs-radius-lg, 10px) !important;
+  }
+
+  .fsfit-bottom-nav {
+    left: 8px !important;
+    right: 8px !important;
+    border-radius: var(--fs-radius-lg, 10px) var(--fs-radius-lg, 10px) 0 0 !important;
+    background: rgba(11, 15, 20, .985) !important;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .28) !important;
+  }
+
+  .fsfit-bottom-nav a,
+  .fsfit-bottom-nav button {
+    border-radius: var(--fs-radius-sm, 6px) !important;
+  }
+
+  .fsfit-bottom-nav a.active,
+  .fsfit-bottom-nav button.active,
+  .fsfit-bottom-nav button.is-open {
+    background: var(--fs-primary-soft, rgba(131, 189, 69, .09)) !important;
+    color: var(--fs-primary, #83bd45) !important;
+  }
+
+  .fsfit-more-panel {
+    border-radius: var(--fs-radius-lg, 10px) var(--fs-radius-lg, 10px) 0 0 !important;
+    padding-bottom: calc(var(--fs-space-5, 20px) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+html.fsfit-sheet-open,
+html.fsfit-sheet-open body,
+body.nav-menu-open {
+  overscroll-behavior: none;
+}
+
+.fsfit-shared-empty,
+.fsfit-shared-error,
+.fsfit-shared-loading {
+  padding: var(--fs-space-8, 32px) var(--fs-space-5, 20px);
+  border: 1px dashed var(--fs-border-strong, rgba(231, 237, 243, .16));
+  border-radius: var(--fs-radius-md, 8px);
+  background: var(--fs-surface, #111820);
+  color: var(--fs-text-muted, #929da9);
+  text-align: center;
+}
+
+.fsfit-toast-region {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 3000;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.fsfit-toast {
+  padding: 12px 14px;
+  border: 1px solid var(--fs-border, rgba(231, 237, 243, .105));
+  border-radius: var(--fs-radius-md, 8px);
+  background: var(--fs-surface-raised, #161e28);
+  color: var(--fs-text, #eef2f5);
+  box-shadow: var(--fs-shadow-sm, 0 8px 24px rgba(0, 0, 0, .18));
+}
+
+.fsfit-toast.is-success { border-color: var(--fs-primary-border, rgba(131, 189, 69, .24)); }
+.fsfit-toast.is-error { border-color: rgba(215, 109, 115, .32); }
+.fsfit-toast.is-warning { border-color: rgba(212, 173, 83, .32); }
+
+/* Fase 3 · Painel */
+body.fsfit-saas .dashboard-tabs {
+  gap: var(--fs-space-1, 4px) !important;
+  padding: var(--fs-space-1, 4px) !important;
+  border-radius: var(--fs-radius-md, 8px) !important;
+  background: var(--fs-surface, #111820) !important;
+}
+
+body.fsfit-saas .dashboard-tab {
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  font-weight: 800 !important;
+  transform: none !important;
+}
+
+body.fsfit-saas .dashboard-tab[aria-selected="true"] {
+  background: var(--fs-primary, #83bd45) !important;
+  color: #0d1409 !important;
+}
+
+body.fsfit-saas .home-now-card,
+body.fsfit-saas .home-review-card {
+  background: var(--fs-surface, #111820) !important;
+  box-shadow: none !important;
+}
+
+body.fsfit-saas .home-now-card {
+  border-left-color: var(--fs-primary, #83bd45) !important;
+}
+
+body.fsfit-saas .home-now-icon,
+body.fsfit-saas .home-review-icon,
+body.fsfit-saas .home-summary-icon {
+  border-radius: var(--fs-radius-md, 8px) !important;
+}
+
+body.fsfit-saas .home-now-action,
+body.fsfit-saas .attention-total,
+body.fsfit-saas .attention-item,
+body.fsfit-saas .today-count {
+  border-radius: var(--fs-radius-sm, 6px) !important;
+}
+
+body.fsfit-saas .attention-item {
+  background: var(--fs-surface-raised, #161e28) !important;
+}
+
+body.fsfit-saas .dashboard-summary-card {
+  border-top-width: 2px !important;
+}
+
+body.fsfit-saas .home-day-progress {
+  height: 5px !important;
+}
+
+body.fsfit-saas .today-card-header,
+body.fsfit-saas .dashboard-activity-heading {
+  padding: var(--fs-space-4, 16px) !important;
+}
+
+/* Padronização global das ações de página */
+body.fsfit-saas .page-header > .actions,
+body.fsfit-saas .page-header .library-top-actions,
+body.fsfit-saas .page-actions,
+body.fsfit-saas .library-action-bar {
+  gap: var(--fs-space-2, 8px) !important;
+}
+
+body.fsfit-saas .page-header > .actions .btn,
+body.fsfit-saas .page-header .library-top-actions .btn,
+body.fsfit-saas .page-actions .btn,
+body.fsfit-saas .library-action-bar .btn {
+  min-height: 44px !important;
+  padding: 10px 16px !important;
+  border-radius: var(--fs-radius-sm, 6px) !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  body.fsfit-saas .page-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--fs-space-4, 16px) !important;
+  }
+
+  body.fsfit-saas .page-header > div:first-child {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.fsfit-saas .page-header > .actions,
+  body.fsfit-saas .page-header .library-top-actions {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  body.fsfit-saas .page-header > .actions .btn,
+  body.fsfit-saas .page-header .library-top-actions .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.fsfit-saas .library-top-actions:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body.fsfit-saas .page-header > .actions .btn,
+  body.fsfit-saas .page-header .library-top-actions .btn,
+  body.fsfit-saas .page-actions .btn,
+  body.fsfit-saas .library-action-bar .btn {
+    min-height: 42px !important;
+    padding: 9px 10px !important;
+    font-size: .84rem !important;
+  }
+}
+
+/* Abas sticky padronizadas */
+@media (max-width: 860px) {
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  ) {
+    position: sticky !important;
+    top: max(0px, env(safe-area-inset-top, 0px)) !important;
+    z-index: 900 !important;
+    width: 100% !important;
+    margin-inline: 0 !important;
+    padding: 6px !important;
+    border: 1px solid var(--fs-border, rgba(231, 237, 243, .105)) !important;
+    border-radius: var(--fs-radius-md, 8px) !important;
+    background: rgba(17, 24, 32, .98) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .24) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  )::-webkit-scrollbar { display: none; }
+
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  ) > :is(button, a, [role="tab"]) {
+    flex: 1 0 auto !important;
+    min-height: 42px !important;
+    padding: 9px 14px !important;
+    border-radius: var(--fs-radius-sm, 6px) !important;
+    white-space: nowrap !important;
+  }
+}
