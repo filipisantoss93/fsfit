@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 import * as core from './layout-core.js';
 import './page-data-cache.js?v=20260723-page-cache1';
-import './shared-components.js?v=20260726-phase2';
+import './shared-components.js?v=20260728-static-shell1';
 
 export * from './layout-core.js';
 
@@ -21,7 +21,6 @@ const AUTO_SHELL_ACTIVE_BY_PAGE = {
   'admin.html': 'admin',
   'admin-contatos.html': 'admin'
 };
-let mobileNavigationStylesPromise = null;
 let enhancementsScheduled = false;
 
 function currentPage() {
@@ -31,57 +30,6 @@ function currentPage() {
 
 function inferShellActivePage() {
   return AUTO_SHELL_ACTIVE_BY_PAGE[currentPage()] || '';
-}
-
-function ensureMobileNavigationCriticalStyles() {
-  if (document.querySelector('style[data-fsfit-mobile-navigation-critical]')) return;
-  const style = document.createElement('style');
-  style.dataset.fsfitMobileNavigationCritical = 'true';
-  style.textContent = `
-    .fsfit-more-sheet{
-      position:fixed;
-      inset:0;
-      z-index:220;
-      visibility:hidden;
-      pointer-events:none;
-    }
-    .fsfit-more-sheet[aria-hidden="true"]{
-      visibility:hidden!important;
-      pointer-events:none!important;
-    }
-    .fsfit-more-sheet.is-open{
-      visibility:visible;
-      pointer-events:auto;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-function ensureMobileNavigationStylesheet() {
-  const existing = document.querySelector('link[data-fsfit-mobile-navigation]');
-  if (existing) {
-    if (existing.sheet) return Promise.resolve(existing);
-    if (!mobileNavigationStylesPromise) {
-      mobileNavigationStylesPromise = new Promise(resolve => {
-        const finish = () => resolve(existing);
-        existing.addEventListener('load', finish, { once: true });
-        existing.addEventListener('error', finish, { once: true });
-      });
-    }
-    return mobileNavigationStylesPromise;
-  }
-
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'css/mobile-navigation.css?v=20260722-shell1';
-  link.dataset.fsfitMobileNavigation = 'true';
-  mobileNavigationStylesPromise = new Promise(resolve => {
-    const finish = () => resolve(link);
-    link.addEventListener('load', finish, { once: true });
-    link.addEventListener('error', finish, { once: true });
-  });
-  document.head.appendChild(link);
-  return mobileNavigationStylesPromise;
 }
 
 function scheduleNonCriticalEnhancements() {
@@ -94,22 +42,7 @@ function scheduleNonCriticalEnhancements() {
   }, 0);
 }
 
-function ensureMobileOverflowGuard() {
-  if (document.querySelector('style[data-fsfit-mobile-overflow-guard]')) return;
-  const style = document.createElement('style');
-  style.dataset.fsfitMobileOverflowGuard = 'true';
-  style.textContent = `
-    html,body{max-width:100%;overflow-x:clip}
-    #header-container .user-greeting{display:none!important}
-    @media(max-width:860px){
-      #header-container .nav-menu{transform:translateY(-8px) scale(.98)!important;transform-origin:top right!important}
-      #header-container .nav-menu.active{transform:translateY(0) scale(1)!important}
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-function ensureMobileMoreSheet(trigger, stylesReadyPromise = Promise.resolve()) {
+function ensureMobileMoreSheet(trigger) {
   document.querySelector('.fsfit-more-sheet')?.remove();
 
   const sheet = document.createElement('div');
@@ -140,21 +73,8 @@ function ensureMobileMoreSheet(trigger, stylesReadyPromise = Promise.resolve()) 
   const publicPageButton = sheet.querySelector('[data-fsfit-public-page]');
   const logoutButton = sheet.querySelector('[data-fsfit-logout]');
   let previousFocus = null;
-  let stylesReady = false;
-  let queuedOpen = false;
-
-  Promise.resolve(stylesReadyPromise).then(() => {
-    stylesReady = true;
-    trigger.removeAttribute('aria-busy');
-    if (queuedOpen) {
-      queuedOpen = false;
-      openSheet();
-    }
-  });
-  trigger.setAttribute('aria-busy', 'true');
 
   const closeSheet = () => {
-    queuedOpen = false;
     if (!sheet.classList.contains('is-open')) return;
     sheet.classList.remove('is-open');
     sheet.setAttribute('aria-hidden', 'true');
@@ -165,10 +85,6 @@ function ensureMobileMoreSheet(trigger, stylesReadyPromise = Promise.resolve()) 
   };
 
   const openSheet = () => {
-    if (!stylesReady) {
-      queuedOpen = true;
-      return;
-    }
     previousFocus = document.activeElement;
     sheet.classList.add('is-open');
     sheet.setAttribute('aria-hidden', 'false');
@@ -216,7 +132,7 @@ function ensureMobileMoreSheet(trigger, stylesReadyPromise = Promise.resolve()) 
   return { openSheet, closeSheet };
 }
 
-function ensureMobileBottomNav(active = '', stylesReadyPromise = Promise.resolve()) {
+function ensureMobileBottomNav(active = '') {
   document.querySelector('.fsfit-bottom-nav')?.remove();
   const page = currentPage();
   const inferredActive = active || page.replace(/\.html$/i, '');
@@ -252,7 +168,7 @@ function ensureMobileBottomNav(active = '', stylesReadyPromise = Promise.resolve
   nav.appendChild(moreButton);
 
   document.body.appendChild(nav);
-  ensureMobileMoreSheet(moreButton, stylesReadyPromise);
+  ensureMobileMoreSheet(moreButton);
 }
 
 function configureStudentRecordBackLink() {
@@ -292,11 +208,8 @@ function configureStudentRecordBackLink() {
 }
 
 export function renderHeader(active = '') {
-  ensureMobileNavigationCriticalStyles();
-  const mobileNavigationStylesReady = ensureMobileNavigationStylesheet();
   core.renderHeader(active);
-  ensureMobileOverflowGuard();
-  ensureMobileBottomNav(active, mobileNavigationStylesReady);
+  ensureMobileBottomNav(active);
   configureStudentRecordBackLink();
   scheduleNonCriticalEnhancements();
 }
