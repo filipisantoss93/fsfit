@@ -1,5 +1,4 @@
 (() => {
-  const stylesheetId = 'fsfit-student-record-actions-styles';
   const contentStylesheetId = 'fsfit-student-record-content-styles';
   const mobileHotfixStylesheetId = 'fsfit-student-record-mobile-hotfix';
 
@@ -12,8 +11,8 @@
     document.head.append(link);
   }
 
-  function ensureStylesheets() {
-    appendStylesheet(stylesheetId, 'css/ficha-aluno-acoes.css?v=20260726-ux2');
+  function ensureSupplementalStylesheets() {
+    // ficha-aluno-acoes.css já é carregado estaticamente em ficha-aluno.html.
     appendStylesheet(contentStylesheetId, 'css/ficha-aluno-conteudo.css?v=20260726-ux3');
     appendStylesheet(mobileHotfixStylesheetId, 'css/ficha-aluno-mobile-hotfix.css?v=20260726-scroll1');
   }
@@ -197,7 +196,7 @@
   }
 
   function init() {
-    ensureStylesheets();
+    ensureSupplementalStylesheets();
     buildHeaderActions();
     enhanceInternalContent();
     enhanceModal();
