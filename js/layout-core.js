@@ -44,14 +44,6 @@ function withTimeout(promise, ms, label) {
   });
 }
 
-function ensureHeaderStyles() {
-  if (document.querySelector('link[data-fsfit-header-styles]')) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'css/header-menu.css?v=20260727-desktop-sidebar2';
-  link.dataset.fsfitHeaderStyles = 'true';
-  document.head.appendChild(link);
-}
 
 function icon(name) {
   const paths = {
@@ -72,7 +64,6 @@ function icon(name) {
 }
 
 export function renderHeader(active = '') {
-  ensureHeaderStyles();
   const host = document.querySelector('#header-container');
   if (!host) return;
 
@@ -265,10 +256,10 @@ export async function getAccessStatus() {
 
 function renderInactiveAccount() {
   document.body.innerHTML = `
-    <main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px">
-      <section class="card" style="width:min(520px,100%);text-align:center;padding:32px">
+    <main class="container inactive-account-screen">
+      <section class="card inactive-account-card">
         <h1>Conta desativada</h1>
-        <p style="margin:12px 0 22px;color:var(--muted)">Seu acesso ao FS Fit foi suspenso pela administração. Entre em contato com o suporte caso precise de ajuda.</p>
+        <p class="inactive-account-message">Seu acesso ao FS Fit foi suspenso pela administração. Entre em contato com o suporte caso precise de ajuda.</p>
         <button id="inactive-account-logout" class="btn btn-primary" type="button">Voltar para o login</button>
       </section>
     </main>`;
@@ -504,37 +495,14 @@ export function showMessage(element, text, type = 'success') {
   element.className = `message show ${type}`;
   element.setAttribute('role', isError ? 'alert' : 'status');
   element.setAttribute('aria-live', isError ? 'assertive' : 'polite');
-  Object.assign(element.style, {
-    position: 'fixed',
-    top: 'calc(92px + env(safe-area-inset-top, 0px))',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    zIndex: '10000',
-    width: 'min(520px, calc(100vw - 32px))',
-    maxWidth: 'calc(100vw - 32px)',
-    margin: '0',
-    padding: '14px 18px',
-    borderRadius: '14px',
-    transform: 'translate(-50%, 0)',
-    boxShadow: '0 18px 50px rgba(0,0,0,.45)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    cursor: 'pointer',
-    opacity: '1',
-    transition: 'opacity .22s ease, transform .22s ease',
-    background: isError ? 'rgba(68,30,34,.96)' : 'rgba(24,66,35,.96)',
-    border: isError ? '1px solid rgba(255,90,95,.62)' : '1px solid rgba(50,215,75,.58)',
-    color: isError ? '#ffd1d3' : '#d7ffdd'
-  });
+  element.classList.remove('is-hiding');
   const hide = () => {
     const activeTimer = messageTimers.get(element);
     if (activeTimer) clearTimeout(activeTimer);
     messageTimers.delete(element);
-    element.style.opacity = '0';
-    element.style.transform = 'translate(-50%, -10px)';
+    element.classList.add('is-hiding');
     setTimeout(() => {
-      element.classList.remove('show');
+      element.classList.remove('show', 'is-hiding');
       element.textContent = '';
     }, 230);
   };
