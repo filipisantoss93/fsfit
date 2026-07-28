@@ -1,0 +1,51 @@
+/* FS Fit · correção isolada da foto do personal na sidebar */
+@media (min-width: 861px) {
+  .sidebar-profile,
+  .sidebar-profile:hover,
+  .sidebar-profile.active {
+    background-image: none !important;
+    background-size: auto !important;
+    background-position: initial !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .sidebar-profile::before,
+  .sidebar-profile::after {
+    background-image: none !important;
+  }
+
+  .sidebar-profile-avatar {
+    position: relative;
+    isolation: isolate;
+    flex: 0 0 42px;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border);
+    border-radius: 50% !important;
+    background-color: #2b3038;
+    background-position: center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .sidebar-profile-avatar img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: inherit;
+  }
+
+  .sidebar-profile-copy,
+  .sidebar-profile > .nav-icon {
+    position: relative;
+    z-index: 1;
+  }
+}
