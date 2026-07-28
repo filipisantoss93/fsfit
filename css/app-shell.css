@@ -181,3 +181,34 @@ body.fsfit-modal-open {
     line-height: 1.4 !important;
   }
 }
+
+/* Estado de conta inativa e transição dos avisos globais. */
+.inactive-account-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.inactive-account-card {
+  width: min(520px, 100%);
+  padding: 32px;
+  text-align: center;
+}
+
+.inactive-account-message {
+  margin: 12px 0 22px;
+  color: var(--muted);
+}
+
+.message.show:not(#public-link-box):not(#access-notice) {
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity .22s ease, transform .22s ease;
+}
+
+.message.show.is-hiding:not(#public-link-box):not(#access-notice) {
+  opacity: 0 !important;
+  transform: translate(-50%, -10px) !important;
+}
+
