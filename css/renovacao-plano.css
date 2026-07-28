@@ -1,0 +1,25 @@
+/* FS Fit · Renovação, assinatura, PIX e cartão */
+.plan-renewal-card{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 20px;padding:18px 20px;border:1px solid rgba(255,193,7,.32);border-radius:16px;background:rgba(255,193,7,.08)}
+.plan-renewal-card.urgent{border-color:rgba(255,87,87,.42);background:rgba(255,87,87,.09)}
+.plan-renewal-card.expired{border-color:rgba(255,87,87,.5);background:rgba(255,87,87,.11)}
+.plan-renewal-card.trial{border-color:rgba(50,215,75,.35);background:rgba(50,215,75,.08)}
+.plan-renewal-card.subscription-active{border-color:rgba(50,215,75,.35);background:rgba(50,215,75,.08)}
+.plan-renewal-card.subscription-canceled{border-color:rgba(120,130,145,.35);background:rgba(120,130,145,.08)}
+.plan-renewal-copy{min-width:0}.plan-renewal-copy small{display:block;margin-bottom:4px;font-size:.72rem;font-weight:900;letter-spacing:.08em;color:var(--muted)}
+.plan-renewal-copy strong{display:block;font-size:1rem}.plan-renewal-copy span{display:block;margin-top:4px;color:var(--muted);font-size:.86rem}
+.plan-renewal-actions{display:flex;gap:10px;flex:0 0 auto;flex-wrap:wrap}
+.plan-modal-backdrop{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}
+.plan-modal{width:min(620px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:22px;border:1px solid var(--border);border-radius:18px;background:var(--surface,#171a20);box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.plan-modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}.plan-modal-header h2{margin:0}.plan-modal-header p{margin:5px 0 0;color:var(--muted);font-size:.88rem}
+.plan-modal-close{border:0;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
+.payment-section{display:grid;gap:10px;margin-top:18px}.payment-section:first-child{margin-top:0}.payment-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.payment-section-title h3{margin:0;font-size:1rem}.payment-section-title small{color:var(--muted)}
+.plan-options{display:grid;gap:10px}.plan-option{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface-light);cursor:pointer;text-align:left;color:inherit}
+.plan-option:hover{border-color:var(--primary)}.plan-option strong,.plan-option span{display:block}.plan-option span{margin-top:3px;color:var(--muted);font-size:.8rem}.plan-option-price{font-weight:900;white-space:nowrap}
+.plan-option-featured{border-color:rgba(50,215,75,.35);background:rgba(50,215,75,.07)}
+.pix-box{text-align:center}.pix-box img{display:block;width:min(280px,100%);margin:14px auto;border-radius:14px;background:#fff}.pix-code{width:100%;min-height:92px;resize:none}.pix-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}.pix-status{margin-top:14px;color:var(--muted);font-size:.88rem}
+.card-checkout{display:grid;gap:18px}.card-checkout-intro{padding:13px 14px;border:1px solid rgba(50,215,75,.28);border-radius:12px;background:rgba(50,215,75,.06)}.card-checkout-intro strong{display:block}.card-checkout-intro span{display:block;margin-top:4px;color:var(--muted);font-size:.82rem}
+.card-form-section{display:grid;gap:12px}.card-form-section h3{margin:0;font-size:.95rem}.card-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card-field{display:grid;gap:6px}.card-field.full{grid-column:1/-1}.card-field label{font-size:.78rem;font-weight:800;color:var(--muted)}.card-field input{width:100%;min-width:0;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-light);color:inherit;font:inherit;outline:none}.card-field input:focus{border-color:var(--primary)}
+.card-secure-note{margin:0;color:var(--muted);font-size:.78rem;line-height:1.45}.card-submit-row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}.card-error{padding:11px 12px;border-radius:10px;background:rgba(255,87,87,.1);color:#ff8b8b;font-size:.84rem}.card-success{padding:14px;border:1px solid rgba(50,215,75,.3);border-radius:12px;background:rgba(50,215,75,.08);text-align:center}.card-success strong{display:block}.card-success span{display:block;margin-top:5px;color:var(--muted);font-size:.84rem}
+.cancel-summary{display:grid;gap:12px}.cancel-summary-box{padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light)}.cancel-summary-box strong{display:block}.cancel-summary-box span{display:block;margin-top:5px;color:var(--muted);font-size:.84rem}.cancel-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+@media(max-width:620px){.plan-renewal-card{align-items:flex-start;flex-direction:column}.plan-renewal-actions{width:100%}.plan-renewal-actions .btn{width:100%}.plan-modal{padding:18px}.card-form-grid{grid-template-columns:1fr}.card-field.full{grid-column:auto}.card-submit-row,.cancel-actions{flex-direction:column-reverse}.card-submit-row .btn,.cancel-actions .btn{width:100%}}
+.plan-retry-action{margin-top:12px}
