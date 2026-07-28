@@ -17,30 +17,6 @@ const escapeHtml = value => String(value ?? '')
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&#039;');
 
-function injectStyles() {
-  if (document.querySelector('#subscription-management-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'subscription-management-styles';
-  style.textContent = `
-    .subscription-management-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .subscription-management-action{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--surface-light)}
-    .subscription-management-action strong{display:block;margin-bottom:5px}.subscription-management-action span{display:block;color:var(--muted);font-size:.82rem;line-height:1.45}
-    .subscription-management-action .btn{flex:0 0 auto;white-space:nowrap}
-    .subscription-management-note{padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light);color:var(--muted);font-size:.84rem;line-height:1.5}
-    .subscription-modal-backdrop{position:fixed;inset:0;z-index:11000;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.74);backdrop-filter:blur(5px)}
-    .subscription-modal{width:min(660px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:22px;border:1px solid var(--border);border-radius:18px;background:var(--surface,#171a20);box-shadow:0 24px 70px rgba(0,0,0,.5)}
-    .subscription-modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}.subscription-modal-header h2{margin:0}.subscription-modal-header p{margin:5px 0 0;color:var(--muted);font-size:.86rem;line-height:1.5}
-    .subscription-modal-close{border:0;background:transparent;color:inherit;font-size:1.5rem;cursor:pointer}
-    .subscription-option-list{display:grid;gap:10px}.subscription-option{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface-light);color:inherit;text-align:left;cursor:pointer}.subscription-option:hover{border-color:var(--primary)}
-    .subscription-option strong,.subscription-option span{display:block}.subscription-option span{margin-top:3px;color:var(--muted);font-size:.8rem}.subscription-option-price{font-weight:900;white-space:nowrap}
-    .subscription-method-title{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:18px 0 10px}.subscription-method-title:first-child{margin-top:0}.subscription-method-title h3{margin:0;font-size:1rem}.subscription-method-title small{color:var(--muted)}
-    .subscription-card-form{display:grid;gap:18px}.subscription-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.subscription-card-field{display:grid;gap:6px}.subscription-card-field.full{grid-column:1/-1}.subscription-card-field label{font-size:.78rem;font-weight:800;color:var(--muted)}.subscription-card-field input{width:100%;min-width:0;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-light);color:inherit;font:inherit;outline:none}.subscription-card-field input:focus{border-color:var(--primary)}
-    .subscription-modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}.subscription-error{padding:11px 12px;border-radius:10px;background:rgba(255,87,87,.1);color:#ff9b9f;font-size:.84rem}.subscription-success{padding:16px;border:1px solid rgba(50,215,75,.3);border-radius:12px;background:rgba(50,215,75,.08);text-align:center}.subscription-success strong{display:block}.subscription-success span{display:block;margin-top:5px;color:var(--muted);font-size:.84rem;line-height:1.5}
-    .subscription-pix{text-align:center}.subscription-pix img{display:block;width:min(280px,100%);margin:14px auto;border-radius:14px;background:#fff}.subscription-pix textarea{width:100%;min-height:96px;resize:none}.subscription-pix-status{margin-top:14px;color:var(--muted);font-size:.86rem}
-    @media(max-width:720px){.subscription-management-grid{grid-template-columns:1fr}.subscription-management-action{flex-direction:column}.subscription-management-action .btn{width:100%}.subscription-card-grid{grid-template-columns:1fr}.subscription-card-field.full{grid-column:auto}.subscription-modal-actions{flex-direction:column-reverse}.subscription-modal-actions .btn{width:100%}}
-  `;
-  document.head.appendChild(style);
-}
 
 function closeModal() {
   if (pollTimer) clearInterval(pollTimer);
@@ -94,8 +70,8 @@ async function cancelCardSubscription(access, { removeCard = false, content = nu
       <strong>${removeCard ? 'O cartão deixará de aparecer na sua assinatura.' : 'Seu acesso não será encerrado imediatamente.'}</strong><br>
       Acesso atual válido até ${formatDate(access?.acesso_valido_ate)}.
     </div>
-    <div id="subscription-cancel-error" class="subscription-error" hidden style="margin-top:12px"></div>
-    <div class="subscription-modal-actions" style="margin-top:16px">
+    <div id="subscription-cancel-error" class="subscription-error subscription-error-spaced" hidden></div>
+    <div class="subscription-modal-actions subscription-modal-actions-spaced">
       <button class="btn btn-neutral" type="button" data-close-subscription-modal>Voltar</button>
       <button id="subscription-confirm-cancel" class="btn btn-danger" type="button">${removeCard ? 'Remover cartão e cancelar recorrência' : 'Confirmar cancelamento'}</button>
     </div>`;
@@ -279,7 +255,7 @@ async function createPix(plan, content, { cancelRecurringAfterPaid = false } = {
         <p>${cancelRecurringAfterPaid ? 'Após a confirmação do PIX, a renovação automática do cartão será cancelada.' : 'Após o pagamento, seu acesso será atualizado automaticamente.'}</p>
         ${charge.qr_code_url ? `<img src="${escapeHtml(charge.qr_code_url)}" alt="QR Code PIX">` : ''}
         <textarea id="subscription-pix-code" readonly>${escapeHtml(charge.pix_copia_cola || '')}</textarea>
-        <div class="subscription-modal-actions" style="justify-content:center;margin-top:12px"><button id="subscription-copy-pix" class="btn btn-primary" type="button">Copiar código PIX</button><button id="subscription-check-pix" class="btn btn-outline" type="button">Já paguei, verificar</button></div>
+        <div class="subscription-modal-actions subscription-modal-actions-centered"><button id="subscription-copy-pix" class="btn btn-primary" type="button">Copiar código PIX</button><button id="subscription-check-pix" class="btn btn-outline" type="button">Já paguei, verificar</button></div>
         <div id="subscription-pix-status" class="subscription-pix-status">Aguardando confirmação do pagamento...</div>
       </div>`;
     content.querySelector('#subscription-copy-pix')?.addEventListener('click', async event => {
@@ -365,7 +341,7 @@ function renderManagement(access) {
   const host = document.querySelector('#subscription-management-actions');
   if (!host) return;
   if (access?.admin) {
-    host.innerHTML = '<div class="subscription-management-note" style="grid-column:1/-1"><strong>Conta administrativa</strong><br>Seu acesso administrativo não depende de uma assinatura paga. A central permanece disponível para consulta do histórico.</div>';
+    host.innerHTML = '<div class="subscription-management-note subscription-management-note-full"><strong>Conta administrativa</strong><br>Seu acesso administrativo não depende de uma assinatura paga. A central permanece disponível para consulta do histórico.</div>';
     return;
   }
 
@@ -402,7 +378,6 @@ function renderManagement(access) {
 }
 
 async function init() {
-  injectStyles();
   const host = document.querySelector('#subscription-management-actions');
   if (!host) return;
   try {
@@ -413,7 +388,7 @@ async function init() {
     currentAccess = data;
     renderManagement(data);
   } catch (error) {
-    host.innerHTML = `<div class="subscription-management-note" style="grid-column:1/-1">Não foi possível carregar as opções de gerenciamento agora: ${escapeHtml(error?.message || 'erro desconhecido')}.</div>`;
+    host.innerHTML = `<div class="subscription-management-note subscription-management-note-full">Não foi possível carregar as opções de gerenciamento agora: ${escapeHtml(error?.message || 'erro desconhecido')}.</div>`;
   }
 }
 
