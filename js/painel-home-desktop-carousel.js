@@ -7,8 +7,6 @@ let previousButton = null;
 let nextButton = null;
 
 if (homePanel && liveList) {
-  injectStyles();
-
   const ensureNavigation = () => {
     const card = document.querySelector('#home-now-card');
     if (!card) return;
@@ -134,61 +132,6 @@ function syncDesktopHint() {
   const position = current.split('·')[0]?.trim();
   const replacement = `${position}${position ? ' · ' : ''}use as setas para trocar de aluno`;
   if (hint.textContent !== replacement) hint.textContent = replacement;
-}
-
-function injectStyles() {
-  if (document.querySelector('#painel-home-desktop-carousel-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'painel-home-desktop-carousel-styles';
-  style.textContent = `
-    .home-now-desktop-nav{
-      position:absolute;
-      z-index:12;
-      top:50%;
-      display:none;
-      place-items:center;
-      width:46px;
-      height:46px;
-      padding:0;
-      border:1px solid rgba(177,255,0,.65);
-      border-radius:50%;
-      background:rgba(7,15,20,.92);
-      color:var(--primary);
-      font:inherit;
-      font-size:2rem;
-      font-weight:700;
-      line-height:1;
-      cursor:pointer;
-      box-shadow:0 10px 28px rgba(0,0,0,.42);
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      transform:translateY(-50%);
-      transition:background .18s ease,border-color .18s ease,transform .18s ease;
-    }
-    .home-now-desktop-nav span{display:block;transform:translateY(-2px)}
-    .home-now-desktop-nav-previous{left:18px}
-    .home-now-desktop-nav-next{right:18px}
-    .home-now-desktop-nav:hover,
-    .home-now-desktop-nav:focus-visible{
-      border-color:var(--primary);
-      background:rgba(177,255,0,.17);
-      outline:none;
-      transform:translateY(-50%) scale(1.06);
-    }
-    .home-now-desktop-nav:active{transform:translateY(-50%) scale(.95)}
-    .home-now-desktop-nav[hidden]{display:none!important}
-
-    @media(min-width:721px){
-      .home-now-card.has-desktop-student-navigation .home-now-desktop-nav{display:grid!important}
-      .home-now-card.has-desktop-student-navigation .home-now-content{padding-left:64px}
-      .home-now-card.has-desktop-student-navigation .home-now-action{
-        width:auto!important;
-        margin:0 64px 0 0!important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 function waitForElement(selector, timeout = 8000) {
