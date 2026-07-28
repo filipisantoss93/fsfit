@@ -3,10 +3,11 @@
  *
  * Os tokens visuais são declarados exclusivamente em fsfit-design-system.css.
  * A ordem abaixo garante tokens disponíveis desde a primeira renderização e
- * preserva uma cascata estática: base → painel → identidade → shell.
+ * preserva uma cascata estática: base → painel → identidade → shell → utilitários.
  */
 @import url('./fsfit-design-system.css?v=20260728-tokens2');
 @import url('./style-base.css?v=20260728-tokens2');
 @import url('./style-dashboard.css?v=20260728-tokens2');
 @import url('./style-brand.css?v=20260728-components1');
 @import url('./app-shell.css?v=20260728-notifications1');
+@import url('./image-cropper.css?v=20260728-static1');
