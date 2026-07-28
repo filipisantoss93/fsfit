@@ -91,11 +91,9 @@
   #dashboard-overview-panel > .attention-card, #dashboard-overview-panel > .dashboard-overview-summary { display: none !important; }
   #dashboard-overview-panel > .admin-cron-monitor { grid-column: 1 / -1; margin: 0 !important; }
   #dashboard-overview-panel > .dashboard-public-link-compact, #dashboard-overview-panel > .dashboard-activity-card { min-width: 0; margin: 0 !important; }
-  #dashboard-agenda-panel .today-card, #dashboard-live-panel { height: 100%; }
-  #dashboard-agenda-panel .today-list, #dashboard-live-panel .live-students-list { max-height: 330px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
-  #dashboard-agenda-panel .today-card-header, #dashboard-live-panel .live-students-heading { position: sticky; top: 0; z-index: 2; background: var(--surface); }
-  #dashboard-agenda-panel .today-list::-webkit-scrollbar, #dashboard-live-panel .live-students-list::-webkit-scrollbar { width: 8px; }
-  #dashboard-agenda-panel .today-list::-webkit-scrollbar-thumb, #dashboard-live-panel .live-students-list::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: rgba(181,189,200,.28); background-clip: padding-box; }
+  #dashboard-agenda-panel .today-card, #dashboard-live-panel { height: auto; min-height: 310px; }
+  #dashboard-agenda-panel .today-list, #dashboard-live-panel .live-students-list { max-height: none; overflow: visible; }
+  #dashboard-agenda-panel .today-card-header, #dashboard-live-panel .live-students-heading { position: static; background: var(--surface); }
   #dashboard-agenda-panel .dashboard-empty, #dashboard-live-panel .empty { min-height: 92px; display: grid; place-items: center; }
 }
 
@@ -142,4 +140,69 @@
   .live-session-modal-actions [data-modal-finish-session] {
     grid-column: 2 / 4 !important;
   }
+}
+
+/* Auditoria visual e UX da tela inicial. */
+@media (max-width: 1099px) {
+  .dashboard-tabs {
+    position: sticky;
+    top: calc(env(safe-area-inset-top) + 72px);
+    z-index: 20;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 10px 22px rgba(0,0,0,.28);
+  }
+
+  .dashboard-tab[data-dashboard-tab="home"] { display: none !important; }
+  .dashboard-tab { flex: 1 1 0 !important; }
+
+  #dashboard-home-panel {
+    padding-bottom: calc(104px + env(safe-area-inset-bottom));
+  }
+
+  .home-day-card {
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr);
+    column-gap: 12px;
+    align-items: center;
+    padding: 12px 14px !important;
+  }
+
+  .home-day-card .home-section-title {
+    margin: 0 !important;
+    white-space: nowrap;
+  }
+
+  .home-day-summary {
+    justify-content: flex-end;
+    gap: 6px 10px !important;
+  }
+
+  .home-day-progress {
+    grid-column: 1 / -1;
+    margin-top: 9px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .dashboard-tabs {
+    top: calc(env(safe-area-inset-top) + 66px);
+    border-radius: 12px !important;
+  }
+
+  .home-day-card {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .home-day-summary {
+    justify-content: flex-start;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .home-day-summary::-webkit-scrollbar { display: none; }
+  .home-day-summary span { white-space: nowrap; }
+  .home-upcoming-card { padding-bottom: 6px !important; }
 }
