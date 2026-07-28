@@ -2,63 +2,6 @@ let initialized = false;
 let chatObserver = null;
 let liveLabelObserver = null;
 
-function injectStyles() {
-  if (document.querySelector('style[data-student-main-tabs]')) return;
-
-  const style = document.createElement('style');
-  style.dataset.studentMainTabs = 'true';
-  style.textContent = `
-    .student-main-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
-      margin: 12px 0 12px;
-      padding: 5px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(255,255,255,.025);
-    }
-    .student-main-tab {
-      min-width: 0;
-      min-height: 44px;
-      padding: 8px 6px;
-      border: 0;
-      border-radius: 10px;
-      background: transparent;
-      color: var(--muted);
-      font: inherit;
-      font-weight: 850;
-      font-size: .86rem;
-      cursor: pointer;
-      transition: .2s ease;
-    }
-    .student-main-tab.active {
-      background: var(--primary);
-      color: #07120a;
-    }
-    .student-main-panel { display: none; }
-    .student-main-panel.active { display: block; }
-    [data-student-main-agenda-content].student-main-agenda-hidden { display: none !important; }
-    .student-main-panel > .live-class-card,
-    .student-main-panel > .live-chat-card { margin-top: 0; }
-    .student-main-empty {
-      margin: 0;
-      text-align: center;
-      color: var(--muted);
-    }
-    .student-main-empty h2 {
-      margin: 0 0 8px;
-      color: var(--text);
-    }
-    .student-main-empty p { margin: 0; }
-    @media (max-width: 520px) {
-      .student-main-tabs { gap: 5px; padding: 5px; margin: 10px 0 10px; }
-      .student-main-tab { min-height: 42px; font-size: .8rem; padding: 7px 4px; }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 function renderChatEmpty(chatPanel) {
   if (!chatPanel || chatPanel.querySelector('.live-chat-card') || chatPanel.querySelector('[data-student-chat-empty]')) return;
   chatPanel.innerHTML = `
@@ -114,8 +57,6 @@ export function ensureStudentPortalMainTabs() {
 
   const planTabs = root.querySelector('.student-plan-tabs');
   if (!planTabs) return null;
-
-  injectStyles();
 
   const planPanels = [...root.querySelectorAll(':scope > .student-tab-panel')];
   planTabs.dataset.studentMainAgendaContent = 'true';

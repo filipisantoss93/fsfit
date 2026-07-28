@@ -1,0 +1,77 @@
+/* FS Fit · Abas principais do portal do aluno */
+.student-main-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .025);
+}
+
+.student-main-tab {
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 850;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.student-main-tab.active {
+  background: var(--primary);
+  color: #07120a;
+}
+
+.student-main-panel {
+  display: none;
+}
+
+.student-main-panel.active {
+  display: block;
+}
+
+[data-student-main-agenda-content].student-main-agenda-hidden {
+  display: none !important;
+}
+
+.student-main-panel > .live-class-card,
+.student-main-panel > .live-chat-card {
+  margin-top: 0;
+}
+
+.student-main-empty {
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.student-main-empty h2 {
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.student-main-empty p {
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .student-main-tabs {
+    gap: 5px;
+    margin: 10px 0;
+    padding: 5px;
+  }
+
+  .student-main-tab {
+    min-height: 42px;
+    padding: 7px 4px;
+    font-size: .8rem;
+  }
+}
