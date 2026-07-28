@@ -3,7 +3,10 @@ import { requireSession } from './layout.js';
 
 if (window.matchMedia('(min-width: 1100px)').matches) {
   const session = await requireSession();
-  if (session) initializeGeneralOverview(session.user.id);
+  if (session) {
+    initializeGeneralOverview(session.user.id);
+    loadSidebarPersonalProfile(session.user.id);
+  }
 }
 
 function esc(value = '') {
@@ -43,6 +46,46 @@ function recentMonths() {
 function avatar(student) {
   const photo = String(student.foto_perfil_url || '').trim();
   return `<span class="dashboard-general-avatar" aria-hidden="true">${photo ? `<img src="${esc(photo)}" alt="" loading="lazy">` : esc(initials(student.nome))}</span>`;
+}
+
+async function loadSidebarPersonalProfile(userId) {
+  const avatarHost = document.querySelector('#sidebar-profile-avatar');
+  const nameHost = document.querySelector('#sidebar-profile-name');
+  if (!avatarHost && !nameHost) return;
+
+  try {
+    const [{ data: profile }, { data: publicProfile }] = await Promise.all([
+      supabase.from('perfis').select('nome').eq('id', userId).maybeSingle(),
+      supabase.from('perfis_publicos').select('nome_publico,foto_url').eq('personal_id', userId).maybeSingle()
+    ]);
+
+    const name = String(publicProfile?.nome_publico || profile?.nome || 'Personal').trim() || 'Personal';
+    const photo = String(publicProfile?.foto_url || '').trim();
+    if (nameHost) nameHost.textContent = name;
+    if (!avatarHost) return;
+
+    avatarHost.style.backgroundImage = '';
+    avatarHost.classList.remove('has-image');
+    avatarHost.replaceChildren();
+
+    if (photo) {
+      const image = document.createElement('img');
+      image.src = photo;
+      image.alt = '';
+      image.loading = 'lazy';
+      image.addEventListener('error', () => {
+        avatarHost.replaceChildren();
+        avatarHost.textContent = initials(name);
+        avatarHost.classList.remove('has-image');
+      }, { once: true });
+      avatarHost.appendChild(image);
+      avatarHost.classList.add('has-image');
+    } else {
+      avatarHost.textContent = initials(name);
+    }
+  } catch (error) {
+    console.info('Foto do personal indisponível no menu:', error?.message || error);
+  }
 }
 
 function waitForHomePanel() {
