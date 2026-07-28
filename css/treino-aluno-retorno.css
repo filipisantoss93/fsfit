@@ -1,0 +1,89 @@
+/* FS Fit · Barra de ações e contexto do editor estruturado */
+.workout-active-summary-compact .workout-active-compact-heading #active-workout-details {
+  display: none !important;
+}
+
+.workout-active-summary-compact .workout-compact-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 12px !important;
+}
+
+.workout-active-summary-compact .workout-compact-actions.has-apply {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.workout-active-summary-compact .workout-compact-actions .btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 42px !important;
+  padding: 9px 8px !important;
+  margin: 0 !important;
+  white-space: nowrap;
+  font-size: .82rem;
+}
+
+.workout-plan-row.selected:not(.active) {
+  border-color: rgba(59, 130, 246, .62) !important;
+  box-shadow: inset 5px 0 0 var(--secondary);
+  background: linear-gradient(90deg, rgba(59, 130, 246, .09), rgba(59, 130, 246, .025));
+}
+
+.workout-plan-row-title em.draft {
+  border: 1px solid rgba(59, 130, 246, .25);
+  background: rgba(59, 130, 246, .1);
+  color: #aecdff;
+}
+
+.workout-plan-row.selected .workout-row-arrow {
+  color: var(--secondary);
+}
+
+.workout-editor-context {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 800;
+}
+
+.workout-editor-context-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 7px;
+  border: 1px solid rgba(59, 130, 246, .24);
+  border-radius: 999px;
+  color: #aecdff;
+  background: rgba(59, 130, 246, .08);
+  font-size: .6rem;
+  font-weight: 900;
+  letter-spacing: .05em;
+}
+
+.workout-editor-context-badge.active {
+  border-color: rgba(50, 215, 75, .28);
+  color: var(--primary);
+  background: rgba(50, 215, 75, .08);
+}
+
+@media (max-width: 640px) {
+  .workout-active-summary-compact .workout-compact-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin-top: 9px !important;
+  }
+
+  .workout-active-summary-compact .workout-compact-actions.has-apply {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .workout-active-summary-compact .workout-compact-actions .btn {
+    min-height: 40px !important;
+    padding: 8px 5px !important;
+    font-size: .7rem !important;
+  }
+}
