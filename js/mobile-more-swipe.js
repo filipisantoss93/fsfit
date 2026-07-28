@@ -34,44 +34,6 @@ function pageFromHref(value = '') {
   }
 }
 
-function injectFreePlanNavigationStyles() {
-  if (document.querySelector('#fsfit-free-plan-navigation-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'fsfit-free-plan-navigation-styles';
-  style.textContent = `
-    a.fsfit-plan-locked {
-      opacity: .42 !important;
-      cursor: not-allowed !important;
-      filter: grayscale(.35);
-      pointer-events: none !important;
-      user-select: none;
-    }
-
-    a.fsfit-plan-locked::after {
-      content: '🔒';
-      display: inline-block;
-      margin-left: .38em;
-      font-size: .72em;
-      line-height: 1;
-      vertical-align: .08em;
-    }
-
-    .fsfit-bottom-nav a.fsfit-plan-locked::after {
-      position: absolute;
-      top: 5px;
-      right: calc(50% - 22px);
-      margin: 0;
-      font-size: 10px;
-    }
-
-    .fsfit-more-item.fsfit-plan-locked .fsfit-more-item-chevron {
-      display: none;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 function premiumNavigationHref(link) {
   if (!(link instanceof HTMLAnchorElement)) return '';
   return link.dataset.fsfitPremiumHref || link.getAttribute('href') || '';
@@ -132,7 +94,6 @@ async function initFreePlanNavigationGuard() {
 
     freePlanNavigationActive = true;
     document.documentElement.classList.add('fsfit-free-plan');
-    injectFreePlanNavigationStyles();
 
     if (redirectFreeUserFromBlockedPage()) return;
     applyFreePlanNavigationLocks();
@@ -141,43 +102,6 @@ async function initFreePlanNavigationGuard() {
   }
 }
 
-function injectBottomNavigationPositionFix() {
-  if (document.querySelector('#fsfit-bottom-navigation-position-fix')) return;
-
-  const style = document.createElement('style');
-  style.id = 'fsfit-bottom-navigation-position-fix';
-  style.textContent = `
-    @media (max-width: 860px) {
-      html {
-        scroll-padding-bottom: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px) + 12px) !important;
-      }
-
-      html body {
-        padding-bottom: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px) + 12px) !important;
-      }
-
-      html body .fsfit-bottom-nav {
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        min-height: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
-        padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px)) !important;
-        border-left: 0 !important;
-        border-right: 0 !important;
-        border-bottom: 0 !important;
-        border-radius: 18px 18px 0 0 !important;
-      }
-
-      html body .fsfit-bottom-nav::before {
-        display: none !important;
-        content: none !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-injectBottomNavigationPositionFix();
 
 function revealAdminEntry(entry) {
   if (!(entry instanceof HTMLElement)) return;
