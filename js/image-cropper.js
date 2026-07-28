@@ -74,8 +74,6 @@ async function cropImage(file, config, index = 0, total = 1) {
     let dragging = false;
     let lastX = 0;
     let lastY = 0;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
     document.body.appendChild(modal);
 
     function bounds() {
@@ -106,7 +104,6 @@ async function cropImage(file, config, index = 0, total = 1) {
 
     function finish(value, error) {
       URL.revokeObjectURL(url);
-      document.body.style.overflow = previousOverflow;
       modal.remove();
       error ? reject(error) : resolve(value);
     }
