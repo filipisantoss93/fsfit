@@ -10,7 +10,6 @@ let selectedExerciseName = '';
 let normalizationQueued = false;
 
 if (sessionModal && modalActions) {
-  injectStyles();
   bindEvents();
   queueNormalizeControls();
 
@@ -400,29 +399,3 @@ function handleActionError(error, pickerError = false) {
   else alert(message);
 }
 
-function injectStyles() {
-  if (document.querySelector('#live-session-delete-controls-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'live-session-delete-controls-styles';
-  style.textContent = `
-    .live-session-end-actions{display:grid;grid-template-columns:minmax(118px,.78fr) minmax(0,1.22fr);gap:8px;align-items:stretch}
-    .live-session-end-actions>.btn{width:100%!important;min-width:0;margin:0!important}
-    .live-session-clear-action{border-color:rgba(255,95,103,.58)!important;background:rgba(255,95,103,.045)!important;color:#ff9aa0!important}
-    .live-session-clear-action:hover,.live-session-clear-action:focus-visible{border-color:#ff5f67!important;background:rgba(255,95,103,.1)!important;outline:none}
-    .live-session-clear-action .btn-action-icon{color:#ff9aa0!important}
-    .live-exercise-edit-dialog{position:relative}
-    .live-exercise-edit-dialog>h3{padding-right:46px}
-    .live-exercise-delete-button{position:absolute;top:12px;right:12px;display:grid;place-items:center;width:38px;height:38px;padding:0;border:1px solid rgba(255,95,103,.58);border-radius:50%;background:rgba(255,95,103,.08);color:#ff9aa0;font:inherit;font-size:1.55rem;font-weight:700;line-height:1;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
-    .live-exercise-delete-button:hover,.live-exercise-delete-button:focus-visible{border-color:#ff5f67;background:rgba(255,95,103,.16);outline:none}
-    .live-exercise-delete-button:active{transform:scale(.96)}
-    .live-exercise-delete-button:disabled{opacity:.62;cursor:wait}
-    .live-delete-toast{position:absolute;top:max(16px,env(safe-area-inset-top));left:50%;z-index:32;max-width:calc(100% - 32px);padding:10px 14px;border:1px solid rgba(177,255,0,.38);border-radius:999px;background:#182318;color:var(--primary);font-size:.72rem;font-weight:850;opacity:0;transform:translate(-50%,-8px);transition:.18s ease;box-shadow:0 12px 35px rgba(0,0,0,.38);pointer-events:none;text-align:center}
-    .live-delete-toast.show{opacity:1;transform:translate(-50%,0)}
-    @media(max-width:520px){
-      .live-session-end-actions{grid-template-columns:minmax(108px,.76fr) minmax(0,1.24fr);gap:6px}
-      .live-session-end-actions .btn-action-description{font-size:.62rem}
-      .live-exercise-delete-button{top:10px;right:10px;width:36px;height:36px}
-    }
-  `;
-  document.head.appendChild(style);
-}
