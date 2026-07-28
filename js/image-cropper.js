@@ -4,21 +4,6 @@ const CROPPABLE_INPUTS = {
   'gallery-files': { aspect: 1, width: 1080, height: 1080, title: 'Ajustar foto da galeria', shape: 'rect' }
 };
 
-function installStyles() {
-  if (document.querySelector('#fsfit-image-cropper-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'fsfit-image-cropper-styles';
-  style.textContent = `
-    .fsfit-cropper{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));background:rgba(0,0,0,.82);backdrop-filter:blur(6px);overscroll-behavior:contain}
-    .fsfit-cropper-card{width:min(100%,560px);max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:var(--surface,#171a21);border:1px solid var(--border,#303640);border-radius:20px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}
-    .fsfit-cropper-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}.fsfit-cropper-head h2{margin:0;font-size:1.15rem}.fsfit-cropper-close{width:38px;height:38px;border:1px solid var(--border,#303640);border-radius:11px;background:transparent;color:inherit;font-size:1.35rem;cursor:pointer}
-    .fsfit-cropper-stage{position:relative;width:100%;aspect-ratio:var(--crop-aspect);overflow:hidden;border-radius:16px;background:#08090c;touch-action:none;cursor:grab;user-select:none}.fsfit-cropper-stage:active{cursor:grabbing}.fsfit-cropper-stage img{position:absolute;left:50%;top:50%;max-width:none;max-height:none;pointer-events:none;transform-origin:center center;will-change:transform}.fsfit-cropper-stage.circle{border-radius:50%}
-    .fsfit-cropper-grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.1%,rgba(255,255,255,.28) 33.3%,rgba(255,255,255,.28) 33.6%,transparent 33.8%,transparent 66.1%,rgba(255,255,255,.28) 66.3%,rgba(255,255,255,.28) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.1%,rgba(255,255,255,.28) 33.3%,rgba(255,255,255,.28) 33.6%,transparent 33.8%,transparent 66.1%,rgba(255,255,255,.28) 66.3%,rgba(255,255,255,.28) 66.6%,transparent 66.8%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.72)}
-    .fsfit-cropper-help{margin:12px 0 14px;color:var(--muted,#9ca3af);font-size:.85rem;text-align:center}.fsfit-cropper-zoom{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}.fsfit-cropper-zoom input{width:100%;accent-color:#22c55e}.fsfit-cropper-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.fsfit-cropper-actions .btn{min-width:110px}@media(max-width:520px){.fsfit-cropper-card{padding:16px}.fsfit-cropper-actions{display:grid;grid-template-columns:1fr 1fr}.fsfit-cropper-actions .btn{width:100%;min-width:0}}
-  `;
-  document.head.appendChild(style);
-}
-
 function loadImage(file) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -40,7 +25,6 @@ function canvasToFile(canvas, originalName) {
 }
 
 async function cropImage(file, config, index = 0, total = 1) {
-  installStyles();
   const { img, url } = await loadImage(file);
 
   return new Promise((resolve, reject) => {
