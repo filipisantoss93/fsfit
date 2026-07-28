@@ -1,3 +1,6 @@
+import('./sidebar-profile-photo.js?v=20260727-sidebar-photo2')
+  .catch(error => console.warn('Não foi possível carregar a foto do perfil na sidebar:', error));
+
 const cepRequests = new WeakMap();
 
 if ((window.location.pathname.split('/').pop() || '') === 'financeiro.html') {
