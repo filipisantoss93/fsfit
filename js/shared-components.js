@@ -26,6 +26,13 @@ function ensureSharedStyles() {
     refreshStyles.dataset.fsfitPullRefresh = 'true';
     document.head.appendChild(refreshStyles);
   }
+  if (!document.querySelector('link[data-fsfit-sidebar-avatar-fix]')) {
+    const avatarFix = document.createElement('link');
+    avatarFix.rel = 'stylesheet';
+    avatarFix.href = 'css/sidebar-profile-avatar-fix.css?v=20260727-avatar-fix1';
+    avatarFix.dataset.fsfitSidebarAvatarFix = 'true';
+    document.head.appendChild(avatarFix);
+  }
 }
 
 function ensureAppContainerStyles() {
