@@ -9,31 +9,9 @@ let loadRequest = 0;
 let lastDetails = null;
 
 if (sessionModal) {
-  injectStyles();
   ensureExtraFields();
   bindExerciseRows();
   bindSaveOverride();
-}
-
-function injectStyles() {
-  if (document.querySelector('#live-exercise-personal-controls-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'live-exercise-personal-controls-styles';
-  style.textContent = `
-    .live-exercise-rest-field{grid-column:1/-1}
-    .live-exercise-completion{display:flex;align-items:center;gap:11px;margin-top:12px;padding:12px 13px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.025);cursor:pointer}
-    .live-exercise-completion input{width:22px;height:22px;margin:0;accent-color:var(--warning,#ffcc33);flex:0 0 auto}
-    .live-exercise-completion-copy{min-width:0}
-    .live-exercise-completion-copy strong{display:block;font-size:.82rem}
-    .live-exercise-completion-copy small{display:block;margin-top:3px;color:var(--muted);font-size:.68rem;line-height:1.35}
-    .live-session-exercise-row.is-completed{border-color:rgba(50,215,75,.34);background:rgba(50,215,75,.055)}
-    .live-session-exercise-row.is-completed .live-session-exercise-order{background:rgba(50,215,75,.13);color:var(--primary)}
-    .live-session-exercise-copy .live-session-exercise-title-line{display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap;margin-top:0;color:inherit;font-size:inherit;line-height:normal}
-    .live-session-exercise-title-line strong{min-width:0}
-    .live-session-exercise-copy .live-exercise-completed-badge{display:inline-flex;align-items:center;min-height:19px;margin-top:0;padding:0 6px;border:1px solid rgba(50,215,75,.35);border-radius:999px;background:rgba(50,215,75,.08);color:var(--primary);font-size:.52rem!important;font-weight:900;letter-spacing:.045em;line-height:1}
-    @media(max-width:520px){.live-exercise-completion{padding:11px 12px}.live-exercise-rest-field{grid-column:1/-1}}
-  `;
-  document.head.appendChild(style);
 }
 
 function ensureExtraFields() {
