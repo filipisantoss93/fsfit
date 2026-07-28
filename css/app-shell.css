@@ -1,0 +1,34 @@
+@import url('./shared-components.css?v=20260728-static-shell1');
+@import url('./pull-to-refresh.css?v=20260728-static-shell1');
+@import url('./sidebar-profile-avatar-fix.css?v=20260728-static-shell1');
+@import url('./mobile-navigation.css?v=20260728-static-shell1');
+
+/* Regras anteriormente injetadas por JavaScript. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+#header-container .user-greeting {
+  display: none !important;
+}
+
+@media (min-width: 1100px) {
+  body.fsfit-saas main.container {
+    width: min(calc(100% - 48px), var(--fs-content-max)) !important;
+    max-width: var(--fs-content-max) !important;
+    margin-inline: auto !important;
+  }
+}
+
+@media (max-width: 860px) {
+  #header-container .nav-menu {
+    transform: translateY(-8px) scale(.98) !important;
+    transform-origin: top right !important;
+  }
+
+  #header-container .nav-menu.active {
+    transform: translateY(0) scale(1) !important;
+  }
+}
