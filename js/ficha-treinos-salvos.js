@@ -3,7 +3,6 @@ const planningActions = document.querySelector('.planning-actions');
 if (planningActions && !globalThis.__FSFIT_STUDENT_PLAN_UX__) {
   globalThis.__FSFIT_STUDENT_PLAN_UX__ = true;
 
-  const styleId = 'fsfit-student-plan-ux-styles';
   const planCard = planningActions.closest('.record-section-card');
   const heading = planCard?.querySelector('.section-heading');
   const headingKicker = heading?.querySelector('small');
@@ -46,161 +45,6 @@ if (planningActions && !globalThis.__FSFIT_STUDENT_PLAN_UX__) {
     }
   ];
 
-  function injectStyles() {
-    if (document.getElementById(styleId)) return;
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      .student-plan-card{
-        padding:20px;
-        border-color:rgba(255,255,255,.1);
-        background:linear-gradient(155deg,rgba(26,31,38,.98),rgba(18,22,28,.98));
-        box-shadow:0 14px 38px rgba(0,0,0,.22);
-      }
-      .student-plan-card .section-heading{
-        margin-bottom:7px;
-      }
-      .student-plan-card .section-heading small{
-        color:var(--primary);
-        letter-spacing:.11em;
-      }
-      .student-plan-card .section-heading h2{
-        font-size:1.42rem;
-        letter-spacing:-.035em;
-      }
-      .student-plan-intro{
-        margin:0 0 17px!important;
-        color:var(--muted)!important;
-        font-size:.84rem!important;
-        line-height:1.45!important;
-      }
-      .planning-actions.student-plan-list{
-        display:grid!important;
-        grid-template-columns:1fr!important;
-        gap:0!important;
-        overflow:hidden;
-        border:1px solid rgba(255,255,255,.09);
-        border-radius:16px;
-        background:rgba(255,255,255,.018);
-      }
-      .student-plan-option{
-        display:grid;
-        grid-template-columns:40px minmax(0,1fr) 22px;
-        align-items:center;
-        gap:13px;
-        width:100%;
-        min-height:74px;
-        padding:13px 15px;
-        border:0;
-        border-bottom:1px solid rgba(255,255,255,.075);
-        border-radius:0;
-        background:transparent;
-        color:var(--text);
-        text-align:left;
-        text-decoration:none;
-        transition:background .18s ease,transform .18s ease;
-        -webkit-tap-highlight-color:transparent;
-      }
-      .student-plan-option:last-child{
-        border-bottom:0;
-      }
-      .student-plan-option:hover{
-        background:rgba(255,255,255,.04);
-      }
-      .student-plan-option:active{
-        background:rgba(50,215,75,.07);
-        transform:scale(.995);
-      }
-      .student-plan-option:focus-visible{
-        position:relative;
-        z-index:1;
-        outline:3px solid rgba(50,215,75,.2);
-        outline-offset:-3px;
-      }
-      .student-plan-option-icon{
-        display:grid;
-        place-items:center;
-        width:40px;
-        height:40px;
-        border:1px solid rgba(50,215,75,.18);
-        border-radius:12px;
-        background:rgba(50,215,75,.09);
-        color:var(--primary);
-      }
-      .student-plan-option-icon svg{
-        width:21px;
-        height:21px;
-      }
-      .student-plan-option-copy{
-        display:grid;
-        gap:3px;
-        min-width:0;
-      }
-      .student-plan-option-copy strong{
-        display:block;
-        color:var(--text);
-        font-size:.94rem;
-        font-weight:850;
-        line-height:1.2;
-        letter-spacing:-.01em;
-      }
-      .student-plan-option-copy small{
-        display:block;
-        overflow:hidden;
-        color:var(--muted);
-        font-size:.75rem;
-        font-weight:600;
-        line-height:1.35;
-        text-overflow:ellipsis;
-      }
-      .student-plan-option-arrow{
-        color:rgba(181,189,200,.72);
-        font-size:1.5rem;
-        font-weight:400;
-        line-height:1;
-        text-align:right;
-        transition:transform .18s ease,color .18s ease;
-      }
-      .student-plan-option:hover .student-plan-option-arrow{
-        color:var(--primary);
-        transform:translateX(2px);
-      }
-      #apply-saved-workout{
-        display:none!important;
-      }
-      @media(max-width:620px){
-        .student-plan-card{
-          padding:17px;
-        }
-        .student-plan-card .section-heading h2{
-          font-size:1.3rem;
-        }
-        .student-plan-intro{
-          margin-bottom:14px!important;
-          font-size:.79rem!important;
-        }
-        .student-plan-option{
-          grid-template-columns:38px minmax(0,1fr) 20px;
-          gap:11px;
-          min-height:70px;
-          padding:12px 13px;
-        }
-        .student-plan-option-icon{
-          width:38px;
-          height:38px;
-          border-radius:11px;
-        }
-        .student-plan-option-copy strong{
-          font-size:.91rem;
-        }
-        .student-plan-option-copy small{
-          font-size:.71rem;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   function updateTitle() {
     if (!headingTitle) return;
     const fullName = studentName?.textContent?.trim() || '';
@@ -223,7 +67,6 @@ if (planningActions && !globalThis.__FSFIT_STUDENT_PLAN_UX__) {
       <span class="student-plan-option-arrow" aria-hidden="true">›</span>`;
   }
 
-  injectStyles();
   document.getElementById('apply-saved-workout')?.remove();
   planCard?.classList.add('student-plan-card');
   planningActions.classList.add('student-plan-list');
