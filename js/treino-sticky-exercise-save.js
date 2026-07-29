@@ -8,8 +8,6 @@ const selectedBuilder = document.querySelector('#selected-exercises-builder');
 const originalActions = saveButton?.closest('.workout-modal-actions');
 
 if (modal && modalCard && form && saveButton && originalActions && selectedBuilder) {
-  injectStyles();
-
   const stickyBar = document.createElement('div');
   stickyBar.className = 'exercise-sticky-save-bar';
   stickyBar.setAttribute('aria-hidden', 'true');
@@ -62,61 +60,4 @@ if (modal && modalCard && form && saveButton && originalActions && selectedBuild
   });
 
   syncStickyButton();
-}
-
-function injectStyles() {
-  if (document.querySelector('#treino-sticky-exercise-save-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'treino-sticky-exercise-save-styles';
-  style.textContent = `
-    #exercise-modal .exercise-sticky-save-bar {
-      position: absolute;
-      left: 50%;
-      bottom: max(10px, env(safe-area-inset-bottom));
-      z-index: 5;
-      display: none;
-      width: min(772px, calc(100vw - 52px));
-      padding: 10px;
-      transform: translateX(-50%);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      background: rgba(23,27,33,.94);
-      box-shadow: 0 -12px 32px rgba(0,0,0,.34);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    #exercise-modal .exercise-sticky-save-bar.show {
-      display: block;
-    }
-
-    #exercise-modal .exercise-sticky-save-bar #save-exercise-batch {
-      width: 100%;
-      min-height: 48px;
-      margin: 0;
-    }
-
-    #exercise-modal .workout-exercise-builder-modal.has-fixed-exercise-save {
-      padding-bottom: calc(112px + env(safe-area-inset-bottom));
-    }
-
-    @media (max-width: 640px) {
-      #exercise-modal .exercise-sticky-save-bar {
-        bottom: max(8px, env(safe-area-inset-bottom));
-        width: calc(100vw - 36px);
-        padding: 8px;
-        border-radius: 14px;
-      }
-
-      #exercise-modal .exercise-sticky-save-bar #save-exercise-batch {
-        min-height: 50px;
-      }
-
-      #exercise-modal .workout-exercise-builder-modal.has-fixed-exercise-save {
-        padding-bottom: calc(118px + env(safe-area-inset-bottom));
-      }
-    }
-  `;
-  document.head.appendChild(style);
 }
