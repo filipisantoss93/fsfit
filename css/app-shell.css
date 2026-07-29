@@ -212,3 +212,39 @@ body.fsfit-modal-open {
   transform: translate(-50%, -10px) !important;
 }
 
+/* Correção de regressões do shell mobile · 2026-07-29 */
+@media (max-width: 860px) {
+  #header-container .nav-footer,
+  #header-container .sidebar-profile,
+  #header-container .sidebar-logout {
+    display: none !important;
+  }
+
+  #header-container .nav-container {
+    min-height: var(--fs-nav-height, 68px) !important;
+  }
+
+  #header-container .nav-header-actions {
+    margin-left: auto !important;
+  }
+
+  body.fsfit-saas :is(
+    .dashboard-tabs,
+    .profile-tabs,
+    .perfil-tabs,
+    .student-tabs,
+    .aluno-tabs,
+    .ficha-tabs,
+    .library-tabs,
+    .library-mode-tabs,
+    .tabs-nav,
+    .tab-nav,
+    [role="tablist"]
+  ) {
+    z-index: var(--fs-z-sticky, 30) !important;
+  }
+
+  .fsfit-more-sheet {
+    z-index: var(--fs-z-sheet, 220) !important;
+  }
+}
