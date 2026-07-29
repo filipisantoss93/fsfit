@@ -435,14 +435,14 @@ body.fsfit-saas .library-action-bar .btn {
 }
 
 @media (max-width: 860px) {
-  body.fsfit-saas .page-header {
+  body.fsfit-saas .page-header:not(.students-page-header):not(.agenda-header) {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
     gap: var(--fs-space-4, 16px) !important;
   }
 
-  body.fsfit-saas .page-header > div:first-child {
+  body.fsfit-saas .page-header:not(.students-page-header):not(.agenda-header) > div:first-child {
     width: 100% !important;
     min-width: 0 !important;
   }
