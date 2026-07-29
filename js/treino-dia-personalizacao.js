@@ -23,7 +23,6 @@ if (alunoId && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER__) {
   let dirty = false;
   let rendering = false;
 
-  injectStyles();
   bindContextCapture();
   bindActions();
   observeModal();
@@ -398,23 +397,4 @@ if (alunoId && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER__) {
     }
   }
 
-  function injectStyles() {
-    if (document.querySelector('#day-workout-customizer-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'day-workout-customizer-styles';
-    style.textContent = `
-      .day-custom-loading{padding:28px 12px;color:var(--muted);text-align:center}
-      .day-custom-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-      .day-custom-toolbar small,.day-custom-editor-title small{display:block;margin-bottom:4px;color:var(--primary);font-size:.62rem;font-weight:900;letter-spacing:.08em}
-      .day-custom-toolbar strong,.day-custom-editor-title strong{display:block;font-size:.94rem}
-      .day-custom-toolbar .btn{min-height:40px;padding:8px 11px;font-size:.74rem}
-      .day-custom-note{margin:0 0 13px;padding:9px 11px;border:1px solid rgba(177,255,0,.16);border-radius:10px;background:rgba(177,255,0,.035);color:var(--muted);font-size:.7rem;line-height:1.4}
-      .day-custom-exercise{grid-template-columns:34px minmax(0,1fr) 34px!important}
-      .day-custom-exercise .simple-exercise-main{text-align:left}
-      .day-custom-picker{min-height:0}
-      .day-custom-editor-title{margin-bottom:14px}
-      @media(max-width:560px){.day-custom-toolbar{align-items:flex-start}.day-custom-toolbar .btn{flex:0 0 auto;max-width:48%}.day-custom-note{font-size:.66rem}}
-    `;
-    document.head.appendChild(style);
-  }
 }
