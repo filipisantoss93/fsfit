@@ -9,7 +9,6 @@ const DAY_NAMES = {
   7: 'Domingo'
 };
 const DAY_SHORT_NAMES = { 1: 'Seg', 2: 'Ter', 3: 'Qua', 4: 'Qui', 5: 'Sex', 6: 'Sáb', 7: 'Dom' };
-const STYLE_ID = 'fsfit-plan-day-tabs-styles';
 
 let selectedPlanDay = null;
 let selectedWorkoutId = null;
@@ -32,54 +31,6 @@ function waitFor(getter, timeout = 12000, interval = 80) {
     };
     check();
   });
-}
-
-function injectStyles() {
-  if (document.getElementById(STYLE_ID)) return;
-  const style = document.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = `
-    .workout-plan-day-tabs{
-      display:grid;
-      grid-template-columns:repeat(var(--plan-day-count,7),minmax(0,1fr));
-      gap:5px;
-      margin:0 0 10px;
-      padding:6px;
-      border:1px solid var(--border);
-      border-radius:15px;
-      background:var(--surface);
-    }
-    .workout-plan-day-tab{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:1px;
-      min-width:0;
-      min-height:44px;
-      padding:5px 2px;
-      border:0;
-      border-radius:10px;
-      background:transparent;
-      color:var(--muted);
-      font:inherit;
-      font-size:.78rem;
-      font-weight:850;
-      cursor:pointer;
-    }
-    .workout-plan-day-tab small{font-size:.58rem;font-weight:800;opacity:.78}
-    .workout-plan-day-tab.active{background:var(--primary);color:#061008}
-    .workout-plan-day-tab.active small{opacity:.85}
-    .workout-plan-day-tab:focus-visible{outline:2px solid rgba(50,215,75,.55);outline-offset:2px}
-    .workout-plan-day-panel[hidden]{display:none!important}
-    .workout-plan-day-panel{margin-top:0!important}
-    @media(max-width:640px){
-      .workout-plan-day-tabs{gap:3px;padding:5px}
-      .workout-plan-day-tab{min-height:40px;font-size:.7rem}
-      .workout-plan-day-tab small{font-size:.54rem}
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 function parseAllowedDays(workspace) {
@@ -247,7 +198,6 @@ async function boot() {
   const workspace = await waitFor(() => document.querySelector('#active-workout-workspace'));
   if (!root || !workspace) return;
 
-  injectStyles();
   bindActions();
 
   new MutationObserver(scheduleApply).observe(root, { childList: true, subtree: true });
