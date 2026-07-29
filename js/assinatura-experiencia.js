@@ -1,54 +1,6 @@
 const MANAGEMENT_HOST_SELECTOR = '#subscription-management-actions';
 const SUMMARY_HOST_SELECTOR = '#subscription-summary-grid';
 
-function injectExperienceStyles() {
-  if (document.querySelector('#subscription-experience-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'subscription-experience-styles';
-  style.textContent = `
-    .subscription-page{padding-bottom:40px}
-    .subscription-management-grid{grid-template-columns:1fr}
-    .subscription-management-action--primary{align-items:center;padding:18px;border-color:rgba(181,236,0,.34);background:linear-gradient(145deg,rgba(181,236,0,.08),var(--surface-light) 58%)}
-    .subscription-management-action--primary>div{min-width:0}
-    .subscription-management-action--primary strong{font-size:1.02rem}
-    .subscription-management-action--primary .btn{min-width:170px}
-    .subscription-management-more{border-top:1px solid var(--border)}
-    .subscription-management-more summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 2px 2px;cursor:pointer;list-style:none;color:var(--muted);font-size:.84rem;font-weight:800}
-    .subscription-management-more summary::-webkit-details-marker{display:none}
-    .subscription-management-more summary::after{content:'›';font-size:1.4rem;line-height:1;transition:transform .18s ease}
-    .subscription-management-more[open] summary::after{transform:rotate(90deg)}
-    .subscription-management-secondary-list{display:grid;margin-top:10px}
-    .subscription-management-secondary-list .subscription-management-action{align-items:center;padding:13px 2px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:transparent}
-    .subscription-management-secondary-list .subscription-management-action:last-child{border-bottom:0}
-    .subscription-management-secondary-list .subscription-management-action .btn{min-width:122px}
-    html.subscription-modal-active,body.subscription-modal-active{overflow:hidden;overscroll-behavior:none}
-    .subscription-modal-backdrop{overscroll-behavior:contain;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
-    .subscription-modal{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-    .subscription-history-item{grid-template-columns:minmax(0,1fr) auto auto}
-    .subscription-history-date{display:none}
-
-    @media(max-width:720px){
-      .subscription-page{padding-bottom:calc(118px + env(safe-area-inset-bottom))}
-      .subscription-management-action--primary{align-items:flex-start;flex-direction:column;padding:16px}
-      .subscription-management-action--primary .btn{width:100%;min-width:0}
-      .subscription-management-secondary-list .subscription-management-action{align-items:flex-start;flex-direction:row;gap:10px}
-      .subscription-management-secondary-list .subscription-management-action>div{min-width:0;flex:1}
-      .subscription-management-secondary-list .subscription-management-action .btn{width:auto;min-width:0;padding-inline:12px}
-      .subscription-modal-backdrop{place-items:end center;padding:env(safe-area-inset-top) 0 0}
-      .subscription-modal{width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 8px);padding:20px 16px calc(20px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0}
-    }
-
-    @media(max-width:620px){
-      .subscription-history-item{grid-template-columns:minmax(0,1fr) auto}
-      .subscription-history-main{grid-column:1;grid-row:1 / span 2}
-      .subscription-history-value{grid-column:2;grid-row:1;text-align:right}
-      .subscription-history-item>.subscription-status-badge{grid-column:2;grid-row:2;justify-self:end}
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 function actionTitle(article) {
   return article?.querySelector('strong')?.textContent?.trim() || '';
 }
@@ -180,8 +132,6 @@ function syncModalState() {
   document.documentElement.classList.toggle('subscription-modal-active', isOpen);
   document.body.classList.toggle('subscription-modal-active', isOpen);
 }
-
-injectExperienceStyles();
 
 const observer = new MutationObserver(() => {
   enhanceManagement();
