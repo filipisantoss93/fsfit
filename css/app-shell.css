@@ -238,8 +238,7 @@ body.fsfit-modal-open {
     .library-tabs,
     .library-mode-tabs,
     .tabs-nav,
-    .tab-nav,
-    [role="tablist"]
+    .tab-nav
   ) {
     z-index: var(--fs-z-sticky, 30) !important;
   }

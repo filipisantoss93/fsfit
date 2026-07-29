@@ -490,8 +490,7 @@ body.fsfit-saas .library-action-bar .btn {
     .library-tabs,
     .library-mode-tabs,
     .tabs-nav,
-    .tab-nav,
-    [role="tablist"]
+    .tab-nav
   ) {
     position: sticky !important;
     top: max(0px, env(safe-area-inset-top, 0px)) !important;
@@ -521,8 +520,7 @@ body.fsfit-saas .library-action-bar .btn {
     .library-tabs,
     .library-mode-tabs,
     .tabs-nav,
-    .tab-nav,
-    [role="tablist"]
+    .tab-nav
   )::-webkit-scrollbar { display: none; }
 
   body.fsfit-saas :is(
@@ -535,8 +533,7 @@ body.fsfit-saas .library-action-bar .btn {
     .library-tabs,
     .library-mode-tabs,
     .tabs-nav,
-    .tab-nav,
-    [role="tablist"]
+    .tab-nav
   ) > :is(button, a, [role="tab"]) {
     flex: 1 0 auto !important;
     min-height: 42px !important;
