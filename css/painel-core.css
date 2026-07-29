@@ -1,4 +1,5 @@
 /* FS Fit · Estrutura visual principal do painel */
+#access-notice { display:none; margin-bottom:20px; }
 .dashboard-home-header { margin-bottom:12px; }
 .dashboard-user-greeting { margin:0; color:var(--text); font-size:1.35rem; font-weight:900; letter-spacing:-.02em; }
 .dashboard-welcome-line { margin:4px 0 0; color:var(--muted); font-size:.82rem; }
