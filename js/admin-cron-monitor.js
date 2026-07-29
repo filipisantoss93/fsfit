@@ -25,47 +25,8 @@ function formatCompetence(value) {
     : date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 }
 
-function ensureStyles() {
-  if (document.querySelector('#admin-cron-monitor-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'admin-cron-monitor-styles';
-  style.textContent = `
-    .admin-cron-monitor{margin-bottom:18px;border:1px solid var(--border)}
-    .admin-cron-monitor.is-healthy{border-color:rgba(50,215,75,.3)}
-    .admin-cron-monitor.is-warning{border-color:rgba(255,193,7,.45)}
-    .admin-cron-monitor.is-error{border-color:rgba(255,82,82,.5)}
-    .admin-cron-monitor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-    .admin-cron-monitor-head h2{margin:3px 0 6px}
-    .admin-cron-monitor-head p{margin:0;color:var(--muted)}
-    .admin-cron-status{display:inline-flex;align-items:center;min-height:30px;padding:0 11px;border-radius:999px;background:var(--surface-light);font-size:.72rem;font-weight:900;white-space:nowrap}
-    .admin-cron-monitor.is-healthy .admin-cron-status{background:rgba(50,215,75,.12);color:var(--primary)}
-    .admin-cron-monitor.is-warning .admin-cron-status{background:rgba(255,193,7,.13);color:var(--warning)}
-    .admin-cron-monitor.is-error .admin-cron-status{background:rgba(255,82,82,.13);color:#ff7676}
-    .admin-automation-list{display:grid;gap:12px;margin-top:16px}
-    .admin-automation-item{padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface-light)}
-    .admin-automation-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-    .admin-automation-title strong{display:block;font-size:.92rem}
-    .admin-automation-title small{display:block;margin-top:3px;color:var(--muted)}
-    .admin-automation-state{font-size:.7rem;font-weight:900;white-space:nowrap}
-    .admin-automation-state.is-healthy{color:var(--primary)}
-    .admin-automation-state.is-warning{color:var(--warning)}
-    .admin-automation-state.is-error{color:#ff7676}
-    .admin-cron-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-    .admin-cron-grid>div{padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
-    .admin-cron-grid small{display:block;margin-bottom:5px;color:var(--muted);font-size:.66rem;font-weight:900;letter-spacing:.04em}
-    .admin-cron-grid strong{display:block;font-size:.84rem;word-break:break-word}
-    .admin-cron-error{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:rgba(255,82,82,.1);color:#ff9a9a;font-size:.8rem}
-    .admin-cron-success{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(50,215,75,.1);color:var(--primary);font-size:.8rem}
-    .admin-cron-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
-    @media(max-width:760px){.admin-cron-monitor-head,.admin-automation-title{display:grid}.admin-cron-status{justify-self:start}.admin-cron-grid{grid-template-columns:1fr 1fr}.admin-cron-actions{justify-content:stretch}.admin-cron-actions .btn{width:100%}}
-    @media(max-width:460px){.admin-cron-grid{grid-template-columns:1fr}}
-  `;
-  document.head.appendChild(style);
-}
-
 function ensureCard() {
   if (!overviewPanel || monitorCard) return monitorCard;
-  ensureStyles();
   monitorCard = document.createElement('section');
   monitorCard.className = 'card admin-section-card admin-cron-monitor';
   monitorCard.innerHTML = '<div class="admin-cron-monitor-head"><div><small>AUTOMAÇÕES OPERACIONAIS</small><h2>Rotinas financeiras</h2><p>Verificando tarefas automáticas e integridade dos dados...</p></div><span class="admin-cron-status">Carregando</span></div>';
