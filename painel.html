@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="css/aulas.css?v=20260716-live2">
   <link rel="stylesheet" href="css/aulas-painel-compact.css?v=20260719-live-compact1">
   <link rel="stylesheet" href="css/painel-resumo-geral.css?v=20260727-general1" media="(min-width: 1100px)">
-  <link rel="stylesheet" href="css/painel-core.css?v=20260728-static1">
+  <link rel="stylesheet" href="css/painel-core.css?v=20260729-access-notice1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
@@ -42,7 +42,7 @@
   </div>
 
   <main class="container">
-    <div id="access-notice" class="message" style="display:none;margin-bottom:20px"></div>
+    <div id="access-notice" class="message"></div>
 
     <section class="page-header dashboard-home-header">
       <div>
@@ -223,116 +223,16 @@
         <h3 class="live-session-chat-title">Chat com o aluno</h3>
         <div id="live-session-chat-thread" class="live-chat-thread"><p class="empty">Carregando chat...</p></div>
         <form id="live-session-chat-form" class="live-chat-form">
-          <textarea name="mensagem" maxlength="3000" placeholder="Escreva uma orientação para o aluno" required></textarea>
-          <button class="btn btn-primary" type="submit" data-icon="➤">Enviar</button>
+          <textarea id="live-session-chat-input" rows="2" maxlength="1000" placeholder="Enviar mensagem para o aluno"></textarea>
+          <button type="submit" class="btn btn-primary">Enviar</button>
         </form>
-        <div id="live-session-modal-actions" class="live-session-modal-actions"></div>
       </div>
     </section>
   </div>
 
-  <div id="live-workout-editor-modal" class="live-workout-editor-modal" aria-hidden="true">
-    <section class="live-workout-editor-dialog" role="dialog" aria-modal="true" aria-label="Editar treino do aluno">
-      <button id="live-workout-editor-close" class="live-workout-editor-close" type="button" aria-label="Fechar edição do treino">×</button>
-      <iframe id="live-workout-editor-frame" class="live-workout-editor-frame" title="Editar treino do aluno"></iframe>
-    </section>
-  </div>
-
-  <script>
-    (() => {
-      const tabs = Array.from(document.querySelectorAll('[data-dashboard-tab]'));
-      const panels = {
-        home: document.getElementById('dashboard-home-panel'),
-        overview: document.getElementById('dashboard-overview-panel'),
-        agenda: document.getElementById('dashboard-agenda-panel'),
-        live: document.getElementById('dashboard-live-panel')
-      };
-      const todayCount = document.getElementById('today-count');
-      const todaySummary = document.getElementById('summary-today-appointments');
-      const agendaTabCount = document.getElementById('dashboard-agenda-tab-count');
-      const liveCount = document.getElementById('live-students-count');
-      const liveTabCount = document.getElementById('dashboard-live-tab-count');
-      const attentionCard = document.querySelector('.attention-card');
-      const attentionTotal = document.getElementById('attention-total-count');
-      const attentionItems = Array.from(document.querySelectorAll('[data-attention-item]'));
-
-      const activateTab = (name, shouldFocus = false) => {
-        tabs.forEach(tab => {
-          const active = tab.dataset.dashboardTab === name;
-          tab.setAttribute('aria-selected', String(active));
-          tab.tabIndex = active ? 0 : -1;
-          if (active && shouldFocus) tab.focus();
-        });
-        Object.entries(panels).forEach(([panelName, panel]) => {
-          if (panel) panel.hidden = panelName !== name;
-        });
-      };
-
-      tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => activateTab(tab.dataset.dashboardTab));
-        tab.addEventListener('keydown', event => {
-          let nextIndex = null;
-          if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
-          if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
-          if (event.key === 'Home') nextIndex = 0;
-          if (event.key === 'End') nextIndex = tabs.length - 1;
-          if (nextIndex === null) return;
-          event.preventDefault();
-          activateTab(tabs[nextIndex].dataset.dashboardTab, true);
-        });
-      });
-
-      const syncTodayCount = () => {
-        const value = todayCount?.textContent.trim() || '—';
-        if (todaySummary) todaySummary.textContent = value;
-        if (agendaTabCount) agendaTabCount.textContent = value;
-      };
-
-      const syncLiveCount = () => {
-        const value = liveCount?.textContent.trim() || '0';
-        if (liveTabCount) liveTabCount.textContent = value;
-      };
-
-      const syncAttentionCount = () => {
-        if (!attentionTotal) return;
-        const total = attentionItems.reduce((sum, item) => {
-          if (item.hidden) return sum;
-          const value = Number(item.querySelector('.attention-number')?.textContent || 0);
-          return sum + (Number.isFinite(value) ? value : 0);
-        }, 0);
-        attentionTotal.textContent = String(total);
-      };
-
-      syncTodayCount();
-      syncLiveCount();
-      syncAttentionCount();
-
-      if (todayCount) new MutationObserver(syncTodayCount).observe(todayCount, { childList:true, subtree:true, characterData:true });
-      if (liveCount) new MutationObserver(syncLiveCount).observe(liveCount, { childList:true, subtree:true, characterData:true });
-      attentionItems.forEach(item => {
-        new MutationObserver(syncAttentionCount).observe(item, {
-          attributes:true,
-          attributeFilter:['hidden'],
-          childList:true,
-          subtree:true,
-          characterData:true
-        });
-      });
-      if (attentionCard) {
-        new MutationObserver(syncAttentionCount).observe(attentionCard, { attributes:true, attributeFilter:['hidden'] });
-      }
-
-      activateTab('home');
-    })();
-  </script>
-  <script type="module" src="js/painel-dashboard.js?v=20260716-fix-cache1"></script>
-  <script type="module" src="js/painel-visao-geral.js?v=20260726-home-improvements1"></script>
-  <script src="https://cdn.jsdelivr.net/gh/efipay/js-payment-token-efi/dist/payment-token-efi-umd.min.js"></script>
-  <script type="module" src="js/renovacao-plano.js?v=20260717-cartao1"></script>
-  <script type="module" src="js/assinatura-cartao-status.js?v=20260717-cartao1"></script>
-  <script type="module" src="js/aulas-painel.js?v=20260721-live-central1"></script>
-  <script type="module" src="js/aulas-painel-editor.js?v=20260721-live-central1"></script>
-  <script type="module" src="js/push-personal.js?v=20260720-push-state4"></script>
-  <script type="module" src="js/pwa-install.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="js/supabase.js"></script>
+  <script type="module" src="js/layout.js"></script>
+  <script type="module" src="js/painel.js?v=20260728-dashboard1"></script>
 </body>
 </html>
