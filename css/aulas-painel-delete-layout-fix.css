@@ -1,0 +1,41 @@
+/* FS Fit · Layout das ações Limpar e Finalizar durante a aula */
+.live-session-modal-actions.live-session-modal-actions-quick{
+  display:grid!important;
+  grid-template-columns:minmax(112px,.78fr) minmax(0,1.22fr)!important;
+  gap:8px!important;
+  align-items:stretch!important;
+}
+.live-session-modal-actions.live-session-modal-actions-quick>.live-session-quick-actions{
+  grid-column:1/-1!important;
+}
+.live-session-modal-actions.live-session-modal-actions-quick>.live-session-end-actions{
+  display:contents!important;
+}
+.live-session-modal-actions.live-session-modal-actions-quick .live-session-clear-action{
+  grid-column:1!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.live-session-modal-actions.live-session-modal-actions-quick .live-session-end-actions>[data-modal-finish-session],
+.live-session-modal-actions.live-session-modal-actions-quick>[data-modal-finish-session]{
+  grid-column:2!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+}
+@media(max-width:520px){
+  .live-session-modal-actions.live-session-modal-actions-quick{
+    grid-template-columns:minmax(104px,.72fr) minmax(0,1.28fr)!important;
+    gap:6px!important;
+  }
+  .live-session-clear-action .btn-action-description{
+    display:none!important;
+  }
+  .live-session-clear-action .btn-action-copy{
+    justify-content:center!important;
+  }
+  .live-session-clear-action .btn-action-title{
+    white-space:nowrap!important;
+  }
+}
