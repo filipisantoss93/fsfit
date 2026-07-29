@@ -200,30 +200,9 @@
     </section>
   </div>
 
-  <script>
-    (() => {
-      const input = document.querySelector('#admin-user-search');
-      const clearButton = document.querySelector('#admin-user-search-clear');
-      if (!input || !clearButton) return;
-
-      const syncClearButton = () => {
-        clearButton.hidden = !input.value;
-      };
-
-      clearButton.addEventListener('click', () => {
-        if (!input.value) return;
-        input.value = '';
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.focus();
-        syncClearButton();
-      });
-
-      input.addEventListener('input', syncClearButton);
-      syncClearButton();
-    })();
-  </script>
   <script src="js/admin-tabs.js?v=20260719-admin-tabs1"></script>
   <script type="module" src="js/admin.js?v=20260717-admin-complete1"></script>
+  <script type="module" src="js/admin-search-clear.js?v=20260729-static1"></script>
   <script type="module" src="js/admin-users-compact.js?v=20260719-admin-users1"></script>
   <script type="module" src="js/admin-attention.js?v=20260719-admin-attention1"></script>
   <script type="module" src="js/admin-forecast.js?v=20260719-admin-forecast1"></script>
