@@ -8,6 +8,14 @@ export * from './layout-core.js';
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
 const DESKTOP_SHELL_STYLESHEET = 'css/header-menu.css?v=20260729-shell-order1';
+const FREE_ALLOWED_PAGES = new Set([
+  'painel.html',
+  'perfil.html',
+  'contato.html',
+  'assinatura.html',
+  'admin.html',
+  'admin-contatos.html'
+]);
 const AUTO_SHELL_ACTIVE_BY_PAGE = {
   'painel.html': 'painel',
   'alunos.html': 'alunos',
@@ -25,6 +33,7 @@ const AUTO_SHELL_ACTIVE_BY_PAGE = {
 const STUDENT_AVATAR_PAGES = new Set(['painel.html', 'alunos.html', 'agenda.html', 'financeiro.html', 'ficha-aluno.html']);
 let enhancementsScheduled = false;
 let mobileMoreCleanup = null;
+let sessionPromise = null;
 
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
@@ -249,6 +258,23 @@ function configureStudentRecordBackLink() {
   backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? `agenda.html?data=${encodeURIComponent(date)}` : 'agenda.html';
 }
 
+function renderInactiveAccount() {
+  document.body.innerHTML = `
+    <main class="container inactive-account-screen">
+      <section class="card inactive-account-card">
+        <h1>Conta desativada</h1>
+        <p class="inactive-account-message">Seu acesso ao FS Fit foi suspenso pela administração. Entre em contato com o suporte caso precise de ajuda.</p>
+        <button id="inactive-account-logout" class="btn btn-primary" type="button">Voltar para o login</button>
+      </section>
+    </main>`;
+
+  document.querySelector('#inactive-account-logout')?.addEventListener('click', async () => {
+    try { await supabase.auth.signOut(); } finally {
+      window.location.replace('index.html');
+    }
+  });
+}
+
 export function renderHeader(active = '') {
   ensureDesktopShellStyles();
   core.renderHeader(active);
@@ -261,8 +287,34 @@ export async function setGreeting(session) {
   return core.setGreeting(session);
 }
 
-export async function requireSession() {
-  return core.requireSession();
+export function requireSession() {
+  if (!sessionPromise) {
+    sessionPromise = (async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        window.location.replace('index.html?login=1');
+        return null;
+      }
+
+      const access = await core.getAccessStatus(session.user.id);
+      if (access?.tipo_acesso === 'inativo' && !access?.admin) {
+        renderInactiveAccount();
+        return null;
+      }
+      if (!access?.acesso_premium && !FREE_ALLOWED_PAGES.has(currentPage())) {
+        window.location.replace('painel.html?acesso=free');
+        return null;
+      }
+
+      session.fsfitAccess = access;
+      return session;
+    })().catch(error => {
+      sessionPromise = null;
+      throw error;
+    });
+  }
+
+  return sessionPromise;
 }
 
 if (currentPage() === 'ficha-aluno.html') {
