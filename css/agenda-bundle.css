@@ -1,0 +1,11 @@
+/* FS Fit — ponto único de entrada dos estilos da agenda */
+@import url("./agenda.css?v=20260724-agenda-header1");
+@import url("./agenda-padronizacao.css?v=20260727-dashboard1");
+
+.agenda-loading-card{display:grid;gap:11px;overflow:hidden}
+.agenda-loading-line{height:12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.055) 20%,rgba(255,255,255,.11) 40%,rgba(255,255,255,.055) 60%);background-size:220% 100%;animation:agendaSkeleton 1.25s ease-in-out infinite}
+.agenda-loading-line:first-child{width:42%;height:16px}
+.agenda-loading-line:nth-child(2){width:68%}
+.agenda-loading-line:nth-child(3){width:54%}
+@keyframes agendaSkeleton{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@media(prefers-reduced-motion:reduce){.agenda-loading-line{animation:none}}
