@@ -1,0 +1,7 @@
+/* FS Fit — ponto único de entrada dos estilos do painel do personal */
+@import url("./aulas.css?v=20260716-live2");
+@import url("./aulas-painel-compact.css?v=20260719-live-compact1");
+@import url("./painel-resumo-geral.css?v=20260727-general1") screen and (min-width:1100px);
+@import url("./painel-core.css?v=20260728-static1");
+@import url("./painel-home-redesign.css?v=20260728-static1");
+@import url("./painel-visao-geral.css?v=20260728-static1");
