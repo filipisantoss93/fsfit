@@ -1,3 +1,4 @@
+import './inactive-account-guard.js?v=20260730-inactive-account1';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const SUPABASE_URL = 'https://jjpijncxlkwutbnkpsaw.supabase.co';
