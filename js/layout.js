@@ -22,7 +22,9 @@ const AUTO_SHELL_ACTIVE_BY_PAGE = {
   'admin.html': 'admin',
   'admin-contatos.html': 'admin'
 };
+const STUDENT_AVATAR_PAGES = new Set(['painel.html', 'alunos.html', 'agenda.html', 'financeiro.html', 'ficha-aluno.html']);
 let enhancementsScheduled = false;
+let mobileMoreCleanup = null;
 
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
@@ -31,6 +33,18 @@ function currentPage() {
 
 function inferShellActivePage() {
   return AUTO_SHELL_ACTIVE_BY_PAGE[currentPage()] || '';
+}
+
+function clearFsFitStorage() {
+  const removeNamespacedKeys = storage => {
+    for (let index = storage.length - 1; index >= 0; index -= 1) {
+      const key = storage.key(index);
+      if (key?.startsWith('fsfit:')) storage.removeItem(key);
+    }
+  };
+  removeNamespacedKeys(localStorage);
+  removeNamespacedKeys(sessionStorage);
+  ['id', 'usuario_email', 'usuario_plano', 'usuario_nome'].forEach(key => localStorage.removeItem(key));
 }
 
 function ensureDesktopShellStyles() {
@@ -48,13 +62,21 @@ function scheduleNonCriticalEnhancements() {
   if (enhancementsScheduled) return;
   enhancementsScheduled = true;
   window.setTimeout(() => {
-    import('./checkout-endereco.js').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
-    import('./mobile-more-swipe.js?v=20260721-more-swipe1').catch(error => console.error('Não foi possível carregar os gestos do menu Mais:', error));
-    import('./student-avatars-personal.js?v=20260722-student-avatars1').catch(error => console.error('Não foi possível carregar os avatares dos alunos:', error));
+    const page = currentPage();
+    if (document.querySelector('[data-checkout-endereco], #checkout-endereco, [name="cep"]')) {
+      import('./checkout-endereco.js').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
+    }
+    if (document.querySelector('.fsfit-more-sheet, [data-bottom-page="mais"]')) {
+      import('./mobile-more-swipe.js?v=20260721-more-swipe1').catch(error => console.error('Não foi possível carregar os gestos do menu Mais:', error));
+    }
+    if (STUDENT_AVATAR_PAGES.has(page)) {
+      import('./student-avatars-personal.js?v=20260722-student-avatars1').catch(error => console.error('Não foi possível carregar os avatares dos alunos:', error));
+    }
   }, 0);
 }
 
 function ensureMobileMoreSheet(trigger) {
+  mobileMoreCleanup?.();
   document.querySelector('.fsfit-more-sheet')?.remove();
 
   const sheet = document.createElement('div');
@@ -79,11 +101,14 @@ function ensureMobileMoreSheet(trigger) {
     </section>`;
 
   document.body.appendChild(sheet);
+  const panel = sheet.querySelector('.fsfit-more-panel');
   const closeButton = sheet.querySelector('.fsfit-more-close');
   const backdrop = sheet.querySelector('.fsfit-more-backdrop');
   const publicPageButton = sheet.querySelector('[data-fsfit-public-page]');
   const logoutButton = sheet.querySelector('[data-fsfit-logout]');
   let previousFocus = null;
+
+  const focusableElements = () => Array.from(panel?.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])') || []);
 
   const closeSheet = () => {
     if (!sheet.classList.contains('is-open')) return;
@@ -103,6 +128,26 @@ function ensureMobileMoreSheet(trigger) {
     trigger.setAttribute('aria-expanded', 'true');
     document.documentElement.classList.add('fsfit-sheet-open');
     requestAnimationFrame(() => closeButton?.focus());
+  };
+
+  const handleKeydown = event => {
+    if (!sheet.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      closeSheet();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = focusableElements();
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   };
 
   backdrop?.addEventListener('click', closeSheet);
@@ -130,15 +175,18 @@ function ensureMobileMoreSheet(trigger) {
     const existingLogout = document.querySelector('#logout-button');
     if (existingLogout instanceof HTMLElement) return existingLogout.click();
     try { await supabase.auth.signOut(); } finally {
-      localStorage.clear();
+      clearFsFitStorage();
       window.location.replace('index.html');
     }
   });
 
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && sheet.classList.contains('is-open')) closeSheet();
-  });
+  document.addEventListener('keydown', handleKeydown);
   trigger.addEventListener('click', openSheet);
+  mobileMoreCleanup = () => {
+    document.removeEventListener('keydown', handleKeydown);
+    trigger.removeEventListener('click', openSheet);
+    document.documentElement.classList.remove('fsfit-sheet-open');
+  };
 
   return { openSheet, closeSheet };
 }
