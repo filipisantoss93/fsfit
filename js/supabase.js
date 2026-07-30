@@ -1,4 +1,5 @@
 import './inactive-account-guard.js?v=20260730-inactive-account1';
+import { loadPageModules } from './page-module-loader.js?v=20260730-page-loader1';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const SUPABASE_URL = 'https://jjpijncxlkwutbnkpsaw.supabase.co';
@@ -64,10 +65,7 @@ function normalizeScheduleResult(result) {
   if (!result || result.error || !result.data) return result;
   const normalizeRow = row => {
     if (!row || !Array.isArray(row.dias_semana)) return row;
-    return {
-      ...row,
-      dias_semana: row.dias_semana.map(day => Number(day) === 7 ? 0 : Number(day))
-    };
+    return { ...row, dias_semana: row.dias_semana.map(day => Number(day) === 7 ? 0 : Number(day)) };
   };
   return {
     ...result,
@@ -113,37 +111,7 @@ if (!globalThis[SCHEDULE_NORMALIZER_KEY] && ['agenda.html', 'painel.html'].inclu
   };
 }
 
-if (!globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__) {
-  globalThis.__FSFIT_STUDENT_WORKFLOW_ENHANCEMENTS__ = true;
-  queueMicrotask(() => {
-    import('./student-workflow-improvements.js?v=20260725-student-workflow1')
-      .catch(error => console.warn('Melhorias integradas do aluno indisponíveis:', error));
-  });
-}
-
-if (currentPage() === 'ficha-aluno.html' && !globalThis.__FSFIT_STUDENT_RECORD_HIERARCHY_LOADER__) {
-  globalThis.__FSFIT_STUDENT_RECORD_HIERARCHY_LOADER__ = true;
-  queueMicrotask(() => {
-    import('./ficha-aluno-hierarquia.js?v=20260725-hierarchy1')
-      .catch(error => console.warn('Hierarquia otimizada da ficha do aluno indisponível:', error));
-  });
-}
-
-if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER_LOADER__) {
-  globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER_LOADER__ = true;
-  queueMicrotask(() => {
-    import('./treino-dia-personalizacao.js?v=20260725-day-custom1')
-      .catch(error => console.warn('Personalização do treino aplicado indisponível:', error));
-  });
-}
-
-if (currentPage() === 'treino-aluno.html' && !globalThis.__FSFIT_EXERCISE_CATEGORY_FILTER_LOADER__) {
-  globalThis.__FSFIT_EXERCISE_CATEGORY_FILTER_LOADER__ = true;
-  queueMicrotask(() => {
-    import('./treino-exercicio-categorias.js?v=20260725-category1')
-      .catch(error => console.warn('Categorias do seletor de exercícios indisponíveis:', error));
-  });
-}
+loadPageModules(currentPage());
 
 // O portal do aluno usa somente o token temporário de aluno_sessoes.
 // Esta camada mantém compatibilidade com módulos antigos sem devolver access_token persistente ao navegador.
@@ -180,12 +148,4 @@ if (!globalThis.__FSFIT_STUDENT_SESSION_RPC_ADAPTER__) {
     delete safeParams.p_access_token;
     return originalRpc(safeName, safeParams, options);
   };
-}
-
-if (currentPage() === 'aluno.html' && !globalThis.__FSFIT_STUDENT_SESSION_CONTROLS__) {
-  globalThis.__FSFIT_STUDENT_SESSION_CONTROLS__ = true;
-  queueMicrotask(() => {
-    import('./aluno-sessao-controles.js?v=20260726-session1')
-      .catch(error => console.warn('Controles de sessão do aluno indisponíveis:', error));
-  });
 }
