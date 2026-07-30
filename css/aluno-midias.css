@@ -1,2 +1,2 @@
-/* Compatibilidade: aluno.html continua apontando para este arquivo, que agora carrega o bundle consolidado. */
+/* Compatibilidade temporária: aluno.html continua apontando para este arquivo, que carrega o bundle consolidado. */
 @import url("./aluno.css?v=20260730-student-bundle1");
