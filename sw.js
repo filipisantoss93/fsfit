@@ -1,6 +1,25 @@
-const CACHE_NAME = 'fsfit-shell-v14';
-const APP_SHELL = [
+const CACHE_PREFIX = 'fsfit-shell-';
+const CACHE_NAME = `${CACHE_PREFIX}v15`;
+
+const CORE_SHELL = [
   '/',
+  '/acesso-aluno.html',
+  '/aluno.html',
+  '/css/style.css',
+  '/css/header-menu.css',
+  '/css/mobile-navigation.css',
+  '/js/supabase.js',
+  '/js/layout-core.js',
+  '/js/layout.js',
+  '/js/pwa-install.js',
+  '/manifest.webmanifest',
+  '/manifest-personal.webmanifest',
+  '/assets/icons/02-pwa/icon-192x192.png',
+  '/assets/icons/02-pwa/icon-512x512.png',
+  '/assets/icons/02-pwa/icon-maskable-512x512.png'
+];
+
+const OPTIONAL_SHELL = [
   '/painel.html',
   '/alunos.html',
   '/agenda.html',
@@ -8,26 +27,17 @@ const APP_SHELL = [
   '/perfil.html',
   '/biblioteca-exercicios.html',
   '/biblioteca-alimentar.html',
-  '/acesso-aluno.html',
   '/selecionar-personal.html',
-  '/aluno.html',
-  '/css/style.css',
-  '/css/header-menu.css',
-  '/css/mobile-navigation.css',
   '/css/financeiro.css',
   '/css/aluno-midias.css',
   '/css/aluno-notificacoes.css',
   '/css/aluno-financeiro.css',
   '/css/aluno-perfil.css',
-  '/js/supabase.js',
-  '/js/layout-core.js',
-  '/js/layout.js',
   '/js/ui-cache.js',
   '/js/page-data-cache.js',
   '/js/painel-ui-cache.js',
   '/js/painel-dashboard.js',
   '/js/painel-visao-geral.js',
-  '/js/pwa-install.js',
   '/js/painel-agenda-modal.js',
   '/js/painel-agenda-modal-hotfix.js',
   '/js/painel-agenda-modal-avatar.js',
@@ -41,49 +51,56 @@ const APP_SHELL = [
   '/js/aluno.js',
   '/js/aluno-perfil.js',
   '/js/aluno-notificacoes.js',
-  '/js/aluno-financeiro.js',
-  '/manifest.webmanifest',
-  '/manifest-personal.webmanifest',
-  '/assets/icons/02-pwa/icon-192x192.png',
-  '/assets/icons/02-pwa/icon-512x512.png',
-  '/assets/icons/02-pwa/icon-maskable-512x512.png'
+  '/js/aluno-financeiro.js'
 ];
+
+const APP_SHELL = [...new Set([...CORE_SHELL, ...OPTIONAL_SHELL])];
 const APP_SHELL_PATHS = new Set(APP_SHELL.map(path => new URL(path, self.location.origin).pathname));
 const SWR_DESTINATIONS = new Set(['style', 'image', 'font', 'manifest']);
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).catch(() => undefined));
+  event.waitUntil(installShell());
   self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
-  );
+  event.waitUntil(cleanupOldShellCaches());
   self.clients.claim();
 });
+
+async function installShell() {
+  const cache = await caches.open(CACHE_NAME);
+  await cache.addAll(CORE_SHELL);
+
+  const results = await Promise.allSettled(
+    OPTIONAL_SHELL.map(path => cache.add(path))
+  );
+
+  const failed = results.reduce((total, result) => total + (result.status === 'rejected' ? 1 : 0), 0);
+  if (failed > 0) console.info(`FS Fit PWA: ${failed} recurso(s) opcional(is) não foram pré-armazenados.`);
+}
+
+async function cleanupOldShellCaches() {
+  const keys = await caches.keys();
+  const obsoleteKeys = keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME);
+  await Promise.all(obsoleteKeys.map(key => caches.delete(key)));
+}
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin || url.pathname === '/sw.js') return;
 
-  // HTML: prioriza a rede para nunca prender o usuário em uma versão antiga,
-  // mantendo a última cópia apenas como fallback de navegação/offline.
   if (event.request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(event.request, url.pathname));
     return;
   }
 
-  // JavaScript da aplicação também precisa priorizar a rede. Servir módulos antigos
-  // junto de HTML/DOM novos pode causar estados incompatíveis, como modal invisível
-  // com o scroll bloqueado. O cache continua sendo usado como fallback offline.
   if (event.request.destination === 'script') {
     event.respondWith(networkFirstAsset(event.request, url.pathname));
     return;
   }
 
-  // CSS, imagens, fontes e manifests podem abrir do cache e revalidar em background.
   if (SWR_DESTINATIONS.has(event.request.destination) || APP_SHELL_PATHS.has(url.pathname)) {
     event.respondWith(staleWhileRevalidate(event.request, url.pathname));
   }
