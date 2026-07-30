@@ -1,0 +1,4 @@
+/* FS Fit — ponto único de entrada dos estilos da gestão de alunos */
+@import url("./dashboard-desktop.css?v=20260727-dashboard1");
+@import url("./alunos.css?v=20260727-dashboard1");
+@import url("./alunos-lista-compacta.css?v=20260726-ux1");
