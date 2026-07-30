@@ -7,6 +7,7 @@ export * from './layout-core.js';
 
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
+const DESKTOP_SHELL_STYLESHEET = 'css/header-menu.css?v=20260729-shell-order1';
 const AUTO_SHELL_ACTIVE_BY_PAGE = {
   'painel.html': 'painel',
   'alunos.html': 'alunos',
@@ -30,6 +31,17 @@ function currentPage() {
 
 function inferShellActivePage() {
   return AUTO_SHELL_ACTIVE_BY_PAGE[currentPage()] || '';
+}
+
+function ensureDesktopShellStyles() {
+  const existingStyles = Array.from(document.querySelectorAll('link[data-fsfit-header-styles], link[href*="header-menu.css"]'));
+  existingStyles.forEach(link => link.remove());
+
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = DESKTOP_SHELL_STYLESHEET;
+  stylesheet.dataset.fsfitHeaderStyles = '';
+  document.head.appendChild(stylesheet);
 }
 
 function scheduleNonCriticalEnhancements() {
@@ -67,7 +79,6 @@ function ensureMobileMoreSheet(trigger) {
     </section>`;
 
   document.body.appendChild(sheet);
-
   const closeButton = sheet.querySelector('.fsfit-more-close');
   const backdrop = sheet.querySelector('.fsfit-more-backdrop');
   const publicPageButton = sheet.querySelector('[data-fsfit-public-page]');
@@ -208,6 +219,7 @@ function configureStudentRecordBackLink() {
 }
 
 export function renderHeader(active = '') {
+  ensureDesktopShellStyles();
   core.renderHeader(active);
   ensureMobileBottomNav(active);
   configureStudentRecordBackLink();
