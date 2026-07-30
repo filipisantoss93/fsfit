@@ -6,6 +6,8 @@ const status = document.querySelector('#recovery-status');
 const fields = form ? [...form.querySelectorAll('input, button[type="submit"]')] : [];
 let recoveryReady = false;
 let validationFinished = false;
+let validationTimer = null;
+let authSubscription = null;
 
 function show(text, type = 'error') {
   if (!message) return;
@@ -31,43 +33,70 @@ function setFormEnabled(enabled) {
   });
 }
 
+function stopRecoveryValidation() {
+  if (validationTimer) {
+    window.clearTimeout(validationTimer);
+    validationTimer = null;
+  }
+  authSubscription?.unsubscribe();
+  authSubscription = null;
+}
+
+function removeRecoveryParamsFromUrl() {
+  try {
+    const url = new URL(window.location.href);
+    ['code', 'type', 'token', 'token_hash', 'access_token', 'refresh_token'].forEach(key => url.searchParams.delete(key));
+    url.hash = '';
+    window.history.replaceState({}, document.title, `${url.pathname}${url.search}`);
+  } catch {}
+}
+
 function markRecoveryReady() {
   if (recoveryReady) return;
   recoveryReady = true;
   validationFinished = true;
+  stopRecoveryValidation();
+  removeRecoveryParamsFromUrl();
   setStatus('Link validado. Agora você pode criar sua nova senha.', 'ready');
   setFormEnabled(true);
   document.querySelector('#new-password')?.focus();
 }
 
 function markRecoveryInvalid() {
-  if (recoveryReady) return;
+  if (recoveryReady || validationFinished) return;
   validationFinished = true;
+  stopRecoveryValidation();
   setStatus('Este link é inválido ou expirou. Solicite um novo link de recuperação.', 'invalid');
   setFormEnabled(false);
 }
 
-supabase.auth.onAuthStateChange((event) => {
-  if (event === 'PASSWORD_RECOVERY') markRecoveryReady();
+setFormEnabled(false);
+
+const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY' && session?.user) markRecoveryReady();
 });
+authSubscription = authListener?.subscription || null;
 
 const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
 const queryParams = new URLSearchParams(window.location.search);
-const recoveryFlow = hashParams.get('type') === 'recovery' || queryParams.get('type') === 'recovery';
+const recoveryFlow = hashParams.get('type') === 'recovery'
+  || queryParams.get('type') === 'recovery'
+  || queryParams.has('code');
 
 try {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session && recoveryFlow) {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  if (session?.user && recoveryFlow) {
     markRecoveryReady();
   } else {
-    window.setTimeout(() => {
-      if (!recoveryReady) markRecoveryInvalid();
-    }, 1200);
+    validationTimer = window.setTimeout(markRecoveryInvalid, 5000);
   }
 } catch (error) {
   console.error(error);
   markRecoveryInvalid();
 }
+
+window.addEventListener('beforeunload', stopRecoveryValidation, { once: true });
 
 form?.addEventListener('submit', async event => {
   event.preventDefault();
@@ -83,6 +112,7 @@ form?.addEventListener('submit', async event => {
   if (password !== confirmPassword) return show('As senhas não coincidem.');
 
   const button = form.querySelector('[type="submit"]');
+  if (!button) return;
   button.disabled = true;
   button.textContent = 'Salvando...';
 
@@ -97,7 +127,7 @@ form?.addEventListener('submit', async event => {
       input.disabled = true;
       input.value = '';
     });
-    window.setTimeout(() => window.location.replace('index.html?modo=login#cadastro'), 1400);
+    window.setTimeout(() => window.location.replace('index.html?modo=login'), 1400);
   } catch (error) {
     console.error(error);
     show(error.message || 'Não foi possível atualizar sua senha. Solicite um novo link e tente novamente.');

@@ -1,5 +1,4 @@
 import { supabase } from './supabase.js';
-import { ensurePersonalProfile } from './layout.js';
 
 const PLAY_DISTRIBUTION_KEY = 'fsfit_distribution';
 const PLAY_DISTRIBUTION_VALUE = 'google-play';
@@ -72,6 +71,16 @@ function trackSignupCreated(attribution) {
   window.dispatchEvent(new CustomEvent('fsfit:signup-created', { detail }));
 }
 
+function authErrorMessage(error) {
+  const message = String(error?.message || '').toLowerCase();
+  if (message.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
+  if (message.includes('email not confirmed')) return 'Confirme seu e-mail antes de acessar.';
+  if (message.includes('user already registered')) return 'Este e-mail já possui cadastro.';
+  if (message.includes('password should be')) return 'A senha não atende aos requisitos mínimos de segurança.';
+  if (message.includes('rate limit') || message.includes('too many requests')) return 'Muitas tentativas em pouco tempo. Aguarde e tente novamente.';
+  return error?.message || 'Não foi possível concluir a autenticação.';
+}
+
 const attribution = captureAttribution();
 
 if (launchedFromGooglePlay) {
@@ -106,6 +115,7 @@ const defaultAuthMode = document.body?.dataset.authDefault === 'signup'
 let mode = 'login';
 
 function show(text, type = 'error') {
+  if (!message) return;
   message.textContent = text;
   message.className = `message show ${type}`;
 }
@@ -122,24 +132,24 @@ function setMode(nextMode, { preserveMessage = false } = {}) {
 
   mode = nextMode;
   const signup = mode === 'signup';
-  title.textContent = signup ? 'Comece seus 7 dias grátis' : 'Acesse sua conta';
-  submit.textContent = signup ? 'Começar meus 7 dias grátis' : 'Entrar';
+  if (title) title.textContent = signup ? 'Comece seus 7 dias grátis' : 'Acesse sua conta';
+  if (submit) submit.textContent = signup ? 'Começar meus 7 dias grátis' : 'Entrar';
   if (switchButton) switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Clique aqui.';
   if (trialNote) {
     trialNote.innerHTML = signup
       ? '<strong>7 dias grátis.</strong> Crie sua conta agora. Depois do período gratuito, continue por R$ 29,90.'
       : '<strong>Novo por aqui?</strong> Crie sua conta e ganhe 7 dias grátis.';
   }
-  nameGroup.classList.toggle('hidden', !signup);
-  confirmGroup.classList.toggle('hidden', !signup);
+  nameGroup?.classList.toggle('hidden', !signup);
+  confirmGroup?.classList.toggle('hidden', !signup);
   legalConsentGroup?.classList.toggle('hidden', !signup);
   forgotWrap?.classList.toggle('hidden', signup);
-  form.password.autocomplete = signup ? 'new-password' : 'current-password';
-  if (!signup) {
-    form.confirm_password.value = '';
+  if (form?.password) form.password.autocomplete = signup ? 'new-password' : 'current-password';
+  if (!signup && form) {
+    if (form.confirm_password) form.confirm_password.value = '';
     if (legalConsent) legalConsent.checked = false;
   }
-  if (!preserveMessage) message.className = 'message';
+  if (!preserveMessage && message) message.className = 'message';
 }
 
 function toggleMode() {
@@ -147,12 +157,12 @@ function toggleMode() {
   setMode(mode === 'login' ? 'signup' : 'login');
 }
 
-async function finishAuthenticatedAccess(session) {
+function finishAuthenticatedAccess(session) {
+  if (!session?.user?.id) throw new Error('Não foi possível validar a sessão. Faça login novamente.');
   if (isGooglePlayDistribution) {
     localStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
     sessionStorage.setItem(PLAY_DISTRIBUTION_KEY, PLAY_DISTRIBUTION_VALUE);
   }
-  await ensurePersonalProfile(session);
   window.location.replace('painel.html');
 }
 
@@ -167,24 +177,25 @@ form?.addEventListener('submit', async event => {
 
   const email = form.email.value.trim().toLowerCase();
   const password = form.password.value;
-  const fullName = form.full_name.value.trim();
-  const confirmPassword = form.confirm_password.value;
+  const fullName = form.full_name?.value.trim() || '';
+  const confirmPassword = form.confirm_password?.value || '';
 
-  if (mode === 'signup' && password !== confirmPassword) {
-    return show('As senhas não coincidem.');
-  }
+  if (!email || !password) return show('Informe seu e-mail e sua senha.');
+  if (mode === 'signup' && password !== confirmPassword) return show('As senhas não coincidem.');
   if (mode === 'signup' && !legalConsent?.checked) {
     return show('Para criar sua conta, leia e aceite os Termos de Uso e a Política de Privacidade.');
   }
 
-  submit.disabled = true;
-  submit.textContent = 'Aguarde...';
+  if (submit) {
+    submit.disabled = true;
+    submit.textContent = 'Aguarde...';
+  }
 
   try {
     if (mode === 'login') {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      await finishAuthenticatedAccess(data.session);
+      finishAuthenticatedAccess(data.session);
       return;
     }
 
@@ -213,25 +224,25 @@ form?.addEventListener('submit', async event => {
 
     trackSignupCreated(attribution);
 
-    if (data.session) {
-      await supabase.auth.signOut();
-    }
+    if (data.session) await supabase.auth.signOut();
 
     form.reset();
     setMode('login', { preserveMessage: true });
     form.email.value = email;
     show(
       data.session
-        ? 'Conta criada com sucesso. Seus 7 dias grátis já estão disponíveis. Faça login para continuar.'
+        ? 'Conta criada com sucesso. Faça login para continuar.'
         : 'Conta criada. Confirme seu e-mail para ativar o cadastro e iniciar seus 7 dias grátis.',
       'success'
     );
   } catch (error) {
     console.error(error);
-    show(error.message || 'Não foi possível concluir a autenticação.');
+    show(authErrorMessage(error));
   } finally {
-    submit.disabled = false;
-    submit.textContent = mode === 'signup' ? 'Começar meus 7 dias grátis' : 'Entrar';
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = mode === 'signup' ? 'Começar meus 7 dias grátis' : 'Entrar';
+    }
   }
 });
 
@@ -254,10 +265,10 @@ if (session) {
     await supabase.auth.signOut();
   } else {
     try {
-      await finishAuthenticatedAccess(session);
+      finishAuthenticatedAccess(session);
     } catch (error) {
       console.error(error);
-      show('Não foi possível preparar seu perfil. Tente novamente.');
+      show(authErrorMessage(error));
     }
   }
 }
