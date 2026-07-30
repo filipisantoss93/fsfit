@@ -5,7 +5,6 @@ const NOTIFICATION_EMPTY_HTML = '<div class="notification-empty"><strong>Nenhuma
 let notificationDeleteChannel = null;
 let notificationDeleteUserId = null;
 let notificationReconnectTimer = null;
-let notificationRefreshTimer = null;
 let notificationActionPending = false;
 let cleanupRegistered = false;
 
@@ -141,23 +140,29 @@ function setNotificationBusy(busy) {
   if (clearAll) clearAll.disabled = busy;
 }
 
-function decrementNotificationBadge() {
+function readNotificationBadge() {
+  const { badge } = notificationElements();
+  if (!badge || badge.classList.contains('hidden')) return 0;
+  const value = Number.parseInt(badge.textContent || '0', 10);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function setNotificationBadge(count) {
   const { badge, markAll } = notificationElements();
   if (!badge) return;
-  const current = Number.parseInt(badge.textContent || '0', 10);
-  const next = Number.isFinite(current) ? Math.max(0, current - 1) : 0;
-  badge.textContent = next > 9 ? '9+' : String(next);
-  badge.classList.toggle('hidden', next === 0);
-  markAll?.classList.toggle('hidden', next === 0);
+  const value = Math.max(0, Number(count) || 0);
+  badge.textContent = value > 9 ? '9+' : String(value);
+  badge.classList.toggle('hidden', value === 0);
+  markAll?.classList.toggle('hidden', value === 0);
+}
+
+function decrementNotificationBadge() {
+  setNotificationBadge(Math.max(0, readNotificationBadge() - 1));
 }
 
 function clearNotificationUi() {
-  const { badge, list, markAll, clearAll } = notificationElements();
-  if (badge) {
-    badge.textContent = '0';
-    badge.classList.add('hidden');
-  }
-  markAll?.classList.add('hidden');
+  const { list, clearAll } = notificationElements();
+  setNotificationBadge(0);
   clearAll?.classList.add('hidden');
   if (list) list.innerHTML = NOTIFICATION_EMPTY_HTML;
   document.querySelectorAll('[data-admin-support-badge]').forEach(item => {
@@ -166,20 +171,9 @@ function clearNotificationUi() {
   });
 }
 
-function scheduleNotificationPageRefresh() {
-  if (notificationRefreshTimer) clearTimeout(notificationRefreshTimer);
-  notificationRefreshTimer = window.setTimeout(() => {
-    notificationRefreshTimer = null;
-    window.location.reload();
-  }, 350);
-}
-
 function applyRealtimeDelete(payload) {
   const deletedId = payload?.old?.id;
-  if (!deletedId) {
-    scheduleNotificationPageRefresh();
-    return;
-  }
+  if (!deletedId) return;
 
   const item = document.querySelector(`#notification-list [data-notification-id="${CSS.escape(String(deletedId))}"]`);
   if (!item) return;
@@ -200,6 +194,7 @@ async function currentUserId() {
 
 async function markOneNotification(item, userId) {
   const targetLink = item.tagName === 'A' ? item.getAttribute('href') : '';
+  const previousUnreadCount = readNotificationBadge();
   item.classList.remove('unread');
   item.setAttribute('aria-busy', 'true');
   decrementNotificationBadge();
@@ -213,7 +208,7 @@ async function markOneNotification(item, userId) {
   item.removeAttribute('aria-busy');
   if (error) {
     item.classList.add('unread');
-    scheduleNotificationPageRefresh();
+    setNotificationBadge(previousUnreadCount);
     throw error;
   }
   if (targetLink) window.location.assign(targetLink);
@@ -228,12 +223,7 @@ async function markAllNotifications(userId) {
   if (error) throw error;
 
   document.querySelectorAll('#notification-list .notification-item.unread').forEach(item => item.classList.remove('unread'));
-  const { badge, markAll } = notificationElements();
-  if (badge) {
-    badge.textContent = '0';
-    badge.classList.add('hidden');
-  }
-  markAll?.classList.add('hidden');
+  setNotificationBadge(0);
 }
 
 async function deleteAllNotifications(userId) {
@@ -264,7 +254,6 @@ function setupNotificationActions() {
     } catch (error) {
       console.error('Não foi possível concluir a ação da notificação:', error);
       window.alert('Não foi possível atualizar as notificações. Verifique sua conexão e tente novamente.');
-      scheduleNotificationPageRefresh();
     } finally {
       setNotificationBusy(false);
     }
@@ -321,7 +310,6 @@ function setupNotificationLifecycle() {
     cleanupRegistered = true;
     window.addEventListener('beforeunload', () => {
       clearNotificationReconnectTimer();
-      if (notificationRefreshTimer) clearTimeout(notificationRefreshTimer);
       if (notificationDeleteChannel) supabase.removeChannel(notificationDeleteChannel);
     }, { once: true });
   }
