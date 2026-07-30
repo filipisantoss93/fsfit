@@ -170,10 +170,26 @@ function scheduleNotificationPageRefresh() {
   if (notificationRefreshTimer) clearTimeout(notificationRefreshTimer);
   notificationRefreshTimer = window.setTimeout(() => {
     notificationRefreshTimer = null;
-    window.dispatchEvent(new CustomEvent('fsfit-notifications-invalidated'));
-    const button = document.querySelector('#notification-button');
-    if (button?.getAttribute('aria-expanded') === 'true') button.click();
-  }, 180);
+    window.location.reload();
+  }, 350);
+}
+
+function applyRealtimeDelete(payload) {
+  const deletedId = payload?.old?.id;
+  if (!deletedId) {
+    scheduleNotificationPageRefresh();
+    return;
+  }
+
+  const item = document.querySelector(`#notification-list [data-notification-id="${CSS.escape(String(deletedId))}"]`);
+  if (!item) return;
+  if (item.classList.contains('unread')) decrementNotificationBadge();
+  item.remove();
+
+  const { list, clearAll } = notificationElements();
+  const hasItems = Boolean(list?.querySelector('[data-notification-id]'));
+  clearAll?.classList.toggle('hidden', !hasItems);
+  if (list && !hasItems) list.innerHTML = NOTIFICATION_EMPTY_HTML;
 }
 
 async function currentUserId() {
@@ -287,9 +303,7 @@ async function setupNotificationDeleteRealtime(explicitUserId = null) {
   const filter = `destinatario_id=eq.${userId}`;
   notificationDeleteChannel = supabase
     .channel(`fsfit-notificacoes-delete-${userId}`)
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notificacoes', filter }, () => {
-      scheduleNotificationPageRefresh();
-    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notificacoes', filter }, applyRealtimeDelete)
     .subscribe(status => {
       if (status === 'SUBSCRIBED') clearNotificationReconnectTimer();
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
