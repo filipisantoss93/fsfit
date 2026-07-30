@@ -1,5 +1,5 @@
 /* FS Fit — ponto único de entrada dos estilos da área do aluno */
-@import url("./aluno-midias.css");
+@import url("./aluno-midias-core.css?v=20260730-student-bundle1");
 @import url("./aluno-notificacoes.css?v=20260716-notifications1");
 @import url("./aluno-treino-player.css?v=20260724-student-home1");
 @import url("./aluno-inicio.css?v=20260724-student-home1");
