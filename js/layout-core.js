@@ -17,7 +17,9 @@ let profilePromise = null;
 let profilePromiseUserId = null;
 let accessPromise = null;
 let accessPromiseAt = 0;
+let accessPromiseUserId = null;
 let coreSessionPromise = null;
+let coreSessionUserId = null;
 let notificationChannel = null;
 let notificationChannelUserId = null;
 let notificationRefreshTimer = null;
@@ -25,6 +27,56 @@ let notificationRefreshTimer = null;
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
   return page || 'index.html';
+}
+
+function accessCacheKey(userId) {
+  return userId ? `${ACCESS_CACHE_KEY}:${userId}` : ACCESS_CACHE_KEY;
+}
+
+function clearFsFitStorage() {
+  try {
+    for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+      const key = localStorage.key(index);
+      if (key?.startsWith('fsfit:')) localStorage.removeItem(key);
+    }
+  } catch {}
+
+  try {
+    for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = sessionStorage.key(index);
+      if (key?.startsWith('fsfit:')) sessionStorage.removeItem(key);
+    }
+  } catch {}
+}
+
+async function resetClientSessionState({ clearStorage = false } = {}) {
+  if (notificationRefreshTimer) {
+    clearTimeout(notificationRefreshTimer);
+    notificationRefreshTimer = null;
+  }
+  if (notificationChannel) {
+    try { await supabase.removeChannel(notificationChannel); } catch {}
+  }
+  notificationChannel = null;
+  notificationChannelUserId = null;
+  lastProfile = null;
+  profilePromise = null;
+  profilePromiseUserId = null;
+  accessPromise = null;
+  accessPromiseAt = 0;
+  accessPromiseUserId = null;
+  coreSessionPromise = null;
+  coreSessionUserId = null;
+  if (clearStorage) clearFsFitStorage();
+}
+
+async function signOutAndRedirect() {
+  try {
+    await supabase.auth.signOut();
+  } finally {
+    await resetClientSessionState({ clearStorage: true });
+    window.location.replace('index.html');
+  }
 }
 
 if (currentPage() !== 'ficha-aluno.html') {
@@ -43,7 +95,6 @@ function withTimeout(promise, ms, label) {
     if (timer) window.clearTimeout(timer);
   });
 }
-
 
 function icon(name) {
   const paths = {
@@ -156,12 +207,7 @@ export function renderHeader(active = '') {
     if (!window.matchMedia('(max-width: 860px)').matches) setMenuOpen(false);
   });
 
-  host.querySelector('#logout-button')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    localStorage.clear();
-    sessionStorage.removeItem(ACCESS_CACHE_KEY);
-    window.location.replace('index.html');
-  });
+  host.querySelector('#logout-button')?.addEventListener('click', signOutAndRedirect);
 }
 
 async function preparePersonalProfile(session) {
@@ -215,29 +261,32 @@ export function ensurePersonalProfile(session) {
   return profilePromise;
 }
 
-function readCachedAccess() {
+function readCachedAccess(userId) {
+  if (!userId) return null;
   try {
-    const cached = JSON.parse(sessionStorage.getItem(ACCESS_CACHE_KEY) || 'null');
-    if (cached?.value && Date.now() - Number(cached.savedAt || 0) < ACCESS_CACHE_MAX_AGE_MS) return cached.value;
+    const cached = JSON.parse(sessionStorage.getItem(accessCacheKey(userId)) || 'null');
+    if (cached?.userId === userId && cached?.value && Date.now() - Number(cached.savedAt || 0) < ACCESS_CACHE_MAX_AGE_MS) return cached.value;
   } catch {}
   return null;
 }
 
-export async function getAccessStatus() {
+export async function getAccessStatus(userId) {
+  if (!userId) throw new Error('Sessão inválida.');
   const now = Date.now();
-  if (accessPromise && now - accessPromiseAt < 30000) return accessPromise;
+  if (accessPromise && accessPromiseUserId === userId && now - accessPromiseAt < 30000) return accessPromise;
 
   accessPromiseAt = now;
+  accessPromiseUserId = userId;
   accessPromise = (async () => {
     try {
       const result = await withTimeout(supabase.rpc('fsfit_sincronizar_meu_acesso'), 5000, 'Verificação de acesso');
       if (result?.error) throw result.error;
       const access = result?.data || null;
       if (!access) throw new Error('Status de acesso indisponível.');
-      try { sessionStorage.setItem(ACCESS_CACHE_KEY, JSON.stringify({ value: access, savedAt: Date.now() })); } catch {}
+      try { sessionStorage.setItem(accessCacheKey(userId), JSON.stringify({ userId, value: access, savedAt: Date.now() })); } catch {}
       return access;
     } catch (error) {
-      const cached = readCachedAccess();
+      const cached = readCachedAccess(userId);
       if (cached) {
         console.warn('Verificação de acesso indisponível; usando último estado validado recente:', error);
         return { ...cached, cached: true };
@@ -247,7 +296,10 @@ export async function getAccessStatus() {
     }
   })().finally(() => {
     window.setTimeout(() => {
-      if (Date.now() - accessPromiseAt >= 30000) accessPromise = null;
+      if (accessPromiseUserId === userId && Date.now() - accessPromiseAt >= 30000) {
+        accessPromise = null;
+        accessPromiseUserId = null;
+      }
     }, 30000);
   });
 
@@ -263,23 +315,22 @@ function renderInactiveAccount() {
         <button id="inactive-account-logout" class="btn btn-primary" type="button">Voltar para o login</button>
       </section>
     </main>`;
-  document.querySelector('#inactive-account-logout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    localStorage.clear();
-    sessionStorage.removeItem(ACCESS_CACHE_KEY);
-    window.location.replace('index.html');
-  });
+  document.querySelector('#inactive-account-logout')?.addEventListener('click', signOutAndRedirect);
 }
 
 async function prepareSession() {
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error || !session) {
+    await resetClientSessionState();
     window.location.replace('index.html?login=1');
     return null;
   }
 
+  const userId = session.user.id;
+  if (coreSessionUserId && coreSessionUserId !== userId) await resetClientSessionState();
+  coreSessionUserId = userId;
   await ensurePersonalProfile(session);
-  const access = await getAccessStatus();
+  const access = await getAccessStatus(userId);
   if (access?.tipo_acesso === 'inativo' && !access?.admin) {
     renderInactiveAccount();
     return null;
