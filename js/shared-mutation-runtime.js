@@ -55,6 +55,16 @@ function installSharedMutationRuntime() {
     });
   };
 
+  const releaseSharedObserverIfIdle = () => {
+    if (subscriptions.size > 0) return;
+    sharedObserver?.disconnect();
+    sharedObserver = null;
+    sharedTarget = null;
+    pendingRecords = [];
+    if (deliveryFrame) window.cancelAnimationFrame(deliveryFrame);
+    deliveryFrame = 0;
+  };
+
   class SharedMutationObserver {
     constructor(callback) {
       if (typeof callback !== 'function') throw new TypeError('MutationObserver callback must be a function.');
@@ -64,11 +74,20 @@ function installSharedMutationRuntime() {
     }
 
     observe(target, options = {}) {
-      const canShare = target === document.body && options?.subtree === true;
+      const canShare = target === document.body
+        && options?.subtree === true
+        && options?.attributeOldValue !== true
+        && options?.characterDataOldValue !== true;
+
       if (!canShare) {
         if (!this.nativeObserver) this.nativeObserver = new NativeMutationObserver(this.callback);
         this.nativeObserver.observe(target, options);
         return;
+      }
+
+      if (this.sharedSubscription) {
+        this.sharedSubscription.active = false;
+        subscriptions.delete(this.sharedSubscription);
       }
 
       this.sharedSubscription = {
@@ -88,14 +107,7 @@ function installSharedMutationRuntime() {
         subscriptions.delete(this.sharedSubscription);
         this.sharedSubscription = null;
       }
-      if (subscriptions.size === 0) {
-        sharedObserver?.disconnect();
-        sharedObserver = null;
-        sharedTarget = null;
-        pendingRecords = [];
-        if (deliveryFrame) window.cancelAnimationFrame(deliveryFrame);
-        deliveryFrame = 0;
-      }
+      releaseSharedObserverIfIdle();
     }
 
     takeRecords() {
@@ -119,7 +131,9 @@ function installSharedMutationRuntime() {
     }
   };
 
-  window.addEventListener('pagehide', () => globalThis[RUNTIME_KEY]?.disconnect(), { once: true });
+  window.addEventListener('pagehide', event => {
+    if (!event.persisted) globalThis[RUNTIME_KEY]?.disconnect();
+  }, { once: true });
 }
 
 installSharedMutationRuntime();
