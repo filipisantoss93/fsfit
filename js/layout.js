@@ -35,18 +35,6 @@ function inferShellActivePage() {
   return AUTO_SHELL_ACTIVE_BY_PAGE[currentPage()] || '';
 }
 
-function clearFsFitStorage() {
-  const removeNamespacedKeys = storage => {
-    for (let index = storage.length - 1; index >= 0; index -= 1) {
-      const key = storage.key(index);
-      if (key?.startsWith('fsfit:')) storage.removeItem(key);
-    }
-  };
-  removeNamespacedKeys(localStorage);
-  removeNamespacedKeys(sessionStorage);
-  ['id', 'usuario_email', 'usuario_plano', 'usuario_nome'].forEach(key => localStorage.removeItem(key));
-}
-
 function ensureDesktopShellStyles() {
   const existingStyles = Array.from(document.querySelectorAll('link[data-fsfit-header-styles], link[href*="header-menu.css"]'));
   existingStyles.forEach(link => link.remove());
@@ -170,14 +158,9 @@ function ensureMobileMoreSheet(trigger) {
     }
   });
 
-  logoutButton?.addEventListener('click', async () => {
+  logoutButton?.addEventListener('click', () => {
     closeSheet();
-    const existingLogout = document.querySelector('#logout-button');
-    if (existingLogout instanceof HTMLElement) return existingLogout.click();
-    try { await supabase.auth.signOut(); } finally {
-      clearFsFitStorage();
-      window.location.replace('index.html');
-    }
+    document.querySelector('#logout-button')?.click();
   });
 
   document.addEventListener('keydown', handleKeydown);
