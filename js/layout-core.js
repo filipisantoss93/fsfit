@@ -12,9 +12,6 @@ const FREE_ALLOWED_PAGES = new Set([
 ]);
 
 const messageTimers = new WeakMap();
-let lastProfile = null;
-let profilePromise = null;
-let profilePromiseUserId = null;
 let accessPromise = null;
 let accessPromiseAt = 0;
 let accessPromiseUserId = null;
@@ -23,6 +20,7 @@ let coreSessionUserId = null;
 let notificationChannel = null;
 let notificationChannelUserId = null;
 let notificationRefreshTimer = null;
+let headerCleanup = null;
 
 function currentPage() {
   const page = window.location.pathname.split('/').pop();
@@ -59,9 +57,6 @@ async function resetClientSessionState({ clearStorage = false } = {}) {
   }
   notificationChannel = null;
   notificationChannelUserId = null;
-  lastProfile = null;
-  profilePromise = null;
-  profilePromiseUserId = null;
   accessPromise = null;
   accessPromiseAt = 0;
   accessPromiseUserId = null;
@@ -117,6 +112,9 @@ function icon(name) {
 export function renderHeader(active = '') {
   const host = document.querySelector('#header-container');
   if (!host) return;
+
+  headerCleanup?.();
+  headerCleanup = null;
 
   host.innerHTML = `
     <header class="main-header">
@@ -175,6 +173,24 @@ export function renderHeader(active = '') {
     notificationButton.setAttribute('aria-expanded', String(open));
   };
 
+  const handleDocumentClick = event => {
+    if (!host.contains(event.target)) {
+      setMenuOpen(false);
+      setNotificationsOpen(false);
+    }
+  };
+
+  const handleDocumentKeydown = event => {
+    if (event.key === 'Escape') {
+      setMenuOpen(false);
+      setNotificationsOpen(false);
+    }
+  };
+
+  const handleResize = () => {
+    if (!window.matchMedia('(max-width: 860px)').matches) setMenuOpen(false);
+  };
+
   menuButton?.addEventListener('click', event => {
     event.stopPropagation();
     setNotificationsOpen(false);
@@ -188,77 +204,32 @@ export function renderHeader(active = '') {
   });
 
   menu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
-
-  document.addEventListener('click', event => {
-    if (!host.contains(event.target)) {
-      setMenuOpen(false);
-      setNotificationsOpen(false);
-    }
-  });
-
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      setMenuOpen(false);
-      setNotificationsOpen(false);
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    if (!window.matchMedia('(max-width: 860px)').matches) setMenuOpen(false);
-  });
-
+  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('keydown', handleDocumentKeydown);
+  window.addEventListener('resize', handleResize);
   host.querySelector('#logout-button')?.addEventListener('click', signOutAndRedirect);
+
+  headerCleanup = () => {
+    document.removeEventListener('click', handleDocumentClick);
+    document.removeEventListener('keydown', handleDocumentKeydown);
+    window.removeEventListener('resize', handleResize);
+    document.body.classList.remove('nav-menu-open');
+  };
 }
 
-async function preparePersonalProfile(session) {
+async function loadPersonalProfile(session) {
   if (!session?.user?.id) throw new Error('Sessão inválida.');
 
   const result = await withTimeout(
-    supabase.from('perfis').select('id,nome,tipo,ativo,plano,trial_inicio,trial_fim').eq('id', session.user.id).maybeSingle(),
+    supabase.from('perfis').select('id,nome').eq('id', session.user.id).maybeSingle(),
     5000,
     'Carregamento do perfil'
   );
   if (result?.error) throw result.error;
-  if (result?.data) {
-    lastProfile = result.data;
-    return result.data;
+  if (!result?.data) {
+    throw new Error('Perfil não encontrado. O provisionamento automático da conta não foi concluído.');
   }
-
-  const fallbackName = session.user.user_metadata?.full_name?.trim()
-    || session.user.user_metadata?.nome?.trim()
-    || session.user.email?.split('@')[0]
-    || 'Personal';
-  const trialInicio = new Date();
-  const trialFim = new Date(trialInicio.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const insertResult = await withTimeout(
-    supabase.from('perfis').insert({
-      id: session.user.id,
-      tipo: 'personal',
-      nome: fallbackName,
-      plano: 'trial',
-      ativo: true,
-      trial_inicio: trialInicio.toISOString(),
-      trial_fim: trialFim.toISOString()
-    }).select('id,nome,tipo,ativo,plano,trial_inicio,trial_fim').single(),
-    5000,
-    'Criação do perfil'
-  );
-  if (insertResult?.error) throw insertResult.error;
-  lastProfile = insertResult?.data || null;
-  return lastProfile;
-}
-
-export function ensurePersonalProfile(session) {
-  const userId = session?.user?.id || null;
-  if (!userId) return Promise.reject(new Error('Sessão inválida.'));
-  if (!profilePromise || profilePromiseUserId !== userId) {
-    profilePromiseUserId = userId;
-    profilePromise = preparePersonalProfile(session).catch(error => {
-      profilePromise = null;
-      throw error;
-    });
-  }
-  return profilePromise;
+  return result.data;
 }
 
 function readCachedAccess(userId) {
@@ -329,7 +300,7 @@ async function prepareSession() {
   const userId = session.user.id;
   if (coreSessionUserId && coreSessionUserId !== userId) await resetClientSessionState();
   coreSessionUserId = userId;
-  await ensurePersonalProfile(session);
+  const profile = await loadPersonalProfile(session);
   const access = await getAccessStatus(userId);
   if (access?.tipo_acesso === 'inativo' && !access?.admin) {
     renderInactiveAccount();
@@ -339,6 +310,7 @@ async function prepareSession() {
     window.location.replace('painel.html?acesso=free');
     return null;
   }
+  session.fsfitProfile = profile;
   session.fsfitAccess = access;
   return session;
 }
@@ -497,7 +469,7 @@ async function setupNotificationRealtime(session) {
 
 export async function setGreeting(session) {
   if (!session) return;
-  const resolvedName = lastProfile?.nome?.trim()
+  const resolvedName = session.fsfitProfile?.nome?.trim()
     || session.user?.user_metadata?.full_name?.trim()
     || session.user?.user_metadata?.nome?.trim()
     || session.user?.email?.split('@')[0]
