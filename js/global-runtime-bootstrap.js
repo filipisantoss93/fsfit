@@ -1,4 +1,86 @@
-import { appLifecycle } from './app-lifecycle-runtime.js?v=20260731-global-runtime4';
+const APP_LIFECYCLE_KEY = '__FSFIT_APP_LIFECYCLE__';
+
+function createAppLifecycle() {
+  const cleanups = new Set();
+  const pauseHandlers = new Set();
+  const resumeHandlers = new Set();
+  let suspended = false;
+  let disposed = false;
+
+  const runHandlers = handlers => {
+    handlers.forEach(handler => {
+      try {
+        handler();
+      } catch (error) {
+        console.warn('Falha em handler do lifecycle FS Fit:', error);
+      }
+    });
+  };
+
+  const pause = () => {
+    if (suspended || disposed) return;
+    suspended = true;
+    runHandlers(pauseHandlers);
+  };
+
+  const resume = () => {
+    if (!suspended || disposed) return;
+    suspended = false;
+    runHandlers(resumeHandlers);
+  };
+
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    cleanups.forEach(cleanup => {
+      try {
+        cleanup();
+      } catch (error) {
+        console.warn('Falha ao limpar recurso do lifecycle FS Fit:', error);
+      }
+    });
+    cleanups.clear();
+    pauseHandlers.clear();
+    resumeHandlers.clear();
+  };
+
+  window.addEventListener('pagehide', event => {
+    if (event.persisted) pause();
+    else dispose();
+  });
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) resume();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') pause();
+    else resume();
+  });
+  window.addEventListener('focus', resume, { passive: true });
+
+  return {
+    registerCleanup(cleanup) {
+      if (typeof cleanup !== 'function' || disposed) return () => undefined;
+      cleanups.add(cleanup);
+      return () => cleanups.delete(cleanup);
+    },
+    onPause(handler) {
+      if (typeof handler !== 'function' || disposed) return () => undefined;
+      pauseHandlers.add(handler);
+      return () => pauseHandlers.delete(handler);
+    },
+    onResume(handler) {
+      if (typeof handler !== 'function' || disposed) return () => undefined;
+      resumeHandlers.add(handler);
+      return () => resumeHandlers.delete(handler);
+    },
+    isSuspended: () => suspended,
+    isDisposed: () => disposed,
+    dispose
+  };
+}
+
+if (!globalThis[APP_LIFECYCLE_KEY]) globalThis[APP_LIFECYCLE_KEY] = createAppLifecycle();
+const appLifecycle = globalThis[APP_LIFECYCLE_KEY];
 
 const BOOTSTRAP_KEY = '__FSFIT_GLOBAL_RUNTIME_BOOTSTRAP__';
 const RESOURCE_AUTOWIRE_KEY = '__FSFIT_RESOURCE_LIFECYCLE_AUTOWIRE__';
@@ -6,7 +88,7 @@ const REALTIME_AUTOWIRE_KEY = '__FSFIT_REALTIME_LIFECYCLE_AUTOWIRE__';
 const SHARED_MUTATION_KEY = '__FSFIT_SHARED_MUTATION_RUNTIME__';
 const SUPABASE_CLIENT_KEY = '__FSFIT_SUPABASE_CLIENT__';
 const MOBILE_CHANNEL_PREFIX = 'fsfit-mobile-badges-';
-const VERSION = '20260731-global-runtime4';
+const VERSION = '20260731-global-runtime5';
 
 function installSharedMutationRuntime() {
   if (globalThis[SHARED_MUTATION_KEY] || typeof MutationObserver !== 'function') return;
