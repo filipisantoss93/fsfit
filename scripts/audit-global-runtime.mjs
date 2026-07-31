@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = join(fileURLToPath(new URL('..', import.meta.url)), '..');
+const root = fileURLToPath(new URL('..', import.meta.url));
 const requiredFiles = [
   'js/global-runtime-bootstrap.js',
   'js/app-lifecycle-runtime.js',
