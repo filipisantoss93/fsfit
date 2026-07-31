@@ -1,11 +1,12 @@
-import { appLifecycle } from './app-lifecycle-runtime.js?v=20260731-global-runtime1';
-import './shared-mutation-runtime.js?v=20260731-global-runtime1';
+import { appLifecycle } from './app-lifecycle-runtime.js?v=20260731-global-runtime3';
+import './shared-mutation-runtime.js?v=20260731-global-runtime3';
 
 const BOOTSTRAP_KEY = '__FSFIT_GLOBAL_RUNTIME_BOOTSTRAP__';
 const RESOURCE_AUTOWIRE_KEY = '__FSFIT_RESOURCE_LIFECYCLE_AUTOWIRE__';
 const REALTIME_AUTOWIRE_KEY = '__FSFIT_REALTIME_LIFECYCLE_AUTOWIRE__';
 const SUPABASE_CLIENT_KEY = '__FSFIT_SUPABASE_CLIENT__';
 const MOBILE_CHANNEL_PREFIX = 'fsfit-mobile-badges-';
+const VERSION = '20260731-global-runtime3';
 
 function installResourceLifecycle() {
   if (globalThis[RESOURCE_AUTOWIRE_KEY]) return;
@@ -203,24 +204,52 @@ function waitForSupabaseClient(attempt = 0) {
   window.setTimeout(() => waitForSupabaseClient(attempt + 1), 25);
 }
 
-installResourceLifecycle();
-queueMicrotask(() => waitForSupabaseClient());
+function createRuntime() {
+  const startedAt = Date.now();
+  let readyDispatched = false;
 
-if (!globalThis[BOOTSTRAP_KEY]) {
-  globalThis[BOOTSTRAP_KEY] = Object.freeze({
-    version: '20260731-global-runtime2',
-    startedAt: Date.now(),
+  return {
+    version: VERSION,
+    startedAt,
     lifecycle: appLifecycle,
+    loadCount: 1,
+    markReload() {
+      this.loadCount += 1;
+      return this.loadCount;
+    },
     status() {
       return {
+        version: this.version,
+        startedAt: this.startedAt,
+        uptimeMs: Date.now() - this.startedAt,
+        loadCount: this.loadCount,
         suspended: appLifecycle.isSuspended(),
         disposed: appLifecycle.isDisposed(),
         supabaseReady: Boolean(globalThis[SUPABASE_CLIENT_KEY]),
         resourceAutowire: Boolean(globalThis[RESOURCE_AUTOWIRE_KEY]),
-        realtimeAutowire: Boolean(globalThis[SUPABASE_CLIENT_KEY]?.[REALTIME_AUTOWIRE_KEY])
+        realtimeAutowire: Boolean(globalThis[SUPABASE_CLIENT_KEY]?.[REALTIME_AUTOWIRE_KEY]),
+        mutationRuntime: Boolean(globalThis.__FSFIT_SHARED_MUTATION_RUNTIME__)
       };
+    },
+    dispatchReady() {
+      if (readyDispatched || appLifecycle.isDisposed()) return false;
+      readyDispatched = true;
+      window.dispatchEvent(new CustomEvent('fsfit:global-runtime-ready', {
+        detail: this.status()
+      }));
+      return true;
     }
-  });
+  };
+}
+
+installResourceLifecycle();
+queueMicrotask(() => waitForSupabaseClient());
+
+if (!globalThis[BOOTSTRAP_KEY]) {
+  globalThis[BOOTSTRAP_KEY] = createRuntime();
+  queueMicrotask(() => globalThis[BOOTSTRAP_KEY].dispatchReady());
+} else {
+  globalThis[BOOTSTRAP_KEY].markReload?.();
 }
 
 export const globalRuntime = globalThis[BOOTSTRAP_KEY];
