@@ -1,3 +1,5 @@
+import './painel-runtime.js?v=20260730-panel-runtime1';
+
 const DISMISS_KEY = 'fsfit_pwa_install_dismissed_until';
 const DISMISS_DAYS = 7;
 const IOS_GUIDE_GIF = '/assets/Gif adicionar a tela de início.gif?v=20260720-pwa-install-guide1';
@@ -20,7 +22,6 @@ const isDismissed = () => {
 function dismissForDays(days = DISMISS_DAYS) {
   localStorage.setItem(DISMISS_KEY, String(Date.now() + days * 24 * 60 * 60 * 1000));
 }
-
 
 function removeModal() {
   document.querySelector('#fsfit-pwa-install-modal')?.remove();
@@ -122,57 +123,4 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-
-if (isIos()) {
-  window.setTimeout(showModal, 900);
-}
-
-if (document.querySelector('#today-list') || document.querySelector('#live-students-list')) {
-  import('./painel-home-redesign.js?v=20260723-home-redesign1')
-    .then(() => import('./painel-day-summary.js?v=20260724-day-summary1').catch(error => {
-      console.error('Falha ao carregar o resumo diário do painel:', error);
-    }))
-    .catch(error => {
-      console.error('Falha ao carregar nova tela inicial do painel:', error);
-    });
-  import('./painel-home-desktop-carousel.js?v=20260724-desktop-carousel1').catch(error => {
-    console.error('Falha ao carregar as setas do carrossel de alunos:', error);
-  });
-  import('./painel-home-avatar.js?v=20260724-home-avatar1').catch(error => {
-    console.error('Falha ao carregar a foto do aluno no card Agora:', error);
-  });
-  import('./painel-compact-enhancements.js?v=20260720-dashboard-compact2').catch(error => {
-    console.error('Falha ao carregar melhorias compactas do painel:', error);
-  });
-  import('./aulas-painel-quick-actions.js?v=20260724-live-actions1')
-    .then(() => import('./aulas-painel-exercise-categories.js?v=20260724-exercise-categories1'))
-    .catch(error => {
-      console.error('Falha ao carregar ações rápidas da aula:', error);
-    });
-  import('./aulas-painel-delete-controls.js?v=20260724-live-delete1')
-    .then(() => import('./aulas-painel-delete-layout-fix.js?v=20260724-live-delete-layout1'))
-    .catch(error => {
-      console.error('Falha ao carregar exclusão de exercícios em aula:', error);
-    });
-  import('./aulas-painel-exercise-controls.js?v=20260720-live-exercise-controls1').catch(error => {
-    console.error('Falha ao carregar controles de exercício em aula:', error);
-  });
-  import('./exercicio-drag-order.js?v=20260722-dnd2').catch(error => {
-    console.error('Falha ao carregar reordenação de exercícios em aula:', error);
-  });
-  import('./painel-agenda-modal.js?v=20260723-agenda-dashboard2').catch(error => {
-    console.error('Falha ao carregar dashboard da agenda de hoje:', error);
-  });
-  import('./painel-agenda-modal-hotfix.js?v=20260723-agenda-modal-hotfix4').catch(error => {
-    console.error('Falha ao carregar correção do modal da agenda de hoje:', error);
-  });
-  import('./painel-agenda-modal-avatar.js?v=20260723-agenda-avatar3').catch(error => {
-    console.error('Falha ao carregar a foto do aluno no modal da agenda de hoje:', error);
-  });
-
-  if (window.matchMedia('(min-width: 1100px)').matches) {
-    import('./painel-resumo-geral.js?v=20260727-general1').catch(error => {
-      console.error('Falha ao carregar o resumo geral do painel:', error);
-    });
-  }
-}
+if (isIos()) window.setTimeout(showModal, 900);
