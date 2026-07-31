@@ -14,6 +14,10 @@ const forbiddenReferences = [
   'realtime-lifecycle-autowire.js',
   'mobile-lifecycle-runtime.js'
 ];
+const auditFiles = new Set([
+  'scripts/audit-global-runtime.mjs',
+  'scripts/audit-page-scripts.mjs'
+]);
 const failures = [];
 
 function fail(message) {
@@ -75,7 +79,7 @@ for (const eventName of ['pagehide', 'pageshow', 'visibilitychange', 'focus']) {
 
 for (const file of walk(root)) {
   const relativePath = relative(root, file);
-  if (relativePath === 'scripts/audit-global-runtime.mjs') continue;
+  if (auditFiles.has(relativePath)) continue;
   const content = readFileSync(file, 'utf8');
   for (const forbidden of forbiddenReferences) {
     if (content.includes(forbidden)) fail(`Referência obsoleta em ${relativePath}: ${forbidden}`);
