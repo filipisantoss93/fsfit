@@ -1,12 +1,135 @@
-import { appLifecycle } from './app-lifecycle-runtime.js?v=20260731-global-runtime3';
-import './shared-mutation-runtime.js?v=20260731-global-runtime3';
+import { appLifecycle } from './app-lifecycle-runtime.js?v=20260731-global-runtime4';
 
 const BOOTSTRAP_KEY = '__FSFIT_GLOBAL_RUNTIME_BOOTSTRAP__';
 const RESOURCE_AUTOWIRE_KEY = '__FSFIT_RESOURCE_LIFECYCLE_AUTOWIRE__';
 const REALTIME_AUTOWIRE_KEY = '__FSFIT_REALTIME_LIFECYCLE_AUTOWIRE__';
+const SHARED_MUTATION_KEY = '__FSFIT_SHARED_MUTATION_RUNTIME__';
 const SUPABASE_CLIENT_KEY = '__FSFIT_SUPABASE_CLIENT__';
 const MOBILE_CHANNEL_PREFIX = 'fsfit-mobile-badges-';
-const VERSION = '20260731-global-runtime3';
+const VERSION = '20260731-global-runtime4';
+
+function installSharedMutationRuntime() {
+  if (globalThis[SHARED_MUTATION_KEY] || typeof MutationObserver !== 'function') return;
+
+  const NativeMutationObserver = globalThis.MutationObserver;
+  const subscriptions = new Set();
+  let sharedObserver = null;
+  let sharedTarget = null;
+  let pendingRecords = [];
+  let deliveryFrame = 0;
+
+  const matchesOptions = (record, options) => {
+    if (record.type === 'childList') return options.childList === true;
+    if (record.type === 'characterData') return options.characterData === true;
+    if (record.type !== 'attributes' || options.attributes !== true) return false;
+    return !Array.isArray(options.attributeFilter)
+      || options.attributeFilter.length === 0
+      || options.attributeFilter.includes(record.attributeName);
+  };
+
+  const deliver = () => {
+    deliveryFrame = 0;
+    const records = pendingRecords;
+    pendingRecords = [];
+    if (!records.length) return;
+    subscriptions.forEach(subscription => {
+      if (!subscription.active) return;
+      const filtered = records.filter(record => matchesOptions(record, subscription.options));
+      if (!filtered.length) return;
+      try {
+        subscription.callback(filtered, subscription.facade);
+      } catch (error) {
+        window.setTimeout(() => { throw error; }, 0);
+      }
+    });
+  };
+
+  const queueDelivery = records => {
+    pendingRecords.push(...records);
+    if (!deliveryFrame) deliveryFrame = window.requestAnimationFrame(deliver);
+  };
+
+  const ensureSharedObserver = target => {
+    if (sharedObserver && sharedTarget === target) return;
+    sharedObserver?.disconnect();
+    sharedTarget = target;
+    sharedObserver = new NativeMutationObserver(queueDelivery);
+    sharedObserver.observe(target, { childList: true, subtree: true, characterData: true, attributes: true });
+  };
+
+  const releaseSharedObserverIfIdle = () => {
+    if (subscriptions.size > 0) return;
+    sharedObserver?.disconnect();
+    sharedObserver = null;
+    sharedTarget = null;
+    pendingRecords = [];
+    if (deliveryFrame) window.cancelAnimationFrame(deliveryFrame);
+    deliveryFrame = 0;
+  };
+
+  class SharedMutationObserver {
+    constructor(callback) {
+      if (typeof callback !== 'function') throw new TypeError('MutationObserver callback must be a function.');
+      this.callback = callback;
+      this.nativeObserver = null;
+      this.sharedSubscription = null;
+    }
+
+    observe(target, options = {}) {
+      const canShare = target === document.body
+        && options.subtree === true
+        && options.attributeOldValue !== true
+        && options.characterDataOldValue !== true;
+
+      if (!canShare) {
+        if (!this.nativeObserver) this.nativeObserver = new NativeMutationObserver(this.callback);
+        this.nativeObserver.observe(target, options);
+        return;
+      }
+
+      if (this.sharedSubscription) {
+        this.sharedSubscription.active = false;
+        subscriptions.delete(this.sharedSubscription);
+      }
+
+      this.sharedSubscription = { callback: this.callback, facade: this, options: { ...options }, active: true };
+      subscriptions.add(this.sharedSubscription);
+      ensureSharedObserver(target);
+    }
+
+    disconnect() {
+      this.nativeObserver?.disconnect();
+      if (this.sharedSubscription) {
+        this.sharedSubscription.active = false;
+        subscriptions.delete(this.sharedSubscription);
+        this.sharedSubscription = null;
+      }
+      releaseSharedObserverIfIdle();
+    }
+
+    takeRecords() {
+      return this.nativeObserver?.takeRecords() || [];
+    }
+  }
+
+  globalThis.MutationObserver = SharedMutationObserver;
+  globalThis[SHARED_MUTATION_KEY] = {
+    native: NativeMutationObserver,
+    subscriptions,
+    disconnect() {
+      sharedObserver?.disconnect();
+      sharedObserver = null;
+      sharedTarget = null;
+      pendingRecords = [];
+      subscriptions.forEach(subscription => { subscription.active = false; });
+      subscriptions.clear();
+      if (deliveryFrame) window.cancelAnimationFrame(deliveryFrame);
+      deliveryFrame = 0;
+    }
+  };
+
+  appLifecycle.registerCleanup(() => globalThis[SHARED_MUTATION_KEY]?.disconnect());
+}
 
 function installResourceLifecycle() {
   if (globalThis[RESOURCE_AUTOWIRE_KEY]) return;
@@ -157,7 +280,7 @@ function createRuntime() {
         supabaseReady: Boolean(globalThis[SUPABASE_CLIENT_KEY]),
         resourceAutowire: Boolean(globalThis[RESOURCE_AUTOWIRE_KEY]),
         realtimeAutowire: Boolean(globalThis[SUPABASE_CLIENT_KEY]?.[REALTIME_AUTOWIRE_KEY]),
-        mutationRuntime: Boolean(globalThis.__FSFIT_SHARED_MUTATION_RUNTIME__)
+        mutationRuntime: Boolean(globalThis[SHARED_MUTATION_KEY])
       };
     },
     dispatchReady() {
@@ -169,6 +292,7 @@ function createRuntime() {
   };
 }
 
+installSharedMutationRuntime();
 installResourceLifecycle();
 queueMicrotask(() => waitForSupabaseClient());
 
