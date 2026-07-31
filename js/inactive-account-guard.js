@@ -1,3 +1,4 @@
+import './app-lifecycle-runtime.js?v=20260730-app-lifecycle1';
 import './shared-mutation-runtime.js?v=20260730-shared-runtime1';
 
 const INACTIVE_ACCOUNT_GUARD_KEY = '__FSFIT_INACTIVE_ACCOUNT_BODY_GUARD__';
