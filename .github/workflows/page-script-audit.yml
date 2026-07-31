@@ -1,0 +1,45 @@
+name: Auditoria de scripts das páginas
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - '**/*.js'
+      - '**/*.mjs'
+      - 'scripts/audit-page-scripts.mjs'
+      - '.github/workflows/page-script-audit.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - '**/*.js'
+      - '**/*.mjs'
+      - 'scripts/audit-page-scripts.mjs'
+      - '.github/workflows/page-script-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: page-script-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Validar páginas e imports
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar carregamento de scripts
+        run: node scripts/audit-page-scripts.mjs
