@@ -23,21 +23,40 @@ function matchesPage(module, page) {
   return module.pages === '*' || module.pages.includes(page);
 }
 
-function loadModule(module, state) {
-  if (state.loaded.has(module.id)) return Promise.resolve();
+export function loadRuntimeModule(module) {
+  const state = getState();
+  if (!module?.id || !module?.source) return Promise.resolve(false);
+  if (state.loaded.has(module.id)) return Promise.resolve(true);
   if (state.pending.has(module.id)) return state.pending.get(module.id);
 
   const pending = import(module.source)
-    .then(() => state.loaded.add(module.id))
-    .catch(error => console.warn(module.errorMessage, error))
+    .then(() => {
+      state.loaded.add(module.id);
+      return true;
+    })
+    .catch(error => {
+      console.warn(module.errorMessage || `Falha ao carregar ${module.id}:`, error);
+      return false;
+    })
     .finally(() => state.pending.delete(module.id));
 
   state.pending.set(module.id, pending);
   return pending;
 }
 
+export function loadRuntimeGroup(modules = []) {
+  return Promise.all(modules.map(loadRuntimeModule));
+}
+
+export async function loadRuntimeSequence(modules = []) {
+  for (const module of modules) {
+    const loaded = await loadRuntimeModule(module);
+    if (!loaded) return false;
+  }
+  return true;
+}
+
 export function loadPageModules(page = currentPage()) {
-  const state = getState();
   const modules = MODULES.filter(module => matchesPage(module, page));
-  queueMicrotask(() => modules.forEach(module => loadModule(module, state)));
+  queueMicrotask(() => loadRuntimeGroup(modules));
 }
