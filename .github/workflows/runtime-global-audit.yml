@@ -1,0 +1,43 @@
+name: Runtime global audit
+
+on:
+  pull_request:
+    paths:
+      - 'js/**'
+      - 'scripts/audit-global-runtime.mjs'
+      - '.github/workflows/runtime-global-audit.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'js/**'
+      - 'scripts/audit-global-runtime.mjs'
+      - '.github/workflows/runtime-global-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Validar runtime global
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verificar sintaxe dos runtimes
+        run: |
+          node --check js/global-runtime-bootstrap.js
+          node --check js/app-lifecycle-runtime.js
+          node --check js/shared-mutation-runtime.js
+          node --check js/inactive-account-guard.js
+
+      - name: Auditar contrato e referências
+        run: node scripts/audit-global-runtime.mjs
