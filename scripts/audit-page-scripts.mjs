@@ -9,6 +9,10 @@ const forbiddenRuntimeFiles = new Set([
   'realtime-lifecycle-autowire.js',
   'mobile-lifecycle-runtime.js'
 ]);
+const auditFiles = new Set([
+  'scripts/audit-global-runtime.mjs',
+  'scripts/audit-page-scripts.mjs'
+]);
 const failures = [];
 const stats = {
   htmlFiles: 0,
@@ -146,9 +150,12 @@ function auditJavascript(file) {
     validateLocalFile(file, reference, 'import local');
   }
 
+  const relativePath = relative(root, file);
+  if (auditFiles.has(relativePath)) return;
+
   for (const forbidden of forbiddenRuntimeFiles) {
     if (content.includes(forbidden)) {
-      fail(`${relative(root, file)} referencia runtime removido: ${forbidden}`);
+      fail(`${relativePath} referencia runtime removido: ${forbidden}`);
     }
   }
 }
