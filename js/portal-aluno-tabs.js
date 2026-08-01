@@ -1,6 +1,7 @@
 let initialized = false;
 let chatObserver = null;
 let liveLabelObserver = null;
+let activeTarget = 'agenda';
 
 function renderChatEmpty(chatPanel) {
   if (!chatPanel || chatPanel.querySelector('.live-chat-card') || chatPanel.querySelector('[data-student-chat-empty]')) return;
@@ -12,10 +13,11 @@ function renderChatEmpty(chatPanel) {
 }
 
 function routeChatCard(root, chatPanel) {
+  if (!root || !chatPanel) return;
   const directChatCard = [...root.children].find(element => element.classList?.contains('live-chat-card'));
   if (directChatCard) {
-    chatPanel.innerHTML = '';
-    chatPanel.appendChild(directChatCard);
+    chatPanel.querySelector('[data-student-chat-empty]')?.remove();
+    if (directChatCard.parentElement !== chatPanel) chatPanel.appendChild(directChatCard);
     return;
   }
   renderChatEmpty(chatPanel);
@@ -30,17 +32,21 @@ function normalizeLiveTabLabel(nav) {
 }
 
 function activateTab(root, target) {
+  if (!root || !['agenda', 'live', 'chat'].includes(target)) return false;
+  activeTarget = target;
+
   root.querySelectorAll('[data-student-main-tab]').forEach(button => {
     button.classList.toggle('active', button.dataset.studentMainTab === target);
   });
-
   root.querySelectorAll('[data-student-main-panel]').forEach(panel => {
     panel.classList.toggle('active', panel.dataset.studentMainPanel === target);
   });
-
   root.querySelectorAll('[data-student-main-agenda-content]').forEach(element => {
     element.classList.toggle('student-main-agenda-hidden', target !== 'agenda');
   });
+
+  document.dispatchEvent(new CustomEvent('student-main-tab-change', { detail: { target } }));
+  return true;
 }
 
 export function ensureStudentPortalMainTabs() {
@@ -62,60 +68,61 @@ export function ensureStudentPortalMainTabs() {
   planTabs.dataset.studentMainAgendaContent = 'true';
   planPanels.forEach(panel => { panel.dataset.studentMainAgendaContent = 'true'; });
 
-  const nav = document.createElement('nav');
-  nav.className = 'student-main-tabs';
-  nav.setAttribute('aria-label', 'Áreas do portal do aluno');
-  nav.innerHTML = `
-    <button class="student-main-tab active" type="button" data-student-main-tab="agenda">Início</button>
-    <button class="student-main-tab" type="button" data-student-main-tab="live" data-live-state="today">Aula</button>
-    <button class="student-main-tab" type="button" data-student-main-tab="chat">Chat</button>
-  `;
+  const nav = existingNav || document.createElement('nav');
+  if (!existingNav) {
+    nav.className = 'student-main-tabs';
+    nav.hidden = true;
+    nav.setAttribute('aria-hidden', 'true');
+    nav.innerHTML = `
+      <button class="student-main-tab active" type="button" data-student-main-tab="agenda">Início</button>
+      <button class="student-main-tab" type="button" data-student-main-tab="live" data-live-state="today">Aula</button>
+      <button class="student-main-tab" type="button" data-student-main-tab="chat">Chat</button>`;
+    root.insertBefore(nav, planTabs);
+  }
 
-  const livePanel = document.createElement('section');
-  livePanel.id = 'student-main-live';
-  livePanel.className = 'student-main-panel';
-  livePanel.dataset.studentMainPanel = 'live';
+  const livePanel = existingLive || document.createElement('section');
+  if (!existingLive) {
+    livePanel.id = 'student-main-live';
+    livePanel.className = 'student-main-panel';
+    livePanel.dataset.studentMainPanel = 'live';
+    root.insertBefore(livePanel, planTabs);
+  }
 
-  const chatPanel = document.createElement('section');
-  chatPanel.id = 'student-main-chat';
-  chatPanel.className = 'student-main-panel';
-  chatPanel.dataset.studentMainPanel = 'chat';
-
-  root.insertBefore(nav, planTabs);
-  root.insertBefore(livePanel, planTabs);
-  root.insertBefore(chatPanel, planTabs);
+  const chatPanel = existingChat || document.createElement('section');
+  if (!existingChat) {
+    chatPanel.id = 'student-main-chat';
+    chatPanel.className = 'student-main-panel';
+    chatPanel.dataset.studentMainPanel = 'chat';
+    root.insertBefore(chatPanel, planTabs);
+  }
   renderChatEmpty(chatPanel);
-
-  nav.addEventListener('click', event => {
-    const button = event.target.closest('[data-student-main-tab]');
-    if (!button) return;
-    activateTab(root, button.dataset.studentMainTab);
-  });
 
   liveLabelObserver?.disconnect();
   liveLabelObserver = new MutationObserver(() => normalizeLiveTabLabel(nav));
-  liveLabelObserver.observe(nav, {
-    subtree: true,
-    childList: true,
-    characterData: true,
-    attributes: true,
-    attributeFilter: ['data-live-state']
-  });
+  const liveButton = nav.querySelector('[data-student-main-tab="live"]');
+  if (liveButton) liveLabelObserver.observe(liveButton, { attributes: true, attributeFilter: ['data-live-state'], childList: true, characterData: true, subtree: true });
   normalizeLiveTabLabel(nav);
 
   chatObserver?.disconnect();
-  chatObserver = new MutationObserver(() => routeChatCard(root, chatPanel));
-  chatObserver.observe(root, { childList: true, subtree: true });
+  chatObserver = new MutationObserver(mutations => {
+    const relevant = mutations.some(mutation => [...mutation.addedNodes, ...mutation.removedNodes].some(node => node.nodeType === 1 && (node.classList?.contains('live-chat-card') || node.querySelector?.('.live-chat-card'))));
+    if (relevant) routeChatCard(root, chatPanel);
+  });
+  chatObserver.observe(root, { childList: true, subtree: false });
   routeChatCard(root, chatPanel);
 
-  activateTab(root, 'agenda');
   initialized = true;
+  activateTab(root, activeTarget);
   return { live: livePanel, agenda: root, chat: chatPanel };
 }
 
 export function showStudentPortalTab(target) {
   const root = document.querySelector('#student-content');
-  if (!root) return;
+  if (!root) return false;
   ensureStudentPortalMainTabs();
-  activateTab(root, target);
+  return activateTab(root, target);
+}
+
+export function getStudentPortalTab() {
+  return activeTarget;
 }
