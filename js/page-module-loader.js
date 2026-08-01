@@ -6,7 +6,7 @@ const MODULES = [
   { id: 'day-workout-customizer', pages: ['treino-aluno.html'], source: './treino-dia-personalizacao.js?v=20260725-day-custom1', errorMessage: 'Personalização do treino aplicado indisponível:' },
   { id: 'exercise-category-filter', pages: ['treino-aluno.html'], source: './treino-exercicio-categorias.js?v=20260725-category1', errorMessage: 'Categorias do seletor de exercícios indisponíveis:' },
   { id: 'student-session-controls', pages: ['aluno.html'], source: './aluno-sessao-controles.js?v=20260726-session1', errorMessage: 'Controles de sessão do aluno indisponíveis:' },
-  { id: 'exercise-svg-pages', pages: ['biblioteca-exercicios.html', 'aluno.html', 'visualizar-aluno.html'], source: './exercise-svg-pages.js?v=20260801-pages3', errorMessage: 'Ilustrações dos exercícios indisponíveis:' }
+  { id: 'exercise-svg-pages', pages: ['biblioteca-exercicios.html', 'aluno.html', 'visualizar-aluno.html'], source: './exercise-svg-pages.js?v=20260801-pages4', errorMessage: 'Ilustrações dos exercícios indisponíveis:' }
 ];
 
 function currentPage() {
