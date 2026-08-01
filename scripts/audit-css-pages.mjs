@@ -34,6 +34,15 @@ function localPathFromHtml(htmlFile, href) {
     : path.resolve(path.dirname(htmlFile), decoded);
 }
 
+function localPathFromCss(cssFile, target) {
+  const clean = stripQuery(target).trim();
+  if (!clean || /^(?:https?:)?\/\//i.test(clean) || clean.startsWith('data:')) return null;
+  const decoded = decodeURIComponent(clean);
+  return decoded.startsWith('/')
+    ? path.join(root, decoded.slice(1))
+    : path.resolve(path.dirname(cssFile), decoded);
+}
+
 const htmlFiles = walk(root, '.html');
 const cssUsage = new Map();
 
@@ -85,8 +94,8 @@ for (const cssFile of cssFiles) {
   const imports = [...css.matchAll(/@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?\s*\)?/gi)]
     .map(match => match[1]);
   for (const target of imports) {
-    if (/^(?:https?:)?\/\//i.test(target) || target.startsWith('data:')) continue;
-    const imported = path.resolve(path.dirname(cssFile), stripQuery(target));
+    const imported = localPathFromCss(cssFile, target);
+    if (!imported) continue;
     if (!fs.existsSync(imported)) failures.push(`${fileName}: @import ausente: ${target}`);
   }
 
