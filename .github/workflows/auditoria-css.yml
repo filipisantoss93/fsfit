@@ -1,0 +1,35 @@
+name: Auditoria estrutural de CSS
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'css/**/*.css'
+      - 'scripts/audit-css-pages.mjs'
+      - '.github/workflows/auditoria-css.yml'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+      - 'css/**/*.css'
+      - 'scripts/audit-css-pages.mjs'
+      - '.github/workflows/auditoria-css.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit-css:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Auditar referências, duplicações e arquivos CSS
+        run: node scripts/audit-css-pages.mjs
