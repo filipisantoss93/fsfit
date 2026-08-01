@@ -2,12 +2,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const ignoredDirs = new Set(['.git', 'node_modules', '.vercel', 'dist', 'build']);
+const reportDir = path.join(root, 'artifacts');
+const reportPath = path.join(reportDir, 'css-audit-report.json');
+const ignoredDirs = new Set(['.git', 'node_modules', '.vercel', 'dist', 'build', 'artifacts']);
 const failures = [];
 const warnings = [];
+const metrics = {
+  htmlFiles: 0,
+  cssFiles: 0,
+  inlineStyleBlocks: 0,
+  inlineStyleAttributes: 0,
+  importantDeclarations: 0,
+  emptyRules: 0,
+  directCssReferences: 0,
+  importedCssReferences: 0
+};
 
 function walk(dir, extension) {
   const files = [];
+  if (!fs.existsSync(dir)) return files;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (ignoredDirs.has(entry.name)) continue;
     const full = path.join(dir, entry.name);
@@ -25,26 +38,32 @@ function stripQuery(value) {
   return value.split(/[?#]/, 1)[0];
 }
 
-function localPathFromHtml(htmlFile, href) {
-  const clean = stripQuery(href).trim();
-  if (!clean || /^(?:https?:)?\/\//i.test(clean) || clean.startsWith('data:')) return null;
-  const decoded = decodeURIComponent(clean);
-  return decoded.startsWith('/')
-    ? path.join(root, decoded.slice(1))
-    : path.resolve(path.dirname(htmlFile), decoded);
+function isExternal(value) {
+  return !value || /^(?:https?:)?\/\//i.test(value) || value.startsWith('data:');
 }
 
-function localPathFromCss(cssFile, target) {
+function resolveLocal(baseFile, target) {
   const clean = stripQuery(target).trim();
-  if (!clean || /^(?:https?:)?\/\//i.test(clean) || clean.startsWith('data:')) return null;
+  if (isExternal(clean)) return null;
   const decoded = decodeURIComponent(clean);
   return decoded.startsWith('/')
     ? path.join(root, decoded.slice(1))
-    : path.resolve(path.dirname(cssFile), decoded);
+    : path.resolve(path.dirname(baseFile), decoded);
+}
+
+function getCssImports(cssFile, css) {
+  return [...css.matchAll(/@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?\s*\)?/gi)]
+    .map(match => ({ target: match[1], resolved: resolveLocal(cssFile, match[1]) }));
 }
 
 const htmlFiles = walk(root, '.html');
-const cssUsage = new Map();
+const cssFiles = walk(path.join(root, 'css'), '.css');
+const directUsage = new Map();
+const importUsage = new Map();
+const cssGraph = new Map();
+
+metrics.htmlFiles = htmlFiles.length;
+metrics.cssFiles = cssFiles.length;
 
 for (const htmlFile of htmlFiles) {
   const html = fs.readFileSync(htmlFile, 'utf8');
@@ -57,19 +76,21 @@ for (const htmlFile of htmlFiles) {
   if (duplicates.length) failures.push(`${fileName}: CSS duplicado: ${[...new Set(duplicates)].join(', ')}`);
 
   for (const href of links) {
-    const local = localPathFromHtml(htmlFile, href);
+    const local = resolveLocal(htmlFile, href);
     if (!local) continue;
+    metrics.directCssReferences += 1;
     const localRelative = relative(local);
     if (!fs.existsSync(local)) failures.push(`${fileName}: stylesheet ausente: ${href}`);
-    const users = cssUsage.get(localRelative) || new Set();
+    const users = directUsage.get(localRelative) || new Set();
     users.add(fileName);
-    cssUsage.set(localRelative, users);
+    directUsage.set(localRelative, users);
   }
 
-  const inlineBlocks = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)];
-  if (inlineBlocks.length) warnings.push(`${fileName}: ${inlineBlocks.length} bloco(s) <style> inline`);
-
+  const inlineBlocks = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].length;
   const inlineAttributes = [...html.matchAll(/\sstyle=["'][^"']*["']/gi)].length;
+  metrics.inlineStyleBlocks += inlineBlocks;
+  metrics.inlineStyleAttributes += inlineAttributes;
+  if (inlineBlocks) warnings.push(`${fileName}: ${inlineBlocks} bloco(s) <style> inline`);
   if (inlineAttributes) warnings.push(`${fileName}: ${inlineAttributes} atributo(s) style inline`);
 
   const pageSpecific = normalized.filter(value => value.startsWith('css/') && ![
@@ -82,34 +103,61 @@ for (const htmlFile of htmlFiles) {
   }
 }
 
-const cssFiles = walk(path.join(root, 'css'), '.css');
 for (const cssFile of cssFiles) {
   const fileName = relative(cssFile);
   const css = fs.readFileSync(cssFile, 'utf8');
+  const imports = getCssImports(cssFile, css);
+  cssGraph.set(fileName, imports.map(item => item.resolved ? relative(item.resolved) : item.target));
 
-  if (!cssUsage.has(fileName) && !/@import\s+/i.test(css)) {
-    warnings.push(`${fileName}: sem referência direta em HTML; confirmar se é importado ou obsoleto`);
-  }
-
-  const imports = [...css.matchAll(/@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?\s*\)?/gi)]
-    .map(match => match[1]);
-  for (const target of imports) {
-    const imported = localPathFromCss(cssFile, target);
-    if (!imported) continue;
-    if (!fs.existsSync(imported)) failures.push(`${fileName}: @import ausente: ${target}`);
+  for (const { target, resolved } of imports) {
+    if (!resolved) continue;
+    metrics.importedCssReferences += 1;
+    const importedRelative = relative(resolved);
+    if (!fs.existsSync(resolved)) failures.push(`${fileName}: @import ausente: ${target}`);
+    const users = importUsage.get(importedRelative) || new Set();
+    users.add(fileName);
+    importUsage.set(importedRelative, users);
   }
 
   const importantCount = (css.match(/!important\b/g) || []).length;
-  if (importantCount > 30) warnings.push(`${fileName}: uso elevado de !important (${importantCount})`);
-
   const emptyRules = [...css.matchAll(/([^{}]+)\{\s*\}/g)].length;
+  metrics.importantDeclarations += importantCount;
+  metrics.emptyRules += emptyRules;
+
+  if (importantCount > 30) warnings.push(`${fileName}: uso elevado de !important (${importantCount})`);
   if (emptyRules) warnings.push(`${fileName}: ${emptyRules} regra(s) vazia(s)`);
 }
 
-console.log(`HTML analisados: ${htmlFiles.length}`);
-console.log(`CSS analisados: ${cssFiles.length}`);
+const orphanCss = cssFiles
+  .map(relative)
+  .filter(fileName => !directUsage.has(fileName) && !importUsage.has(fileName));
+
+for (const fileName of orphanCss) {
+  warnings.push(`${fileName}: sem referência direta ou via @import; confirmar se é obsoleto`);
+}
+
+const report = {
+  generatedAt: new Date().toISOString(),
+  metrics,
+  failures,
+  warnings,
+  orphanCss,
+  directUsage: Object.fromEntries([...directUsage].map(([file, users]) => [file, [...users].sort()])),
+  importUsage: Object.fromEntries([...importUsage].map(([file, users]) => [file, [...users].sort()])),
+  cssGraph: Object.fromEntries([...cssGraph].sort(([a], [b]) => a.localeCompare(b)))
+};
+
+fs.mkdirSync(reportDir, { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+
+console.log(`HTML analisados: ${metrics.htmlFiles}`);
+console.log(`CSS analisados: ${metrics.cssFiles}`);
+console.log(`Referências diretas: ${metrics.directCssReferences}`);
+console.log(`Referências via @import: ${metrics.importedCssReferences}`);
+console.log(`CSS potencialmente órfãos: ${orphanCss.length}`);
 console.log(`Falhas: ${failures.length}`);
 console.log(`Avisos: ${warnings.length}`);
+console.log(`Relatório: ${relative(reportPath)}`);
 
 if (warnings.length) {
   console.log('\nAVISOS');
