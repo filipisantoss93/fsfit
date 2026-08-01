@@ -8,6 +8,11 @@ const auditFile = 'scripts/audit-no-forced-reloads.mjs';
 const failures = [];
 const allowed = [];
 const allowMarker = 'fsfit-allow-reload:';
+const explicitExceptions = new Map([
+  ['js/aluno-sessao-controles.js', 'Ação manual “Tentar novamente” após timeout do portal do aluno.'],
+  ['js/mobile-experience.js', 'Gesto manual de pull-to-refresh solicitado pelo usuário.'],
+  ['js/shared-components.js', 'Aplicação explícita de atualização do service worker/PWA.']
+]);
 
 function walk(directory, files = []) {
   if (!existsSync(directory)) return files;
@@ -111,10 +116,14 @@ for (const file of walk(root)) {
       const currentLine = lines[lineNumber - 1] || '';
       const previousLine = lines[lineNumber - 2] || '';
       const finding = `${relativePath}:${lineNumber} usa ${pattern.name}`;
-      const hasJustification = currentLine.includes(allowMarker) || previousLine.includes(allowMarker);
+      const inlineJustification = currentLine.includes(allowMarker) || previousLine.includes(allowMarker);
+      const explicitReason = explicitExceptions.get(relativePath);
 
-      if (hasJustification) allowed.push(finding);
-      else failures.push(finding);
+      if (inlineJustification || explicitReason) {
+        allowed.push(`${finding}${explicitReason ? ` — ${explicitReason}` : ''}`);
+      } else {
+        failures.push(finding);
+      }
     }
   }
 }
