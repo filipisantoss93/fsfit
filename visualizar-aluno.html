@@ -4,11 +4,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
   <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
   <meta charset="UTF-8">
-  <meta name="theme-color" content="#0f1115">
-  <title>Visualizar como aluno — FS Fit</title>
+  <meta name="theme-color" content="#080c0f">
+  <title>Minha área — FS Fit</title>
   <link rel="manifest" href="manifest.webmanifest?v=20260722-icons-v4">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/visualizar-aluno.css?v=20260730-cleanup1">
+  <link rel="stylesheet" href="css/visualizar-aluno.css?v=20260731-dashboard1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -16,85 +16,145 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
 </head>
 <body class="student-page">
-  <main class="student-shell">
-    <header class="student-header">
-      <div class="auth-logo"><strong>FS</strong><span>Fit</span></div>
-      <p>Portal do aluno</p>
+  <main class="student-app">
+    <header class="student-topbar">
+      <a class="student-brand" href="visualizar-aluno.html" aria-label="FS Fit">
+        <strong>FS</strong><span>Fit</span>
+      </a>
+      <div class="student-top-actions">
+        <button class="student-icon-button" type="button" aria-label="Notificações" data-dashboard-action="notifications">
+          <span aria-hidden="true">♧</span><b id="notification-count" class="student-badge hidden">0</b>
+        </button>
+        <button class="student-icon-button" type="button" aria-label="Configurações" data-dashboard-action="settings"><span aria-hidden="true">⚙</span></button>
+      </div>
     </header>
 
-    <section class="personal-preview-banner">
-      <strong>Pré-visualização do personal</strong>
-      <span>Esta é a visão atual que o aluno recebe no portal.</span><br>
+    <section id="personal-preview-banner" class="personal-preview-banner">
+      <div><strong>Pré-visualização do personal</strong><span>Esta é a tela inicial exibida ao aluno.</span></div>
       <a id="back-to-record" class="btn btn-outline personal-preview-back" href="alunos.html">Voltar para a ficha</a>
     </section>
 
-    <section id="loading-state" class="card student-state">Carregando visão do aluno...</section>
-    <section id="error-state" class="card student-state hidden"></section>
+    <section id="loading-state" class="student-loading-card">Carregando sua área...</section>
+    <section id="error-state" class="student-loading-card hidden"></section>
 
-    <div id="student-content" class="hidden">
-      <section class="student-profile-summary">
-        <small>ALUNO</small>
-        <h1 id="student-name"></h1>
-        <p>Orientado por <strong id="trainer-name"></strong></p>
-        <p id="updated-at" class="updated"></p>
-        <div class="actions" style="justify-content:center;margin-top:14px">
-          <a id="personal-page-button" class="btn btn-outline hidden" target="_blank" rel="noopener">Ver página do meu personal</a>
+    <div id="student-content" class="student-dashboard hidden">
+      <section class="student-welcome">
+        <div id="student-avatar" class="student-avatar" aria-hidden="true">AL</div>
+        <div class="student-welcome-copy">
+          <h1>Oi, <span id="student-first-name">Aluno</span>! <span aria-hidden="true">👋</span></h1>
+          <p>Vamos juntos rumo à sua melhor versão!</p>
         </div>
+        <a id="trainer-card" class="student-trainer-chip" href="#personal-tip">
+          <span id="trainer-avatar" class="student-trainer-avatar">PT</span>
+          <span><small>Seu personal</small><strong id="trainer-name">Personal</strong></span>
+          <b aria-hidden="true">◉</b>
+        </a>
       </section>
 
-      <nav class="student-plan-tabs" aria-label="Seções do portal do aluno">
-        <button class="student-plan-tab active" type="button" data-student-tab="treino">Treino</button>
-        <button class="student-plan-tab" type="button" data-student-tab="dieta">Dieta</button>
-        <button class="student-plan-tab" type="button" data-student-tab="observacoes">Observações</button>
+      <nav class="student-primary-nav" aria-label="Navegação principal">
+        <button class="active" type="button" data-student-view="home"><span>⌂</span>Início</button>
+        <button type="button" data-student-view="workout"><span>♜</span>Aula</button>
+        <button type="button" data-student-view="chat"><span>◌</span>Chat<i id="chat-dot" class="student-dot hidden"></i></button>
+        <button type="button" data-student-view="more"><span>⠿</span>Mais</button>
       </nav>
 
-      <section class="student-tab-panel active" data-student-panel="treino">
-        <div class="student-section-heading">
-          <div><small>AGENDA SEMANAL</small><h2>Treino</h2></div>
-          <span id="workout-plan-name"></span>
-        </div>
-        <div id="workout-content" class="student-week-agenda"></div>
-      </section>
-
-      <section class="student-tab-panel" data-student-panel="dieta">
-        <div class="student-section-heading">
-          <div><small>AGENDA SEMANAL</small><h2>Dieta</h2></div>
-          <span id="diet-plan-name"></span>
-        </div>
-        <div id="diet-content" class="student-week-agenda"></div>
-      </section>
-
-      <section class="student-tab-panel" data-student-panel="observacoes">
-        <section class="student-observation-card">
-          <small>OBSERVAÇÕES DO PERSONAL</small>
-          <p id="student-observations">Nenhuma observação publicada ainda.</p>
-        </section>
-
-        <section id="student-media-section" class="student-portal-media-section hidden">
-          <div class="student-portal-media-heading">
-            <div><small>CONTEÚDO DO PERSONAL</small><h2>Fotos e vídeos</h2></div>
+      <section class="student-view active" data-student-panel="home">
+        <article class="student-hero-card">
+          <div class="student-hero-content">
+            <div class="student-card-heading"><small>PLANO DE HOJE</small><span id="today-label"></span></div>
+            <h2 id="today-workout-title">Treino de hoje</h2>
+            <p><strong id="today-exercise-count">0 exercícios</strong><i></i><span id="today-duration">Sem duração definida</span></p>
+            <div class="student-hero-actions">
+              <button id="start-workout" class="btn btn-primary" type="button">Iniciar treino <span>▷</span></button>
+              <button id="view-exercises" class="btn btn-outline" type="button">Ver exercícios</button>
+            </div>
           </div>
-          <div id="student-media-list" class="student-portal-media-grid"></div>
-        </section>
+          <div class="student-body-graphic" aria-hidden="true"><span>FS</span><b>FIT</b></div>
+        </article>
+
+        <article class="student-daily-summary">
+          <div><span class="summary-icon">◒</span><p><strong id="completed-count">0</strong><small>exercícios concluídos</small></p></div>
+          <div><span id="weekly-progress-ring" class="student-progress-ring">0%</span><p><strong id="weekly-progress">0%</strong><small>Meta semanal</small></p></div>
+          <button type="button" data-student-view="diet"><span class="summary-icon">♨</span><p><small>Dieta de hoje</small><strong id="today-meal-count">Sem refeições</strong></p></button>
+        </article>
+
+        <article class="student-section-card">
+          <header><small>PRÓXIMOS COMPROMISSOS</small></header>
+          <div id="upcoming-list" class="student-upcoming-list"></div>
+        </article>
+
+        <article id="personal-tip" class="student-tip-card">
+          <span class="student-quote">“</span>
+          <div><small>DICA DO SEU PERSONAL</small><p id="personal-tip-text">Seu personal ainda não publicou uma orientação.</p></div>
+          <span id="tip-trainer-avatar" class="student-tip-avatar">PT</span>
+        </article>
+
+        <article class="student-section-card student-quick-card">
+          <header><small>ACESSOS RÁPIDOS</small></header>
+          <div class="student-quick-grid">
+            <button type="button" data-student-view="progress"><span>⌁</span>Meu progresso</button>
+            <button type="button" data-student-view="measures"><span>◉</span>Medidas</button>
+            <button type="button" data-student-view="assessments"><span>☑</span>Avaliações</button>
+            <button type="button" data-student-view="notes"><span>▤</span>Anotações</button>
+          </div>
+        </article>
       </section>
 
-      <div class="actions" style="justify-content:center;margin-top:20px">
-        <a id="whatsapp-button" class="btn btn-primary hidden" target="_blank" rel="noopener">Falar com meu personal</a>
-      </div>
+      <section class="student-view" data-student-panel="workout">
+        <article class="student-section-card student-full-card">
+          <div class="student-section-heading"><div><small>AGENDA SEMANAL</small><h2>Treino</h2></div><span id="workout-plan-name"></span></div>
+          <div id="workout-content" class="student-week-agenda"></div>
+        </article>
+      </section>
+
+      <section class="student-view" data-student-panel="diet">
+        <article class="student-section-card student-full-card">
+          <div class="student-section-heading"><div><small>PLANO ALIMENTAR</small><h2>Dieta</h2></div><span id="diet-plan-name"></span></div>
+          <div id="diet-content" class="student-week-agenda"></div>
+        </article>
+      </section>
+
+      <section class="student-view" data-student-panel="chat">
+        <article class="student-empty-view"><span>◌</span><h2>Fale com seu personal</h2><p>Use o canal disponível para tirar dúvidas sobre seu treino e sua alimentação.</p><a id="whatsapp-button" class="btn btn-primary hidden" target="_blank" rel="noopener">Abrir conversa</a></article>
+      </section>
+
+      <section class="student-view" data-student-panel="more">
+        <article class="student-section-card student-more-list">
+          <button type="button" data-student-view="diet"><span>Dieta e refeições</span><b>›</b></button>
+          <button type="button" data-student-view="notes"><span>Orientações do personal</span><b>›</b></button>
+          <a id="personal-page-button" class="hidden" target="_blank" rel="noopener"><span>Página do meu personal</span><b>›</b></a>
+        </article>
+      </section>
+
+      <section class="student-view" data-student-panel="notes">
+        <article class="student-section-card student-full-card">
+          <div class="student-section-heading"><div><small>ORIENTAÇÕES</small><h2>Anotações do personal</h2></div></div>
+          <p id="student-observations" class="student-note-text">Nenhuma observação publicada ainda.</p>
+          <section id="student-media-section" class="student-portal-media-section hidden"><div id="student-media-list" class="student-portal-media-grid"></div></section>
+        </article>
+      </section>
+
+      <section class="student-view" data-student-panel="progress"><article class="student-empty-view"><span>⌁</span><h2>Meu progresso</h2><p id="progress-empty-copy">O progresso será atualizado conforme os treinos forem concluídos.</p></article></section>
+      <section class="student-view" data-student-panel="measures"><article class="student-empty-view"><span>◉</span><h2>Medidas</h2><p>Consulte suas medidas e evolução nas avaliações cadastradas pelo personal.</p></article></section>
+      <section class="student-view" data-student-panel="assessments"><article class="student-empty-view"><span>☑</span><h2>Avaliações</h2><p>Suas avaliações físicas aparecerão aqui quando forem publicadas.</p></article></section>
     </div>
   </main>
+
+  <nav class="student-bottom-nav hidden" id="student-bottom-nav" aria-label="Navegação inferior">
+    <button class="active" type="button" data-student-view="home"><span>⌂</span>Início</button>
+    <button type="button" data-student-view="workout"><span>♜</span>Aula</button>
+    <button type="button" data-student-view="chat"><span>◌</span>Chat<i class="student-dot hidden" data-chat-dot></i></button>
+    <button type="button" data-student-view="more"><span>⠿</span>Mais</button>
+  </nav>
 
   <div id="student-detail-modal" class="student-detail-modal" aria-hidden="true">
     <button class="student-detail-backdrop" type="button" data-close-student-detail aria-label="Fechar detalhes"></button>
     <section class="student-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="student-detail-title">
-      <div class="student-detail-header">
-        <h2 id="student-detail-title">Detalhes</h2>
-        <button class="student-detail-close" type="button" data-close-student-detail aria-label="Fechar">×</button>
-      </div>
+      <div class="student-detail-header"><h2 id="student-detail-title">Detalhes</h2><button class="student-detail-close" type="button" data-close-student-detail aria-label="Fechar">×</button></div>
       <div id="student-detail-body" class="student-detail-body"></div>
     </section>
   </div>
 
-  <script type="module" src="js/visualizar-aluno.js?v=20260716-preview1"></script>
+  <script type="module" src="js/visualizar-aluno.js?v=20260731-dashboard1"></script>
 </body>
 </html>
