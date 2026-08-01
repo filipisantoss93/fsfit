@@ -1,0 +1,9 @@
+/* Utilitários compartilhados para remover estilos inline residuais. */
+.fs-center-stage{min-height:70vh;display:grid;place-items:center;padding-top:32px;padding-bottom:32px}
+.fs-card-narrow{width:min(560px,100%);text-align:center}
+.fs-space-top-md{margin-top:14px}
+.fs-actions-center{justify-content:center;margin-top:20px}
+.fs-btn-block{width:100%}
+.fs-btn-block-spaced{width:100%;margin-top:10px}
+.fs-align-start{align-items:start}
+.fs-dashboard-donut-zero{--dashboard-active:0%;--dashboard-live:0%}
