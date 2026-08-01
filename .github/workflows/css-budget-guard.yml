@@ -1,0 +1,40 @@
+name: Orçamento estrutural do CSS
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'css/**/*.css'
+      - 'scripts/audit-css-pages.mjs'
+      - 'scripts/check-css-budget.mjs'
+      - 'config/css-audit-budget.json'
+      - '.github/workflows/css-budget-guard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  css-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Gerar relatório estrutural
+        run: node scripts/audit-css-pages.mjs
+
+      - name: Validar orçamento do CSS
+        run: node scripts/check-css-budget.mjs
+
+      - name: Publicar resumo
+        if: always()
+        run: |
+          if [ -f artifacts/css-audit-report.json ]; then
+            node -e "const r=require('./artifacts/css-audit-report.json'); const b=require('./config/css-audit-budget.json'); const i=r.metrics.inlineStyleBlocks+r.metrics.inlineStyleAttributes; const lines=['## Orçamento estrutural do CSS','', '- Arquivos CSS: '+r.metrics.cssFiles+'/'+b.maxCssFiles, '- CSS órfãos: '+r.orphanCss.length+'/'+b.maxOrphanCss, '- Estilos inline: '+i+'/'+b.maxInlineStyles, '- !important: '+r.metrics.importantDeclarations+'/'+b.maxImportantDeclarations, '- Regras vazias: '+r.metrics.emptyRules+'/'+b.maxEmptyRules]; require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n')+'\n');"
+          fi
