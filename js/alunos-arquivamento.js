@@ -57,6 +57,7 @@ document.addEventListener('click', async event => {
     const { error } = await supabase.rpc(rpc, { p_aluno_id: id });
     if (error) throw error;
 
+    const status = action === 'reactivate' ? 'ativo' : 'encerrado';
     showMessage(
       message,
       action === 'reactivate'
@@ -64,9 +65,12 @@ document.addEventListener('click', async event => {
         : `${name} foi encerrado. Todo o histórico foi preservado.`
     );
 
-    statusById.set(id, action === 'reactivate' ? 'ativo' : 'encerrado');
+    statusById.set(id, status);
     syncButtons();
-    window.setTimeout(() => window.location.reload(), 450);
+    button.disabled = false;
+    window.dispatchEvent(new CustomEvent('fsfit:student-status-updated', {
+      detail: { alunoId: id, status, action }
+    }));
   } catch (error) {
     console.error(error);
     showMessage(message, error.message || 'Não foi possível concluir a ação.', 'error');
