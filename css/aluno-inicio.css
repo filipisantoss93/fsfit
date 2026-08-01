@@ -70,15 +70,16 @@
   border-radius:13px;background:rgba(139,198,63,.08);object-fit:contain
 }
 .student-page .student-compact-main{
-  grid-column:3;min-width:0;display:block;overflow:hidden
+  grid-column:3;min-width:0;width:100%;display:block;overflow:hidden;
+  justify-self:stretch;text-align:left!important
 }
 .student-page .student-compact-main strong{
-  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  font-size:.95rem;line-height:1.2;font-weight:800
+  display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  text-align:left!important;font-size:.95rem;line-height:1.2;font-weight:800
 }
 .student-page .student-compact-main span{
-  display:block;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  color:var(--muted);font-size:.76rem;line-height:1.2
+  display:block;width:100%;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  text-align:left!important;color:var(--muted);font-size:.76rem;line-height:1.2
 }
 .student-page .student-compact-arrow{
   grid-column:4;justify-self:end;align-self:center;margin:0;color:var(--muted);
