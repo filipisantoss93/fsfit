@@ -32,10 +32,6 @@ function firstName(value = '') {
   return String(value).trim().split(/\s+/)[0] || 'Aluno';
 }
 
-function initials(value = '') {
-  return String(value).trim().split(/\s+/).filter(Boolean).slice(0, 2).map(item => item[0]).join('').toUpperCase() || 'PT';
-}
-
 function greeting() {
   const hour = new Date().getHours();
   if (hour < 12) return 'Bom dia';
@@ -110,16 +106,7 @@ function syncWhatsapp() {
 function ensureDashboardChrome() {
   if (!content) return;
   ensureStudentPortalMainTabs();
-
-  const profile = document.querySelector('.student-profile-summary');
-  if (profile && !profile.querySelector('.student-trainer-dashboard-chip')) {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'student-trainer-dashboard-chip';
-    chip.dataset.dashboardAction = 'personal';
-    chip.innerHTML = '<span class="student-trainer-dashboard-avatar">PT</span><span><small>Seu personal</small><strong>Personal</strong></span><b aria-hidden="true">◉</b>';
-    profile.appendChild(chip);
-  }
+  document.querySelector('.student-trainer-dashboard-chip')?.remove();
 
   if (!document.querySelector('.student-dashboard-summary')) {
     const summary = document.createElement('section');
@@ -186,12 +173,8 @@ function handleNavigation(event) {
     return;
   }
 
-  const action = control.dataset.dashboardAction;
-  if (action === 'settings') {
+  if (control.dataset.dashboardAction === 'settings') {
     document.querySelector('#student-settings-button')?.click();
-  } else if (action === 'personal') {
-    if (settingsWhatsapp?.href) window.open(settingsWhatsapp.href, '_blank', 'noopener');
-    else document.querySelector('#student-settings-button')?.click();
   }
 }
 
@@ -237,12 +220,6 @@ function syncHome() {
   setText(homeTitle, `${greeting()}, ${firstName(name)}`);
   setText(homeDate, formattedToday());
   setText(homeSubtitle, `Veja o que ${trainer} preparou para você hoje.`);
-
-  const chip = document.querySelector('.student-trainer-dashboard-chip');
-  if (chip) {
-    setText(chip.querySelector('strong'), trainer);
-    setText(chip.querySelector('.student-trainer-dashboard-avatar'), initials(trainer));
-  }
 
   const workout = agendaSummary(workoutContent, 'exercício', 'exercícios', 'Dia de descanso');
   setText(workoutStatus, workout.title);
