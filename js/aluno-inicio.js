@@ -64,7 +64,7 @@ function activatePlanTab(target) {
   document.querySelectorAll('[data-student-tab]').forEach(item => item.classList.toggle('active', item === tab));
   document.querySelectorAll('[data-student-panel]').forEach(item => item.classList.toggle('active', item === panel));
   showStudentPortalTab('agenda');
-  syncBottomActive('inicio');
+  syncBottomActive(target === 'treino' ? 'agenda' : 'inicio');
   requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   return true;
 }
@@ -77,6 +77,10 @@ function activateMain(target) {
     showStudentPortalTab('live');
     syncBottomActive('live');
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  } else if (target === 'agenda') {
+    showStudentPortalTab('agenda');
+    activatePlanTab('treino');
+    syncBottomActive('agenda');
   } else if (target === 'chat') {
     showStudentPortalTab('chat');
     syncBottomActive('chat');
@@ -142,7 +146,7 @@ function ensureDashboardChrome() {
     const bottom = document.createElement('nav');
     bottom.className = 'student-dashboard-bottom-nav';
     bottom.setAttribute('aria-label', 'Navegação principal');
-    bottom.innerHTML = '<button class="active" type="button" data-dashboard-main="inicio" aria-current="page"><span>⌂</span>Início</button><button type="button" data-dashboard-main="live" aria-current="false"><span>♜</span>Aula</button><button type="button" data-dashboard-main="chat" aria-current="false"><span>◌</span>Chat</button><button type="button" data-dashboard-action="more" aria-current="false"><span>⠿</span>Mais</button>';
+    bottom.innerHTML = '<button class="active" type="button" data-dashboard-main="inicio" aria-current="page"><span>⌂</span>Início</button><button type="button" data-dashboard-main="live" aria-current="false"><span>♜</span>Aula</button><button type="button" data-dashboard-main="agenda" aria-current="false"><span>▣</span>Agenda</button><button type="button" data-dashboard-main="chat" aria-current="false"><span>◌</span>Chat</button>';
     document.body.appendChild(bottom);
   }
 }
@@ -183,9 +187,8 @@ function handleNavigation(event) {
   }
 
   const action = control.dataset.dashboardAction;
-  if (action === 'settings' || action === 'more') {
+  if (action === 'settings') {
     document.querySelector('#student-settings-button')?.click();
-    syncBottomActive('more');
   } else if (action === 'personal') {
     if (settingsWhatsapp?.href) window.open(settingsWhatsapp.href, '_blank', 'noopener');
     else document.querySelector('#student-settings-button')?.click();
@@ -196,7 +199,10 @@ document.addEventListener('click', handleNavigation, true);
 
 document.addEventListener('student-main-tab-change', event => {
   const target = event.detail?.target;
-  if (target === 'agenda') syncBottomActive('inicio');
+  if (target === 'agenda') {
+    const treinoAtivo = document.querySelector('[data-student-panel="treino"]')?.classList.contains('active');
+    syncBottomActive(treinoAtivo ? 'agenda' : 'inicio');
+  }
   if (target === 'live') syncBottomActive('live');
   if (target === 'chat') syncBottomActive('chat');
 });
