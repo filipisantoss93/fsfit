@@ -45,6 +45,46 @@
 .student-week-agenda{display:grid;gap:10px}
 .student-observation-card,.student-portal-media-section{border-radius:16px}
 .student-state{margin-top:18px;text-align:center}
-@media(max-width:390px){.student-shell{padding-inline:12px}.student-today-grid{grid-template-columns:1fr}.student-today-card{min-height:100px}.student-plan-tabs{gap:3px;padding:5px}.student-plan-tab{padding:7px 2px;font-size:.67rem}.student-profile-summary-copy h1{font-size:1.15rem}}
+
+/* Lista consolidada de exercícios — compacta e estável com SVG */
+.student-page .student-agenda-list{display:grid;gap:0}
+.student-page .student-compact-row{
+  width:100%;min-height:76px;padding:10px 14px;display:grid;
+  grid-template-columns:30px 52px minmax(0,1fr) 18px;
+  align-items:center;column-gap:10px;border:0;border-bottom:1px solid rgba(255,255,255,.08);
+  background:transparent;color:inherit;text-align:left;overflow:hidden
+}
+.student-page .student-compact-row:last-child{border-bottom:0}
+.student-page .student-compact-order{
+  width:30px;min-width:30px;height:36px;display:grid;place-items:center;
+  border-radius:10px;background:rgba(255,255,255,.025);color:var(--muted);
+  font-size:.78rem;font-weight:850;line-height:1
+}
+.student-page .student-compact-row>svg,
+.student-page .student-compact-row>img,
+.student-page .student-compact-row .exercise-icon,
+.student-page .student-compact-row .student-exercise-icon,
+.student-page .student-compact-row .exercise-svg{
+  grid-column:2;width:46px!important;height:46px!important;min-width:46px;max-width:46px;
+  padding:7px;box-sizing:border-box;border:1px solid rgba(139,198,63,.28);
+  border-radius:13px;background:rgba(139,198,63,.08);object-fit:contain
+}
+.student-page .student-compact-main{
+  grid-column:3;min-width:0;display:block;overflow:hidden
+}
+.student-page .student-compact-main strong{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:.95rem;line-height:1.2;font-weight:800
+}
+.student-page .student-compact-main span{
+  display:block;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--muted);font-size:.76rem;line-height:1.2
+}
+.student-page .student-compact-arrow{
+  grid-column:4;justify-self:end;align-self:center;margin:0;color:var(--muted);
+  font-size:1.15rem;line-height:1
+}
+
+@media(max-width:390px){.student-shell{padding-inline:12px}.student-today-grid{grid-template-columns:1fr}.student-today-card{min-height:100px}.student-plan-tabs{gap:3px;padding:5px}.student-plan-tab{padding:7px 2px;font-size:.67rem}.student-profile-summary-copy h1{font-size:1.15rem}.student-page .student-compact-row{min-height:70px;padding:8px 10px;grid-template-columns:26px 44px minmax(0,1fr) 16px;column-gap:8px}.student-page .student-compact-order{width:26px;min-width:26px;height:32px;font-size:.72rem}.student-page .student-compact-row>svg,.student-page .student-compact-row>img,.student-page .student-compact-row .exercise-icon,.student-page .student-compact-row .student-exercise-icon,.student-page .student-compact-row .exercise-svg{width:40px!important;height:40px!important;min-width:40px;padding:6px;border-radius:11px}.student-page .student-compact-main strong{font-size:.86rem}.student-page .student-compact-main span{font-size:.7rem}}
 @media(max-height:700px){.student-today-hero{padding:15px}.student-profile-summary{margin-top:10px}.student-plan-tabs{margin-bottom:9px}}
 @media(min-width:680px){.student-home-primary{grid-template-columns:1fr 1fr}.student-today-card{min-height:132px}.student-shell{padding-bottom:48px}}
