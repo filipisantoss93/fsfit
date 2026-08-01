@@ -21,6 +21,76 @@ function walk(directory, files = []) {
   return files;
 }
 
+function maskNonExecutable(content) {
+  const chars = [...content];
+  let state = 'code';
+  let quote = '';
+  let escaped = false;
+
+  for (let index = 0; index < chars.length; index += 1) {
+    const char = chars[index];
+    const next = chars[index + 1];
+
+    if (state === 'line-comment') {
+      if (char === '\n') state = 'code';
+      else chars[index] = ' ';
+      continue;
+    }
+
+    if (state === 'block-comment') {
+      if (char === '*' && next === '/') {
+        chars[index] = ' ';
+        chars[index + 1] = ' ';
+        index += 1;
+        state = 'code';
+      } else if (char !== '\n') chars[index] = ' ';
+      continue;
+    }
+
+    if (state === 'string') {
+      if (escaped) {
+        escaped = false;
+        if (char !== '\n') chars[index] = ' ';
+        continue;
+      }
+      if (char === '\\') {
+        escaped = true;
+        chars[index] = ' ';
+        continue;
+      }
+      if (char === quote) {
+        chars[index] = ' ';
+        state = 'code';
+      } else if (char !== '\n') chars[index] = ' ';
+      continue;
+    }
+
+    if (char === '/' && next === '/') {
+      chars[index] = ' ';
+      chars[index + 1] = ' ';
+      index += 1;
+      state = 'line-comment';
+      continue;
+    }
+
+    if (char === '/' && next === '*') {
+      chars[index] = ' ';
+      chars[index + 1] = ' ';
+      index += 1;
+      state = 'block-comment';
+      continue;
+    }
+
+    if (char === '"' || char === "'" || char === '`') {
+      quote = char;
+      chars[index] = ' ';
+      state = 'string';
+    }
+  }
+
+  return chars.join('');
+}
+
 const patterns = [
   { name: 'location.reload()', regex: /(?:window\s*\.\s*)?location\s*\.\s*reload\s*\(/g },
   { name: 'history.go(0)', regex: /(?:window\s*\.\s*)?history\s*\.\s*go\s*\(\s*0\s*\)/g }
@@ -30,13 +100,14 @@ for (const file of walk(root)) {
   const relativePath = relative(root, file).replaceAll('\\', '/');
   if (relativePath === auditFile) continue;
   const content = readFileSync(file, 'utf8');
+  const executable = maskNonExecutable(content);
   const lines = content.split('\n');
 
   for (const pattern of patterns) {
     pattern.regex.lastIndex = 0;
     let match;
-    while ((match = pattern.regex.exec(content))) {
-      const lineNumber = content.slice(0, match.index).split('\n').length;
+    while ((match = pattern.regex.exec(executable))) {
+      const lineNumber = executable.slice(0, match.index).split('\n').length;
       const currentLine = lines[lineNumber - 1] || '';
       const previousLine = lines[lineNumber - 2] || '';
       const finding = `${relativePath}:${lineNumber} usa ${pattern.name}`;
