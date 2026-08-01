@@ -89,6 +89,22 @@ if (!foodSection || !mealSection || !mealList || !mealForm) {
     mealSubmit.textContent = 'Salvar refeição';
   }
 
+  function closeMealModal() {
+    mealModal?.classList.remove('open');
+    mealModal?.classList.add('hidden');
+    mealModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  function applyMealUpdateToCard(mealId, meal) {
+    const card = mealList.querySelector(`[data-delete-meal="${CSS.escape(mealId)}"]`)?.closest('.meal-library-item');
+    if (!card) return;
+    const title = card.querySelector('h3,.meal-library-name,[data-meal-name]');
+    const description = card.querySelector('.meal-library-description,[data-meal-description]');
+    if (title) title.textContent = meal.nome;
+    if (description) description.textContent = meal.descricao || '';
+  }
+
   async function openMealEditor(mealId) {
     if (!userId) return;
 
@@ -201,9 +217,14 @@ if (!foodSection || !mealSection || !mealList || !mealForm) {
       const { error: insertItemsError } = await supabase.from('biblioteca_refeicao_itens').insert(newItems);
       if (insertItemsError) throw insertItemsError;
 
-      sessionStorage.setItem('fsfit-food-library-view', 'meals');
-      sessionStorage.setItem('fsfit-food-library-flash', 'Refeição atualizada com sucesso.');
-      window.location.reload();
+      applyMealUpdateToCard(mealId, newMeal);
+      resetEditState();
+      closeMealModal();
+      setView('meals');
+      showMessage(message, 'Refeição atualizada com sucesso.');
+      window.dispatchEvent(new CustomEvent('fsfit:meal-library-updated', {
+        detail: { mealId, meal: newMeal, items: newItems }
+      }));
     } catch (error) {
       console.error(error);
       if (editContext) {
