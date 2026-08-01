@@ -29,13 +29,33 @@ if (!globalThis[RUNTIME_KEY]) {
     document.body.classList.add('student-edit-open');
   };
 
-  const closeEditModal = ({ reload = false } = {}) => {
+  const closeEditModal = () => {
     if (!editModal || !editFrame) return;
     editModal.classList.remove('open');
     editModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('student-edit-open');
     editFrame.src = 'about:blank';
-    if (reload) location.reload();
+  };
+
+  const applyStudentUpdate = payload => {
+    const student = payload?.student || payload?.aluno || payload?.data || null;
+    if (student && typeof student === 'object') {
+      const fieldMap = {
+        nome: '#student-name',
+        email: '#student-email',
+        telefone: '#student-phone',
+        objetivo: '#student-goal'
+      };
+      Object.entries(fieldMap).forEach(([field, selector]) => {
+        if (student[field] == null) return;
+        const element = document.querySelector(selector);
+        if (element) element.textContent = String(student[field]);
+      });
+    }
+
+    window.dispatchEvent(new CustomEvent('fsfit:student-updated', {
+      detail: { alunoId, payload }
+    }));
   };
 
   editButton?.addEventListener('click', event => {
@@ -43,7 +63,7 @@ if (!globalThis[RUNTIME_KEY]) {
     openEditModal();
   });
 
-  editClose?.addEventListener('click', () => closeEditModal());
+  editClose?.addEventListener('click', closeEditModal);
   editModal?.addEventListener('click', event => {
     if (event.target === editModal) closeEditModal();
   });
@@ -51,7 +71,10 @@ if (!globalThis[RUNTIME_KEY]) {
   window.addEventListener('message', event => {
     if (event.origin !== location.origin) return;
     if (event.data?.type === 'fsfit-close-student-modal') closeEditModal();
-    if (event.data?.type === 'fsfit-student-updated') closeEditModal({ reload: true });
+    if (event.data?.type === 'fsfit-student-updated') {
+      applyStudentUpdate(event.data);
+      closeEditModal();
+    }
   });
 
   deleteButton?.addEventListener('click', async () => {
