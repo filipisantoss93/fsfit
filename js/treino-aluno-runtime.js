@@ -7,3 +7,4 @@ import './treino-aluno-semanal.js?v=20260716-weekdays1';
 import './exercicio-drag-order.js?v=20260720-dnd1';
 import './exercise-svg-icons.js?v=20260801-svg2';
 import './exercise-svg-specific.js?v=20260801-specific1';
+import './exercise-svg-extended.js?v=20260801-extended1';
