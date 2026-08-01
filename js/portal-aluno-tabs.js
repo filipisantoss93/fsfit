@@ -57,6 +57,8 @@ export function ensureStudentPortalMainTabs() {
   const existingChat = root.querySelector('#student-main-chat');
   const existingNav = root.querySelector('.student-main-tabs');
   if (initialized && existingLive && existingChat && existingNav) {
+    existingNav.hidden = true;
+    existingNav.style.display = 'none';
     normalizeLiveTabLabel(existingNav);
     return { live: existingLive, agenda: root, chat: existingChat };
   }
@@ -69,10 +71,11 @@ export function ensureStudentPortalMainTabs() {
   planPanels.forEach(panel => { panel.dataset.studentMainAgendaContent = 'true'; });
 
   const nav = existingNav || document.createElement('nav');
+  nav.className = 'student-main-tabs';
+  nav.hidden = true;
+  nav.style.display = 'none';
+  nav.setAttribute('aria-hidden', 'true');
   if (!existingNav) {
-    nav.className = 'student-main-tabs';
-    nav.hidden = true;
-    nav.setAttribute('aria-hidden', 'true');
     nav.innerHTML = `
       <button class="student-main-tab active" type="button" data-student-main-tab="agenda">Início</button>
       <button class="student-main-tab" type="button" data-student-main-tab="live" data-live-state="today">Aula</button>
