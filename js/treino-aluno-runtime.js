@@ -5,4 +5,5 @@ import './treino-multidias.js?v=20260730-rules1';
 import './treino-busca-exercicios.js?v=20260719-search2';
 import './treino-aluno-semanal.js?v=20260716-weekdays1';
 import './exercicio-drag-order.js?v=20260720-dnd1';
-import './exercise-svg-icons.js?v=20260731-svg1';
+import './exercise-svg-icons.js?v=20260801-svg2';
+import './exercise-svg-specific.js?v=20260801-specific1';
