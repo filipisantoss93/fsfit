@@ -30,7 +30,14 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+
+      - name: Verificar arquivos obrigatórios
+        run: |
+          test -f js/global-runtime-bootstrap.js
+          test -f js/app-lifecycle-runtime.js
+          test -f js/shared-mutation-runtime.js
+          test -f js/inactive-account-guard.js
 
       - name: Verificar sintaxe dos runtimes
         run: |
