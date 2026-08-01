@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/personal-publico.css?v=20260722-student-greeting1">
   <link rel="stylesheet" href="/css/personal-publico-padronizacao.css?v=20260726-public-profile1">
+  <link rel="stylesheet" href="/css/inline-cleanup.css?v=20260801-inline1">
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <meta name="application-name" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
@@ -35,7 +36,7 @@
           <label for="student-phone">Seu WhatsApp</label>
           <input id="student-phone" name="telefone" inputmode="numeric" autocomplete="tel" maxlength="11" placeholder="DDD + número" required>
         </div>
-        <button class="btn btn-primary" type="submit" style="width:100%">Continuar</button>
+        <button class="btn btn-primary fs-btn-block" type="submit">Continuar</button>
       </form>
 
       <form id="pin-form" class="hidden">
@@ -43,8 +44,8 @@
           <label for="student-pin">PIN de 4 números</label>
           <input id="student-pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required>
         </div>
-        <button class="btn btn-primary" type="submit" style="width:100%">Abrir minha área</button>
-        <button id="change-phone" class="btn btn-outline" type="button" style="width:100%;margin-top:10px">Usar outro telefone</button>
+        <button class="btn btn-primary fs-btn-block" type="submit">Abrir minha área</button>
+        <button id="change-phone" class="btn btn-outline fs-btn-block-spaced" type="button">Usar outro telefone</button>
       </form>
 
       <form id="activation-form" class="hidden">
@@ -61,8 +62,8 @@
           <label for="activation-pin-confirm">Confirme o PIN</label>
           <input id="activation-pin-confirm" name="pin_confirm" type="password" inputmode="numeric" autocomplete="new-password" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required>
         </div>
-        <button class="btn btn-primary" type="submit" style="width:100%">Ativar acesso e entrar</button>
-        <button id="change-phone-activation" class="btn btn-outline" type="button" style="width:100%;margin-top:10px">Usar outro telefone</button>
+        <button class="btn btn-primary fs-btn-block" type="submit">Ativar acesso e entrar</button>
+        <button id="change-phone-activation" class="btn btn-outline fs-btn-block-spaced" type="button">Usar outro telefone</button>
       </form>
     </section>
 
