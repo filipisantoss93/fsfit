@@ -24,8 +24,7 @@ function setText(node, value) {
 }
 
 function setClass(node, className, enabled) {
-  if (!node) return;
-  node.classList.toggle(className, Boolean(enabled));
+  node?.classList.toggle(className, Boolean(enabled));
 }
 
 function firstName(value = '') {
@@ -52,21 +51,47 @@ function formattedToday() {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+function removeDuplicateMenus() {
+  document.querySelectorAll('.student-dashboard-nav').forEach(node => node.remove());
+
+  document.querySelectorAll('nav').forEach(nav => {
+    if (nav.classList.contains('student-dashboard-bottom-nav')) return;
+    if (nav.classList.contains('student-plan-tabs')) return;
+
+    const labels = [...nav.querySelectorAll('button, a')]
+      .map(item => item.textContent.trim().toLowerCase())
+      .filter(Boolean);
+
+    const isStudentDuplicate = labels.includes('início') && labels.includes('aula') && labels.includes('chat');
+    if (isStudentDuplicate) nav.remove();
+  });
+}
+
+function syncBottomActive(target) {
+  document.querySelectorAll('.student-dashboard-bottom-nav button').forEach(button => {
+    const buttonTarget = button.dataset.dashboardTarget || button.dataset.dashboardAction;
+    button.classList.toggle('active', buttonTarget === target);
+  });
+}
+
 function activateTab(target) {
   const tab = document.querySelector(`[data-student-tab="${target}"]`);
-  if (!tab) return;
+  if (!tab) return false;
   tab.click();
-  document.querySelectorAll('[data-dashboard-target]').forEach(button => {
-    button.classList.toggle('active', button.dataset.dashboardTarget === target || (target === 'inicio' && button.dataset.dashboardTarget === 'inicio'));
-  });
+  syncBottomActive(target);
   requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  return true;
 }
 
 function agendaSummary(host, singular, plural, emptyText) {
   const rows = host?.querySelectorAll('.student-compact-row').length || 0;
   const headerText = host?.querySelector('.student-agenda-day-header span')?.textContent?.trim() || '';
   if (!rows) return { title: emptyText, detail: headerText || 'Nada programado para hoje', rows: 0 };
-  return { title: `${rows} ${rows === 1 ? singular : plural}`, detail: headerText || 'Programado para hoje', rows };
+  return {
+    title: `${rows} ${rows === 1 ? singular : plural}`,
+    detail: headerText || 'Programado para hoje',
+    rows,
+  };
 }
 
 function syncWhatsapp() {
@@ -81,91 +106,110 @@ function syncWhatsapp() {
   }
 }
 
+function openChat() {
+  const chatTrigger = document.querySelector('[data-student-tab="chat"], #student-chat-button, [data-open-student-chat], [data-aula-chat-trigger]');
+  if (chatTrigger) {
+    chatTrigger.click();
+    syncBottomActive('chat');
+    return;
+  }
+
+  const href = homeWhatsapp?.getAttribute('href') || settingsWhatsapp?.getAttribute('href');
+  if (href) window.open(href, '_blank', 'noopener');
+}
+
 function ensureDashboardChrome() {
-  if (!content || document.querySelector('.student-dashboard-nav')) return;
+  if (!content) return;
+
+  removeDuplicateMenus();
 
   const profile = document.querySelector('.student-profile-summary');
-  const trainerChip = document.createElement('a');
-  trainerChip.className = 'student-trainer-dashboard-chip';
-  trainerChip.href = '#student-home-observation';
-  trainerChip.innerHTML = `<span class="student-trainer-dashboard-avatar">PT</span><span><small>Seu personal</small><strong>Personal</strong></span><b aria-hidden="true">◉</b>`;
-  profile?.appendChild(trainerChip);
+  if (profile && !profile.querySelector('.student-trainer-dashboard-chip')) {
+    const trainerChip = document.createElement('a');
+    trainerChip.className = 'student-trainer-dashboard-chip';
+    trainerChip.href = '#student-home-observation';
+    trainerChip.innerHTML = '<span class="student-trainer-dashboard-avatar">PT</span><span><small>Seu personal</small><strong>Personal</strong></span><b aria-hidden="true">◉</b>';
+    profile.appendChild(trainerChip);
+  }
 
-  const nav = document.createElement('nav');
-  nav.className = 'student-dashboard-nav';
-  nav.setAttribute('aria-label', 'Navegação principal do aluno');
-  nav.innerHTML = `
-    <button class="active" type="button" data-dashboard-target="inicio"><span>⌂</span>Início</button>
-    <button type="button" data-dashboard-target="treino"><span>♜</span>Aula</button>
-    <button type="button" data-dashboard-action="chat"><span>◌</span>Chat</button>
-    <button type="button" data-dashboard-action="more"><span>⠿</span>Mais</button>`;
-  profile?.insertAdjacentElement('afterend', nav);
+  if (!document.querySelector('.student-dashboard-summary')) {
+    const summary = document.createElement('section');
+    summary.className = 'student-dashboard-summary';
+    summary.innerHTML = '<div><span class="student-dashboard-summary-icon">◒</span><p><strong id="student-dashboard-exercises">0</strong><small>exercícios hoje</small></p></div><div><span class="student-dashboard-summary-icon">◎</span><p><strong id="student-dashboard-progress">0%</strong><small>Meta semanal</small></p></div><button type="button" data-dashboard-target="dieta"><span class="student-dashboard-summary-icon">♨</span><p><strong id="student-dashboard-meals">0</strong><small>refeições hoje</small></p></button>';
+    document.querySelector('.student-today-grid')?.insertAdjacentElement('afterend', summary);
+  }
 
-  const homePanel = document.querySelector('[data-student-panel="inicio"]');
-  const summary = document.createElement('section');
-  summary.className = 'student-dashboard-summary';
-  summary.innerHTML = `
-    <div><span class="student-dashboard-summary-icon">◒</span><p><strong id="student-dashboard-exercises">0</strong><small>exercícios hoje</small></p></div>
-    <div><span class="student-dashboard-summary-icon">◎</span><p><strong id="student-dashboard-progress">0%</strong><small>Meta semanal</small></p></div>
-    <button type="button" data-dashboard-target="dieta"><span class="student-dashboard-summary-icon">♨</span><p><strong id="student-dashboard-meals">0</strong><small>refeições hoje</small></p></button>`;
-  document.querySelector('.student-today-grid')?.insertAdjacentElement('afterend', summary);
+  if (!document.querySelector('#student-dashboard-upcoming')) {
+    const upcoming = document.createElement('section');
+    upcoming.className = 'student-dashboard-section';
+    upcoming.innerHTML = '<header>PRÓXIMOS COMPROMISSOS</header><div id="student-dashboard-upcoming" class="student-dashboard-upcoming"></div>';
+    homeObservation?.insertAdjacentElement('beforebegin', upcoming);
+  }
 
-  const upcoming = document.createElement('section');
-  upcoming.className = 'student-dashboard-section';
-  upcoming.innerHTML = `<header>PRÓXIMOS COMPROMISSOS</header><div id="student-dashboard-upcoming" class="student-dashboard-upcoming"></div>`;
-  homeObservation?.insertAdjacentElement('beforebegin', upcoming);
+  if (!document.querySelector('.student-dashboard-quick-grid')) {
+    const quick = document.createElement('section');
+    quick.className = 'student-dashboard-section';
+    quick.innerHTML = '<header>ACESSOS RÁPIDOS</header><div class="student-dashboard-quick-grid"><button type="button" data-dashboard-target="treino"><span>⌁</span>Meu progresso</button><button type="button" data-dashboard-action="settings"><span>◉</span>Medidas</button><button type="button" data-dashboard-action="settings"><span>☑</span>Avaliações</button><button type="button" data-dashboard-target="observacoes"><span>▤</span>Anotações</button></div>';
+    homeObservation?.insertAdjacentElement('afterend', quick);
+  }
 
-  const quick = document.createElement('section');
-  quick.className = 'student-dashboard-section';
-  quick.innerHTML = `<header>ACESSOS RÁPIDOS</header><div class="student-dashboard-quick-grid">
-    <button type="button" data-dashboard-target="treino"><span>⌁</span>Meu progresso</button>
-    <button type="button" data-dashboard-action="settings"><span>◉</span>Medidas</button>
-    <button type="button" data-dashboard-action="settings"><span>☑</span>Avaliações</button>
-    <button type="button" data-dashboard-target="observacoes"><span>▤</span>Anotações</button>
-  </div>`;
-  homeObservation?.insertAdjacentElement('afterend', quick);
-
-  const bottom = document.createElement('nav');
-  bottom.className = 'student-dashboard-bottom-nav';
-  bottom.setAttribute('aria-label', 'Navegação inferior');
-  bottom.innerHTML = `
-    <button class="active" type="button" data-dashboard-target="inicio"><span>⌂</span>Início</button>
-    <button type="button" data-dashboard-target="treino"><span>♜</span>Aula</button>
-    <button type="button" data-dashboard-action="chat"><span>◌</span>Chat</button>
-    <button type="button" data-dashboard-action="more"><span>⠿</span>Mais</button>`;
-  document.body.appendChild(bottom);
-
-  document.querySelectorAll('[data-dashboard-target]').forEach(button => {
-    button.addEventListener('click', () => activateTab(button.dataset.dashboardTarget));
-  });
-  document.querySelectorAll('[data-dashboard-action="settings"]').forEach(button => {
-    button.addEventListener('click', () => document.querySelector('#student-settings-button')?.click());
-  });
-  document.querySelectorAll('[data-dashboard-action="chat"]').forEach(button => {
-    button.addEventListener('click', () => {
-      const chatTrigger = document.querySelector('[data-student-tab="chat"], #student-chat-button, [data-open-student-chat]');
-      if (chatTrigger) chatTrigger.click();
-      else if (homeWhatsapp?.getAttribute('href')) homeWhatsapp.click();
-    });
-  });
-  document.querySelectorAll('[data-dashboard-action="more"]').forEach(button => {
-    button.addEventListener('click', () => document.querySelector('#student-settings-button')?.click());
-  });
+  if (!document.querySelector('.student-dashboard-bottom-nav')) {
+    const bottom = document.createElement('nav');
+    bottom.className = 'student-dashboard-bottom-nav';
+    bottom.setAttribute('aria-label', 'Navegação inferior');
+    bottom.innerHTML = '<button class="active" type="button" data-dashboard-target="inicio"><span>⌂</span>Início</button><button type="button" data-dashboard-target="treino"><span>♜</span>Aula</button><button type="button" data-dashboard-action="chat"><span>◌</span>Chat</button><button type="button" data-dashboard-action="more"><span>⠿</span>Mais</button>';
+    document.body.appendChild(bottom);
+  }
 }
+
+function handleDashboardNavigation(event) {
+  const button = event.target.closest('.student-dashboard-bottom-nav button, [data-dashboard-target], [data-dashboard-action]');
+  if (!button) return;
+
+  const target = button.dataset.dashboardTarget;
+  const action = button.dataset.dashboardAction;
+
+  if (target) {
+    event.preventDefault();
+    activateTab(target);
+    return;
+  }
+
+  if (action === 'chat') {
+    event.preventDefault();
+    openChat();
+    return;
+  }
+
+  if (action === 'settings' || action === 'more') {
+    event.preventDefault();
+    document.querySelector('#student-settings-button')?.click();
+    syncBottomActive('more');
+  }
+}
+
+document.addEventListener('click', handleDashboardNavigation);
+
+document.querySelectorAll('[data-student-tab]').forEach(tab => {
+  tab.addEventListener('click', () => syncBottomActive(tab.dataset.studentTab));
+});
 
 function renderUpcoming() {
   const host = document.querySelector('#student-dashboard-upcoming');
   if (!host) return;
   const rows = [...(workoutContent?.querySelectorAll('.student-compact-row') || [])].slice(0, 3);
+
   if (!rows.length) {
     host.innerHTML = '<p class="student-empty-inline">Nenhum compromisso programado.</p>';
     return;
   }
+
   host.innerHTML = rows.map((row, index) => {
     const title = row.querySelector('strong')?.textContent?.trim() || `Treino ${index + 1}`;
     const detail = row.querySelector('.student-compact-main span')?.textContent?.trim() || 'Programação disponível';
     return `<button class="student-dashboard-upcoming-row" type="button" data-upcoming-index="${index}"><span>♜</span><div><strong>${title}</strong><small>${detail}</small></div><b>›</b></button>`;
   }).join('');
+
   host.querySelectorAll('[data-upcoming-index]').forEach((button, index) => {
     button.addEventListener('click', () => rows[index]?.click());
   });
@@ -207,6 +251,7 @@ function syncHome() {
 
   renderUpcoming();
   syncWhatsapp();
+  removeDuplicateMenus();
 }
 
 document.querySelectorAll('[data-student-home-target]').forEach(button => {
