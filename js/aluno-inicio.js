@@ -19,6 +19,9 @@ const homeWhatsapp = document.querySelector('#student-home-whatsapp');
 const settingsWhatsapp = document.querySelector('#whatsapp-button');
 const primaryWorkoutButton = document.querySelector('#student-home-open-workout');
 
+let syncScheduled = false;
+let upcomingSignature = '';
+
 function setText(node, value) {
   if (node && node.textContent !== value) node.textContent = value;
 }
@@ -53,18 +56,6 @@ function formattedToday() {
 
 function removeDuplicateMenus() {
   document.querySelectorAll('.student-dashboard-nav').forEach(node => node.remove());
-
-  document.querySelectorAll('nav').forEach(nav => {
-    if (nav.classList.contains('student-dashboard-bottom-nav')) return;
-    if (nav.classList.contains('student-plan-tabs')) return;
-
-    const labels = [...nav.querySelectorAll('button, a')]
-      .map(item => item.textContent.trim().toLowerCase())
-      .filter(Boolean);
-
-    const isStudentDuplicate = labels.includes('início') && labels.includes('aula') && labels.includes('chat');
-    if (isStudentDuplicate) nav.remove();
-  });
 }
 
 function syncBottomActive(target) {
@@ -76,10 +67,18 @@ function syncBottomActive(target) {
 
 function activateTab(target) {
   const tab = document.querySelector(`[data-student-tab="${target}"]`);
-  if (!tab) return false;
-  tab.click();
+  const panel = document.querySelector(`[data-student-panel="${target}"]`);
+  if (!tab || !panel) return false;
+
+  document.querySelectorAll('[data-student-tab]').forEach(item => {
+    item.classList.toggle('active', item === tab);
+  });
+  document.querySelectorAll('[data-student-panel]').forEach(item => {
+    item.classList.toggle('active', item === panel);
+  });
+
   syncBottomActive(target);
-  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   return true;
 }
 
@@ -107,7 +106,7 @@ function syncWhatsapp() {
 }
 
 function openChat() {
-  const chatTrigger = document.querySelector('[data-student-tab="chat"], #student-chat-button, [data-open-student-chat], [data-aula-chat-trigger]');
+  const chatTrigger = document.querySelector('#student-chat-button, [data-open-student-chat], [data-aula-chat-trigger]');
   if (chatTrigger) {
     chatTrigger.click();
     syncBottomActive('chat');
@@ -120,7 +119,6 @@ function openChat() {
 
 function ensureDashboardChrome() {
   if (!content) return;
-
   removeDuplicateMenus();
 
   const profile = document.querySelector('.student-profile-summary');
@@ -166,38 +164,36 @@ function handleDashboardNavigation(event) {
   const button = event.target.closest('.student-dashboard-bottom-nav button, [data-dashboard-target], [data-dashboard-action]');
   if (!button) return;
 
+  event.preventDefault();
+  event.stopPropagation();
+
   const target = button.dataset.dashboardTarget;
   const action = button.dataset.dashboardAction;
 
   if (target) {
-    event.preventDefault();
     activateTab(target);
     return;
   }
-
   if (action === 'chat') {
-    event.preventDefault();
     openChat();
     return;
   }
-
   if (action === 'settings' || action === 'more') {
-    event.preventDefault();
     document.querySelector('#student-settings-button')?.click();
     syncBottomActive('more');
   }
 }
 
-document.addEventListener('click', handleDashboardNavigation);
-
-document.querySelectorAll('[data-student-tab]').forEach(tab => {
-  tab.addEventListener('click', () => syncBottomActive(tab.dataset.studentTab));
-});
+document.addEventListener('click', handleDashboardNavigation, true);
 
 function renderUpcoming() {
   const host = document.querySelector('#student-dashboard-upcoming');
   if (!host) return;
+
   const rows = [...(workoutContent?.querySelectorAll('.student-compact-row') || [])].slice(0, 3);
+  const signature = rows.map(row => row.textContent.trim()).join('|');
+  if (signature === upcomingSignature) return;
+  upcomingSignature = signature;
 
   if (!rows.length) {
     host.innerHTML = '<p class="student-empty-inline">Nenhum compromisso programado.</p>';
@@ -211,7 +207,10 @@ function renderUpcoming() {
   }).join('');
 
   host.querySelectorAll('[data-upcoming-index]').forEach((button, index) => {
-    button.addEventListener('click', () => rows[index]?.click());
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      rows[index]?.click();
+    }, { once: true });
   });
 }
 
@@ -251,15 +250,8 @@ function syncHome() {
 
   renderUpcoming();
   syncWhatsapp();
-  removeDuplicateMenus();
 }
 
-document.querySelectorAll('[data-student-home-target]').forEach(button => {
-  button.addEventListener('click', () => activateTab(button.dataset.studentHomeTarget));
-});
-primaryWorkoutButton?.addEventListener('click', () => activateTab('treino'));
-
-let syncScheduled = false;
 function scheduleSync() {
   if (syncScheduled) return;
   syncScheduled = true;
@@ -269,11 +261,13 @@ function scheduleSync() {
   });
 }
 
-const observer = new MutationObserver(scheduleSync);
-if (content) observer.observe(content, { subtree: true, childList: true, attributes: true, characterData: true });
-if (settingsWhatsapp) observer.observe(settingsWhatsapp, { attributes: true, attributeFilter: ['href', 'class'] });
+const dataObserver = new MutationObserver(scheduleSync);
+if (workoutContent) dataObserver.observe(workoutContent, { childList: true, subtree: true });
+if (dietContent) dataObserver.observe(dietContent, { childList: true, subtree: true });
+if (observations) dataObserver.observe(observations, { childList: true, characterData: true, subtree: true });
+if (settingsWhatsapp) dataObserver.observe(settingsWhatsapp, { attributes: true, attributeFilter: ['href'] });
 
-window.addEventListener('load', scheduleSync);
+window.addEventListener('load', scheduleSync, { once: true });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) scheduleSync(); });
 setTimeout(scheduleSync, 250);
 setTimeout(scheduleSync, 900);
