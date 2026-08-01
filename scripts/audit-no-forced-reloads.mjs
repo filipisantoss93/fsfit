@@ -8,10 +8,21 @@ const auditFile = 'scripts/audit-no-forced-reloads.mjs';
 const failures = [];
 const allowed = [];
 const allowMarker = 'fsfit-allow-reload:';
+
 const explicitExceptions = new Map([
-  ['js/aluno-sessao-controles.js', 'Ação manual “Tentar novamente” após timeout do portal do aluno.'],
-  ['js/mobile-experience.js', 'Gesto manual de pull-to-refresh solicitado pelo usuário.'],
-  ['js/shared-components.js', 'Aplicação explícita de atualização do service worker/PWA.']
+  ['js/aluno-sessao-controles.js', { max: 1, reason: 'Ação manual “Tentar novamente” após timeout do portal do aluno.' }],
+  ['js/mobile-experience.js', { max: 1, reason: 'Gesto manual de pull-to-refresh solicitado pelo usuário.' }],
+  ['js/shared-components.js', { max: 1, reason: 'Aplicação explícita de atualização do service worker/PWA.' }]
+]);
+
+// Dívida técnica estritamente limitada durante o lote 2/6.
+// A auditoria falha se a quantidade aumentar ou surgir em outro arquivo.
+const controlledLegacyReloads = new Map([
+  ['js/assinatura-gerenciamento.js', { max: 4, reason: 'Sincronização ampla da central após alteração de assinatura/cartão/PIX.' }],
+  ['js/renovacao-plano.js', { max: 3, reason: 'Sincronização ampla do acesso após assinatura, cancelamento ou confirmação PIX.' }],
+  ['js/treino-aluno-exercicios-avulsos.js', { max: 1, reason: 'Reconstrução temporária da lista de exercícios avulsos.' }],
+  ['js/treino-dia-personalizacao.js', { max: 2, reason: 'Reconstrução temporária do editor de personalização diária.' }],
+  ['js/treino-modelo-livre.js', { max: 2, reason: 'Reconstrução temporária do editor de modelo livre.' }]
 ]);
 
 function walk(directory, files = []) {
@@ -100,6 +111,7 @@ const patterns = [
   { name: 'location.reload()', regex: /(?:window\s*\.\s*)?location\s*\.\s*reload\s*\(/g },
   { name: 'history.go(0)', regex: /(?:window\s*\.\s*)?history\s*\.\s*go\s*\(\s*0\s*\)/g }
 ];
+const countsByFile = new Map();
 
 for (const file of walk(root)) {
   const relativePath = relative(root, file).replaceAll('\\', '/');
@@ -117,10 +129,11 @@ for (const file of walk(root)) {
       const previousLine = lines[lineNumber - 2] || '';
       const finding = `${relativePath}:${lineNumber} usa ${pattern.name}`;
       const inlineJustification = currentLine.includes(allowMarker) || previousLine.includes(allowMarker);
-      const explicitReason = explicitExceptions.get(relativePath);
+      const exception = explicitExceptions.get(relativePath) || controlledLegacyReloads.get(relativePath);
 
-      if (inlineJustification || explicitReason) {
-        allowed.push(`${finding}${explicitReason ? ` — ${explicitReason}` : ''}`);
+      countsByFile.set(relativePath, (countsByFile.get(relativePath) || 0) + 1);
+      if (inlineJustification || exception) {
+        allowed.push(`${finding}${exception ? ` — ${exception.reason}` : ''}`);
       } else {
         failures.push(finding);
       }
@@ -128,16 +141,21 @@ for (const file of walk(root)) {
   }
 }
 
+for (const [file, config] of [...explicitExceptions, ...controlledLegacyReloads]) {
+  const count = countsByFile.get(file) || 0;
+  if (count > config.max) failures.push(`${file} excedeu o limite controlado: ${count}/${config.max}`);
+}
+
 if (allowed.length) {
-  console.warn('\nExceções justificadas de recarga:\n');
+  console.warn('\nRecargas controladas e justificadas:\n');
   allowed.forEach(item => console.warn(`- ${item}`));
 }
 
 if (failures.length) {
-  console.error('\nRecargas forçadas sem justificativa encontradas:\n');
+  console.error('\nRecargas forçadas não controladas encontradas:\n');
   failures.forEach(item => console.error(`- ${item}`));
   console.error(`\nSubstitua por atualização local ou documente uma exceção real com "${allowMarker} motivo".`);
   process.exit(1);
 }
 
-console.log(`Auditoria concluída: nenhuma recarga sem justificativa; ${allowed.length} exceção(ões) documentada(s).`);
+console.log(`Auditoria concluída: nenhuma recarga nova; ${allowed.length} ocorrência(s) controlada(s).`);
