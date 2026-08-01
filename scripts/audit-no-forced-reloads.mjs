@@ -6,13 +6,8 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const ignoredDirectories = new Set(['.git', 'node_modules', '.vercel', 'dist', 'build', 'coverage']);
 const auditFile = 'scripts/audit-no-forced-reloads.mjs';
 const failures = [];
-const recoveryOnly = [];
-const recoveryFiles = new Set([
-  'js/aluno-sessao-controles.js',
-  'js/mobile-experience.js',
-  'js/shared-components.js',
-  'js/supabase.js'
-]);
+const allowed = [];
+const allowMarker = 'fsfit-allow-reload:';
 
 function walk(directory, files = []) {
   if (!existsSync(directory)) return files;
@@ -35,29 +30,34 @@ for (const file of walk(root)) {
   const relativePath = relative(root, file).replaceAll('\\', '/');
   if (relativePath === auditFile) continue;
   const content = readFileSync(file, 'utf8');
+  const lines = content.split('\n');
 
   for (const pattern of patterns) {
     pattern.regex.lastIndex = 0;
     let match;
     while ((match = pattern.regex.exec(content))) {
-      const line = content.slice(0, match.index).split('\n').length;
-      const finding = `${relativePath}:${line} usa ${pattern.name}`;
-      if (recoveryFiles.has(relativePath)) recoveryOnly.push(finding);
+      const lineNumber = content.slice(0, match.index).split('\n').length;
+      const currentLine = lines[lineNumber - 1] || '';
+      const previousLine = lines[lineNumber - 2] || '';
+      const finding = `${relativePath}:${lineNumber} usa ${pattern.name}`;
+      const hasJustification = currentLine.includes(allowMarker) || previousLine.includes(allowMarker);
+
+      if (hasJustification) allowed.push(finding);
       else failures.push(finding);
     }
   }
 }
 
-if (recoveryOnly.length) {
-  console.warn('\nRecargas restritas a recuperação/ação explícita encontradas:\n');
-  recoveryOnly.forEach(item => console.warn(`- ${item}`));
+if (allowed.length) {
+  console.warn('\nExceções justificadas de recarga:\n');
+  allowed.forEach(item => console.warn(`- ${item}`));
 }
 
 if (failures.length) {
-  console.error('\nRecargas forçadas em fluxos funcionais encontradas:\n');
+  console.error('\nRecargas forçadas sem justificativa encontradas:\n');
   failures.forEach(item => console.error(`- ${item}`));
-  console.error('\nSubstitua por atualização local de estado/DOM ou navegação explícita para outra página.');
+  console.error(`\nSubstitua por atualização local ou documente uma exceção real com "${allowMarker} motivo".`);
   process.exit(1);
 }
 
-console.log(`Auditoria concluída: ${recoveryOnly.length} recarga(s) restrita(s) a recuperação e nenhuma em fluxo funcional.`);
+console.log(`Auditoria concluída: nenhuma recarga sem justificativa; ${allowed.length} exceção(ões) documentada(s).`);
