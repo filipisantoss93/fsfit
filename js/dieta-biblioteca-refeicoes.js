@@ -168,7 +168,9 @@ async function useLibraryMeal(id) {
 
   closeModal();
   showMessage(message, `Refeição “${selected.nome}” adicionada ao plano ativo.`);
-  setTimeout(() => window.location.reload(), 350);
+  window.dispatchEvent(new CustomEvent('fsfit:diet-updated', {
+    detail: { alunoId, planId, mealId: createdMeal.id, source: 'library' }
+  }));
 }
 
 openButton?.addEventListener('click', async () => {

@@ -11,6 +11,10 @@ function closeModal() {
   document.querySelector('#card-status-modal-backdrop')?.remove();
 }
 
+function notifySubscriptionUpdate(detail = {}) {
+  window.dispatchEvent(new CustomEvent('fsfit:subscription-updated', { detail }));
+}
+
 function openCancelModal(access) {
   closeModal();
   const backdrop = document.createElement('div');
@@ -63,9 +67,16 @@ function openCancelModal(access) {
           <div class="card-success">
             <strong>✅ Recorrência cancelada</strong>
             <span>Não haverá novas cobranças desta assinatura. Você já pode iniciar uma nova assinatura com outro cartão.</span>
+            <button class="btn btn-primary" type="button" data-close-card-status>Fechar</button>
           </div>`;
+        container.querySelector('[data-close-card-status]')?.addEventListener('click', closeModal);
       }
-      setTimeout(() => window.location.reload(), 1600);
+      document.querySelector('#plan-renewal-card')?.remove();
+      notifySubscriptionUpdate({
+        action: 'cancelled',
+        assinaturaId: access?.assinatura_id,
+        acessoValidoAte: data?.acesso_valido_ate || access?.acesso_valido_ate
+      });
     } catch (error) {
       console.error('Erro ao cancelar assinatura pendente:', error);
       if (errorBox) {

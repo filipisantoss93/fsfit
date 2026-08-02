@@ -113,7 +113,16 @@ async function applyModel(modelId) {
 
     closeModal();
     showMessage(message, `Modelo “${model.nome}” aplicado ao aluno com sucesso.`);
-    setTimeout(() => window.location.reload(), 350);
+    window.dispatchEvent(new CustomEvent('fsfit:diet-plan-updated', {
+      detail: {
+        alunoId,
+        planId: createdPlanId,
+        modelId,
+        model,
+        mealIds: createdMealIds
+      }
+    }));
+    document.querySelector('[data-refresh-diet-plan],#refresh-diet-plan')?.click();
   } catch (error) {
     console.error(error);
     if (createdPlanId) await rollbackPlan(createdPlanId, createdMealIds);
