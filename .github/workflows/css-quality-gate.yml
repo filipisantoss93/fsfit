@@ -1,0 +1,62 @@
+name: Qualidade consolidada do CSS
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'css/**'
+      - 'config/css-audit-budget.json'
+      - 'config/important-debt-budget.json'
+      - 'scripts/audit-css-pages.mjs'
+      - 'scripts/final-css-validation.mjs'
+      - 'scripts/check-css-budget.mjs'
+      - 'scripts/audit-important-per-file.mjs'
+      - 'scripts/check-important-debt.mjs'
+      - '.github/workflows/css-quality-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.html'
+      - 'css/**'
+      - 'config/css-audit-budget.json'
+      - 'config/important-debt-budget.json'
+      - 'scripts/**css*.mjs'
+      - 'scripts/**important*.mjs'
+      - '.github/workflows/css-quality-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  css-quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Gerar relatórios
+        run: |
+          node scripts/audit-css-pages.mjs
+          node scripts/audit-important-per-file.mjs
+
+      - name: Validar consolidação e orçamentos
+        run: |
+          node scripts/final-css-validation.mjs
+          node scripts/check-css-budget.mjs
+          node scripts/check-important-debt.mjs
+
+      - name: Publicar relatórios
+        uses: actions/upload-artifact@v4
+        with:
+          name: css-quality-reports
+          path: |
+            artifacts/css-audit-report.json
+            reports/important-per-file.json
+            reports/important-debt-report.json
+          if-no-files-found: error
