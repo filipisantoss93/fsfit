@@ -1,0 +1,49 @@
+name: Limpeza segura de CSS redundante
+
+on:
+  push:
+    branches:
+      - cleanup/redundant-css-declarations-large-batch
+    paths:
+      - 'scripts/cleanup-redundant-css.mjs'
+      - '.github/workflows/cleanup-redundant-css.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup-css:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          ref: cleanup/redundant-css-declarations-large-batch
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Remover redundâncias seguras
+        run: node scripts/cleanup-redundant-css.mjs
+
+      - name: Validar auditorias
+        run: |
+          node scripts/audit-css-pages.mjs
+          node scripts/check-css-budget.mjs
+
+      - name: Consolidar alterações
+        run: |
+          if git diff --quiet; then
+            echo 'Nenhuma redundância segura encontrada.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add css config/css-audit-budget.json
+          git commit -m 'Remover declarações CSS redundantes'
+          git push origin HEAD:cleanup/redundant-css-declarations-large-batch
