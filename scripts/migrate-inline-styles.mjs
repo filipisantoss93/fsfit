@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+// Migração idempotente: converte estilos inline estáticos em classes compartilhadas.
 const root = process.cwd();
 const cssPath = path.join(root, 'css', 'inline-cleanup.css');
 const budgetPath = path.join(root, 'config', 'css-audit-budget.json');
