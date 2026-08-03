@@ -1,0 +1,38 @@
+name: Auditoria de important por arquivo
+
+on:
+  pull_request:
+    paths:
+      - 'css/**'
+      - 'scripts/audit-important-per-file.mjs'
+      - '.github/workflows/important-per-file-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-important:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Gerar relatório por arquivo
+        run: node scripts/audit-important-per-file.mjs
+
+      - name: Validar estrutura final
+        run: |
+          node scripts/final-css-validation.mjs
+          node scripts/check-css-budget.mjs
+
+      - name: Publicar relatório
+        uses: actions/upload-artifact@v4
+        with:
+          name: important-per-file-report
+          path: reports/important-per-file.json
