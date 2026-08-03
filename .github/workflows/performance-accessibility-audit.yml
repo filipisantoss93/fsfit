@@ -1,0 +1,34 @@
+name: Performance and accessibility audit
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'js/**'
+      - 'scripts/audit-performance-accessibility.mjs'
+      - '.github/workflows/performance-accessibility-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: performance-accessibility-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Validate interface structure
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate audit syntax
+        run: node --check scripts/audit-performance-accessibility.mjs
+      - name: Run structural audit
+        run: node scripts/audit-performance-accessibility.mjs
