@@ -15,14 +15,12 @@ const explicitExceptions = new Map([
   ['js/shared-components.js', { max: 1, reason: 'Aplicação explícita de atualização do service worker/PWA.' }]
 ]);
 
-// Dívida técnica estritamente limitada durante o lote 2/6.
+// Dívida técnica estritamente limitada durante o lote 3/6.
 // A auditoria falha se a quantidade aumentar ou surgir em outro arquivo.
 const controlledLegacyReloads = new Map([
   ['js/assinatura-gerenciamento.js', { max: 4, reason: 'Sincronização ampla da central após alteração de assinatura/cartão/PIX.' }],
   ['js/renovacao-plano.js', { max: 3, reason: 'Sincronização ampla do acesso após assinatura, cancelamento ou confirmação PIX.' }],
-  ['js/treino-aluno-exercicios-avulsos.js', { max: 1, reason: 'Reconstrução temporária da lista de exercícios avulsos.' }],
-  ['js/treino-dia-personalizacao.js', { max: 2, reason: 'Reconstrução temporária do editor de personalização diária.' }],
-  ['js/treino-modelo-livre.js', { max: 2, reason: 'Reconstrução temporária do editor de modelo livre.' }]
+  ['js/treino-aluno-exercicios-avulsos.js', { max: 1, reason: 'Reconstrução temporária da lista de exercícios avulsos.' }]
 ]);
 
 function walk(directory, files = []) {
