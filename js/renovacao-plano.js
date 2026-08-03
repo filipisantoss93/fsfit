@@ -408,7 +408,7 @@ async function openCardCheckout(plan, content) {
           <strong>✅ Assinatura criada com sucesso</strong>
           <span>O cartão foi enviado para processamento. Assim que a Efí confirmar a cobrança, seu acesso e a renovação automática serão atualizados.</span>
         </div>`;
-      setTimeout(() => window.location.reload(), 2200);
+      setTimeout(() => { refreshRenewalState(); }, 2200);
     } catch (error) {
       console.error('Erro ao assinar com cartão:', error);
       if (errorBox) {
@@ -459,7 +459,7 @@ function openCancelSubscriptionModal(access) {
           <strong>✅ Renovação automática cancelada</strong>
           <span>Não haverá nova cobrança. Seu acesso permanece ativo até ${formatDate(data?.acesso_valido_ate || access?.acesso_valido_ate)}.</span>
         </div>`;
-      setTimeout(() => window.location.reload(), 1800);
+      setTimeout(() => { refreshRenewalState(); }, 1800);
     } catch (error) {
       console.error('Erro ao cancelar assinatura:', error);
       if (errorBox) {
@@ -530,7 +530,7 @@ async function verifyPix(chargeId, content) {
       if (pollTimer) clearInterval(pollTimer);
       pollTimer = null;
       if (status) status.textContent = '✅ Pagamento confirmado. Seu acesso foi renovado com sucesso.';
-      setTimeout(() => window.location.reload(), 1400);
+      setTimeout(() => { refreshRenewalState(); }, 1400);
     } else if (status) {
       status.textContent = 'Aguardando confirmação do pagamento...';
     }
@@ -538,6 +538,13 @@ async function verifyPix(chargeId, content) {
     console.error('Erro ao verificar PIX:', error);
     if (status) status.textContent = 'Não foi possível verificar agora. Tentaremos novamente automaticamente.';
   }
+}
+
+
+async function refreshRenewalState(source = 'plan-renewal') {
+  closeModal();
+  await init();
+  window.dispatchEvent(new CustomEvent('fsfit:subscription-updated', { detail: { source } }));
 }
 
 async function init() {

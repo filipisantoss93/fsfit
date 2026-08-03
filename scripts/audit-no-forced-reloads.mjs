@@ -15,13 +15,6 @@ const explicitExceptions = new Map([
   ['js/shared-components.js', { max: 1, reason: 'Aplicação explícita de atualização do service worker/PWA.' }]
 ]);
 
-// Dívida técnica estritamente limitada durante o lote 3/6.
-// A auditoria falha se a quantidade aumentar ou surgir em outro arquivo.
-const controlledLegacyReloads = new Map([
-  ['js/assinatura-gerenciamento.js', { max: 4, reason: 'Sincronização ampla da central após alteração de assinatura/cartão/PIX.' }],
-  ['js/renovacao-plano.js', { max: 3, reason: 'Sincronização ampla do acesso após assinatura, cancelamento ou confirmação PIX.' }],
-  ['js/treino-aluno-exercicios-avulsos.js', { max: 1, reason: 'Reconstrução temporária da lista de exercícios avulsos.' }]
-]);
 
 function walk(directory, files = []) {
   if (!existsSync(directory)) return files;
@@ -127,7 +120,7 @@ for (const file of walk(root)) {
       const previousLine = lines[lineNumber - 2] || '';
       const finding = `${relativePath}:${lineNumber} usa ${pattern.name}`;
       const inlineJustification = currentLine.includes(allowMarker) || previousLine.includes(allowMarker);
-      const exception = explicitExceptions.get(relativePath) || controlledLegacyReloads.get(relativePath);
+      const exception = explicitExceptions.get(relativePath);
 
       countsByFile.set(relativePath, (countsByFile.get(relativePath) || 0) + 1);
       if (inlineJustification || exception) {
@@ -139,13 +132,13 @@ for (const file of walk(root)) {
   }
 }
 
-for (const [file, config] of [...explicitExceptions, ...controlledLegacyReloads]) {
+for (const [file, config] of explicitExceptions) {
   const count = countsByFile.get(file) || 0;
   if (count > config.max) failures.push(`${file} excedeu o limite controlado: ${count}/${config.max}`);
 }
 
 if (allowed.length) {
-  console.warn('\nRecargas controladas e justificadas:\n');
+  console.warn('\nExceções explícitas de recarga:\n');
   allowed.forEach(item => console.warn(`- ${item}`));
 }
 
@@ -156,4 +149,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Auditoria concluída: nenhuma recarga nova; ${allowed.length} ocorrência(s) controlada(s).`);
+console.log(`Auditoria concluída: nenhuma recarga funcional; ${allowed.length} ocorrência(s) controlada(s).`);

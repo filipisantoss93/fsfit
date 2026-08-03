@@ -446,10 +446,10 @@ if (pageName === 'treino-aluno.html' && alunoId && !globalThis.__FSFIT_DAY_EXERC
       if (insertError) throw insertError;
 
       await synchronizeOpenSession(workoutId);
-      sessionStorage.setItem(selectedDayStorageKey(), String(selectedDay));
       closePicker();
       showPageMessage(`${payload.length} ${payload.length === 1 ? 'exercício adicionado' : 'exercícios adicionados'} em ${dayNames[selectedDay]}.`);
-      window.setTimeout(() => window.location.reload(), 450);
+      window.dispatchEvent(new CustomEvent('fsfit:workout-updated', { detail: { alunoId, workoutId, day: selectedDay, source: 'day-exercises' } }));
+      app.querySelector(`[data-simple-day="${selectedDay}"]`)?.click();
     } catch (error) {
       if (createdWorkoutId) await supabase.from('treinos').delete().eq('id', createdWorkoutId);
       throw error;
