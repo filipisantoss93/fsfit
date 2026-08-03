@@ -1,0 +1,18 @@
+{
+  "maxTotal": 1257,
+  "files": {
+    "css/acesso-aluno-padronizacao.css": 33,
+    "css/app-shell.css": 66,
+    "css/aulas-painel-compact-base.css": 57,
+    "css/aulas-painel-compact.css": 80,
+    "css/aulas.css": 47,
+    "css/ficha-aluno.css": 86,
+    "css/header-menu.css": 80,
+    "css/library-compact.css": 62,
+    "css/mobile-navigation.css": 37,
+    "css/painel-home-redesign.css": 35,
+    "css/painel-visao-geral.css": 40,
+    "css/style-brand.css": 96,
+    "css/treino-aluno.css": 82
+  }
+}
