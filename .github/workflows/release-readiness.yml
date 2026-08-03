@@ -6,8 +6,9 @@ on:
       - '**/*.html'
       - 'css/**'
       - 'js/**'
-      - 'manifest.json'
-      - 'service-worker.js'
+      - 'config/**'
+      - 'manifest*.webmanifest'
+      - 'sw.js'
       - 'scripts/**'
       - '.github/workflows/release-readiness.yml'
   push:
@@ -17,9 +18,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: fsfit-release-readiness-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   release-readiness:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Baixar repositório
         uses: actions/checkout@v4
@@ -32,22 +38,27 @@ jobs:
       - name: Validar páginas, scripts e imports
         run: node scripts/audit-page-scripts.mjs
 
-      - name: Validar qualidade consolidada do CSS
+      - name: Gerar relatórios consolidados do CSS
         run: |
           node scripts/audit-css-pages.mjs
+          node scripts/audit-important-per-file.mjs
+
+      - name: Validar estrutura e orçamentos do CSS
+        run: |
           node scripts/final-css-validation.mjs
           node scripts/check-css-budget.mjs
           node scripts/check-important-debt.mjs
 
-      - name: Validar referências e arquivos essenciais
+      - name: Validar referências, PWA e arquivos essenciais
         run: node scripts/release-readiness.mjs
 
-      - name: Publicar relatório final
+      - name: Publicar relatório único da auditoria
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fsfit-release-readiness
+          name: fsfit-production-audit
           path: |
             reports/
             artifacts/
           if-no-files-found: warn
+          retention-days: 14
