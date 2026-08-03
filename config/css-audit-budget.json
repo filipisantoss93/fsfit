@@ -1,7 +1,7 @@
 {
   "maxCssFiles": 106,
   "maxOrphanCss": 0,
-  "maxInlineStyles": 8,
+  "maxInlineStyles": 0,
   "maxImportantDeclarations": 1257,
   "maxEmptyRules": 0
 }
