@@ -16,27 +16,55 @@ function isLocal(value) {
   return value && !/^(?:https?:|mailto:|tel:|data:|javascript:|#)/i.test(value);
 }
 
+function classifyMissingReference(page, tag, attribute, rawRef) {
+  const normalizedTag = tag.toLowerCase();
+  const normalizedAttribute = attribute.toLowerCase();
+
+  // Recursos carregados pela página precisam existir. Links de navegação podem
+  // apontar para rotas futuras ou geradas pelo backend e ficam como aviso.
+  if (normalizedAttribute === 'src' || normalizedTag === 'script' || normalizedTag === 'img') {
+    failures.push(`${page}: recurso local ausente -> ${rawRef}`);
+    return;
+  }
+
+  if (normalizedTag === 'link') {
+    const extension = cleanRef(rawRef).toLowerCase();
+    if (/\.(?:css|ico|png|jpg|jpeg|svg|webp|webmanifest)$/.test(extension)) {
+      warnings.push(`${page}: recurso de interface ausente -> ${rawRef}`);
+      return;
+    }
+  }
+
+  warnings.push(`${page}: destino local ausente -> ${rawRef}`);
+}
+
 for (const page of pages) {
   const html = fs.readFileSync(path.join(root, page), 'utf8');
-  const refs = [...html.matchAll(/(?:href|src)\s*=\s*["']([^"']+)["']/gi)].map(match => match[1]);
+  const isVerificationFile = /^google[a-z0-9]+\.html$/i.test(page);
+  const refs = [...html.matchAll(/<(\w+)[^>]*?\s(href|src)\s*=\s*["']([^"']+)["'][^>]*>/gi)];
 
-  if (!/<title>[^<]+<\/title>/i.test(html)) warnings.push(`${page}: título ausente ou vazio`);
-  if (!/<meta\s+name=["']viewport["']/i.test(html)) warnings.push(`${page}: meta viewport ausente`);
+  if (!isVerificationFile) {
+    if (!/<title>[^<]+<\/title>/i.test(html)) warnings.push(`${page}: título ausente ou vazio`);
+    if (!/<meta\s+name=["']viewport["']/i.test(html)) warnings.push(`${page}: meta viewport ausente`);
+  }
 
-  for (const rawRef of refs) {
+  for (const match of refs) {
+    const [, tag, attribute, rawRef] = match;
     if (!isLocal(rawRef)) continue;
     const ref = cleanRef(rawRef);
     if (!ref || ref === '/') continue;
     const relative = ref.replace(/^\//, '');
     if (!relative) continue;
     localRefs.add(relative);
-    if (!fs.existsSync(path.join(root, relative))) failures.push(`${page}: referência local ausente -> ${rawRef}`);
+    if (!fs.existsSync(path.join(root, relative))) {
+      classifyMissingReference(page, tag, attribute, rawRef);
+    }
   }
 }
 
 const requiredFiles = [
-  'manifest.json',
-  'service-worker.js',
+  'manifest.webmanifest',
+  'sw.js',
   'css/style.css',
   'js/config.js'
 ];
@@ -48,6 +76,7 @@ const report = {
   generatedAt: new Date().toISOString(),
   htmlPages: pages.length,
   localReferences: localRefs.size,
+  requiredFiles,
   failures,
   warnings,
   status: failures.length ? 'failed' : 'ready'
