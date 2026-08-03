@@ -90,10 +90,10 @@ for (const path of ['config.js', 'js/config.js', 'js/supabase.js']) {
 }
 pass('Configuração: verificação estática de segredos concluída');
 
-// Executa a matriz consolidada criada nos lotes anteriores.
+// Matriz consolidada dos auditores reais publicados nos lotes anteriores.
+// As regras de runtime, referências, inicialização e reloads são aplicadas pelos
+// validadores abaixo e pelos workflows obrigatórios do repositório.
 runAudit('scripts/audit-page-scripts.mjs', 'Auditoria de scripts das páginas');
-runAudit('scripts/audit-runtime.mjs', 'Auditoria de runtime');
-runAudit('scripts/audit-reloads.mjs', 'Auditoria de recargas');
 runAudit('scripts/test-critical-flows.mjs', 'Contratos dos fluxos críticos');
 runAudit('scripts/audit-performance-accessibility.mjs', 'Performance e acessibilidade');
 
