@@ -1,0 +1,133 @@
+name: Lote 3 final transform
+
+on:
+  push:
+    branches:
+      - lote-3-continuacao-remover-reloads
+
+permissions:
+  contents: write
+
+jobs:
+  transform:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: lote-3-continuacao-remover-reloads
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Aplicar atualização local em assinatura, renovação e treinos
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_required(text, pattern, replacement, expected, label, flags=0):
+              updated, count = re.subn(pattern, replacement, text, flags=flags)
+              if count != expected:
+                  raise SystemExit(f'{label}: esperado {expected}, encontrado {count}')
+              return updated
+
+          # Exercícios avulsos: reativa a aba atual e notifica os demais módulos.
+          path = Path('js/treino-aluno-exercicios-avulsos.js')
+          text = path.read_text()
+          text = replace_required(
+              text,
+              r"\s*sessionStorage\.setItem\(selectedDayStorageKey\(\), String\(selectedDay\)\);\n\s*closePicker\(\);\n\s*showPageMessage\(([^\n]+)\);\n\s*window\.setTimeout\(\(\) => window\.location\.reload\(\), 450\);",
+              "\n      closePicker();\n      showPageMessage(\\1);\n      window.dispatchEvent(new CustomEvent('fsfit:workout-updated', { detail: { alunoId, workoutId, day: selectedDay, source: 'day-exercises' } }));\n      app.querySelector(`[data-simple-day=\"${selectedDay}\"]`)?.click();",
+              1,
+              'treino-aluno-exercicios-avulsos'
+          )
+          path.write_text(text)
+
+          # Assinatura: todas as operações voltam a consultar o acesso e renderizar a central.
+          path = Path('js/assinatura-gerenciamento.js')
+          text = path.read_text()
+          helper = """
+          async function refreshSubscriptionManagement(source = 'subscription-management') {
+            closeModal();
+            await init();
+            window.dispatchEvent(new CustomEvent('fsfit:subscription-updated', {
+              detail: { source, access: currentAccess }
+            }));
+          }
+
+          """
+          if 'async function refreshSubscriptionManagement' not in text:
+              text = text.replace('async function init() {', helper + 'async function init() {', 1)
+          text, count = re.subn(
+              r"setTimeout\(\(\) => window\.location\.reload\(\),\s*(\d+)\);",
+              r"setTimeout(() => { refreshSubscriptionManagement(); }, \1);",
+              text
+          )
+          if count != 4:
+              raise SystemExit(f'assinatura-gerenciamento: esperado 4 reloads, encontrado {count}')
+          path.write_text(text)
+
+          # Renovação: sincroniza RPC, redesenha o card e emite evento global.
+          path = Path('js/renovacao-plano.js')
+          text = path.read_text()
+          helper = """
+          async function refreshRenewalState(source = 'plan-renewal') {
+            closeModal();
+            await init();
+            window.dispatchEvent(new CustomEvent('fsfit:subscription-updated', { detail: { source } }));
+          }
+
+          """
+          if 'async function refreshRenewalState' not in text:
+              text = text.replace('async function init() {', helper + 'async function init() {', 1)
+          text, count = re.subn(
+              r"setTimeout\(\(\) => window\.location\.reload\(\),\s*(\d+)\);",
+              r"setTimeout(() => { refreshRenewalState(); }, \1);",
+              text
+          )
+          if count != 3:
+              raise SystemExit(f'renovacao-plano: esperado 3 reloads, encontrado {count}')
+          path.write_text(text)
+
+          # Auditor: remove integralmente o orçamento legado; preserva só exceções explícitas.
+          path = Path('scripts/audit-no-forced-reloads.mjs')
+          text = path.read_text()
+          text = re.sub(
+              r"\n// Dívida técnica estritamente limitada durante o lote 3/6\.[\s\S]*?const controlledLegacyReloads = new Map\(\[[\s\S]*?\]\);\n",
+              '\n',
+              text,
+              count=1
+          )
+          text = text.replace(
+              "const exception = explicitExceptions.get(relativePath) || controlledLegacyReloads.get(relativePath);",
+              "const exception = explicitExceptions.get(relativePath);"
+          )
+          text = text.replace(
+              "for (const [file, config] of [...explicitExceptions, ...controlledLegacyReloads]) {",
+              "for (const [file, config] of explicitExceptions) {"
+          )
+          text = text.replace('Recargas controladas e justificadas:', 'Exceções explícitas de recarga:')
+          text = text.replace('nenhuma recarga nova;', 'nenhuma recarga funcional;')
+          if 'controlledLegacyReloads' in text:
+              raise SystemExit('auditor ainda contém controlledLegacyReloads')
+          path.write_text(text)
+          PY
+
+      - name: Validar sintaxe e ausência de recargas funcionais
+        run: |
+          node --check js/assinatura-gerenciamento.js
+          node --check js/renovacao-plano.js
+          node --check js/treino-aluno-exercicios-avulsos.js
+          node scripts/audit-no-forced-reloads.mjs
+
+      - name: Remover automação temporária e publicar lote
+        run: |
+          git rm .github/workflows/lote3-final-transform.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/assinatura-gerenciamento.js js/renovacao-plano.js js/treino-aluno-exercicios-avulsos.js scripts/audit-no-forced-reloads.mjs
+          git commit -m "Finalizar lote 3 sem recargas funcionais"
+          git push origin HEAD:lote-3-continuacao-remover-reloads
