@@ -19,7 +19,11 @@ function selectedWorkoutId() {
   return document.querySelector('.workout-plan-row.selected[data-select-workout]')?.dataset.selectWorkout || null;
 }
 
-
+function notifyWorkoutUpdate(detail = {}) {
+  const payload = { alunoId, ...detail };
+  window.dispatchEvent(new CustomEvent('fsfit:workout-updated', { detail: payload }));
+  document.dispatchEvent(new CustomEvent('fsfit:workout-updated', { detail: payload }));
+}
 
 function simplifyWorkoutForm() {
   if (!workoutForm) return;
@@ -58,14 +62,24 @@ async function saveTemplate(event) {
 
   const editingId = formMode === 'edit' ? selectedWorkoutId() : null;
   let error;
+  let savedWorkout = null;
   if (editingId) {
-    ({ error } = await supabase.from('treinos').update(payload).eq('id', editingId).eq('personal_id', session.user.id));
+    const result = await supabase.from('treinos').update(payload).eq('id', editingId).eq('personal_id', session.user.id).select('id,nome,descricao,data_inicio,data_fim,dias_semana,modelo,status').single();
+    error = result.error;
+    savedWorkout = result.data;
   } else {
-    ({ error } = await supabase.from('treinos').insert({ ...payload, personal_id: session.user.id, aluno_id: alunoId }));
+    const result = await supabase.from('treinos').insert({ ...payload, personal_id: session.user.id, aluno_id: alunoId }).select('id,nome,descricao,data_inicio,data_fim,dias_semana,modelo,status').single();
+    error = result.error;
+    savedWorkout = result.data;
   }
   if (error) return showMessage(message, editingId ? 'Não foi possível atualizar o treino.' : 'Não foi possível criar o treino.', 'error');
+
   showMessage(message, editingId ? 'Treino atualizado.' : 'Treino salvo. Agora adicione os exercícios e depois escolha os dias para aplicar.');
-  setTimeout(() => location.reload(), 350);
+  notifyWorkoutUpdate({ action: editingId ? 'updated' : 'created', workout: savedWorkout });
+  workoutForm.reset();
+  formMode = 'new';
+  simplifyWorkoutForm();
+  document.querySelector('[data-close-workout-modal], #workout-modal-close')?.click();
 }
 
 function normalizeExerciseBuilder() {
@@ -121,7 +135,7 @@ async function applyTemplate(workoutId, sheet) {
   const { error: insertError } = await supabase.from('treino_exercicios').insert(copies);
   if (insertError) return applicationError(confirmButton, 'Não foi possível distribuir os exercícios nos dias escolhidos.');
 
-  const { error: updateError } = await supabase.from('treinos').update({ dias_semana: days, modelo: false }).eq('id', workoutId).eq('personal_id', session.user.id);
+  const { data: updatedWorkout, error: updateError } = await supabase.from('treinos').update({ dias_semana: days, modelo: false }).eq('id', workoutId).eq('personal_id', session.user.id).select('id,nome,descricao,data_inicio,data_fim,dias_semana,modelo,status').single();
   if (updateError) return applicationError(confirmButton, 'Não foi possível salvar os dias do treino.');
 
   const { error: activateError } = await supabase.rpc('fsfit_ativar_treino_aluno', { p_treino_id: workoutId });
@@ -129,7 +143,7 @@ async function applyTemplate(workoutId, sheet) {
 
   closeApplicationSheet(sheet);
   showMessage(message, 'Treino aplicado nos dias selecionados.');
-  setTimeout(() => location.reload(), 350);
+  notifyWorkoutUpdate({ action: 'applied', workout: { ...updatedWorkout, status: 'ativo' }, days });
 }
 
 function applicationError(button, text) {
