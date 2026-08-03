@@ -1,0 +1,42 @@
+name: Critical flows audit
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'js/**/*.js'
+      - 'scripts/test-critical-flows.mjs'
+      - 'manifest.json'
+      - 'sw.js'
+      - 'service-worker.js'
+      - '.github/workflows/critical-flows-audit.yml'
+      - 'docs/MATRIZ-TESTES-FLUXOS-CRITICOS.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: critical-flows-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-critical-flows:
+    name: Validate critical flows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate test syntax
+        run: node --check scripts/test-critical-flows.mjs
+
+      - name: Run critical-flow contracts
+        run: node scripts/test-critical-flows.mjs
