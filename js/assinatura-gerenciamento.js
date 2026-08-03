@@ -90,7 +90,7 @@ async function cancelCardSubscription(access, { removeCard = false, content = nu
       if (data?.erro) throw new Error(data.erro);
       if (error) throw error;
       target.innerHTML = `<div class="subscription-success"><strong>✅ ${removeCard ? 'Cartão removido da recorrência' : 'Renovação automática cancelada'}</strong><span>Seu acesso permanece válido até ${formatDate(data?.acesso_valido_ate || access?.acesso_valido_ate)}.</span></div>`;
-      setTimeout(() => window.location.reload(), 1600);
+      setTimeout(() => { refreshSubscriptionManagement(); }, 1600);
     } catch (error) {
       if (errorBox) {
         errorBox.hidden = false;
@@ -214,7 +214,7 @@ async function openCardForm({ access = null, plan = null, mode = 'subscribe' } =
         if (error) throw error;
         content.innerHTML = '<div class="subscription-success"><strong>✅ Assinatura criada</strong><span>O cartão foi enviado para processamento. O acesso será atualizado após a confirmação da cobrança.</span></div>';
       }
-      setTimeout(() => window.location.reload(), 1800);
+      setTimeout(() => { refreshSubscriptionManagement(); }, 1800);
     } catch (error) {
       if (errorBox) {
         errorBox.hidden = false;
@@ -235,7 +235,7 @@ async function updateCardPlan(access, plan, content) {
     if (data?.erro) throw new Error(data.erro);
     if (error) throw error;
     content.innerHTML = `<div class="subscription-success"><strong>✅ Plano atualizado</strong><span>Sua recorrência foi alterada para ${escapeHtml(plan.nome)}. As próximas cobranças seguirão o novo plano.</span></div>`;
-    setTimeout(() => window.location.reload(), 1700);
+    setTimeout(() => { refreshSubscriptionManagement(); }, 1700);
   } catch (error) {
     content.innerHTML = `<div class="subscription-error">${escapeHtml(error?.message || 'Não foi possível alterar o plano.')}</div>`;
   }
@@ -280,7 +280,7 @@ async function createPix(plan, content, { cancelRecurringAfterPaid = false } = {
             }
           }
           if (status) status.textContent = '✅ Pagamento confirmado. Seu plano foi atualizado com sucesso.';
-          setTimeout(() => window.location.reload(), 1500);
+          setTimeout(() => { refreshSubscriptionManagement(); }, 1500);
         } else if (status) status.textContent = 'Aguardando confirmação do pagamento...';
       } catch {
         if (status) status.textContent = 'Não foi possível verificar agora. Tentaremos novamente automaticamente.';
@@ -375,6 +375,15 @@ function renderManagement(access) {
     article.querySelector('button')?.addEventListener('click', handler);
     host.appendChild(article);
   });
+}
+
+
+async function refreshSubscriptionManagement(source = 'subscription-management') {
+  closeModal();
+  await init();
+  window.dispatchEvent(new CustomEvent('fsfit:subscription-updated', {
+    detail: { source, access: currentAccess }
+  }));
 }
 
 async function init() {
