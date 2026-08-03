@@ -3,7 +3,7 @@ name: Aplicar migração final de estilos inline
 on:
   push:
     branches:
-      - cleanup/zero-inline-styles-large-batch
+      - main
     paths:
       - 'scripts/migrate-inline-styles.mjs'
       - '.github/workflows/apply-inline-style-migration.yml'
@@ -20,7 +20,7 @@ jobs:
       - name: Baixar repositório
         uses: actions/checkout@v4
         with:
-          ref: cleanup/zero-inline-styles-large-batch
+          ref: main
           fetch-depth: 0
 
       - name: Configurar Node.js
@@ -46,4 +46,4 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add '*.html' css/inline-cleanup.css config/css-audit-budget.json
           git commit -m 'Consolidar estilos inline restantes'
-          git push origin HEAD:cleanup/zero-inline-styles-large-batch
+          git push origin HEAD:main
