@@ -35,17 +35,13 @@ function auditHtml() {
       const attrs = `${match[1]} ${match[3]}`;
       const src = match[2];
       if (/^(?:https?:)?\/\//i.test(src)) continue;
-      if (!/\b(?:defer|async|type\s*=\s*["']module["'])\b/i.test(attrs)) {
-        warn(`${name}: script local potencialmente bloqueante (${src})`);
-      }
+      if (!/\b(?:defer|async|type\s*=\s*["']module["'])\b/i.test(attrs)) warn(`${name}: script local potencialmente bloqueante (${src})`);
     }
 
     for (const match of source.matchAll(/<img\b([^>]*)>/gi)) {
       const attrs = match[1];
       if (!/\balt\s*=\s*["'][^"']*["']/i.test(attrs)) fail(`${name}: imagem sem atributo alt`);
-      if (!/\bloading\s*=\s*["']lazy["']/i.test(attrs) && !/\b(?:logo|hero|avatar|above-fold)\b/i.test(attrs)) {
-        warn(`${name}: imagem sem loading="lazy"`);
-      }
+      if (!/\bloading\s*=\s*["']lazy["']/i.test(attrs) && !/\b(?:logo|hero|avatar|above-fold)\b/i.test(attrs)) warn(`${name}: imagem sem loading="lazy"`);
     }
 
     for (const match of source.matchAll(/<iframe\b([^>]*)>/gi)) {
@@ -57,9 +53,7 @@ function auditHtml() {
     for (const match of source.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi)) {
       const attrs = match[1];
       const body = match[2].replace(/<[^>]+>/g, '').trim();
-      if (!body && !/\baria-label\s*=\s*["'][^"']+["']/i.test(attrs) && !/\btitle\s*=\s*["'][^"']+["']/i.test(attrs)) {
-        fail(`${name}: botão sem nome acessível`);
-      }
+      if (!body && !/\baria-label\s*=\s*["'][^"']+["']/i.test(attrs) && !/\btitle\s*=\s*["'][^"']+["']/i.test(attrs)) fail(`${name}: botão sem nome acessível`);
     }
 
     for (const match of source.matchAll(/<input\b([^>]*)>/gi)) {
@@ -88,28 +82,22 @@ function auditJavaScript() {
 
     const intervals = (source.match(/\bsetInterval\s*\(/g) || []).length;
     const clearIntervals = (source.match(/\bclearInterval\s*\(/g) || []).length;
-    if (intervals > clearIntervals && !/fsfit-allow-persistent-interval:/i.test(source)) {
-      warn(`${name}: ${intervals} setInterval e ${clearIntervals} clearInterval`);
-    }
+    if (intervals > clearIntervals && !/fsfit-allow-persistent-interval:/i.test(source)) warn(`${name}: ${intervals} setInterval e ${clearIntervals} clearInterval`);
 
     const observers = (source.match(/new\s+(?:MutationObserver|IntersectionObserver|ResizeObserver)\s*\(/g) || []).length;
     const disconnects = (source.match(/\.disconnect\s*\(/g) || []).length;
-    if (observers > disconnects && !/fsfit-allow-persistent-observer:/i.test(source)) {
-      warn(`${name}: observer sem cleanup detectável`);
-    }
+    if (observers > disconnects && !/fsfit-allow-persistent-observer:/i.test(source)) warn(`${name}: observer sem cleanup detectável`);
 
-    if (/addEventListener\(\s*["']submit["']/.test(source) && !/(?:disabled\s*=\s*true|setBusy\s*\(|aria-busy)/.test(source)) {
-      warn(`${name}: submit assíncrono sem bloqueio de ação duplicada detectável`);
-    }
+    if (/addEventListener\(\s*["']submit["']/.test(source) && !/(?:disabled\s*=\s*true|setBusy\s*\(|aria-busy)/.test(source)) warn(`${name}: submit assíncrono sem bloqueio de ação duplicada detectável`);
 
-    if (/innerHTML\s*=\s*[`"'][\s\S]*(?:Carregando|Aguarde|Processando)/i.test(source) && !/(?:erro|error|vazio|empty|sucesso|success)/i.test(source)) {
-      warn(`${name}: estado de loading sem estados complementares detectáveis`);
-    }
+    if (/innerHTML\s*=\s*[`"'][\s\S]*(?:Carregando|Aguarde|Processando)/i.test(source) && !/(?:erro|error|vazio|empty|sucesso|success)/i.test(source)) warn(`${name}: estado de loading sem estados complementares detectáveis`);
 
-    if (/role=["']dialog["']/.test(source)) {
-      if (!/aria-modal=["']true["']/.test(source)) fail(`${name}: modal dinâmico sem aria-modal`);
-      if (!/(?:Escape|keydown|focus\s*\(|tabindex)/.test(source)) warn(`${name}: modal dinâmico sem gestão de teclado/foco detectável`);
+    const dynamicDialogMarkup = source.match(/<[^>]+role=["']dialog["'][^>]*>/gi) || [];
+    for (const markup of dynamicDialogMarkup) {
+      if (!/aria-modal=["']true["']/.test(markup)) fail(`${name}: modal dinâmico sem aria-modal`);
+      if (!/aria-label(?:ledby)?=["'][^"']+["']/.test(markup)) fail(`${name}: modal dinâmico sem nome acessível`);
     }
+    if (dynamicDialogMarkup.length && !/(?:Escape|keydown|focus\s*\(|tabindex)/.test(source)) warn(`${name}: modal dinâmico sem gestão de teclado/foco detectável`);
   }
   pass(`${jsFiles.length} módulo(s) JavaScript inspecionados`);
 }
