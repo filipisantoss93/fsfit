@@ -92,6 +92,15 @@ if (alunoId && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER__) {
     observer.observe(modalBody, { childList: true, subtree: true });
   }
 
+  function finalizeLocalUpdate() {
+    if (!dirty) return;
+    dirty = false;
+    updateWeekCardCount();
+    window.dispatchEvent(new CustomEvent('fsfit:workout-updated', {
+      detail: { alunoId, workoutId, day: selectedDay, exerciseCount: rows.length, source: 'day-customization' }
+    }));
+  }
+
   function bindActions() {
     modal.addEventListener('click', event => {
       if (event.target.closest('[data-day-add-exercise]')) {
@@ -118,14 +127,12 @@ if (alunoId && !globalThis.__FSFIT_DAY_WORKOUT_CUSTOMIZER__) {
     }, true);
 
     modal.addEventListener('click', event => {
-      if (!dirty || !event.target.closest('[data-simple-modal-close]')) return;
-      window.setTimeout(() => location.reload(), 40);
+      if (!event.target.closest('[data-simple-modal-close]')) return;
+      finalizeLocalUpdate();
     });
 
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && dirty && modal.classList.contains('open')) {
-        window.setTimeout(() => location.reload(), 80);
-      }
+      if (event.key === 'Escape' && modal.classList.contains('open')) finalizeLocalUpdate();
     });
   }
 
