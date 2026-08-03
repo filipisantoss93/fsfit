@@ -1,0 +1,63 @@
+name: Lote 3 transform
+
+on:
+  push:
+    branches:
+      - lote-3-remover-reloads-assinatura-treinos
+    paths:
+      - .github/workflows/lote3-transform.yml
+
+permissions:
+  contents: write
+
+jobs:
+  transform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: lote-3-remover-reloads-assinatura-treinos
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Remover reload e atualizar auditor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          target = Path('js/treino-aluno-exercicios-avulsos.js')
+          text = target.read_text()
+          old = """      await synchronizeOpenSession(workoutId);
+                sessionStorage.setItem(selectedDayStorageKey(), String(selectedDay));
+                closePicker();
+                showPageMessage(`${payload.length} ${payload.length === 1 ? 'exercício adicionado' : 'exercícios adicionados'} em ${dayNames[selectedDay]}.`);
+                window.setTimeout(() => window.location.reload(), 450);"""
+          new = """      await synchronizeOpenSession(workoutId);
+                sessionStorage.removeItem(selectedDayStorageKey());
+                closePicker();
+                showPageMessage(`${payload.length} ${payload.length === 1 ? 'exercício adicionado' : 'exercícios adicionados'} em ${dayNames[selectedDay]}.`);
+                window.dispatchEvent(new CustomEvent('fsfit:workout-updated', {
+                  detail: { alunoId, workoutId, day: selectedDay, source: 'loose-exercises' }
+                }));
+                app.querySelector(`[data-simple-day=\"${selectedDay}\"]`)?.click();"""
+          if old not in text:
+              raise SystemExit('Trecho esperado não encontrado no módulo de exercícios avulsos.')
+          target.write_text(text.replace(old, new, 1))
+
+          audit = Path('scripts/audit-no-forced-reloads.mjs')
+          audit_text = audit.read_text()
+          line = "  ['js/treino-aluno-exercicios-avulsos.js', { max: 1, reason: 'Reconstrução temporária da lista de exercícios avulsos.' }],\n"
+          if line not in audit_text:
+              raise SystemExit('Entrada esperada não encontrada no auditor.')
+          audit.write_text(audit_text.replace(line, '', 1))
+
+          Path('.github/workflows/lote3-transform.yml').unlink()
+          PY
+      - name: Commitar transformação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/treino-aluno-exercicios-avulsos.js scripts/audit-no-forced-reloads.mjs .github/workflows/lote3-transform.yml
+          git commit -m "Remover reload de exercícios avulsos"
+          git push origin HEAD:lote-3-remover-reloads-assinatura-treinos
