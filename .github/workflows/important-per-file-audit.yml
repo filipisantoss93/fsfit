@@ -5,6 +5,9 @@ on:
     paths:
       - 'css/**'
       - 'scripts/audit-important-per-file.mjs'
+      - 'scripts/audit-css-pages.mjs'
+      - 'scripts/final-css-validation.mjs'
+      - 'scripts/check-css-budget.mjs'
       - '.github/workflows/important-per-file-audit.yml'
   workflow_dispatch:
 
@@ -25,6 +28,9 @@ jobs:
 
       - name: Gerar relatório por arquivo
         run: node scripts/audit-important-per-file.mjs
+
+      - name: Gerar relatório estrutural do CSS
+        run: node scripts/audit-css-pages.mjs
 
       - name: Validar estrutura final
         run: |
