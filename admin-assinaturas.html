@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f1115">
+  <title>Saúde da assinatura — FS Fit</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    .subscription-health-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.subscription-health-card{padding:18px}.subscription-health-card small{display:block;margin-bottom:8px}.subscription-health-card strong{font-size:1.7rem}.subscription-health-actions{display:flex;gap:10px;flex-wrap:wrap}.subscription-health-status{display:inline-flex;align-items:center;gap:8px}.subscription-health-status::before{content:"";width:10px;height:10px;border-radius:50%;background:#f5b942}.subscription-health-status[data-status="saudavel"]::before{background:#2ecc71}.subscription-health-note{opacity:.78}
+  </style>
+</head>
+<body>
+  <div id="header-container"></div>
+  <main class="container admin-page">
+    <section class="page-header">
+      <div><h1>Saúde da assinatura</h1><p>Diagnóstico operacional da integração FS Fit, Supabase e Efí Bank.</p></div>
+      <span class="hero-badge">ADMIN</span>
+    </section>
+    <div id="subscription-health-message" class="message"></div>
+    <section class="card admin-section-card">
+      <div class="section-heading"><div><small>STATUS GERAL</small><h2 id="subscription-health-title" class="subscription-health-status">Carregando</h2></div><span id="subscription-health-checked" class="admin-note">—</span></div>
+      <p id="subscription-health-summary" class="subscription-health-note">Consultando o diagnóstico financeiro...</p>
+      <div class="subscription-health-actions"><button id="subscription-health-refresh" class="btn btn-primary" type="button">Atualizar diagnóstico</button><a class="btn btn-outline" href="admin.html">Voltar ao painel</a></div>
+    </section>
+    <section class="subscription-health-grid">
+      <div class="card subscription-health-card"><small>INCIDENTES ABERTOS</small><strong id="health-incidents">—</strong></div>
+      <div class="card subscription-health-card"><small>FALHAS NA ÚLTIMA HORA</small><strong id="health-failures">—</strong></div>
+      <div class="card subscription-health-card"><small>PIX EXPIRADOS PENDENTES</small><strong id="health-pix-expired">—</strong></div>
+      <div class="card subscription-health-card"><small>CARTÕES TRAVADOS</small><strong id="health-card-stuck">—</strong></div>
+      <div class="card subscription-health-card"><small>CRON PIX</small><strong id="health-cron-pix">—</strong></div>
+      <div class="card subscription-health-card"><small>CRON CARTÃO</small><strong id="health-cron-card">—</strong></div>
+    </section>
+    <section class="card admin-section-card">
+      <div class="section-heading"><div><small>RECONCILIAÇÃO</small><h2>Últimas execuções</h2></div></div>
+      <p>PIX: <strong id="health-last-pix">—</strong></p>
+      <p>Cartão: <strong id="health-last-card">—</strong></p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/carregar-menu.js"></script>
+  <script src="js/admin-assinatura-saude.js"></script>
+</body>
+</html>
