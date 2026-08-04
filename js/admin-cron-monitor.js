@@ -206,3 +206,52 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && !runningManually) loadCronStatus().catch(console.warn);
 });
+
+let subscriptionHealthCard = null;
+
+function ensureSubscriptionHealthCard() {
+  if (!overviewPanel || subscriptionHealthCard) return subscriptionHealthCard;
+  subscriptionHealthCard = document.createElement('section');
+  subscriptionHealthCard.className = 'card admin-section-card admin-cron-monitor';
+  subscriptionHealthCard.innerHTML = '<div class="admin-cron-monitor-head"><div><small>ASSINATURA FS FIT</small><h2>Integração Efí Bank</h2><p>Consultando pagamentos, reconciliação e incidentes...</p></div><span class="admin-cron-status">Carregando</span></div>';
+  const attentionSection = overviewPanel.querySelector('.admin-attention-section');
+  overviewPanel.insertBefore(subscriptionHealthCard, attentionSection || null);
+  return subscriptionHealthCard;
+}
+
+async function loadSubscriptionHealth() {
+  const card = ensureSubscriptionHealthCard();
+  if (!card) return;
+
+  const { data, error } = await supabase.rpc('fsfit_admin_diagnostico_assinatura');
+  if (error) {
+    console.error('Erro ao carregar saúde da assinatura:', error);
+    card.className = 'card admin-section-card admin-cron-monitor is-error';
+    card.innerHTML = `<div class="admin-cron-monitor-head"><div><small>ASSINATURA FS FIT</small><h2>Integração Efí Bank</h2><p>${esc(error.message || 'Diagnóstico indisponível.')}</p></div><span class="admin-cron-status">Atenção</span></div><div class="admin-cron-actions"><a class="btn btn-outline" href="admin-assinaturas.html">Abrir diagnóstico</a></div>`;
+    return;
+  }
+
+  const healthy = data?.status === 'saudavel';
+  const tone = healthy ? toneForState('saudavel') : toneForState('erro');
+  card.className = `card admin-section-card admin-cron-monitor ${tone.className}`;
+  card.innerHTML = `
+    <div class="admin-cron-monitor-head">
+      <div><small>ASSINATURA FS FIT</small><h2>Integração Efí Bank</h2><p>${healthy ? 'Pagamentos e reconciliações funcionando normalmente.' : 'Existem pendências na operação da assinatura.'}</p></div>
+      <span class="admin-cron-status">${esc(tone.label)}</span>
+    </div>
+    <div class="admin-cron-grid">
+      <div><small>INCIDENTES ABERTOS</small><strong>${Number(data?.incidentes_abertos || 0)}</strong></div>
+      <div><small>FALHAS NA ÚLTIMA HORA</small><strong>${Number(data?.falhas_ultima_hora || 0)}</strong></div>
+      <div><small>CRON PIX</small><strong>${data?.cron_pix_ativo ? 'Ativo' : 'Parado'}</strong></div>
+      <div><small>CRON CARTÃO</small><strong>${data?.cron_cartao_ativo ? 'Ativo' : 'Parado'}</strong></div>
+    </div>
+    <div class="admin-cron-actions"><a class="btn btn-outline" href="admin-assinaturas.html">Ver diagnóstico completo</a></div>`;
+}
+
+await loadSubscriptionHealth();
+setInterval(() => {
+  if (!document.hidden) loadSubscriptionHealth().catch(console.warn);
+}, 60000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadSubscriptionHealth().catch(console.warn);
+});
