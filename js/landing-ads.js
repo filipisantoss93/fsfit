@@ -1,7 +1,6 @@
 (() => {
   const ATTRIBUTION_KEY = 'fsfit_attribution';
   const TRACKED_PARAMS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid'];
-  const MOBILE_FIXES_URL = '/css/landing-ads-mobile-fixes.css?v=20260725-mobile2';
   const url = new URL(window.location.href);
   const current = {};
 
@@ -9,11 +8,6 @@
   if (requestedAuthMode === 'login' || requestedAuthMode === 'entrar') {
     document.body.dataset.authDefault = 'login';
   }
-
-  const mobileFixes = document.createElement('link');
-  mobileFixes.rel = 'stylesheet';
-  mobileFixes.href = MOBILE_FIXES_URL;
-  document.head.appendChild(mobileFixes);
 
   TRACKED_PARAMS.forEach(key => {
     const value = url.searchParams.get(key);
@@ -99,14 +93,18 @@
     const sticky = document.querySelector('.lp-sticky-cta');
     if (!sticky) return;
 
-    sticky.hidden = true;
+    sticky.hidden = false;
+    sticky.setAttribute('aria-hidden', 'true');
 
-    const closeButton = document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.className = 'lp-sticky-close';
-    closeButton.setAttribute('aria-label', 'Fechar chamada para cadastro');
-    closeButton.textContent = '×';
-    sticky.prepend(closeButton);
+    let closeButton = sticky.querySelector('.lp-sticky-close');
+    if (!closeButton) {
+      closeButton = document.createElement('button');
+      closeButton.type = 'button';
+      closeButton.className = 'lp-sticky-close';
+      closeButton.setAttribute('aria-label', 'Fechar chamada para cadastro');
+      closeButton.textContent = '×';
+      sticky.prepend(closeButton);
+    }
 
     const sections = {
       hero: document.querySelector('.lp-hero'),
@@ -122,14 +120,33 @@
       footer: false
     };
 
-    let dismissed = sessionStorage.getItem('fsfit_landing_sticky_dismissed') === '1';
+    let dismissed = false;
+    try {
+      dismissed = sessionStorage.getItem('fsfit_landing_sticky_dismissed') === '1';
+    } catch (error) {
+      console.warn('Não foi possível ler a preferência do CTA flutuante:', error);
+    }
+
     let updateQueued = false;
+
+    function hideSticky() {
+      dismissed = true;
+      sticky.classList.remove('is-visible');
+      sticky.setAttribute('aria-hidden', 'true');
+      sticky.hidden = true;
+      try {
+        sessionStorage.setItem('fsfit_landing_sticky_dismissed', '1');
+      } catch (error) {
+        console.warn('Não foi possível salvar a preferência do CTA flutuante:', error);
+      }
+    }
 
     function updateStickyVisibility() {
       updateQueued = false;
       const mobile = window.matchMedia('(max-width: 720px)').matches;
       const blockedSectionVisible = visibility.hero || visibility.signup || visibility.final || visibility.footer;
       const shouldShow = mobile && !dismissed && !blockedSectionVisible && window.scrollY > 420;
+      sticky.hidden = !shouldShow;
       sticky.classList.toggle('is-visible', shouldShow);
       sticky.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
     }
@@ -159,34 +176,29 @@
       visibility.hero = false;
     }
 
-    closeButton.addEventListener('click', () => {
-      dismissed = true;
-      sessionStorage.setItem('fsfit_landing_sticky_dismissed', '1');
-      sticky.classList.remove('is-visible');
-      sticky.setAttribute('aria-hidden', 'true');
+    const closeSticky = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      hideSticky();
       track('landing_sticky_close');
+    };
+
+    closeButton.addEventListener('click', closeSticky);
+    closeButton.addEventListener('pointerup', event => {
+      if (event.pointerType === 'touch') closeSticky(event);
     });
 
     sticky.querySelector('a[href="#cadastro"]')?.addEventListener('click', () => {
       sticky.classList.remove('is-visible');
       sticky.setAttribute('aria-hidden', 'true');
+      sticky.hidden = true;
     });
 
     window.addEventListener('scroll', queueVisibilityUpdate, { passive: true });
     window.addEventListener('resize', queueVisibilityUpdate, { passive: true });
     window.visualViewport?.addEventListener('resize', queueVisibilityUpdate, { passive: true });
 
-    const revealAfterStyles = () => {
-      sticky.hidden = false;
-      updateStickyVisibility();
-    };
-
-    if (mobileFixes.sheet) {
-      revealAfterStyles();
-    } else {
-      mobileFixes.addEventListener('load', revealAfterStyles, { once: true });
-      mobileFixes.addEventListener('error', () => { sticky.hidden = true; }, { once: true });
-    }
+    updateStickyVisibility();
   }
 
   configureStickyCta();
