@@ -36,6 +36,8 @@ window.addEventListener('fsfit:assinatura-atualizada', () => {
   const activeElement = document.activeElement;
   const modalOpen = document.querySelector('#subscription-management-modal');
   if (modalOpen || activeElement?.matches('input, select, textarea')) return;
+
+  // fsfit-allow-reload: sincronizar toda a tela após alteração confirmada da assinatura em tempo real.
   window.location.reload();
 });
 
