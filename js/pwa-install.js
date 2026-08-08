@@ -118,8 +118,21 @@ window.addEventListener('appinstalled', () => {
 });
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(error => console.error('Falha ao registrar o service worker:', error));
+  let controllerReloaded = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (controllerReloaded) return;
+    controllerReloaded = true;
+    window.location.reload();
+  });
+
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
+      await registration.update();
+    } catch (error) {
+      console.error('Falha ao registrar ou atualizar o service worker:', error);
+    }
   });
 }
 
