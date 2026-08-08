@@ -28,26 +28,6 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
     return row?.querySelector('.fsfit-personal-student-avatar img')?.src || '';
   }
 
-  function ensureStyles() {
-    if (document.querySelector('style[data-fsfit-today-modal-avatar]')) return;
-    const style = document.createElement('style');
-    style.dataset.fsfitTodayModalAvatar = 'true';
-    style.textContent = `
-      .today-workout-dashboard-header.fsfit-has-student-avatar{align-items:center}
-      .fsfit-today-modal-identity{display:flex;align-items:center;gap:13px;min-width:0;flex:1}
-      .fsfit-today-modal-copy{min-width:0}
-      .fsfit-today-modal-copy h2,.fsfit-today-modal-copy p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      .fsfit-today-modal-avatar{flex:0 0 58px;width:58px;height:58px;display:grid;place-items:center;overflow:hidden;border:2px solid rgba(255,255,255,.14);border-radius:50%;background:linear-gradient(145deg,rgba(50,215,75,.18),rgba(59,130,246,.13)),var(--surface-light);color:var(--text);font-size:.9rem;font-weight:900;line-height:1}
-      .fsfit-today-modal-avatar img{width:100%;height:100%;display:block;object-fit:cover}
-      @media(max-width:620px){
-        .fsfit-today-modal-identity{gap:10px}
-        .fsfit-today-modal-avatar{flex-basis:50px;width:50px;height:50px;font-size:.78rem}
-        .today-workout-dashboard-header.fsfit-has-student-avatar{align-items:center}
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   function decorateModal() {
     if (!activeStudent) return;
     const modal = document.querySelector('#today-workout-dashboard-modal.open');
@@ -143,8 +123,6 @@ if ((window.location.pathname.split('/').pop() || '') === 'painel.html') {
       });
     }
   }
-
-  ensureStyles();
 
   document.addEventListener('pointerdown', event => {
     const row = event.target.closest?.('#today-list .today-entry');

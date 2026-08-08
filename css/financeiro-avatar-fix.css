@@ -1,8 +1,0 @@
-/* Financeiro — garante uma única representação visual do aluno. */
-.finance-student-name > .finance-student-avatar {
-  display: none !important;
-}
-
-.finance-student-name > .fsfit-personal-student-avatar {
-  flex: 0 0 34px;
-}

@@ -1,7 +1,11 @@
 {
-  "maxCssFiles": 106,
+  "maxCssFiles": 111,
   "maxOrphanCss": 0,
   "maxInlineStyles": 0,
-  "maxImportantDeclarations": 1257,
-  "maxEmptyRules": 0
+  "maxImportantDeclarations": 1256,
+  "maxEmptyRules": 0,
+  "maxRuntimeStylesheetsPerPage": 1,
+  "maxRuntimeImports": 0,
+  "maxDuplicateBundleSources": 0,
+  "maxJavascriptStyleBlocks": 0
 }

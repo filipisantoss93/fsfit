@@ -6,6 +6,7 @@ const root = document.querySelector('#student-content');
 if (!token || !root) throw new Error('Sessão do aluno indisponível');
 
 function ensureContextStyles() {
+  if (document.querySelector('link[data-fsfit-bundle]')) return;
   if (document.querySelector('link[data-student-live-context]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';

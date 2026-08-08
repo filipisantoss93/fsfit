@@ -32,11 +32,6 @@ if (app && !globalThis.__FSFIT_WORKOUT_EMPTY_STATE_GUARD__) {
     }
   }
 
-  const style = document.createElement('style');
-  style.dataset.workoutEmptyStateGuard = 'true';
-  style.textContent = '.simple-empty-state-copy{margin:0;color:var(--muted);font-size:.74rem;line-height:1.4;text-align:center}';
-  document.head.appendChild(style);
-
   normalizeEmptyState();
 
   // Registrado antes do módulo de exercícios avulsos. Quando a rotina é renderizada

@@ -20,7 +20,24 @@ Plataforma da FS Soluções para personal trainers administrarem alunos, treinos
 
 ## Estrutura visual
 
-Todo o tema está consolidado em `css/style.css`. Não são usados arquivos CSS paralelos nem camadas de override.
+Os estilos de origem permanecem modulares em `css/`, mas nunca são publicados
+separadamente. `scripts/build-css-bundles.mjs` compila um único bundle com hash
+de conteúdo para cada página, elimina `@import` e inclui cada fonte uma única
+vez. Páginas com o mesmo conteúdo reutilizam o mesmo arquivo.
+
+Antes de abrir um PR com alterações em HTML, CSS ou JavaScript, execute:
+
+```bash
+node scripts/build-css-bundles.mjs --write
+node scripts/build-css-bundles.mjs
+node scripts/audit-css-runtime.mjs
+node scripts/audit-css-pages.mjs
+node scripts/check-css-budget.mjs
+```
+
+Os bundles em `css/bundles/` são gerados; não devem ser editados manualmente.
+O Service Worker valida a dupla HTML + bundle antes de armazenar ou entregar
+uma navegação, impedindo que uma página incompleta substitua uma cópia íntegra.
 
 ## Release candidate
 

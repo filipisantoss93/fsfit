@@ -5,14 +5,22 @@ on:
     paths:
       - '**/*.html'
       - 'css/**/*.css'
+      - 'js/**/*.js'
+      - 'config/css-bundles.json'
+      - 'scripts/build-css-bundles.mjs'
       - 'scripts/audit-css-pages.mjs'
+      - 'scripts/audit-css-runtime.mjs'
       - '.github/workflows/auditoria-css.yml'
   push:
     branches: [main]
     paths:
       - '**/*.html'
       - 'css/**/*.css'
+      - 'js/**/*.js'
+      - 'config/css-bundles.json'
+      - 'scripts/build-css-bundles.mjs'
       - 'scripts/audit-css-pages.mjs'
+      - 'scripts/audit-css-runtime.mjs'
       - '.github/workflows/auditoria-css.yml'
 
 permissions:
@@ -31,5 +39,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Auditar referências, duplicações e arquivos CSS
+      - name: Validar bundles determinísticos
+        run: node scripts/build-css-bundles.mjs
+
+      - name: Auditar contrato de CSS em runtime
+        run: node scripts/audit-css-runtime.mjs
+
+      - name: Auditar referências, duplicações e arquivos de origem
         run: node scripts/audit-css-pages.mjs

@@ -3,7 +3,11 @@
  *
  * Os tokens visuais são declarados exclusivamente em fsfit-design-system.css.
  * A ordem abaixo garante tokens disponíveis desde a primeira renderização e
- * preserva uma cascata estática: base → painel → identidade → shell → utilitários.
+ * preserva uma cascata estática: tokens → base → painel → identidade → shell.
+ *
+ * Estilos de funcionalidades não pertencem a este arquivo. O compilador em
+ * scripts/build-css-bundles.mjs inclui cada módulo somente nas páginas que o
+ * utilizam e elimina @import e referências duplicadas no artefato publicado.
  */
 @import url('./fsfit-design-system.css?v=20260728-tokens2');
 @import url('./style-base.css?v=20260728-tokens2');
@@ -12,32 +16,3 @@
 @import url('./app-shell.css?v=20260728-notifications1');
 @import url('./image-cropper.css?v=20260728-static1');
 @import url('./pwa-install.css?v=20260728-static1');
-@import url('./painel-day-summary.css?v=20260728-static1');
-@import url('./painel-home-avatar.css?v=20260728-static1');
-@import url('./painel-home-desktop-carousel.css?v=20260728-static1');
-@import url('./biblioteca-treinos.css?v=20260728-static1');
-@import url('./assinatura-gerenciamento.css?v=20260728-static1');
-@import url('./portal-aluno-tabs.css?v=20260728-static1');
-@import url('./treino-exercise-picker-sheet.css?v=20260728-static1');
-@import url('./biblioteca-treinos-multiselect.css?v=20260728-static1');
-@import url('./biblioteca-treinos-layout.css?v=20260728-static1');
-@import url('./mobile-more-swipe.css?v=20260728-static1');
-@import url('./treino-aluno-retorno.css?v=20260728-static1');
-@import url('./painel-plano-free-ui.css?v=20260728-static1');
-@import url('./aulas-painel-quick-actions.css?v=20260728-static1');
-@import url('./aulas-painel-delete-controls.css?v=20260728-static1');
-@import url('./aulas-painel-exercise-controls.css?v=20260728-static1');
-@import url('./treino-multidias-compact-config.css?v=20260728-static1');
-@import url('./renovacao-plano.css?v=20260728-static1');
-@import url('./biblioteca-refeicoes-enhancements.css?v=20260728-static1');
-@import url('./treino-dia-personalizacao.css?v=20260728-static1');
-@import url('./treino-plan-day-tabs.css?v=20260729-static1');
-@import url('./ficha-treinos-salvos.css?v=20260729-static1');
-@import url('./aulas-painel-exercise-categories.css?v=20260729-static1');
-@import url('./aulas-painel-editor.css?v=20260729-static1');
-@import url('./aulas-painel-delete-layout-fix.css?v=20260729-static1');
-@import url('./exercicio-drag-order.css?v=20260729-static1');
-@import url('./treino-busca-exercicios.css?v=20260729-static1');
-@import url('./treino-modelo-livre.css?v=20260729-static1');
-@import url('./treino-sticky-exercise-save.css?v=20260729-static1');
-@import url('./financeiro-avatar-fix.css?v=20260729-avatar1');

@@ -9,25 +9,6 @@ const message = document.querySelector('#record-message');
 
 if (!alunoId || !actionHost) throw new Error('Aluno não informado para iniciar treino.');
 
-const style = document.createElement('style');
-style.textContent = `
-  .student-preview-action{display:grid;grid-template-columns:1fr;gap:10px}
-  .student-preview-action .btn{width:100%;min-height:46px}
-  .btn-workout-active{
-    color:#171100;
-    border-color:rgba(255,193,7,.78);
-    background:linear-gradient(180deg,#ffd43b 0%,#f2b900 100%);
-    box-shadow:0 10px 26px rgba(255,193,7,.18);
-  }
-  .btn-workout-active:hover{
-    color:#171100;
-    border-color:#ffd95a;
-    background:linear-gradient(180deg,#ffdc52 0%,#f9c515 100%);
-    box-shadow:0 12px 30px rgba(255,193,7,.24);
-  }
-`;
-document.head.appendChild(style);
-
 if (previewLink && profileActions) {
   previewLink.className = 'btn btn-outline';
   if (deleteStudentButton) profileActions.insertBefore(previewLink, deleteStudentButton);

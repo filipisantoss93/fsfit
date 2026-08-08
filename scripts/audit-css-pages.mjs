@@ -4,7 +4,7 @@ import path from 'node:path';
 const root = process.cwd();
 const reportDir = path.join(root, 'artifacts');
 const reportPath = path.join(reportDir, 'css-audit-report.json');
-const ignoredDirs = new Set(['.git', 'node_modules', '.vercel', 'dist', 'build', 'artifacts']);
+const ignoredDirs = new Set(['.git', 'node_modules', '.vercel', 'dist', 'build', 'artifacts', 'bundles']);
 const failures = [];
 const warnings = [];
 const metrics = {
@@ -52,7 +52,8 @@ function resolveLocal(baseFile, target) {
 }
 
 function getCssImports(cssFile, css) {
-  return [...css.matchAll(/@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?\s*\)?/gi)]
+  const executableCss = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  return [...executableCss.matchAll(/^[\t ]*@import\s+(?:url\()?\s*["']?([^"')\s;]+)["']?\s*\)?/gim)]
     .map(match => ({ target: match[1], resolved: resolveLocal(cssFile, match[1]) }));
 }
 
@@ -64,6 +65,18 @@ const cssGraph = new Map();
 
 metrics.htmlFiles = htmlFiles.length;
 metrics.cssFiles = cssFiles.length;
+
+const bundleManifestPath = path.join(root, 'css', 'bundles', 'manifest.json');
+if (fs.existsSync(bundleManifestPath)) {
+  const bundleManifest = JSON.parse(fs.readFileSync(bundleManifestPath, 'utf8'));
+  for (const [page, bundle] of Object.entries(bundleManifest.bundles || {})) {
+    for (const source of bundle.sources || []) {
+      const users = directUsage.get(source) || new Set();
+      users.add(page);
+      directUsage.set(source, users);
+    }
+  }
+}
 
 for (const htmlFile of htmlFiles) {
   const html = fs.readFileSync(htmlFile, 'utf8');

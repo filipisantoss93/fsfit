@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "criticalPages": [
+    "index.html",
+    "painel.html",
+    "agenda.html",
+    "alunos.html",
+    "financeiro.html",
+    "acesso-aluno.html",
+    "aluno.html"
+  ],
+  "pages": {
+    "abrir-whatsapp-lembrete.html": {
+      "styles": [
+        "css/style.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "acesso-aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/fsfit-design-system.css",
+        "css/acesso-aluno.css"
+      ]
+    },
+    "admin-assinaturas.html": {
+      "styles": [
+        "css/style.css",
+        "css/admin.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "admin-contatos.html": {
+      "styles": [
+        "css/style.css",
+        "css/admin-contatos.css"
+      ]
+    },
+    "admin.html": {
+      "styles": [
+        "css/style.css",
+        "css/admin.css"
+      ]
+    },
+    "agenda.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/mobile-navigation.css",
+        "css/agenda-bundle.css"
+      ]
+    },
+    "aluno-preview.html": {
+      "styles": [
+        "css/style.css",
+        "css/fsfit-design-system.css",
+        "css/aluno-midias.css",
+        "css/aluno-treino-player.css",
+        "css/aluno-preview-padronizacao.css"
+      ]
+    },
+    "aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/aluno.css"
+      ]
+    },
+    "alunos.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/mobile-navigation.css",
+        "css/dashboard-desktop.css",
+        "css/alunos.css",
+        "css/alunos-lista-compacta.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "assinatura.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/assinatura.css"
+      ]
+    },
+    "biblioteca-alimentar.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/biblioteca-alimentar.css"
+      ]
+    },
+    "biblioteca-exercicios.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/biblioteca-exercicios.css"
+      ]
+    },
+    "cancelamento.html": {
+      "styles": [
+        "css/legal-pages.css"
+      ]
+    },
+    "contato.html": {
+      "styles": [
+        "css/style.css",
+        "css/contato.css"
+      ]
+    },
+    "dieta-aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/dieta-aluno.css",
+        "css/dieta-planos.css",
+        "css/dieta-aluno-padronizacao.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "ficha-aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/ficha-aluno.css"
+      ]
+    },
+    "financeiro.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/mobile-navigation.css",
+        "css/financeiro.css"
+      ]
+    },
+    "index.html": {
+      "styles": [
+        "css/landing-ads.css",
+        "css/landing-home.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "lembretes-aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/lembretes-aluno.css"
+      ]
+    },
+    "nova-senha.html": {
+      "styles": [
+        "css/style.css",
+        "css/fsfit-design-system.css",
+        "css/nova-senha-padronizacao.css"
+      ]
+    },
+    "painel.html": {
+      "styles": [
+        "css/style.css",
+        "css/header-menu.css",
+        "css/mobile-navigation.css",
+        "css/painel.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "perfil.html": {
+      "styles": [
+        "css/style.css",
+        "css/perfil-padronizacao.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "personal.html": {
+      "styles": [
+        "css/style.css",
+        "css/personal-publico.css",
+        "css/personal-publico-padronizacao.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "privacidade.html": {
+      "styles": [
+        "css/style.css",
+        "css/legal.css"
+      ]
+    },
+    "recuperar-senha.html": {
+      "styles": [
+        "css/style.css",
+        "css/fsfit-design-system.css",
+        "css/recuperar-senha-padronizacao.css"
+      ]
+    },
+    "selecionar-personal.html": {
+      "styles": [
+        "css/style.css",
+        "css/fsfit-design-system.css",
+        "css/selecionar-personal-padronizacao.css"
+      ]
+    },
+    "sistema-para-personal-trainer.html": {
+      "styles": [
+        "css/landing-ads.css",
+        "css/landing-home.css",
+        "css/inline-cleanup.css"
+      ]
+    },
+    "termos.html": {
+      "styles": [
+        "css/legal-pages.css"
+      ]
+    },
+    "treino-aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/treino-aluno.css"
+      ]
+    },
+    "visualizar-aluno.html": {
+      "styles": [
+        "css/style.css",
+        "css/visualizar-aluno.css"
+      ]
+    }
+  }
+}

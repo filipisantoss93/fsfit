@@ -1,18 +1,30 @@
-# Consolidação de CSS do FS Fit
+# Arquitetura de CSS do FS Fit
 
-## Lote 1 — concluído
-- Financeiro consolidado em `css/financeiro.css`.
-- Remoção de `css/financeiro-inline.css`.
-- Imports redundantes de navegação removidos.
+## Contrato de produção
 
-## Lote 2 — Administração
-- Consolidar `admin-cron-monitor.css`, `admin-users-compact.css`, `admin-attention.css`, `admin-forecast.css`, `admin-funnel.css`, `admin-retention.css`, `admin-tabs.css` e `admin-crm.css` em `admin.css`.
-- Atualizar `admin.html` para carregar somente `style.css`, `header-menu.css` e `admin.css`.
-- Remover arquivos incorporados somente após validação visual.
+- Cada página carrega exatamente um stylesheet local.
+- O arquivo publicado possui hash SHA-256 no nome.
+- Nenhum bundle contém `@import`.
+- Cada arquivo de origem aparece no máximo uma vez por bundle.
+- CSS não é criado ou anexado por JavaScript quando o bundle está presente.
+- HTML e bundle são validados juntos antes de entrarem no cache do PWA.
 
-## Lote 3 — Bibliotecas
-- Consolidar os estilos específicos das bibliotecas alimentar e de exercícios.
-- Preservar `style.css` e `header-menu.css` como dependências globais.
+## Fluxo de alteração
 
-## Regra de deploy
-Cada lote deve ser entregue em um único pull request e integrado por squash merge, gerando somente um commit na `main`.
+1. Edite somente os arquivos de origem em `css/`.
+2. Se uma página precisar de uma nova entrada explícita, atualize
+   `config/css-bundles.json`.
+3. Execute `node scripts/build-css-bundles.mjs --write`.
+4. Execute as auditorias de runtime e orçamento.
+5. Inclua HTML, manifest e bundles gerados no mesmo commit.
+
+Os arquivos em `css/bundles/` são artefatos imutáveis. Versões já publicadas
+podem permanecer no repositório para que um HTML antigo continue encontrando o
+CSS correspondente durante a troca de deployment.
+
+## Dívida controlada
+
+Os arquivos de origem ainda contêm regras históricas com `!important`. O limite
+fica congelado em `config/css-audit-budget.json`: um PR pode reduzir a dívida,
+mas o CI bloqueia qualquer aumento. Essa dívida não cria requisições paralelas
+em produção porque o compilador resolve a ordem uma única vez.

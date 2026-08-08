@@ -1,0 +1,14 @@
+/* FS Fit — estilos do módulo push-personal.js */
+.personal-push-card{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:14px;border-color:rgba(177,255,0,.25);background:linear-gradient(120deg,rgba(177,255,0,.075),rgba(18,28,31,.84) 52%,rgba(9,22,31,.92));box-shadow:none}
+.personal-push-card[data-state="active"]{border-color:rgba(50,215,75,.32)}
+.personal-push-card[data-state="blocked"]{border-color:rgba(255,90,95,.4);background:linear-gradient(120deg,rgba(255,90,95,.08),rgba(18,28,31,.88) 58%)}
+.personal-push-card[data-state="install"]{border-color:rgba(59,130,246,.38);background:linear-gradient(120deg,rgba(59,130,246,.09),rgba(18,28,31,.88) 58%)}
+.personal-push-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:rgba(177,255,0,.12);color:var(--primary);font-size:1.25rem}
+.personal-push-card[data-state="blocked"] .personal-push-icon{background:rgba(255,90,95,.12);color:#ff858a}
+.personal-push-card[data-state="install"] .personal-push-icon{background:rgba(59,130,246,.12);color:#79aaff}
+.personal-push-copy{min-width:0}.personal-push-copy small{display:block;margin-bottom:3px;color:var(--primary);font-size:.61rem;font-weight:950;letter-spacing:.08em}
+.personal-push-card[data-state="blocked"] .personal-push-copy small{color:#ff858a}.personal-push-card[data-state="install"] .personal-push-copy small{color:#79aaff}
+.personal-push-copy h2{margin:0;font-size:.93rem;line-height:1.2}.personal-push-copy p{margin:5px 0 0;color:var(--muted);font-size:.7rem;line-height:1.45}
+.personal-push-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}.personal-push-actions .btn{min-height:40px;padding-inline:12px;font-size:.72rem}
+.personal-push-feedback{display:block;min-height:17px;margin-top:8px;color:var(--muted);font-size:.65rem}.personal-push-feedback.success{color:#75e98a}.personal-push-feedback.error{color:#ff9ca0}
+@media(max-width:520px){.personal-push-card{grid-template-columns:40px minmax(0,1fr);gap:10px;padding:13px}.personal-push-icon{width:40px;height:40px;border-radius:13px}.personal-push-actions{display:grid;grid-template-columns:1fr}.personal-push-actions .btn{width:100%}}

@@ -12,6 +12,7 @@ function currentPage() {
 }
 
 function ensureStyles() {
+  if (document.querySelector('link[data-fsfit-bundle]')) return;
   if (document.querySelector('link[data-fsfit-mobile-experience]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';

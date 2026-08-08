@@ -9,6 +9,7 @@ let notificationActionPending = false;
 let cleanupRegistered = false;
 
 function ensureFixStyles() {
+  if (document.querySelector('link[data-fsfit-bundle]')) return;
   if (document.querySelector('link[data-fsfit-mobile-experience-fixes]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';

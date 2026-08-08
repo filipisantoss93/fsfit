@@ -5,9 +5,13 @@ on:
     paths:
       - '**/*.html'
       - 'css/**/*.css'
+      - 'js/**/*.js'
+      - 'scripts/build-css-bundles.mjs'
       - 'scripts/audit-css-pages.mjs'
+      - 'scripts/audit-css-runtime.mjs'
       - 'scripts/check-css-budget.mjs'
       - 'config/css-audit-budget.json'
+      - 'config/css-bundles.json'
       - '.github/workflows/css-budget-guard.yml'
   workflow_dispatch:
 
@@ -26,8 +30,13 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Gerar relatório estrutural
-        run: node scripts/audit-css-pages.mjs
+      - name: Validar bundles determinísticos
+        run: node scripts/build-css-bundles.mjs
+
+      - name: Gerar relatórios estruturais
+        run: |
+          node scripts/audit-css-runtime.mjs
+          node scripts/audit-css-pages.mjs
 
       - name: Validar orçamento do CSS
         run: node scripts/check-css-budget.mjs
@@ -36,5 +45,5 @@ jobs:
         if: always()
         run: |
           if [ -f artifacts/css-audit-report.json ]; then
-            node -e "const r=require('./artifacts/css-audit-report.json'); const b=require('./config/css-audit-budget.json'); const i=r.metrics.inlineStyleBlocks+r.metrics.inlineStyleAttributes; const lines=['## Orçamento estrutural do CSS','', '- Arquivos CSS: '+r.metrics.cssFiles+'/'+b.maxCssFiles, '- CSS órfãos: '+r.orphanCss.length+'/'+b.maxOrphanCss, '- Estilos inline: '+i+'/'+b.maxInlineStyles, '- !important: '+r.metrics.importantDeclarations+'/'+b.maxImportantDeclarations, '- Regras vazias: '+r.metrics.emptyRules+'/'+b.maxEmptyRules]; require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n')+'\n');"
+            node -e "const r=require('./artifacts/css-audit-report.json'); const x=require('./artifacts/css-runtime-report.json'); const b=require('./config/css-audit-budget.json'); const i=r.metrics.inlineStyleBlocks+r.metrics.inlineStyleAttributes; const p=x.metrics.runtimeStylesheetLinks/x.metrics.configuredPages; const lines=['## Orçamento estrutural do CSS','', '- Arquivos CSS de origem: '+r.metrics.cssFiles+'/'+b.maxCssFiles, '- CSS órfãos: '+r.orphanCss.length+'/'+b.maxOrphanCss, '- Estilos inline: '+i+'/'+b.maxInlineStyles, '- !important: '+r.metrics.importantDeclarations+'/'+b.maxImportantDeclarations, '- Regras vazias: '+r.metrics.emptyRules+'/'+b.maxEmptyRules, '- Stylesheets por página: '+p+'/'+b.maxRuntimeStylesheetsPerPage, '- @import em runtime: '+x.metrics.runtimeImports+'/'+b.maxRuntimeImports, '- Fontes duplicadas: '+x.metrics.duplicateBundleSources+'/'+b.maxDuplicateBundleSources, '- CSS criado por JS: '+x.metrics.javascriptStyleBlocks+'/'+b.maxJavascriptStyleBlocks]; require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n')+'\n');"
           fi

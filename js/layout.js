@@ -36,6 +36,12 @@ function inferShellActivePage() {
 }
 
 function ensureDesktopShellStyles() {
+  const bundle = document.querySelector('link[data-fsfit-bundle][data-fsfit-header-styles]');
+  if (bundle) {
+    document.querySelectorAll('link[href*="header-menu.css"]').forEach(link => link.remove());
+    return;
+  }
+
   const existingStyles = Array.from(document.querySelectorAll('link[data-fsfit-header-styles], link[href*="header-menu.css"]'));
   existingStyles.forEach(link => link.remove());
 

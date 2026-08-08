@@ -38,6 +38,11 @@ jobs:
       - name: Validar páginas, scripts e imports
         run: node scripts/audit-page-scripts.mjs
 
+      - name: Validar bundles e contrato de CSS em runtime
+        run: |
+          node scripts/build-css-bundles.mjs
+          node scripts/audit-css-runtime.mjs
+
       - name: Gerar relatórios consolidados do CSS
         run: |
           node scripts/audit-css-pages.mjs

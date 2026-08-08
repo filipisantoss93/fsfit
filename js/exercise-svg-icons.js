@@ -109,19 +109,6 @@ function createIcon(name) {
   const wrapper = document.createElement('span');
   wrapper.className = 'exercise-svg-icon';
   wrapper.dataset.exerciseSvg = normalize(name);
-  wrapper.style.cssText = [
-    'display:inline-flex',
-    'align-items:center',
-    'justify-content:center',
-    'width:48px',
-    'height:48px',
-    'min-width:48px',
-    'border-radius:12px',
-    'background:rgba(34,197,94,.10)',
-    'color:#22c55e',
-    'border:1px solid rgba(34,197,94,.18)',
-    'overflow:hidden'
-  ].join(';');
   wrapper.appendChild(makeSvg(name));
   return wrapper;
 }
@@ -132,7 +119,6 @@ function enhanceWorkoutRows(root = document) {
     const main = row.querySelector('.workout-exercise-main');
     const title = main?.querySelector('strong')?.textContent?.trim();
     if (!main || !title) return;
-    main.style.minWidth = '0';
     row.insertBefore(createIcon(title), main);
   });
 }
