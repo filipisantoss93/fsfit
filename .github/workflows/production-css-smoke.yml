@@ -1,0 +1,69 @@
+name: Production CSS smoke test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - "index.html"
+      - "css/**"
+      - "sw.js"
+      - "vercel.json"
+      - ".github/workflows/production-css-smoke.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-css-smoke
+  cancel-in-progress: true
+
+jobs:
+  verify-production-css:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify landing page and stylesheets
+        shell: bash
+        run: |
+          set -euo pipefail
+          site="https://www.fsfit.com.br"
+          temp_dir="$(mktemp -d)"
+          trap 'rm -rf "$temp_dir"' EXIT
+
+          curl --fail --silent --show-error --location             --retry 3 --retry-all-errors             --output "$temp_dir/index.html" "$site/"
+
+          mapfile -t stylesheets < <(
+            sed -nE 's/.*href="([^"]+\.css[^"]*)".*/\1/p' "$temp_dir/index.html"
+          )
+
+          if [ "${#stylesheets[@]}" -lt 3 ]; then
+            echo "::error::A landing page publicou menos de três folhas de estilo."
+            exit 1
+          fi
+
+          for stylesheet in "${stylesheets[@]}"; do
+            url="$site$stylesheet"
+            headers="$temp_dir/headers"
+            body="$temp_dir/style.css"
+
+            curl --fail --silent --show-error --location               --retry 3 --retry-all-errors               --dump-header "$headers"               --output "$body" "$url"
+
+            content_type="$(awk 'BEGIN { IGNORECASE=1 } /^content-type:/ { gsub("\r", ""); print $2 }' "$headers" | tail -1)"
+            if [[ "$content_type" != text/css* ]]; then
+              echo "::error::Tipo MIME inválido em $url: $content_type"
+              exit 1
+            fi
+
+            if [ ! -s "$body" ]; then
+              echo "::error::Folha de estilo vazia: $url"
+              exit 1
+            fi
+          done
+
+          curl --fail --silent --show-error --location "$site/css/landing-home.css?v=20260808-css-guard1"             | grep --quiet --fixed-strings ".lp-header"             || { echo "::error::O CSS principal não contém o seletor crítico .lp-header."; exit 1; }
+
+          echo "Landing page e folhas de estilo estão saudáveis."
