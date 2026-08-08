@@ -118,14 +118,6 @@ window.addEventListener('appinstalled', () => {
 });
 
 if ('serviceWorker' in navigator) {
-  let controllerReloaded = false;
-
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (controllerReloaded) return;
-    controllerReloaded = true;
-    window.location.reload();
-  });
-
   window.addEventListener('load', async () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
