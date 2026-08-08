@@ -8,8 +8,9 @@ on:
     branches:
       - main
     paths:
-      - "index.html"
+      - "*.html"
       - "css/**"
+      - "js/pwa-install.js"
       - "sw.js"
       - "vercel.json"
       - ".github/workflows/production-css-smoke.yml"
@@ -24,9 +25,9 @@ concurrency:
 jobs:
   verify-production-css:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
-      - name: Verify landing page and stylesheets
+      - name: Verify Landing, Admin and Student stylesheets
         shell: bash
         run: |
           set -euo pipefail
@@ -34,36 +35,70 @@ jobs:
           temp_dir="$(mktemp -d)"
           trap 'rm -rf "$temp_dir"' EXIT
 
-          curl --fail --silent --show-error --location             --retry 3 --retry-all-errors             --output "$temp_dir/index.html" "$site/"
-
-          mapfile -t stylesheets < <(
-            sed -nE 's/.*href="([^"]+\.css[^"]*)".*/\1/p' "$temp_dir/index.html"
+          pages=(
+            "/"
+            "/painel.html"
+            "/agenda.html"
+            "/alunos.html"
+            "/financeiro.html"
+            "/acesso-aluno.html"
+            "/aluno.html"
           )
 
-          if [ "${#stylesheets[@]}" -lt 3 ]; then
-            echo "::error::A landing page publicou menos de três folhas de estilo."
-            exit 1
-          fi
+          for page in "${pages[@]}"; do
+            slug="$(printf '%s' "$page" | tr '/.' '__')"
+            html="$temp_dir/${slug:-home}.html"
 
-          for stylesheet in "${stylesheets[@]}"; do
-            url="$site$stylesheet"
-            headers="$temp_dir/headers"
-            body="$temp_dir/style.css"
+            curl --fail --silent --show-error --location               --retry 3 --retry-all-errors               --output "$html" "$site$page"
 
-            curl --fail --silent --show-error --location               --retry 3 --retry-all-errors               --dump-header "$headers"               --output "$body" "$url"
+            mapfile -t stylesheets < <(
+              grep -oE 'href="[^"]+\.css[^"]*"' "$html"                 | sed -E 's/^href="([^"]+)"$/\1/'                 | sort -u
+            )
 
-            content_type="$(awk 'BEGIN { IGNORECASE=1 } /^content-type:/ { gsub("\r", ""); print $2 }' "$headers" | tail -1)"
-            if [[ "$content_type" != text/css* ]]; then
-              echo "::error::Tipo MIME inválido em $url: $content_type"
+            if [ "${#stylesheets[@]}" -eq 0 ]; then
+              echo "::error::Nenhuma folha de estilo encontrada em $page."
               exit 1
             fi
 
-            if [ ! -s "$body" ]; then
-              echo "::error::Folha de estilo vazia: $url"
-              exit 1
-            fi
+            for stylesheet in "${stylesheets[@]}"; do
+              case "$stylesheet" in
+                http://*|https://*) url="$stylesheet" ;;
+                /*) url="$site$stylesheet" ;;
+                *) url="$site/$stylesheet" ;;
+              esac
+
+              headers="$temp_dir/headers"
+              body="$temp_dir/style.css"
+              curl --fail --silent --show-error --location                 --retry 3 --retry-all-errors                 --dump-header "$headers"                 --output "$body" "$url"
+
+              content_type="$(awk 'BEGIN { IGNORECASE=1 } /^content-type:/ { gsub("\r", ""); print $2 }' "$headers" | tail -1)"
+              if [[ "$content_type" != text/css* ]]; then
+                echo "::error::Tipo MIME inválido em $url: $content_type"
+                exit 1
+              fi
+
+              if [ ! -s "$body" ]; then
+                echo "::error::Folha de estilo vazia: $url"
+                exit 1
+              fi
+            done
           done
 
-          curl --fail --silent --show-error --location "$site/css/landing-home.css?v=20260808-css-guard1"             | grep --quiet --fixed-strings ".lp-header"             || { echo "::error::O CSS principal não contém o seletor crítico .lp-header."; exit 1; }
+          declare -A critical_styles=(
+            ["/css/landing-home.css?v=20260808-css-guard1"]=".lp-header"
+            ["/css/painel.css?v=20260730-painel-bundle1"]="./painel-core.css"
+            ["/css/agenda-bundle.css?v=20260730-bundle1"]=".agenda-loading-card"
+            ["/css/alunos.css?v=20260727-dashboard1"]=".students-page"
+            ["/css/financeiro.css?v=20260730-consolidado1"]=".finance-page"
+            ["/css/acesso-aluno.css?v=20260730-runtime1"]=".student-access"
+            ["/css/aluno.css?v=20260730-bundle1"]=".student-shell"
+          )
 
-          echo "Landing page e folhas de estilo estão saudáveis."
+          for stylesheet in "${!critical_styles[@]}"; do
+            selector="${critical_styles[$stylesheet]}"
+            curl --fail --silent --show-error --location "$site$stylesheet"               | grep --quiet --fixed-strings "$selector"               || { echo "::error::$stylesheet não contém o seletor crítico $selector."; exit 1; }
+          done
+
+          curl --fail --silent --show-error --location "$site/sw.js"             | grep --quiet --fixed-strings "fsfit-shell-"             || { echo "::error::Service Worker indisponível ou inválido."; exit 1; }
+
+          echo "Landing, Admin, Aluno e folhas de estilo críticas estão saudáveis."

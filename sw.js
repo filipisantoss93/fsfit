@@ -1,11 +1,81 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}v16`;
+const CACHE_NAME = `${CACHE_PREFIX}v17`;
 
 const CORE_SHELL = [
   '/',
   '/css/landing-ads.css?v=20260808-css-guard1',
   '/css/landing-home.css?v=20260808-css-guard1',
   '/css/inline-cleanup.css?v=20260808-css-guard1',
+  '/css/fsfit-design-system.css?v=20260728-tokens2',
+  '/css/style-base.css?v=20260728-tokens2',
+  '/css/style-dashboard.css?v=20260728-tokens2',
+  '/css/style-brand.css?v=20260728-components1',
+  '/css/app-shell.css?v=20260728-notifications1',
+  '/css/image-cropper.css?v=20260728-static1',
+  '/css/pwa-install.css?v=20260728-static1',
+  '/css/painel-day-summary.css?v=20260728-static1',
+  '/css/painel-home-avatar.css?v=20260728-static1',
+  '/css/painel-home-desktop-carousel.css?v=20260728-static1',
+  '/css/biblioteca-treinos.css?v=20260728-static1',
+  '/css/assinatura-gerenciamento.css?v=20260728-static1',
+  '/css/portal-aluno-tabs.css?v=20260728-static1',
+  '/css/treino-exercise-picker-sheet.css?v=20260728-static1',
+  '/css/biblioteca-treinos-multiselect.css?v=20260728-static1',
+  '/css/biblioteca-treinos-layout.css?v=20260728-static1',
+  '/css/mobile-more-swipe.css?v=20260728-static1',
+  '/css/treino-aluno-retorno.css?v=20260728-static1',
+  '/css/painel-plano-free-ui.css?v=20260728-static1',
+  '/css/aulas-painel-quick-actions.css?v=20260728-static1',
+  '/css/aulas-painel-delete-controls.css?v=20260728-static1',
+  '/css/aulas-painel-exercise-controls.css?v=20260728-static1',
+  '/css/treino-multidias-compact-config.css?v=20260728-static1',
+  '/css/renovacao-plano.css?v=20260728-static1',
+  '/css/biblioteca-refeicoes-enhancements.css?v=20260728-static1',
+  '/css/treino-dia-personalizacao.css?v=20260728-static1',
+  '/css/treino-plan-day-tabs.css?v=20260729-static1',
+  '/css/ficha-treinos-salvos.css?v=20260729-static1',
+  '/css/aulas-painel-exercise-categories.css?v=20260729-static1',
+  '/css/aulas-painel-editor.css?v=20260729-static1',
+  '/css/aulas-painel-delete-layout-fix.css?v=20260729-static1',
+  '/css/exercicio-drag-order.css?v=20260729-static1',
+  '/css/treino-busca-exercicios.css?v=20260729-static1',
+  '/css/treino-modelo-livre.css?v=20260729-static1',
+  '/css/treino-sticky-exercise-save.css?v=20260729-static1',
+  '/css/financeiro-avatar-fix.css?v=20260729-avatar1',
+  '/css/painel.css?v=20260730-painel-bundle1',
+  '/css/agenda-bundle.css?v=20260730-bundle1',
+  '/css/dashboard-desktop.css?v=20260727-dashboard1',
+  '/css/alunos.css?v=20260727-dashboard1',
+  '/css/alunos-lista-compacta.css?v=20260726-ux1',
+  '/css/financeiro.css?v=20260730-consolidado1',
+  '/css/acesso-aluno.css?v=20260730-runtime1',
+  '/css/aluno.css?v=20260730-bundle1',
+  '/css/perfil-padronizacao.css?v=20260727-desktop-unified1',
+  '/css/biblioteca-exercicios.css?v=20260730-consolidated1',
+  '/css/biblioteca-alimentar.css?v=20260730-consolidated1',
+  '/css/aulas.css?v=20260716-live2',
+  '/css/aulas-painel-compact.css?v=20260719-live-compact1',
+  '/css/painel-resumo-geral.css?v=20260727-general1',
+  '/css/painel-core.css?v=20260728-static1',
+  '/css/painel-home-redesign.css?v=20260728-static1',
+  '/css/painel-visao-geral.css?v=20260728-static1',
+  '/css/agenda.css?v=20260724-agenda-header1',
+  '/css/agenda-padronizacao.css?v=20260727-dashboard1',
+  '/css/acesso-aluno-padronizacao.css?v=20260726-ds1',
+  '/css/aluno-midias-core.css?v=20260730-student-bundle1',
+  '/css/aluno-notificacoes.css?v=20260716-notifications1',
+  '/css/aluno-treino-player.css?v=20260724-student-home1',
+  '/css/aluno-inicio.css?v=20260724-student-home1',
+  '/css/aluno-perfil.css?v=20260722-student-profile1',
+  '/css/aulas.css?v=20260727-student-live3',
+  '/css/aluno-financeiro.css?v=20260717-financeiro1',
+  '/css/library-compact.css?v=20260720-action-bar2',
+  '/css/exercise-picker-horizontal-scroll-fix.css?v=20260723-scroll1',
+  '/css/biblioteca-exercicios-padronizacao.css?v=20260727-structure3',
+  '/css/library-dashboard-desktop.css?v=20260727-library-dashboard1',
+  '/css/biblioteca-exercicios.css?v=20260730-library-entry1',
+  '/css/library-compact.css?v=20260720-row1',
+  '/css/biblioteca-alimentar-padronizacao.css?v=20260726-ds1',
   '/acesso-aluno.html',
   '/aluno.html',
   '/css/style.css',
@@ -125,14 +195,26 @@ async function networkFirstNavigation(request, pathname) {
 async function networkFirstAsset(request, pathname) {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetch(request);
-    if (response?.ok) cache.put(request, response.clone()).catch(() => undefined);
+    const response = await fetch(request, { cache: 'no-store' });
+    if (!(await isValidAssetResponse(request, response))) throw new Error('invalid-asset-response');
+    cache.put(request, response.clone()).catch(() => undefined);
     return response;
   } catch {
     return (await cache.match(request))
       || (await cache.match(pathname))
       || Response.error();
   }
+}
+
+async function isValidAssetResponse(request, response) {
+  if (!response?.ok) return false;
+  if (request.destination !== 'style') return true;
+
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.toLowerCase().startsWith('text/css')) return false;
+
+  const body = await response.clone().text();
+  return body.trim().length > 0;
 }
 
 async function staleWhileRevalidate(request, pathname) {
