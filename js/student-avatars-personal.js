@@ -100,62 +100,6 @@ function syncAvatar(host, student, size = 'md', before = null) {
   return avatar;
 }
 
-function ensureStyles() {
-  if (document.querySelector('style[data-fsfit-personal-student-avatars]')) return;
-
-  const style = document.createElement('style');
-  style.dataset.fsfitPersonalStudentAvatars = 'true';
-  style.textContent = `
-    .fsfit-personal-student-avatar{
-      flex:0 0 auto;display:grid;place-items:center;overflow:hidden;
-      border:1px solid rgba(255,255,255,.14);border-radius:50%;
-      background:linear-gradient(145deg,rgba(177,255,0,.14),rgba(68,134,255,.13)),var(--surface-light);
-      color:var(--text);font-weight:900;line-height:1;text-transform:uppercase
-    }
-    .fsfit-personal-student-avatar img{display:block;width:100%;height:100%;object-fit:cover}
-    .fsfit-personal-student-avatar.is-sm{width:32px;height:32px;font-size:.62rem}
-    .fsfit-personal-student-avatar.is-md{width:36px;height:36px;font-size:.66rem}
-    .fsfit-personal-student-avatar.is-lg{width:68px;height:68px;font-size:1.05rem;border-width:2px}
-
-    .agenda-entry.fsfit-has-student-avatar{grid-template-columns:58px 36px minmax(0,1fr) 24px!important}
-    .agenda-entry.fsfit-has-student-avatar .agenda-entry-main,
-    .agenda-entry.fsfit-has-student-avatar .agenda-entry-title-row,
-    .agenda-entry.fsfit-has-student-avatar .agenda-entry-main strong{min-width:0}
-    .agenda-entry.fsfit-has-student-avatar .agenda-entry-title-row{flex-wrap:nowrap}
-
-    .today-entry.fsfit-has-student-avatar{grid-template-columns:62px 36px minmax(0,1fr) auto!important}
-    .today-entry.fsfit-has-student-avatar .today-entry-main{min-width:0}
-
-    .finance-student-name{display:flex!important;align-items:center!important;gap:9px!important;flex-wrap:nowrap!important;min-width:0}
-    .finance-student-name strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-    .live-student-main{flex-wrap:nowrap!important}
-    .live-student-main>.fsfit-personal-student-avatar{flex:0 0 auto}
-    .live-student-main>div{min-width:0}
-
-    .recent-student-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
-
-    .student-record-person{display:flex;align-items:center;gap:14px;min-width:0}
-    .student-record-person-copy{min-width:0}
-    .student-record-person-copy h1,.student-record-person-copy p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-    html.fsfit-student-avatars-loading .agenda-day-list,
-    html.fsfit-student-avatars-loading #finance-students-list{visibility:hidden}
-
-    @media(max-width:620px){
-      .fsfit-personal-student-avatar.is-sm{width:30px;height:30px;font-size:.58rem}
-      .fsfit-personal-student-avatar.is-md{width:32px;height:32px;font-size:.6rem}
-      .fsfit-personal-student-avatar.is-lg{width:58px;height:58px;font-size:.92rem}
-      .agenda-entry.fsfit-has-student-avatar{grid-template-columns:48px 32px minmax(0,1fr) 20px!important;gap:8px!important}
-      .today-entry.fsfit-has-student-avatar{grid-template-columns:48px 32px minmax(0,1fr)!important;gap:9px!important}
-      .today-entry.fsfit-has-student-avatar .today-open{display:none!important}
-      .student-record-person{gap:11px}
-      .student-record-person-copy h1{font-size:1.75rem!important}
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 async function loadStudents() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.user?.id) return new Map();
@@ -330,7 +274,6 @@ async function refreshData() {
 
 async function init() {
   if (!SUPPORTED_PAGES.has(page)) return;
-  ensureStyles();
   observePage();
   await refreshData();
 

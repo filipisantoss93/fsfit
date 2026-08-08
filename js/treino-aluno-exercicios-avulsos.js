@@ -53,6 +53,7 @@ if (pageName === 'treino-aluno.html' && alunoId && !globalThis.__FSFIT_DAY_EXERC
   restoreSelectedDay();
 
   function injectStyles() {
+    if (document.querySelector('link[data-fsfit-bundle]')) return;
     if (document.querySelector('link[data-day-exercise-picker-styles]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';

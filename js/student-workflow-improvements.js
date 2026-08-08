@@ -2,7 +2,6 @@ import { supabase } from './supabase.js';
 
 const PAGE = window.location.pathname.split('/').pop() || 'index.html';
 const WORKOUT_GUARD_KEY = '__FSFIT_WORKOUT_PUBLICATION_GUARD__';
-const STYLE_ID = 'fsfit-student-workflow-styles';
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -45,47 +44,6 @@ function waitFor(getter, timeout = 10000, interval = 120) {
     };
     check();
   });
-}
-
-function ensureStyles() {
-  if (document.getElementById(STYLE_ID)) return;
-  const style = document.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = `
-    .student-workflow-card{margin-bottom:20px;padding:20px;border-color:rgba(50,215,75,.24);background:linear-gradient(145deg,rgba(30,48,38,.42),rgba(22,26,32,.98))}
-    .student-workflow-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:17px}
-    .student-workflow-heading small{display:block;margin-bottom:5px;color:var(--primary);font-size:.72rem;font-weight:900;letter-spacing:.09em}
-    .student-workflow-heading h2{margin:0}
-    .student-workflow-progress{flex:0 0 auto;display:inline-flex;align-items:center;min-height:30px;padding:0 11px;border:1px solid rgba(50,215,75,.32);border-radius:999px;background:rgba(50,215,75,.1);color:var(--primary);font-size:.75rem;font-weight:900;white-space:nowrap}
-    .student-workflow-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-    .student-workflow-summary{min-width:0;padding:15px;border:1px solid var(--border);border-radius:15px;background:rgba(255,255,255,.035)}
-    .student-workflow-summary>small{display:block;margin-bottom:7px;color:var(--muted);font-size:.7rem;font-weight:900;letter-spacing:.07em}
-    .student-workflow-summary strong{display:block;font-size:1rem;line-height:1.3}
-    .student-workflow-summary span{display:block;margin-top:6px;color:var(--muted);font-size:.8rem;line-height:1.4}
-    .student-workflow-summary .student-workflow-link{display:inline-flex;margin-top:11px;color:var(--primary);font-size:.8rem;font-weight:850;text-decoration:none}
-    .student-workflow-checklist{display:grid;gap:8px;margin-top:16px}
-    .student-workflow-step{display:flex;align-items:center;gap:11px;min-height:46px;padding:10px 12px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.025)}
-    .student-workflow-step-icon{flex:0 0 auto;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--surface-light);color:var(--muted);font-weight:900}
-    .student-workflow-step.is-done .student-workflow-step-icon{background:rgba(50,215,75,.14);color:var(--primary)}
-    .student-workflow-step-copy{min-width:0;flex:1}
-    .student-workflow-step-copy strong{display:block;font-size:.88rem}
-    .student-workflow-step-copy small{display:block;margin-top:2px;color:var(--muted);font-size:.74rem}
-    .student-workflow-step a,.student-workflow-step button{flex:0 0 auto;border:0;background:transparent;color:var(--primary);font:inherit;font-size:.77rem;font-weight:850;cursor:pointer;text-decoration:none}
-    .student-admin-actions{margin-top:14px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(255,255,255,.02)}
-    .student-admin-actions summary{padding:12px 14px;color:var(--muted);font-size:.8rem;font-weight:800;cursor:pointer}
-    .student-admin-actions-body{display:flex;gap:10px;padding:0 14px 14px}
-    .student-admin-actions-body .btn{flex:1}
-    .workout-draft-guidance{margin:12px 0 0;padding:11px 13px;border:1px solid rgba(255,198,52,.22);border-radius:12px;background:rgba(255,198,52,.06);color:var(--muted);font-size:.8rem;line-height:1.45}
-    @media(max-width:760px){
-      .student-workflow-card{padding:17px}
-      .student-workflow-heading{align-items:center}
-      .student-workflow-summary-grid{grid-template-columns:1fr}
-      .student-workflow-step{align-items:flex-start}
-      .student-workflow-step a,.student-workflow-step button{padding-top:4px}
-      .student-admin-actions-body{display:grid}
-    }
-  `;
-  document.head.appendChild(style);
 }
 
 function patchWorkoutPublicationFlow() {
@@ -143,7 +101,6 @@ function patchWorkoutPublicationFlow() {
   };
 
   const setupWorkoutFeedback = async () => {
-    ensureStyles();
     const message = await waitFor(() => document.querySelector('#workout-message'));
     const newButton = document.querySelector('#new-workout-button');
     if (newButton && !document.querySelector('.workout-draft-guidance')) {
@@ -213,7 +170,6 @@ async function enhanceStudentRecord() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;
 
-  ensureStyles();
   const today = localIsoDate();
   const [studentResult, workoutsResult, paymentResult, appointmentResult] = await Promise.all([
     supabase

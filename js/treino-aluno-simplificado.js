@@ -46,6 +46,7 @@ if (alunoId && !globalThis.__FSFIT_SIMPLE_WORKOUTS__) {
   }
 
   function injectStyles() {
+    if (document.querySelector('link[data-fsfit-bundle]')) return;
     if (document.querySelector('link[data-simple-workout-styles]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';

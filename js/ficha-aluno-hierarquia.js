@@ -25,6 +25,7 @@ if (PAGE === 'ficha-aluno.html' && !globalThis.__FSFIT_STUDENT_RECORD_HIERARCHY_
   }
 
   function ensureStyles() {
+    if (document.querySelector('link[data-fsfit-bundle]')) return;
     if (document.querySelector(STYLE_SELECTOR)) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';

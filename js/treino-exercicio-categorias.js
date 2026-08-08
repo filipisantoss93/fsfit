@@ -37,6 +37,7 @@ function optionCategory(option) {
 }
 
 function ensureStyles() {
+  if (document.querySelector('link[data-fsfit-bundle]')) return;
   if (document.querySelector(STYLE_SELECTOR)) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';

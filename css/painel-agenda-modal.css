@@ -1,0 +1,42 @@
+/* FS Fit — estilos do módulo painel-agenda-modal.js */
+body.today-workout-dashboard-open{overflow:hidden}
+.today-entry[role="button"]{width:100%;border-left:0;border-right:0;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.today-workout-dashboard-modal{position:fixed;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:rgba(0,0,0,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.today-workout-dashboard-modal.open{display:flex}
+.today-workout-dashboard-dialog{width:min(620px,100%);max-height:calc(100dvh - 32px);overflow:auto;border:1px solid var(--border);border-radius:22px;background:#171b20;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.today-workout-dashboard-header{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 20px 16px;border-bottom:1px solid var(--border);background:#171b20}
+.today-workout-dashboard-header small{display:block;margin-bottom:5px;color:var(--primary);font-size:.68rem;font-weight:900;letter-spacing:.08em}
+.today-workout-dashboard-header h2{margin:0;font-size:1.5rem}
+.today-workout-dashboard-header p{margin:5px 0 0;color:var(--muted);font-size:.82rem}
+.today-workout-dashboard-close{flex:0 0 42px;width:42px;height:42px;border:1px solid var(--border);border-radius:50%;background:var(--surface-light);color:var(--text);font-size:1.6rem;line-height:1;cursor:pointer}
+.today-workout-dashboard-body{padding:18px 20px}
+.today-workout-loading,.today-workout-empty{padding:22px 14px;border:1px dashed var(--border);border-radius:14px;color:var(--muted);text-align:center;font-size:.82rem}
+.today-workout-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.today-workout-metrics>div{min-width:0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-light)}
+.today-workout-metrics small{display:block;margin-bottom:5px;color:var(--muted);font-size:.6rem;font-weight:900;letter-spacing:.06em}
+.today-workout-metrics strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem}
+.today-workout-plan-card{padding:14px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.02)}
+.today-workout-plan-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.today-workout-plan-heading small{display:block;margin-bottom:3px;color:var(--primary);font-size:.62rem;font-weight:900;letter-spacing:.07em}
+.today-workout-plan-heading h3{margin:0;font-size:1.02rem}
+.today-workout-plan-heading>span{color:var(--muted);font-size:.7rem;font-weight:800;white-space:nowrap}
+.today-workout-description{margin:8px 0 0;color:var(--muted);font-size:.76rem;line-height:1.45}
+.today-workout-exercises{display:grid;gap:6px;margin-top:12px}
+.today-workout-exercise-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:9px;align-items:center;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(255,255,255,.018)}
+.today-workout-exercise-order{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:rgba(59,130,246,.11);color:var(--secondary);font-size:.7rem;font-weight:900}
+.today-workout-exercise-row strong{display:block;font-size:.8rem}
+.today-workout-exercise-row small{display:block;margin-top:2px;color:var(--muted);font-size:.68rem}
+.today-workout-dashboard-actions{position:sticky;bottom:0;z-index:2;display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:8px;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:rgba(23,27,32,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.today-workout-dashboard-actions .btn{min-width:0;margin:0;padding:10px 8px;font-size:.76rem;white-space:nowrap}
+@media(max-width:620px){
+  .today-workout-dashboard-modal{align-items:flex-end;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}
+  .today-workout-dashboard-dialog{max-height:calc(100dvh - max(20px,env(safe-area-inset-top)) - max(20px,env(safe-area-inset-bottom)));border-radius:20px}
+  .today-workout-dashboard-header{padding:17px 16px 13px}
+  .today-workout-dashboard-header h2{font-size:1.3rem}
+  .today-workout-dashboard-body{padding:14px 16px}
+  .today-workout-metrics{gap:6px}
+  .today-workout-metrics>div{padding:10px 8px}
+  .today-workout-metrics strong{font-size:.74rem}
+  .today-workout-dashboard-actions{grid-template-columns:1fr;gap:7px;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .today-workout-dashboard-actions .btn{min-height:44px;font-size:.8rem}
+}

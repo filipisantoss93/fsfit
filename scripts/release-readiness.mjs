@@ -66,6 +66,9 @@ const requiredFiles = [
   'manifest.webmanifest',
   'sw.js',
   'css/style.css',
+  'css/bundles/manifest.json',
+  'config/css-bundles.json',
+  'scripts/build-css-bundles.mjs',
   'js/config.js'
 ];
 for (const file of requiredFiles) {

@@ -10,7 +10,10 @@ on:
     paths:
       - "*.html"
       - "css/**"
-      - "js/pwa-install.js"
+      - "config/css-bundles.json"
+      - "js/**"
+      - "scripts/build-css-bundles.mjs"
+      - "scripts/audit-css-runtime.mjs"
       - "sw.js"
       - "vercel.json"
       - ".github/workflows/production-css-smoke.yml"
@@ -27,78 +30,116 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Verify Landing, Admin and Student stylesheets
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validar os 30 bundles locais
+        run: |
+          node scripts/build-css-bundles.mjs
+          node scripts/audit-css-runtime.mjs
+
+      - name: Aguardar o manifest correspondente em produção
         shell: bash
         run: |
           set -euo pipefail
           site="https://www.fsfit.com.br"
           temp_dir="$(mktemp -d)"
           trap 'rm -rf "$temp_dir"' EXIT
+          deployed_manifest="$temp_dir/manifest.json"
 
-          pages=(
-            "/"
-            "/painel.html"
-            "/agenda.html"
-            "/alunos.html"
-            "/financeiro.html"
-            "/acesso-aluno.html"
-            "/aluno.html"
+          ready=0
+          for attempt in $(seq 1 36); do
+            if curl --fail --silent --show-error --location \
+              -H "Cache-Control: no-cache" \
+              --output "$deployed_manifest" \
+              "$site/css/bundles/manifest.json?deployment-check=${GITHUB_SHA}-${attempt}" \
+              && cmp --silent css/bundles/manifest.json "$deployed_manifest"; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo "::error::A produção não publicou o manifest esperado dentro de seis minutos."
+            exit 1
+          fi
+
+          mapfile -t pages < <(node -e "const m=require('./css/bundles/manifest.json'); process.stdout.write(m.criticalPages.join('\\n'))")
+
+          declare -A critical_sources=(
+            ["/"]="css/landing-home.css"
+            ["/painel.html"]="css/painel-core.css"
+            ["/agenda.html"]="css/agenda-bundle.css"
+            ["/alunos.html"]="css/alunos.css"
+            ["/financeiro.html"]="css/financeiro.css"
+            ["/acesso-aluno.html"]="css/acesso-aluno.css"
+            ["/aluno.html"]="css/aluno.css"
+          )
+
+          declare -A critical_selectors=(
+            ["/"]=".lp-header"
+            ["/painel.html"]=".dashboard"
+            ["/agenda.html"]=".agenda-loading-card"
+            ["/alunos.html"]=".students-page"
+            ["/financeiro.html"]=".finance-page"
+            ["/acesso-aluno.html"]=".student-access"
+            ["/aluno.html"]=".student-shell"
           )
 
           for page in "${pages[@]}"; do
             slug="$(printf '%s' "$page" | tr '/.' '__')"
             html="$temp_dir/${slug:-home}.html"
 
-            curl --fail --silent --show-error --location               --retry 3 --retry-all-errors               --output "$html" "$site$page"
+            curl --fail --silent --show-error --location \
+              --retry 3 --retry-all-errors \
+              -H "Cache-Control: no-cache" \
+              --output "$html" "$site$page?css-smoke=${GITHUB_RUN_ID}"
 
-            mapfile -t stylesheets < <(
-              grep -oE 'href="[^"]+\.css[^"]*"' "$html"                 | sed -E 's/^href="([^"]+)"$/\1/'                 | sort -u
-            )
-
-            if [ "${#stylesheets[@]}" -eq 0 ]; then
-              echo "::error::Nenhuma folha de estilo encontrada em $page."
+            bundle="$(node -e "const fs=require('fs'); const h=fs.readFileSync(process.argv[1],'utf8'); const tags=h.match(/<link\\b[^>]*>/gi)||[]; const styles=tags.filter(t=>/\\brel\\s*=\\s*([\"'])[^\"']*stylesheet[^\"']*\\1/i.test(t)&&!/href\\s*=\\s*([\"'])(?:https?:)?\\/\\//i.test(t)); if(styles.length!==1||!/\\bdata-fsfit-bundle\\b/i.test(styles[0])) process.exit(2); const href=styles[0].match(/\\bhref\\s*=\\s*([\"'])(.*?)\\1/i)?.[2]; if(!href) process.exit(3); process.stdout.write(href);" "$html")"
+            expected="$(node -e "const m=require('./css/bundles/manifest.json'); process.stdout.write(m.pages[process.argv[1]]||'');" "$page")"
+            if [ "$bundle" != "$expected" ]; then
+              echo "::error::$page publicou $bundle, mas o manifest exige $expected."
               exit 1
             fi
 
-            for stylesheet in "${stylesheets[@]}"; do
-              case "$stylesheet" in
-                http://*|https://*) url="$stylesheet" ;;
-                /*) url="$site$stylesheet" ;;
-                *) url="$site/$stylesheet" ;;
-              esac
+            headers="$temp_dir/${slug:-home}.headers"
+            body="$temp_dir/${slug:-home}.css"
+            curl --fail --silent --show-error --location \
+              --retry 3 --retry-all-errors \
+              --dump-header "$headers" \
+              --output "$body" "$site$bundle"
 
-              headers="$temp_dir/headers"
-              body="$temp_dir/style.css"
-              curl --fail --silent --show-error --location                 --retry 3 --retry-all-errors                 --dump-header "$headers"                 --output "$body" "$url"
+            content_type="$(awk 'BEGIN { IGNORECASE=1 } /^content-type:/ { gsub("\r", ""); print $2 }' "$headers" | tail -1)"
+            cache_control="$(awk 'BEGIN { IGNORECASE=1 } /^cache-control:/ { sub(/^[^:]+:[[:space:]]*/, ""); gsub("\r", ""); print }' "$headers" | tail -1)"
+            if [[ "$content_type" != text/css* ]]; then
+              echo "::error::Tipo MIME inválido em $bundle: $content_type"
+              exit 1
+            fi
+            if [[ "$cache_control" != *immutable* ]]; then
+              echo "::error::$bundle não possui cache imutável: $cache_control"
+              exit 1
+            fi
 
-              content_type="$(awk 'BEGIN { IGNORECASE=1 } /^content-type:/ { gsub("\r", ""); print $2 }' "$headers" | tail -1)"
-              if [[ "$content_type" != text/css* ]]; then
-                echo "::error::Tipo MIME inválido em $url: $content_type"
-                exit 1
-              fi
+            node -e "const fs=require('fs'),c=require('crypto'); const css=fs.readFileSync(process.argv[1],'utf8'); const executable=css.replace(/\\/\\*[\\s\\S]*?\\*\\//g,''); if(!css.trim()||/^\\s*@import\\b/m.test(executable)) process.exit(2); const digest=c.createHash('sha256').update(css).digest('hex').slice(0,16); if(!process.argv[2].includes(digest)) process.exit(3); const sources=[...css.matchAll(/\\/\\* source: ([^*]+?) \\*\\//g)].map(x=>x[1]); if(new Set(sources).size!==sources.length) process.exit(4);" "$body" "$bundle"
 
-              if [ ! -s "$body" ]; then
-                echo "::error::Folha de estilo vazia: $url"
-                exit 1
-              fi
-            done
+            source="${critical_sources[$page]}"
+            selector="${critical_selectors[$page]}"
+            grep --quiet --fixed-strings "/* source: $source */" "$body" \
+              || { echo "::error::$bundle não contém a fonte crítica $source."; exit 1; }
+            grep --quiet --fixed-strings "$selector" "$body" \
+              || { echo "::error::$bundle não contém o seletor crítico $selector."; exit 1; }
           done
 
-          declare -A critical_styles=(
-            ["/css/landing-home.css?v=20260808-css-guard1"]=".lp-header"
-            ["/css/painel.css?v=20260730-painel-bundle1"]="./painel-core.css"
-            ["/css/agenda-bundle.css?v=20260730-bundle1"]=".agenda-loading-card"
-            ["/css/alunos.css?v=20260727-dashboard1"]=".students-page"
-            ["/css/financeiro.css?v=20260730-consolidado1"]=".finance-page"
-            ["/css/acesso-aluno.css?v=20260730-runtime1"]=".student-access"
-            ["/css/aluno.css?v=20260730-bundle1"]=".student-shell"
-          )
+          service_worker="$temp_dir/sw.js"
+          curl --fail --silent --show-error --location \
+            --output "$service_worker" "$site/sw.js"
+          grep --quiet --fixed-strings "const CACHE_VERSION = 18" "$service_worker" \
+            || { echo "::error::Service Worker v18 indisponível."; exit 1; }
 
-          for stylesheet in "${!critical_styles[@]}"; do
-            selector="${critical_styles[$stylesheet]}"
-            curl --fail --silent --show-error --location "$site$stylesheet"               | grep --quiet --fixed-strings "$selector"               || { echo "::error::$stylesheet não contém o seletor crítico $selector."; exit 1; }
-          done
-
-          curl --fail --silent --show-error --location "$site/sw.js"             | grep --quiet --fixed-strings "fsfit-shell-"             || { echo "::error::Service Worker indisponível ou inválido."; exit 1; }
-
-          echo "Landing, Admin, Aluno e folhas de estilo críticas estão saudáveis."
+          echo "Bundles críticos de Landing, Admin e Aluno estão íntegros em produção."
