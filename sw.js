@@ -1,8 +1,11 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}v15`;
+const CACHE_NAME = `${CACHE_PREFIX}v16`;
 
 const CORE_SHELL = [
   '/',
+  '/css/landing-ads.css?v=20260808-css-guard1',
+  '/css/landing-home.css?v=20260808-css-guard1',
+  '/css/inline-cleanup.css?v=20260808-css-guard1',
   '/acesso-aluno.html',
   '/aluno.html',
   '/css/style.css',
@@ -96,7 +99,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (event.request.destination === 'script') {
+  if (event.request.destination === 'script' || event.request.destination === 'style') {
     event.respondWith(networkFirstAsset(event.request, url.pathname));
     return;
   }
