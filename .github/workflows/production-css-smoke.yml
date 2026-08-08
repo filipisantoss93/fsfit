@@ -86,8 +86,8 @@ jobs:
 
           declare -A critical_styles=(
             ["/css/landing-home.css?v=20260808-css-guard1"]=".lp-header"
-            ["/css/painel.css?v=20260730-painel-bundle1"]=".dashboard-tabs"
-            ["/css/agenda-bundle.css?v=20260730-bundle1"]=".agenda-dashboard-summary"
+            ["/css/painel.css?v=20260730-painel-bundle1"]="./painel-core.css"
+            ["/css/agenda-bundle.css?v=20260730-bundle1"]=".agenda-loading-card"
             ["/css/alunos.css?v=20260727-dashboard1"]=".students-page"
             ["/css/financeiro.css?v=20260730-consolidado1"]=".finance-page"
             ["/css/acesso-aluno.css?v=20260730-runtime1"]=".student-access"
