@@ -46,3 +46,17 @@
 .finance-students-pagination .btn:disabled{opacity:.45;cursor:not-allowed}
 .finance-students-search-empty{margin:14px 0 0;color:var(--muted);text-align:center;font-size:.86rem}
 @media(max-width:680px){.finance-pix-summary{align-items:flex-start;padding:18px 16px}.finance-pix-summary-title-row{display:grid;gap:8px}.finance-pix-status-badge{justify-self:start}.finance-pix-summary-meta{display:grid;gap:4px}.finance-pix-summary-action-text{display:none}.finance-pix-summary-chevron{margin-top:4px}.finance-pix-content{padding:18px 16px}.finance-pix-intro{display:grid}.finance-pix-intro .finance-zero-fee-badge{justify-self:start}.finance-students-pagination{justify-content:space-between;flex-wrap:wrap}.finance-students-pagination span{order:-1;width:100%;text-align:center}}
+
+.finance-pix-auto{grid-column:1/-1;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.finance-pix-auto-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.finance-pix-auto-heading small{display:block;margin-bottom:4px;color:var(--primary);font-size:.65rem;font-weight:900;letter-spacing:.08em}
+.finance-pix-auto-heading h3{margin:0 0 5px;font-size:1rem}
+.finance-pix-auto-heading p{max-width:760px;margin:0;color:var(--muted);font-size:.76rem;line-height:1.45}
+.finance-pix-auto-form{display:grid;grid-template-columns:minmax(140px,.65fr) repeat(2,minmax(180px,1fr));gap:12px;align-items:start}
+.finance-pix-auto-form .form-group{margin:0}
+.finance-pix-certificate-field{grid-column:1/-1}
+.finance-pix-certificate-field small{display:block;margin-top:6px;color:var(--muted);font-size:.68rem}
+.finance-pix-auto-detail{grid-column:1/-1;margin:0;color:var(--muted);font-size:.74rem}
+.finance-pix-auto-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+
+@media(max-width:680px){.finance-pix-auto-heading{display:grid}.finance-pix-auto-form{grid-template-columns:1fr}.finance-pix-certificate-field,.finance-pix-auto-detail,.finance-pix-auto-actions{grid-column:auto}.finance-pix-auto-actions{display:grid}.finance-pix-auto-actions .btn{width:100%}}

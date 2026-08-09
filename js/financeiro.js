@@ -7,6 +7,11 @@ const session = await requireSession();
 const $ = selector => document.querySelector(selector);
 const message = $('#finance-message');
 const pixForm = $('#pix-config-form');
+const pixAutoForm = $('#pix-auto-form');
+const pixAutoStatus = $('#pix-auto-status');
+const pixAutoDetail = $('#pix-auto-detail');
+const connectPixAutoButton = $('#connect-pix-auto');
+const disconnectPixAutoButton = $('#disconnect-pix-auto');
 const studentsList = $('#finance-students-list');
 const studentsToolbar = $('.finance-students-toolbar');
 const confirmationsCard = $('#payment-confirmations-card');
@@ -23,15 +28,20 @@ const studentModalDueDate = $('#student-finance-due-date');
 const studentModalChargeValue = $('#student-finance-charge-value');
 const studentModalReportedAt = $('#student-finance-reported-at');
 const studentModalConfirmedAt = $('#student-finance-confirmed-at');
+const studentModalPaymentMethod = $('#student-finance-payment-method');
+const studentModalConfirmationSource = $('#student-finance-confirmation-source');
 const studentModalSave = $('#student-finance-save');
 const studentModalMarkPaid = $('#student-finance-mark-paid');
 
 let students = [];
 let payments = [];
 let profile = null;
+let pixAutoIntegration = null;
 let selectedStudentId = null;
 let studentStatusFilter = 'all';
 let cancelPaymentButton = null;
+let financeRealtimeChannel = null;
+let realtimeRefreshTimer = null;
 
 function esc(value = '') {
   const div = document.createElement('div');
@@ -72,6 +82,21 @@ function formatCompetence(value) {
   const [year, month] = String(value).slice(0, 7).split('-').map(Number);
   if (!year || !month) return '—';
   return new Date(year, month - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+}
+
+function paymentMethodLabel(payment) {
+  if (payment?.meio_pagamento === 'pix') return 'Pix';
+  if (payment?.meio_pagamento === 'manual') return 'Manual';
+  return payment?.status === 'pago' ? 'Não informado' : '—';
+}
+
+function confirmationSourceLabel(payment) {
+  const labels = {
+    manual_personal: 'Confirmado pelo personal',
+    pix_webhook: 'Automática · webhook Efí',
+    pix_reconciliacao: 'Automática · reconciliação Efí'
+  };
+  return labels[payment?.confirmacao_origem] || (payment?.status === 'pago' ? 'Não informada' : '—');
 }
 
 function todayIso() {
@@ -175,7 +200,7 @@ function ensureDesktopDashboard() {
 async function fetchPayments() {
   const { data, error } = await supabase
     .from('mensalidades_alunos')
-    .select('id,aluno_id,competencia,vencimento,valor,status,informado_em,confirmado_em,updated_at')
+    .select('id,aluno_id,competencia,vencimento,valor,status,informado_em,confirmado_em,pago_em,meio_pagamento,confirmacao_origem,pix_e2e_id,updated_at')
     .eq('personal_id', session.user.id)
     .order('vencimento', { ascending: false });
   if (error) throw error;
@@ -273,6 +298,39 @@ function fillPixForm() {
   pixForm.pix_cidade.value = profile.pix_cidade || '';
 }
 
+function renderPixAutoIntegration() {
+  if (!pixAutoStatus || !pixAutoDetail || !connectPixAutoButton || !disconnectPixAutoButton) return;
+  const status = pixAutoIntegration?.status || 'desativada';
+  const active = Boolean(pixAutoIntegration?.configurada && status === 'ativa');
+  pixAutoStatus.className = 'finance-pix-status-badge';
+  pixAutoStatus.classList.toggle('is-configured', active);
+  pixAutoStatus.classList.toggle('is-incomplete', status === 'erro' || status === 'pendente');
+  pixAutoStatus.textContent = active
+    ? '✓ Confirmação automática ativa'
+    : (status === 'erro' ? 'Integração com erro' : (status === 'pendente' ? 'Configuração pendente' : 'Não conectada'));
+  pixAutoDetail.textContent = active
+    ? `${pixAutoIntegration.ambiente === 'homologacao' ? 'Homologação' : 'Produção'} · chave ${pixAutoIntegration.pix_chave_mascarada || 'conectada'} · webhook validado.`
+    : (pixAutoIntegration?.ultimo_erro || 'Conecte a conta Efí que receberá as mensalidades.');
+  connectPixAutoButton.textContent = active ? 'Atualizar conexão Efí' : 'Ativar confirmação automática';
+  disconnectPixAutoButton.classList.toggle('hidden', !active && status === 'desativada');
+  if (pixAutoForm?.ambiente && pixAutoIntegration?.ambiente) pixAutoForm.ambiente.value = pixAutoIntegration.ambiente;
+}
+
+async function invokePixAuto(action, payload = {}) {
+  const { data, error } = await supabase.functions.invoke('configurar-pix-automatico-personal', {
+    body: { action, ...payload }
+  });
+  if (error) throw new Error(data?.erro || error.message || 'Não foi possível acessar a integração Efí.');
+  if (!data?.sucesso) throw new Error(data?.erro || 'Não foi possível acessar a integração Efí.');
+  return data;
+}
+
+async function loadPixAutoIntegration() {
+  const data = await invokePixAuto('status');
+  pixAutoIntegration = data.integracao || { configurada: false, status: 'desativada' };
+  renderPixAutoIntegration();
+}
+
 function ensureCancelButton() {
   if (cancelPaymentButton || !studentModal) return;
   cancelPaymentButton = document.createElement('button');
@@ -301,6 +359,8 @@ function openStudentModal(studentId) {
   studentModalChargeValue.textContent = payment ? formatCurrency(payment.valor) : (student.mensalidade_valor ? formatCurrency(student.mensalidade_valor) : '—');
   studentModalReportedAt.textContent = formatDateTime(payment?.informado_em);
   studentModalConfirmedAt.textContent = formatDateTime(payment?.confirmado_em);
+  studentModalPaymentMethod.textContent = paymentMethodLabel(payment);
+  studentModalConfirmationSource.textContent = confirmationSourceLabel(payment);
 
   const actionable = payment && ['pendente', 'informado'].includes(payment.status);
   studentModalMarkPaid.classList.toggle('hidden', !actionable);
@@ -325,9 +385,18 @@ function closeStudentModal() {
 
 function exportCsv() {
   const studentMap = new Map(students.map(student => [student.id, student.nome]));
-  const rows = [['Aluno', 'Competência', 'Vencimento', 'Valor', 'Status', 'Informado em', 'Confirmado em']];
+  const rows = [['Aluno', 'Competência', 'Vencimento', 'Valor', 'Status', 'Forma de pagamento', 'Confirmação', 'Informado em', 'Pago em', 'ID Pix E2E']];
   payments.filter(item => item.status !== 'cancelada').forEach(item => rows.push([
-    studentMap.get(item.aluno_id) || 'Aluno', formatCompetence(item.competencia), formatDate(item.vencimento), Number(item.valor || 0).toFixed(2).replace('.', ','), item.status, formatDateTime(item.informado_em), formatDateTime(item.confirmado_em)
+    studentMap.get(item.aluno_id) || 'Aluno',
+    formatCompetence(item.competencia),
+    formatDate(item.vencimento),
+    Number(item.valor || 0).toFixed(2).replace('.', ','),
+    item.status,
+    paymentMethodLabel(item),
+    confirmationSourceLabel(item),
+    formatDateTime(item.informado_em),
+    formatDateTime(item.pago_em || item.confirmado_em),
+    item.pix_e2e_id || ''
   ]));
   const csv = rows.map(row => row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
   const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
@@ -417,10 +486,34 @@ async function load() {
   await fetchPayments();
   await generateCurrentCharges();
   fillPixForm();
+  await loadPixAutoIntegration().catch(error => {
+    console.warn('Status da integração Efí indisponível:', error);
+    pixAutoIntegration = { configurada: false, status: 'erro', ultimo_erro: 'Não foi possível consultar a Efí agora. As demais funções do Financeiro continuam disponíveis.' };
+    renderPixAutoIntegration();
+  });
   ensureDesktopDashboard();
   renderSummary();
   renderConfirmations();
   renderStudents();
+  subscribeFinancialRealtime();
+}
+
+function subscribeFinancialRealtime() {
+  if (!session?.user?.id || financeRealtimeChannel) return;
+  financeRealtimeChannel = supabase
+    .channel(`finance-mensalidades-${session.user.id}`)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'mensalidades_alunos',
+      filter: `personal_id=eq.${session.user.id}`
+    }, () => {
+      clearTimeout(realtimeRefreshTimer);
+      realtimeRefreshTimer = setTimeout(() => {
+        void refreshFinancialUi().catch(error => console.warn('Atualização financeira em tempo real indisponível:', error));
+      }, 250);
+    })
+    .subscribe();
 }
 
 ensureStudentStatusFilter();
@@ -449,6 +542,64 @@ pixForm?.addEventListener('submit', async event => {
   }
 });
 
+pixAutoForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const certificateFile = pixAutoForm.certificado?.files?.[0];
+  const payload = {
+    ambiente: String(pixAutoForm.ambiente?.value || 'producao'),
+    client_id: String(pixAutoForm.client_id?.value || '').trim(),
+    client_secret: String(pixAutoForm.client_secret?.value || '').trim(),
+    pix_tipo: String(pixForm?.pix_tipo?.value || '').trim(),
+    pix_chave: String(pixForm?.pix_chave?.value || '').trim(),
+    pix_nome_recebedor: String(pixForm?.pix_nome_recebedor?.value || '').trim(),
+    pix_cidade: String(pixForm?.pix_cidade?.value || '').trim()
+  };
+  if (!payload.pix_tipo || !payload.pix_chave || !payload.pix_nome_recebedor || !payload.pix_cidade) {
+    return show('Complete e salve os dados públicos da chave Pix antes de conectar a Efí.', 'error');
+  }
+  if (!payload.client_id || !payload.client_secret || !certificateFile) {
+    return show('Informe Client ID, Client Secret e o certificado PEM da Efí.', 'error');
+  }
+  if (certificateFile.size > 180000) return show('O certificado PEM excede o limite permitido.', 'error');
+
+  connectPixAutoButton.disabled = true;
+  connectPixAutoButton.textContent = 'Validando conta Efí...';
+  try {
+    payload.certificado_pem = await certificateFile.text();
+    const data = await invokePixAuto('conectar', payload);
+    pixAutoIntegration = data.integracao;
+    profile = { ...profile, pix_tipo: payload.pix_tipo, pix_chave: payload.pix_chave, pix_nome_recebedor: payload.pix_nome_recebedor, pix_cidade: payload.pix_cidade };
+    pixAutoForm.client_id.value = '';
+    pixAutoForm.client_secret.value = '';
+    pixAutoForm.certificado.value = '';
+    renderPixAutoIntegration();
+    show('Confirmação automática do Pix ativada com sucesso.');
+  } catch (error) {
+    console.error(error);
+    show(error.message || 'Não foi possível conectar a conta Efí.', 'error');
+    await loadPixAutoIntegration().catch(() => undefined);
+  } finally {
+    connectPixAutoButton.disabled = false;
+    renderPixAutoIntegration();
+  }
+});
+
+disconnectPixAutoButton?.addEventListener('click', async () => {
+  if (!confirm('Desconectar a Efí? Novos pagamentos voltarão a exigir confirmação manual.')) return;
+  disconnectPixAutoButton.disabled = true;
+  try {
+    const data = await invokePixAuto('desativar');
+    pixAutoIntegration = data.integracao;
+    renderPixAutoIntegration();
+    show('Confirmação automática desativada.');
+  } catch (error) {
+    console.error(error);
+    show(error.message || 'Não foi possível desconectar a Efí.', 'error');
+  } finally {
+    disconnectPixAutoButton.disabled = false;
+  }
+});
+
 studentsList?.addEventListener('click', event => {
   const row = event.target.closest('[data-student-row]');
   if (row) openStudentModal(row.dataset.studentRow);
@@ -471,6 +622,12 @@ studentModalMarkPaid?.addEventListener('click', () => confirmPayment(studentModa
 confirmationsList?.addEventListener('click', event => {
   const button = event.target.closest('[data-confirm-payment]');
   if (button) void confirmPayment(button.dataset.confirmPayment, button);
+});
+
+window.addEventListener('pagehide', () => {
+  clearTimeout(realtimeRefreshTimer);
+  if (financeRealtimeChannel) void supabase.removeChannel(financeRealtimeChannel);
+  financeRealtimeChannel = null;
 });
 
 load().catch(error => {

@@ -157,6 +157,19 @@
   line-height:1.45;
   text-align:center;
 }
+
+.student-pix-confirmed {
+  min-height:210px;
+  display:grid;
+  place-content:center;
+  gap:8px;
+  padding:24px;
+  color:#0f1a08;
+  text-align:center;
+}
+
+.student-pix-confirmed strong { font-size:1.05rem; }
+.student-pix-confirmed span { color:#324126; font-size:.82rem; line-height:1.45; }
 body.student-pix-open { overflow:hidden; }
 
 @media (min-width:640px) {

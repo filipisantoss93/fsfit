@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_VERSION = 18;
+const CACHE_VERSION = 19;
 const CACHE_NAME = `${CACHE_PREFIX}v${CACHE_VERSION}`;
 const BUNDLE_MANIFEST_URL = '/css/bundles/manifest.json';
 

@@ -1,0 +1,50 @@
+[functions.aluno-auth]
+verify_jwt = false
+
+[functions.atualizar-assinatura-cartao-fsfit]
+verify_jwt = true
+
+[functions.cancelar-assinatura-cartao-fsfit]
+verify_jwt = true
+
+[functions.cancelar-pix-fsfit]
+verify_jwt = true
+
+[functions.config-assinatura-cartao-fsfit]
+verify_jwt = true
+
+[functions.configurar-pix-automatico-personal]
+verify_jwt = true
+
+[functions.criar-assinatura-cartao-fsfit]
+verify_jwt = true
+
+[functions.criar-pix-fsfit]
+verify_jwt = true
+
+[functions.criar-pix-mensalidade-aluno]
+verify_jwt = false
+
+[functions.personal-aluno-pin]
+verify_jwt = true
+
+[functions.processar-lembretes]
+verify_jwt = false
+
+[functions.reconciliar-assinaturas-cartao-fsfit]
+verify_jwt = false
+
+[functions.reconciliar-pagamentos-fsfit]
+verify_jwt = false
+
+[functions.webhook-efi-pix-mensalidades]
+verify_jwt = false
+
+[functions.reconciliar-pix-mensalidades]
+verify_jwt = false
+
+[functions.verificar-pix-fsfit]
+verify_jwt = true
+
+[functions.webhook-efi-pix]
+verify_jwt = false

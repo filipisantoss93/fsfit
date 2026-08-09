@@ -14,9 +14,12 @@ const pixAmount = document.querySelector('#student-pix-amount');
 const pixDueDate = document.querySelector('#student-pix-due-date');
 const copyButton = document.querySelector('#student-copy-pix');
 const modalPaidButton = document.querySelector('#student-modal-paid-button');
+const securityNote = document.querySelector('#student-pix-security-note');
 
 let payment = null;
 let pixPayload = '';
+let automaticCharge = null;
+let paymentPollTimer = null;
 
 function sessionToken() {
   return String(localStorage.getItem('fsfit_aluno_token') || '').trim();
@@ -103,10 +106,13 @@ function setModalOpen(open) {
   modal.classList.toggle('open', open);
   modal.setAttribute('aria-hidden', String(!open));
   document.body.classList.toggle('student-pix-open', open);
+  if (!open) stopPaymentPolling();
 }
 
 function canGeneratePix(data) {
-  return Boolean(data?.pix_chave && (data?.pix_nome_recebedor || data?.personal_nome) && data?.pix_cidade && Number(data?.valor) > 0);
+  if (!(Number(data?.valor) > 0)) return false;
+  if (data?.pix_automatico) return true;
+  return Boolean(data?.pix_chave && (data?.pix_nome_recebedor || data?.personal_nome) && data?.pix_cidade);
 }
 
 function renderPayment() {
@@ -116,7 +122,8 @@ function renderPayment() {
   }
 
   const remainingDays = daysUntil(payment.vencimento);
-  const waitingConfirmation = payment.status === 'informado';
+  const automatic = Boolean(payment.pix_automatico);
+  const waitingConfirmation = payment.status === 'informado' && !automatic;
   const shouldShow = waitingConfirmation || remainingDays == null || remainingDays <= 7;
 
   if (!shouldShow) {
@@ -134,8 +141,8 @@ function renderPayment() {
     paidButton.classList.add('hidden');
     modalPaidButton?.classList.add('hidden');
   } else {
-    paidButton.classList.remove('hidden');
-    modalPaidButton?.classList.remove('hidden');
+    paidButton.classList.toggle('hidden', automatic);
+    modalPaidButton?.classList.toggle('hidden', automatic);
     if (remainingDays < 0) {
       alertCard.classList.add('overdue');
       const days = Math.abs(remainingDays);
@@ -152,20 +159,32 @@ function renderPayment() {
 
   const pixAvailable = canGeneratePix(payment);
   openPixButton.disabled = !pixAvailable;
-  openPixButton.textContent = pixAvailable ? 'Gerar QR Code Pix' : 'Pix ainda não configurado';
+  openPixButton.textContent = pixAvailable
+    ? (automatic ? 'Gerar Pix com confirmação automática' : 'Gerar QR Code Pix')
+    : 'Pix ainda não configurado';
   paymentNote.textContent = pixAvailable
-    ? 'O pagamento é feito diretamente para a chave Pix do seu personal. O FS Fit não recebe nem intermedeia o valor.'
+    ? (automatic
+      ? 'Depois do pagamento, a Efí confirma automaticamente e o recebimento entra no Financeiro do seu personal.'
+      : 'O pagamento é feito diretamente para a chave Pix do seu personal. O FS Fit não recebe nem intermedeia o valor.')
     : 'Seu personal ainda não configurou uma chave Pix para recebimento no FS Fit.';
 }
 
-function renderPixModal() {
-  pixPayload = buildPixPayload(payment);
+function renderPixModal(charge = null) {
+  const automatic = Boolean(payment?.pix_automatico && charge);
+  pixPayload = automatic ? String(charge.pix_copia_cola || '') : buildPixPayload(payment);
   if (!pixPayload) return;
 
   pixAmount.textContent = formatCurrency(payment.valor);
   pixDueDate.textContent = formatDate(payment.vencimento);
   pixCodeField.value = pixPayload;
   qrHost.innerHTML = '';
+  copyButton?.classList.remove('hidden');
+  modalPaidButton?.classList.toggle('hidden', automatic);
+  if (securityNote) {
+    securityNote.textContent = automatic
+      ? 'O valor vai direto para a conta Efí do seu personal. A confirmação e o lançamento financeiro são automáticos.'
+      : 'O valor é enviado diretamente para a chave Pix cadastrada pelo seu personal. O FS Fit não recebe nem retém este pagamento.';
+  }
 
   try {
     if (window.QRCode) {
@@ -181,6 +200,71 @@ function renderPixModal() {
   } catch (error) {
     console.error('Não foi possível renderizar o QR Code:', error);
     qrHost.innerHTML = '<p style="color:#111;text-align:center">QR Code indisponível. Use o Pix Copia e Cola abaixo.</p>';
+  }
+}
+
+function stopPaymentPolling() {
+  if (paymentPollTimer) window.clearInterval(paymentPollTimer);
+  paymentPollTimer = null;
+}
+
+async function refreshPaymentStatus() {
+  const token = sessionToken();
+  if (!token || !payment?.id) return;
+  const { data, error } = await supabase.functions.invoke('criar-pix-mensalidade-aluno', {
+    body: {
+      action: 'status',
+      session_token: token,
+      mensalidade_id: payment.id
+    }
+  });
+  const monthly = data?.mensalidade;
+  if (error || !data?.sucesso || !monthly?.ok || monthly.status !== 'pago') return;
+  payment = { ...payment, ...monthly };
+
+  stopPaymentPolling();
+  pixPayload = '';
+  qrHost.innerHTML = '<div class="student-pix-confirmed"><strong>✓ Pagamento confirmado</strong><span>O recebimento já foi lançado no Financeiro do seu personal.</span></div>';
+  pixCodeField.value = 'Pagamento confirmado automaticamente';
+  copyButton?.classList.add('hidden');
+  modalPaidButton?.classList.add('hidden');
+  if (securityNote) securityNote.textContent = 'Confirmação recebida com segurança pela Efí.';
+  window.setTimeout(() => {
+    setModalOpen(false);
+    void loadPayment();
+  }, 3200);
+}
+
+function startPaymentPolling() {
+  stopPaymentPolling();
+  paymentPollTimer = window.setInterval(() => {
+    void refreshPaymentStatus().catch(error => console.warn('Confirmação Pix ainda não disponível:', error));
+  }, 5000);
+}
+
+async function createAutomaticPix() {
+  const token = sessionToken();
+  if (!token || !payment?.id) return null;
+  const original = openPixButton.textContent;
+  openPixButton.disabled = true;
+  openPixButton.textContent = 'Gerando Pix seguro...';
+
+  try {
+    const { data, error } = await supabase.functions.invoke('criar-pix-mensalidade-aluno', {
+      body: { session_token: token, mensalidade_id: payment.id }
+    });
+    if (error) throw new Error(data?.erro || error.message || 'Não foi possível gerar o Pix.');
+    if (!data?.sucesso) throw new Error(data?.erro || 'Não foi possível gerar o Pix.');
+    if (data?.pago) {
+      await refreshPaymentStatus();
+      return null;
+    }
+    if (!data?.cobranca?.pix_copia_cola) throw new Error('A cobrança Pix ainda está sendo sincronizada.');
+    automaticCharge = data.cobranca;
+    return automaticCharge;
+  } finally {
+    openPixButton.disabled = false;
+    openPixButton.textContent = original;
   }
 }
 
@@ -228,10 +312,24 @@ async function informPaid(button) {
   }
 }
 
-openPixButton?.addEventListener('click', () => {
+openPixButton?.addEventListener('click', async () => {
   if (!canGeneratePix(payment)) return;
-  renderPixModal();
-  setModalOpen(true);
+  try {
+    if (payment.pix_automatico) {
+      const charge = await createAutomaticPix();
+      if (!charge) return;
+      renderPixModal(charge);
+      setModalOpen(true);
+      startPaymentPolling();
+      return;
+    }
+    automaticCharge = null;
+    renderPixModal();
+    setModalOpen(true);
+  } catch (error) {
+    console.error(error);
+    paymentNote.textContent = error.message || 'Não foi possível gerar o Pix. Tente novamente.';
+  }
 });
 
 copyButton?.addEventListener('click', copyPixCode);
@@ -249,6 +347,7 @@ async function loadPayment() {
     if (error) throw error;
     if (!data || data.erro === 'sessao_invalida') return;
     payment = data;
+    automaticCharge = null;
     renderPayment();
   } catch (error) {
     console.error('Não foi possível carregar a mensalidade do aluno:', error);

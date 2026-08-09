@@ -8,8 +8,8 @@
     "/admin-contatos.html": "/css/bundles/fsfit.02686996834611c7.css",
     "/admin.html": "/css/bundles/fsfit.3243188c99077908.css",
     "/agenda.html": "/css/bundles/fsfit.94c00b0695a63a1f.css",
-    "/aluno-preview.html": "/css/bundles/fsfit.8830fc3cc86cb1e5.css",
-    "/aluno.html": "/css/bundles/fsfit.ae5bcfa6c7887309.css",
+    "/aluno-preview.html": "/css/bundles/fsfit.d87c9474378521f0.css",
+    "/aluno.html": "/css/bundles/fsfit.2728a2ed4941ab1a.css",
     "/alunos.html": "/css/bundles/fsfit.77d635cf607775d0.css",
     "/assinatura.html": "/css/bundles/fsfit.ac566239084e31d4.css",
     "/biblioteca-alimentar.html": "/css/bundles/fsfit.22988dfc009bb7f3.css",
@@ -18,7 +18,7 @@
     "/contato.html": "/css/bundles/fsfit.0c17327f97b0767a.css",
     "/dieta-aluno.html": "/css/bundles/fsfit.07a19abd534aa9f6.css",
     "/ficha-aluno.html": "/css/bundles/fsfit.329e26e9cf1de5bd.css",
-    "/financeiro.html": "/css/bundles/fsfit.670885a2e3755b1a.css",
+    "/financeiro.html": "/css/bundles/fsfit.e4f456f545de823a.css",
     "/lembretes-aluno.html": "/css/bundles/fsfit.5b1b2cbe988f1a47.css",
     "/nova-senha.html": "/css/bundles/fsfit.cef1f7e3cacaabb1.css",
     "/painel.html": "/css/bundles/fsfit.6d084df1bf3cb7cd.css",
@@ -30,7 +30,7 @@
     "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.3d9ae823c9f5aa1e.css",
     "/termos.html": "/css/bundles/fsfit.16d9648f7fd85796.css",
     "/treino-aluno.html": "/css/bundles/fsfit.12faa2dcf8422adc.css",
-    "/visualizar-aluno.html": "/css/bundles/fsfit.788affec86955e1a.css"
+    "/visualizar-aluno.html": "/css/bundles/fsfit.01b6f819ff63f1f7.css"
   },
   "criticalPages": [
     "/",
@@ -42,13 +42,13 @@
     "/painel.html"
   ],
   "criticalBundles": [
+    "/css/bundles/fsfit.2728a2ed4941ab1a.css",
     "/css/bundles/fsfit.3d9ae823c9f5aa1e.css",
     "/css/bundles/fsfit.4bdfbe18d5fce813.css",
-    "/css/bundles/fsfit.670885a2e3755b1a.css",
     "/css/bundles/fsfit.6d084df1bf3cb7cd.css",
     "/css/bundles/fsfit.77d635cf607775d0.css",
     "/css/bundles/fsfit.94c00b0695a63a1f.css",
-    "/css/bundles/fsfit.ae5bcfa6c7887309.css"
+    "/css/bundles/fsfit.e4f456f545de823a.css"
   ],
   "bundles": {
     "abrir-whatsapp-lembrete.html": {
@@ -300,9 +300,9 @@
       ]
     },
     "aluno-preview.html": {
-      "url": "/css/bundles/fsfit.8830fc3cc86cb1e5.css",
-      "sha256": "8830fc3cc86cb1e50e2219fa1e942fbbe39e88fcddfba41c2461432a471ba36f",
-      "bytes": 137431,
+      "url": "/css/bundles/fsfit.d87c9474378521f0.css",
+      "sha256": "d87c9474378521f02a6cdbaee395f29b009aecb96b6391f192cea112ac9ef3f9",
+      "bytes": 137721,
       "sourceCount": 22,
       "duplicatesRemoved": 3,
       "sources": [
@@ -339,9 +339,9 @@
       ]
     },
     "aluno.html": {
-      "url": "/css/bundles/fsfit.ae5bcfa6c7887309.css",
-      "sha256": "ae5bcfa6c7887309e1468d4b12a02e70b9d81b3b51fd802b12be449c98270256",
-      "bytes": 139321,
+      "url": "/css/bundles/fsfit.2728a2ed4941ab1a.css",
+      "sha256": "2728a2ed4941ab1a4f3e1801c8309e232857e61707385c075e602f768d796b99",
+      "bytes": 139611,
       "sourceCount": 24,
       "duplicatesRemoved": 0,
       "sources": [
@@ -811,9 +811,9 @@
       ]
     },
     "financeiro.html": {
-      "url": "/css/bundles/fsfit.670885a2e3755b1a.css",
-      "sha256": "670885a2e3755b1acf1d433406d114b207bd530735a9c07df1eed5356e975537",
-      "bytes": 123005,
+      "url": "/css/bundles/fsfit.e4f456f545de823a.css",
+      "sha256": "e4f456f545de823a00f5d2ee8ae907b21efe0779eef6d0925bb04c2d8f6dca4d",
+      "bytes": 124357,
       "sourceCount": 17,
       "duplicatesRemoved": 1,
       "sources": [
@@ -1322,9 +1322,9 @@
       ]
     },
     "visualizar-aluno.html": {
-      "url": "/css/bundles/fsfit.788affec86955e1a.css",
-      "sha256": "788affec86955e1ac58ce3943ebed0d8c87edc4d6421307a03b4649606ecd640",
-      "bytes": 169075,
+      "url": "/css/bundles/fsfit.01b6f819ff63f1f7.css",
+      "sha256": "01b6f819ff63f1f7614be516694d8e000682eb6d57005576df381448a347554f",
+      "bytes": 169365,
       "sourceCount": 26,
       "duplicatesRemoved": 0,
       "sources": [

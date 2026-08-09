@@ -16,7 +16,7 @@
   <link rel="modulepreload" href="js/supabase.js">
   <link rel="modulepreload" href="js/layout-core.js">
   <link rel="modulepreload" href="js/layout.js">
-  <link rel="stylesheet" href="/css/bundles/fsfit.670885a2e3755b1a.css" data-fsfit-bundle data-fsfit-header-styles data-fsfit-mobile-navigation>
+  <link rel="stylesheet" href="/css/bundles/fsfit.e4f456f545de823a.css" data-fsfit-bundle data-fsfit-header-styles data-fsfit-mobile-navigation>
   <meta name="apple-mobile-web-app-title" content="FS Fit">
   <link rel="icon" href="/assets/icons/01-web-favicon/favicon.ico?v=20260722-icons-v4" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/01-web-favicon/apple-touch-icon.png?v=20260722-icons-v4">
@@ -139,7 +139,7 @@
 
       <div class="finance-pix-content">
         <div class="finance-pix-intro">
-          <p>Os pagamentos vão direto da conta do aluno para a sua chave Pix. O FS Fit apenas gera o QR Code e o Pix Copia e Cola.</p>
+          <p>Os pagamentos vão direto para sua conta. Ao conectar a Efí, cada mensalidade recebe um Pix exclusivo e a confirmação entra automaticamente no relatório financeiro.</p>
           <span class="finance-zero-fee-badge">Sem comissão do FS Fit</span>
         </div>
 
@@ -171,6 +171,46 @@
             <button id="save-pix-button" class="btn btn-primary" type="submit">Salvar configuração Pix</button>
           </div>
         </form>
+
+        <section class="finance-pix-auto" aria-labelledby="pix-auto-title">
+          <div class="finance-pix-auto-heading">
+            <div>
+              <small>CONFIRMAÇÃO AUTOMÁTICA</small>
+              <h3 id="pix-auto-title">Conectar conta Efí</h3>
+              <p>Use uma aplicação Efí com os escopos <strong>cob.read</strong>, <strong>cob.write</strong>, <strong>webhook.read</strong> e <strong>webhook.write</strong>. As credenciais e o certificado são criptografados no Vault.</p>
+            </div>
+            <span id="pix-auto-status" class="finance-pix-status-badge" aria-live="polite">Verificando integração...</span>
+          </div>
+
+          <form id="pix-auto-form" class="finance-pix-auto-form">
+            <div class="form-group">
+              <label for="efi-environment">Ambiente Efí</label>
+              <select id="efi-environment" name="ambiente">
+                <option value="producao">Produção</option>
+                <option value="homologacao">Homologação</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="efi-client-id">Client ID</label>
+              <input id="efi-client-id" name="client_id" autocomplete="off" spellcheck="false" placeholder="Client_Id da aplicação Efí">
+            </div>
+            <div class="form-group">
+              <label for="efi-client-secret">Client Secret</label>
+              <input id="efi-client-secret" name="client_secret" type="password" autocomplete="new-password" spellcheck="false" placeholder="Client_Secret da aplicação Efí">
+            </div>
+            <div class="form-group finance-pix-certificate-field">
+              <label for="efi-certificate">Certificado PEM</label>
+              <input id="efi-certificate" name="certificado" type="file" accept=".pem,application/x-pem-file,text/plain">
+              <small>Envie um PEM que contenha o certificado e a chave privada. O arquivo não fica salvo no navegador.</small>
+            </div>
+            <p id="pix-auto-detail" class="finance-pix-auto-detail">Conecte a conta que receberá as mensalidades.</p>
+            <div class="finance-pix-auto-actions">
+              <a class="btn btn-neutral" href="https://dev.efipay.com.br/docs/api-pix/credenciais/" target="_blank" rel="noopener">Como obter as credenciais</a>
+              <button id="disconnect-pix-auto" class="btn btn-danger hidden" type="button">Desconectar Efí</button>
+              <button id="connect-pix-auto" class="btn btn-primary" type="submit">Ativar confirmação automática</button>
+            </div>
+          </form>
+        </section>
       </div>
     </details>
   </main>
@@ -226,6 +266,8 @@
           <div class="finance-charge-detail"><small>VALOR DA COBRANÇA</small><strong id="student-finance-charge-value">—</strong></div>
           <div class="finance-charge-detail"><small>PAGAMENTO INFORMADO</small><strong id="student-finance-reported-at">—</strong></div>
           <div class="finance-charge-detail"><small>PAGAMENTO CONFIRMADO</small><strong id="student-finance-confirmed-at">—</strong></div>
+          <div class="finance-charge-detail"><small>FORMA DE PAGAMENTO</small><strong id="student-finance-payment-method">—</strong></div>
+          <div class="finance-charge-detail"><small>ORIGEM DA CONFIRMAÇÃO</small><strong id="student-finance-confirmation-source">—</strong></div>
         </div>
 
         <div class="finance-modal-actions">
@@ -237,7 +279,7 @@
     </section>
   </div>
 
-  <script type="module" src="js/financeiro.js?v=20260718-financeiro2"></script>
+  <script type="module" src="js/financeiro.js?v=20260809-pix-auto1"></script>
   <script>
     (() => {
       const details = document.querySelector('#pix-config-details');
