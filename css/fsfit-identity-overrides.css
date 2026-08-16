@@ -1,0 +1,78 @@
+/* FS Fit — identidade visual complementar
+ * Verde = ação / conversão / sucesso
+ * Ciano = informação / tecnologia
+ * Superfícies = profundidade sem adicionar ruído visual
+ */
+:root {
+  --fsfit-bg: #070B10;
+  --fsfit-surface: #0D141B;
+  --fsfit-surface-2: #101A22;
+  --fsfit-text: #F4F7F5;
+  --fsfit-muted: #A8B0B8;
+  --fsfit-primary: #B8F500;
+  --fsfit-primary-hover: #D0FF3D;
+  --fsfit-support: #38BDF8;
+}
+
+/* Superfícies: variação discreta para páginas longas. */
+body.ads-landing {
+  background:
+    radial-gradient(circle at 85% 4%, rgba(184,245,0,.08), transparent 26%),
+    radial-gradient(circle at 8% 28%, rgba(56,189,248,.055), transparent 24%),
+    var(--fsfit-bg);
+  color: var(--fsfit-text);
+}
+
+/* Verde continua reservado para ação, destaque e sucesso. */
+body.ads-landing .lp-btn-primary {
+  background: linear-gradient(135deg, var(--fsfit-primary), var(--fsfit-primary-hover));
+  color: #101500;
+}
+
+body.ads-landing .lp-btn-primary:hover {
+  background: linear-gradient(135deg, var(--fsfit-primary-hover), #E2FF72);
+}
+
+/* Ciano comunica informação/tecnologia sem competir com o CTA. */
+body.ads-landing .lp-student-section {
+  background: linear-gradient(180deg, rgba(56,189,248,.035), transparent);
+}
+
+/* Cards de recursos: alternância sutil de ícones para quebrar monotonia. */
+body.ads-landing .lp-feature:nth-child(even) .lp-feature-icon {
+  background: rgba(56,189,248,.10);
+  color: var(--fsfit-support);
+}
+
+body.ads-landing .lp-feature:nth-child(even):hover {
+  border-color: rgba(56,189,248,.28);
+}
+
+/* Superfícies mais consistentes. */
+body.ads-landing .lp-feature,
+body.ads-landing .lp-compare-card {
+  background: linear-gradient(150deg, rgba(13,20,27,.96), rgba(16,26,34,.72));
+}
+
+body.ads-landing .lp-feature:nth-child(3n) {
+  background: linear-gradient(150deg, rgba(16,26,34,.96), rgba(13,20,27,.78));
+}
+
+/* Mantém verde em títulos de ação/destaque; evita verde em texto corrido. */
+body.ads-landing .lp-section-head p,
+body.ads-landing .lp-feature p,
+body.ads-landing .lp-compare-list li {
+  color: var(--fsfit-muted);
+}
+
+/* Links/indicadores informativos podem usar o ciano. */
+body.ads-landing [data-tone="info"],
+body.ads-landing .lp-info,
+body.ads-landing .lp-feature:nth-child(even) .lp-feature-label {
+  color: var(--fsfit-support);
+}
+
+/* Sucesso permanece verde. */
+body.ads-landing [data-tone="success"] {
+  color: var(--fsfit-primary);
+}
