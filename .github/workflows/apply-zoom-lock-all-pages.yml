@@ -1,18 +1,13 @@
-name: Bloquear zoom em todas as páginas FS Fit
+name: Preservar zoom acessível em todas as páginas FS Fit
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/apply-zoom-lock-all-pages.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  apply-zoom-lock:
+  preserve-accessible-zoom:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,7 +16,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Aplicar bloqueio de zoom em todas as páginas HTML
+      - name: Remover restrições de zoom das páginas HTML
         shell: bash
         run: |
           set -euo pipefail
@@ -29,16 +24,14 @@ jobs:
           from pathlib import Path
           import re
 
-          VIEWPORT = '  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">'
-          SCRIPT = '  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>'
+          VIEWPORT = '  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
 
           viewport_meta = re.compile(
-              r'(?im)^[ \t]*<meta\b(?=[^>]*\bname=["\']viewport["\'])[^>]*>\s*\n?'
+              r'(?im)^[ \t]*<meta\b(?=[^>]*\bname=["\']viewport["\'])[^>]*>[ \t]*(?:\r?\n)?'
           )
           zoom_script = re.compile(
               r'(?im)^[ \t]*<script\b(?=[^>]*\bsrc=["\'][^"\']*zoom-lock\.js[^"\']*["\'])[^>]*>\s*</script>\s*\n?'
           )
-
           changed = []
           for path in sorted(Path('.').rglob('*.html')):
               if any(part in {'.git', 'node_modules'} for part in path.parts):
@@ -48,14 +41,18 @@ jobs:
               if not re.search(r'(?i)<head\b', text) or not re.search(r'(?i)</head>', text):
                   continue
 
-              updated = viewport_meta.sub('', text)
+              matches = list(viewport_meta.finditer(text))
+              if matches:
+                  updated = viewport_meta.sub(VIEWPORT + '\n', text, count=1)
+                  updated = viewport_meta.sub('', updated)
+              else:
+                  updated = re.sub(
+                      r'(?i)(<head\b[^>]*>)',
+                      r'\1\n' + VIEWPORT + '\n',
+                      text,
+                      count=1
+                  )
               updated = zoom_script.sub('', updated)
-              updated = re.sub(
-                  r'(?i)(<head\b[^>]*>)',
-                  r'\1\n' + VIEWPORT + '\n' + SCRIPT,
-                  updated,
-                  count=1
-              )
 
               if updated != text:
                   path.write_text(updated, encoding='utf-8')
@@ -66,7 +63,7 @@ jobs:
               print(item)
           PY
 
-      - name: Commitar bloqueio global de zoom
+      - name: Commitar correções de viewport quando necessário
         shell: bash
         run: |
           set -euo pipefail
@@ -77,6 +74,6 @@ jobs:
             echo 'Nenhuma página precisou ser alterada.'
             exit 0
           fi
-          git commit -m 'fix: permitir rolagem horizontal em menus internos'
+          git commit -m 'fix: preservar zoom acessível em todas as páginas'
           git pull --rebase origin main
           git push origin main

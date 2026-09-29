@@ -47,7 +47,7 @@
 .student-modal-body { min-height: 0; padding: 20px 22px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .student-modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px 22px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--fs-border, var(--border)); background: var(--fs-surface, #111820); }
 .student-modal-footer .btn { min-width: 150px; }
-body.student-modal-open { overflow: hidden; touch-action: none; overscroll-behavior: none; }
+body.student-modal-open { overflow: hidden; touch-action: pinch-zoom; overscroll-behavior: none; }
 
 body.embed-edit { overflow: auto; background: var(--fs-bg, #0b0f14); }
 body.embed-edit #header-container, body.embed-edit .fsfit-bottom-nav, body.embed-edit .students-page-header, body.embed-edit #student-message, body.embed-edit .students-summary, body.embed-edit #students-dashboard, body.embed-edit .student-list-card { display: none !important; }

@@ -27,9 +27,25 @@ function show(text, type = 'error') {
   if (!message) return;
   message.textContent = text;
   message.className = `message show ${type}`;
+  message.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  message.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+  message.setAttribute('aria-atomic', 'true');
+}
+
+function showFieldError(text, field) {
+  if (field) {
+    field.setAttribute('aria-invalid', 'true');
+    if (message?.id) field.setAttribute('aria-describedby', message.id);
+  }
+  show(text);
+  field?.focus();
 }
 
 function clearMessage() {
+  document.querySelectorAll('form [aria-invalid="true"]').forEach(field => {
+    field.removeAttribute('aria-invalid');
+    if (field.getAttribute('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
+  });
   if (!message) return;
   message.textContent = '';
   message.className = 'message';
@@ -161,7 +177,7 @@ async function beginPersonalAccess(personal, telefone) {
 
   if (phone.length !== 11 || !personalSlug) {
     resetAccess();
-    return show('Não foi possível identificar o acompanhamento selecionado. Informe seu WhatsApp novamente.');
+    return showFieldError('Não foi possível identificar o acompanhamento selecionado. Informe seu WhatsApp novamente.', resolverForm?.telefone);
   }
 
   clearMessage();
@@ -215,6 +231,12 @@ resolverForm?.telefone?.addEventListener('input', () => {
   resolverForm.telefone.value = digits(resolverForm.telefone.value);
 });
 
+document.querySelectorAll('#student-resolver-form input, #student-pin-form input, #student-activation-form input').forEach(field => {
+  field.addEventListener('input', () => {
+    if (field.getAttribute('aria-invalid') === 'true' || message?.classList.contains('show')) clearMessage();
+  });
+});
+
 pinForm?.pin?.addEventListener('input', () => {
   pinForm.pin.value = digits(pinForm.pin.value, 4);
 });
@@ -243,7 +265,9 @@ resolverForm?.addEventListener('submit', async event => {
   event.preventDefault();
   clearMessage();
   const telefone = digits(resolverForm.telefone.value);
-  if (telefone.length !== 11) return show('Informe seu WhatsApp com DDD e número, totalizando 11 dígitos.');
+  if (telefone.length !== 11) {
+    return showFieldError('Informe seu WhatsApp com DDD e número, totalizando 11 dígitos.', resolverForm.telefone);
+  }
 
   const button = resolverForm.querySelector('[type="submit"]');
   button.disabled = true;
@@ -279,7 +303,7 @@ pinForm?.addEventListener('submit', async event => {
   event.preventDefault();
   clearMessage();
   const pin = digits(pinForm.pin.value, 4);
-  if (pin.length !== 4) return show('Informe seu PIN de 4 números.');
+  if (pin.length !== 4) return showFieldError('Informe seu PIN de 4 números.', pinForm.pin);
 
   const button = pinForm.querySelector('[type="submit"]');
   button.disabled = true;
@@ -300,9 +324,12 @@ activationForm?.addEventListener('submit', async event => {
   const pin = digits(activationForm.pin.value, 4);
   const pinConfirm = digits(activationForm.pin_confirm.value, 4);
 
-  if (activationCode.length !== 6) return show('Informe o código de ativação de 6 números fornecido pelo seu personal.');
-  if (pin.length !== 4 || pinConfirm.length !== 4) return show('Crie e confirme um PIN de 4 números.');
-  if (pin !== pinConfirm) return show('Os PINs informados não coincidem.');
+  if (activationCode.length !== 6) {
+    return showFieldError('Informe o código de ativação de 6 números fornecido pelo seu personal.', activationForm.activation_code);
+  }
+  if (pin.length !== 4) return showFieldError('Crie um PIN de 4 números.', activationForm.pin);
+  if (pinConfirm.length !== 4) return showFieldError('Confirme seu PIN de 4 números.', activationForm.pin_confirm);
+  if (pin !== pinConfirm) return showFieldError('Os PINs informados não coincidem.', activationForm.pin_confirm);
 
   const button = activationForm.querySelector('[type="submit"]');
   button.disabled = true;

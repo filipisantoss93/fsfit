@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#070b10">
   <title>FS Fit | Sistema para Personal Trainer e Gestão de Alunos</title>
   <meta name="description" content="Sistema para personal trainers gerenciarem alunos, treinos, agenda e mensalidades em um só lugar. Teste o FS Fit grátis por 7 dias.">
@@ -273,16 +273,16 @@
       <div class="lp-container lp-signup">
         <div class="lp-signup-copy">
           <span class="lp-section-kicker">Comece agora</span>
-          <h2>Crie sua conta e organize seu primeiro aluno hoje.</h2>
-          <p>O cadastro leva poucos minutos. Seus 7 dias grátis começam após a ativação da conta.</p>
+          <h2 id="signup-section-title">Crie sua conta e organize seu primeiro aluno hoje.</h2>
+          <p id="signup-section-description">O cadastro leva poucos minutos. Seus 7 dias grátis começam após a ativação da conta.</p>
           <div class="lp-signup-points"><span>Não precisa cadastrar cartão</span><span>Preço de R$ 29,90 após o teste</span><span>Alunos ilimitados desde o início</span></div>
         </div>
         <div class="lp-auth-card">
           <div class="lp-auth-brand"><strong>FS</strong><span>Fit</span></div>
           <p class="lp-auth-context">Área do personal trainer</p>
           <h3 id="auth-title">Comece seus 7 dias grátis</h3>
-          <div id="auth-message" class="message"></div>
-          <form id="auth-form">
+          <div id="auth-message" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
+          <form id="auth-form" novalidate>
             <div id="name-group" class="form-group"><label for="full_name">Seu nome</label><input id="full_name" name="full_name" autocomplete="name"></div>
             <div class="form-group"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required></div>
             <div class="form-group"><label for="password">Senha</label><input id="password" name="password" type="password" minlength="6" autocomplete="new-password" required></div>
@@ -336,6 +336,6 @@
   </aside>
 
   <script src="/js/landing-ads.js?v=20260725-lp1"></script>
-  <script type="module" src="/js/auth.js?v=20260725-attribution1"></script>
+  <script type="module" src="/js/auth.js?v=20260929-ux1"></script>
 </body>
 </html>

@@ -622,7 +622,7 @@
 body.student-edit-open {
   overflow: hidden !important;
   overscroll-behavior: none;
-  touch-action: none;
+  touch-action: pinch-zoom;
 }
 
 @media (max-width: 700px) {
@@ -977,7 +977,7 @@ body.student-record-page:not(.student-edit-open) {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   overscroll-behavior-y: auto !important;
-  touch-action: pan-y !important;
+  touch-action: pan-y pinch-zoom !important;
   -webkit-overflow-scrolling: touch;
 }
 

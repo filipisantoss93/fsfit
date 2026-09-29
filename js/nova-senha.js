@@ -13,13 +13,34 @@ function show(text, type = 'error') {
   if (!message) return;
   message.textContent = text;
   message.className = `message show ${type}`;
+  message.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  message.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+  message.setAttribute('aria-atomic', 'true');
+}
+
+function showFieldError(text, field) {
+  if (field) {
+    field.setAttribute('aria-invalid', 'true');
+    if (message?.id) field.setAttribute('aria-describedby', message.id);
+  }
+  show(text);
+  field?.focus();
 }
 
 function clearMessage() {
+  form?.querySelectorAll('[aria-invalid="true"]').forEach(field => {
+    field.removeAttribute('aria-invalid');
+    if (field.getAttribute('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
+  });
   if (!message) return;
   message.textContent = '';
   message.className = 'message';
 }
+
+form?.addEventListener('input', event => {
+  const field = event.target;
+  if (field?.getAttribute?.('aria-invalid') === 'true' || message?.classList.contains('show')) clearMessage();
+});
 
 function setStatus(text, state = '') {
   if (!status) return;
@@ -108,8 +129,9 @@ form?.addEventListener('submit', async event => {
   if (!validationFinished || !recoveryReady) {
     return show('Este link de recuperação é inválido ou expirou. Solicite um novo link.');
   }
-  if (password.length < 8) return show('A senha deve ter pelo menos 8 caracteres.');
-  if (password !== confirmPassword) return show('As senhas não coincidem.');
+  if (password.length < 8) return showFieldError('A senha deve ter pelo menos 8 caracteres.', form.password);
+  if (!confirmPassword) return showFieldError('Confirme sua nova senha.', form.confirm_password);
+  if (password !== confirmPassword) return showFieldError('As senhas não coincidem.', form.confirm_password);
 
   const button = form.querySelector('[type="submit"]');
   if (!button) return;

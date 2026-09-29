@@ -103,6 +103,9 @@ const legalConsentGroup = document.querySelector('#legal-consent-group');
 const legalConsent = document.querySelector('#legal-consent');
 const trialNote = document.querySelector('#auth-trial-note');
 const priceNote = document.querySelector('.auth-price-note');
+const signupSectionTitle = document.querySelector('#signup-section-title');
+const signupSectionDescription = document.querySelector('#signup-section-description');
+const signupPoints = document.querySelector('.lp-signup-points');
 const heroBadge = document.querySelector('.hero-badge');
 const message = document.querySelector('#auth-message');
 const requestedMode = currentUrl.searchParams.get('modo');
@@ -118,7 +121,50 @@ function show(text, type = 'error') {
   if (!message) return;
   message.textContent = text;
   message.className = `message show ${type}`;
+  message.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  message.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+  message.setAttribute('aria-atomic', 'true');
 }
+
+function clearFormErrors() {
+  form?.querySelectorAll('[aria-invalid="true"]').forEach(field => {
+    field.removeAttribute('aria-invalid');
+    if (field.getAttribute('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
+  });
+  if (message) {
+    message.textContent = '';
+    message.className = 'message';
+  }
+}
+
+function showFieldError(text, field) {
+  if (field) {
+    field.setAttribute('aria-invalid', 'true');
+    if (message?.id) field.setAttribute('aria-describedby', message.id);
+  }
+  show(text);
+  field?.focus();
+}
+
+form?.addEventListener('input', event => {
+  const field = event.target;
+  field?.removeAttribute?.('aria-invalid');
+  if (field?.getAttribute?.('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
+  if (message?.classList.contains('show')) {
+    message.textContent = '';
+    message.className = 'message';
+  }
+});
+
+form?.addEventListener('change', event => {
+  const field = event.target;
+  field?.removeAttribute?.('aria-invalid');
+  if (field?.getAttribute?.('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
+  if (message?.classList.contains('show')) {
+    message.textContent = '';
+    message.className = 'message';
+  }
+});
 
 function applyGooglePlayConsumptionMode() {
   if (!isGooglePlayDistribution) return;
@@ -134,11 +180,27 @@ function setMode(nextMode, { preserveMessage = false } = {}) {
   const signup = mode === 'signup';
   if (title) title.textContent = signup ? 'Comece seus 7 dias grátis' : 'Acesse sua conta';
   if (submit) submit.textContent = signup ? 'Começar meus 7 dias grátis' : 'Entrar';
-  if (switchButton) switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Ainda não tem cadastro? Clique aqui.';
+  if (switchButton) switchButton.textContent = signup ? 'Já possui cadastro? Entrar' : 'Novo no FS Fit? Criar conta grátis';
   if (trialNote) {
     trialNote.innerHTML = signup
       ? '<strong>7 dias grátis.</strong> Crie sua conta agora. Depois do período gratuito, continue por R$ 29,90.'
       : '<strong>Novo por aqui?</strong> Crie sua conta e ganhe 7 dias grátis.';
+  }
+  if (signupSectionTitle) {
+    signupSectionTitle.textContent = signup
+      ? 'Crie sua conta e organize seu primeiro aluno hoje.'
+      : 'Acesse sua conta do FS Fit.';
+  }
+  if (signupSectionDescription) {
+    signupSectionDescription.textContent = signup
+      ? 'O cadastro leva poucos minutos. Seus 7 dias grátis começam após a ativação da conta.'
+      : 'Entre com seu e-mail e senha para continuar sua consultoria.';
+  }
+  signupPoints?.classList.toggle('hidden', !signup);
+  if (priceNote) {
+    priceNote.textContent = signup
+      ? 'Depois do período gratuito, continue por R$ 29,90/mês.'
+      : 'Novo no FS Fit? Crie sua conta e teste por 7 dias.';
   }
   nameGroup?.classList.toggle('hidden', !signup);
   confirmGroup?.classList.toggle('hidden', !signup);
@@ -149,7 +211,7 @@ function setMode(nextMode, { preserveMessage = false } = {}) {
     if (form.confirm_password) form.confirm_password.value = '';
     if (legalConsent) legalConsent.checked = false;
   }
-  if (!preserveMessage && message) message.className = 'message';
+  if (!preserveMessage) clearFormErrors();
 }
 
 function toggleMode() {
@@ -169,6 +231,7 @@ function finishAuthenticatedAccess(session) {
 if (!isGooglePlayDistribution) switchButton?.addEventListener('click', toggleMode);
 form?.addEventListener('submit', async event => {
   event.preventDefault();
+  clearFormErrors();
 
   if (isGooglePlayDistribution && mode !== 'login') {
     setMode('login');
@@ -179,11 +242,33 @@ form?.addEventListener('submit', async event => {
   const password = form.password.value;
   const fullName = form.full_name?.value.trim() || '';
   const confirmPassword = form.confirm_password?.value || '';
+  const emailField = form.elements.namedItem('email');
+  const passwordField = form.elements.namedItem('password');
+  const fullNameField = form.elements.namedItem('full_name');
+  const confirmPasswordField = form.elements.namedItem('confirm_password');
 
-  if (!email || !password) return show('Informe seu e-mail e sua senha.');
-  if (mode === 'signup' && password !== confirmPassword) return show('As senhas não coincidem.');
+  if (!email) return showFieldError('Informe seu e-mail.', emailField);
+  if (emailField instanceof HTMLInputElement && !emailField.checkValidity()) {
+    return showFieldError('Informe um endereço de e-mail válido.', emailField);
+  }
+  if (!password) return showFieldError('Informe sua senha.', passwordField);
+  if (mode === 'signup' && fullName.length < 2) {
+    return showFieldError('Informe seu nome completo.', fullNameField);
+  }
+  if (mode === 'signup' && password.length < 6) {
+    return showFieldError('A senha deve ter pelo menos 6 caracteres.', passwordField);
+  }
+  if (mode === 'signup' && !confirmPassword) {
+    return showFieldError('Confirme sua senha.', confirmPasswordField);
+  }
+  if (mode === 'signup' && password !== confirmPassword) {
+    return showFieldError('As senhas não coincidem.', confirmPasswordField);
+  }
   if (mode === 'signup' && !legalConsent?.checked) {
-    return show('Para criar sua conta, leia e aceite os Termos de Uso e a Política de Privacidade.');
+    return showFieldError(
+      'Para criar sua conta, leia e aceite os Termos de Uso e a Política de Privacidade.',
+      legalConsent
+    );
   }
 
   if (submit) {
@@ -198,8 +283,6 @@ form?.addEventListener('submit', async event => {
       finishAuthenticatedAccess(data.session);
       return;
     }
-
-    if (fullName.length < 2) throw new Error('Informe seu nome completo.');
 
     const acceptedAt = new Date().toISOString();
     const confirmationRedirect = `${window.location.origin}/?email_confirmado=true`;

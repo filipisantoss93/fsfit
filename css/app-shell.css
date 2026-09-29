@@ -79,7 +79,7 @@ body.fsfit-modal-open {
 .modal-body,
 [class*="-modal-body"],
 [data-modal-scroll] {
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 @media (max-width: 720px) {

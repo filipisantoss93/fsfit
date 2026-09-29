@@ -1,5 +1,5 @@
 (() => {
-  const VIEWPORT_CONTENT = 'width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover';
+  const VIEWPORT_CONTENT = 'width=device-width,initial-scale=1,viewport-fit=cover';
   const HORIZONTAL_SCROLL_SELECTOR = [
     '.table-wrap',
     '.admin-revenue-trend',
@@ -45,7 +45,6 @@
     '[role="dialog"][aria-modal="true"]'
   ].join(',');
 
-  let lastTouchEndAt = 0;
   let touchStartX = 0;
   let touchStartY = 0;
   let touchAxis = null;
@@ -72,7 +71,7 @@
 
     // Permite que componentes internos com overflow-x capturem o gesto horizontal.
     // O deslocamento horizontal do documento continua bloqueado pelo handler abaixo.
-    root.style.touchAction = 'pan-x pan-y';
+    root.style.touchAction = 'pan-x pan-y pinch-zoom';
     root.style.webkitTextSizeAdjust = '100%';
     root.style.overflowX = 'clip';
     root.style.maxWidth = '100%';
@@ -80,7 +79,7 @@
     root.style.overscrollBehaviorX = 'none';
 
     if (document.body) {
-      document.body.style.touchAction = 'pan-x pan-y';
+      document.body.style.touchAction = 'pan-x pan-y pinch-zoom';
       document.body.style.webkitTextSizeAdjust = '100%';
       document.body.style.overflowX = 'clip';
       document.body.style.maxWidth = '100%';
@@ -89,7 +88,7 @@
     }
 
     document.querySelectorAll(HORIZONTAL_SCROLL_SELECTOR).forEach(element => {
-      element.style.touchAction = 'pan-x pan-y';
+      element.style.touchAction = 'pan-x pan-y pinch-zoom';
       element.style.webkitOverflowScrolling = 'touch';
       element.style.overscrollBehaviorX = 'contain';
     });
@@ -102,7 +101,7 @@
     keepHorizontalPositionLocked();
   }
 
-  function preventZoom(event) {
+  function preventHorizontalScroll(event) {
     if (event.cancelable) event.preventDefault();
   }
 
@@ -252,10 +251,7 @@
   }
 
   function beginTouch(event) {
-    if (event.touches?.length > 1) {
-      preventZoom(event);
-      return;
-    }
+    if (event.touches?.length > 1) return;
 
     const touch = event.touches?.[0];
     if (!touch) return;
@@ -266,10 +262,7 @@
   }
 
   function handleTouchMove(event) {
-    if (event.touches?.length > 1) {
-      preventZoom(event);
-      return;
-    }
+    if (event.touches?.length > 1) return;
 
     // Menus, abas, tabelas e gráficos horizontalmente roláveis cuidam do próprio gesto.
     if (allowHorizontalScroll) return;
@@ -285,26 +278,18 @@
     }
 
     if (touchAxis === 'x') {
-      preventZoom(event);
+      preventHorizontalScroll(event);
       keepHorizontalPositionLocked();
     }
   }
 
-  function endTouch(event) {
+  function endTouch() {
     touchAxis = null;
     allowHorizontalScroll = false;
-
-    const now = Date.now();
-    if (now - lastTouchEndAt <= 320) preventZoom(event);
-    lastTouchEndAt = now;
     keepHorizontalPositionLocked();
   }
 
   applyViewportLock();
-
-  ['gesturestart', 'gesturechange', 'gestureend'].forEach(type => {
-    document.addEventListener(type, preventZoom, { passive: false, capture: true });
-  });
 
   document.addEventListener('touchstart', beginTouch, { passive: false, capture: true });
   document.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
@@ -314,12 +299,6 @@
     allowHorizontalScroll = false;
     keepHorizontalPositionLocked();
   }, { capture: true });
-
-  document.addEventListener('dblclick', preventZoom, { passive: false, capture: true });
-
-  document.addEventListener('wheel', event => {
-    if (event.ctrlKey || event.metaKey) preventZoom(event);
-  }, { passive: false, capture: true });
 
   window.addEventListener('scroll', keepHorizontalPositionLocked, { passive: true });
 

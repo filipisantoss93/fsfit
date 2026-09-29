@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b0f14">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,7 +30,7 @@
   <link rel="manifest" href="/manifest-aluno.webmanifest?v=20260726-student-icon3">
   <link rel="icon" type="image/png" href="/assets/icons/student/student-icon-180x180.png?v=20260726-student-icon3">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/student/student-icon-180x180.png?v=20260726-student-icon3">
-  <link rel="stylesheet" href="/css/bundles/fsfit.4bdfbe18d5fce813.css" data-fsfit-bundle data-fsfit-mobile-navigation>
+  <link rel="stylesheet" href="/css/bundles/fsfit.524178037f13fc8b.css" data-fsfit-bundle data-fsfit-mobile-navigation>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -45,8 +45,6 @@
     "inLanguage": "pt-BR"
   }
   </script>
-
-  <script src="/js/zoom-lock.js?v=20260718-zoom-lock5"></script>
 </head>
 <body class="fsfit-saas student-page">
   <main class="student-shell">
@@ -62,9 +60,9 @@
 
       <div id="student-identity" class="student-identity hidden"></div>
       <div id="selected-personal" class="selected-personal hidden"></div>
-      <div id="access-message" class="message"></div>
+      <div id="access-message" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
 
-      <form id="student-resolver-form">
+      <form id="student-resolver-form" novalidate>
         <div class="form-group">
           <label for="student-access-phone">Seu WhatsApp</label>
           <input id="student-access-phone" name="telefone" inputmode="numeric" autocomplete="tel" maxlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required>
@@ -72,7 +70,7 @@
         <button class="btn btn-primary" type="submit">Continuar para minha área</button>
       </form>
 
-      <form id="student-pin-form" class="hidden">
+      <form id="student-pin-form" novalidate class="hidden">
         <div class="form-group">
           <label for="student-access-pin">PIN de 4 números</label>
           <input id="student-access-pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="4" pattern="[0-9]{4}" placeholder="••••" aria-label="PIN de 4 números" required>
@@ -84,7 +82,7 @@
         </div>
       </form>
 
-      <form id="student-activation-form" class="hidden">
+      <form id="student-activation-form" novalidate class="hidden">
         <p class="activation-help">Este é seu primeiro acesso. Informe o código de ativação fornecido pelo seu personal e crie seu PIN.</p>
         <div class="form-group">
           <label for="student-activation-code">Código de ativação</label>
@@ -112,6 +110,6 @@
       <a href="/">Sou personal trainer — acessar o FS Fit</a>
     </footer>
   </main>
-  <script type="module" src="js/acesso-aluno-runtime.js?v=20260730-runtime1"></script>
+  <script type="module" src="js/acesso-aluno-runtime.js?v=20260929-ux1"></script>
 </body>
 </html>
