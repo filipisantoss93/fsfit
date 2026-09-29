@@ -139,7 +139,7 @@ jobs:
           service_worker="$temp_dir/sw.js"
           curl --fail --silent --show-error --location \
             --output "$service_worker" "$site/sw.js"
-          grep --quiet --fixed-strings "const CACHE_VERSION = 18" "$service_worker" \
+          grep --quiet --fixed-strings "const CACHE_VERSION = 19" "$service_worker" \
             || { echo "::error::Service Worker v18 indisponível."; exit 1; }
 
           echo "Bundles críticos de Landing, Admin e Aluno estão íntegros em produção."
