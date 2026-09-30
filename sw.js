@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_VERSION = 20;
+const CACHE_VERSION = 21;
 const CACHE_NAME = `${CACHE_PREFIX}v${CACHE_VERSION}`;
 const BUNDLE_MANIFEST_URL = '/css/bundles/manifest.json';
 
@@ -50,8 +50,36 @@ self.addEventListener('activate', event => {
   event.waitUntil(Promise.all([cleanupOldShellCaches(), self.clients.claim()]));
 });
 
+async function openShellCache() {
+  try {
+    return await caches.open(CACHE_NAME);
+  } catch (error) {
+    console.warn('FS Fit PWA: Cache Storage indisponível; seguindo pela rede.', error);
+    return null;
+  }
+}
+
+async function putInCache(cache, request, response) {
+  if (!cache || !response) return false;
+  try {
+    await cache.put(request, response);
+    return true;
+  } catch (error) {
+    console.warn('FS Fit PWA: falha ao gravar cache; recurso continuará disponível pela rede.', error);
+    return false;
+  }
+}
+
+async function matchCache(cache, request) {
+  if (!cache) return null;
+  try {
+    return await cache.match(request);
+  } catch {
+    return null;
+  }
+}
+
 async function installShell() {
-  const cache = await caches.open(CACHE_NAME);
   const { manifest, response: manifestResponse } = await fetchBundleManifest();
   const coreResources = [...new Set([
     ...CORE_SHELL,
@@ -69,13 +97,22 @@ async function installShell() {
     }
   }
 
-  await cache.put(new Request(new URL(BUNDLE_MANIFEST_URL, self.location.origin)), manifestResponse.clone());
-  await Promise.all(prepared.map(item => cache.put(item.request, item.response.clone())));
+  const cache = await openShellCache();
+  if (!cache) return;
+
+  await putInCache(
+    cache,
+    new Request(new URL(BUNDLE_MANIFEST_URL, self.location.origin)),
+    manifestResponse.clone()
+  );
+  await Promise.allSettled(
+    prepared.map(item => putInCache(cache, item.request, item.response.clone()))
+  );
 
   const results = await Promise.allSettled(
     OPTIONAL_SHELL.map(async resource => {
       const preparedResource = await fetchValidatedResource(resource);
-      await cache.put(preparedResource.request, preparedResource.response);
+      await putInCache(cache, preparedResource.request, preparedResource.response);
     })
   );
 
@@ -84,14 +121,18 @@ async function installShell() {
 }
 
 async function cleanupOldShellCaches() {
-  const keys = await caches.keys();
-  const minimumVersion = Math.max(18, CACHE_VERSION - 1);
-  const obsoleteKeys = keys.filter(key => {
-    if (!key.startsWith(CACHE_PREFIX) || key === CACHE_NAME) return false;
-    const version = Number(key.slice(CACHE_PREFIX.length).replace(/^v/, ''));
-    return !Number.isFinite(version) || version < minimumVersion;
-  });
-  await Promise.all(obsoleteKeys.map(key => caches.delete(key)));
+  try {
+    const keys = await caches.keys();
+    const minimumVersion = Math.max(18, CACHE_VERSION - 1);
+    const obsoleteKeys = keys.filter(key => {
+      if (!key.startsWith(CACHE_PREFIX) || key === CACHE_NAME) return false;
+      const version = Number(key.slice(CACHE_PREFIX.length).replace(/^v/, ''));
+      return !Number.isFinite(version) || version < minimumVersion;
+    });
+    await Promise.allSettled(obsoleteKeys.map(key => caches.delete(key)));
+  } catch (error) {
+    console.warn('FS Fit PWA: não foi possível limpar caches antigos.', error);
+  }
 }
 
 async function fetchBundleManifest() {
@@ -160,15 +201,15 @@ self.addEventListener('fetch', event => {
 });
 
 async function networkFirstNavigation(request, pathname) {
-  const cache = await caches.open(CACHE_NAME);
+  const cache = await openShellCache();
   try {
     const response = await fetch(request, { cache: 'no-store' });
     if (!response?.ok) throw new Error('navigation-response-invalid');
     await validateAndCacheNavigation(cache, request, pathname, response);
     return response;
   } catch {
-    return (await getValidCachedNavigation(cache, request, pathname))
-      || recoveryResponse(pathname);
+    const cached = await getValidCachedNavigation(cache, request, pathname);
+    return cached || recoveryResponse(pathname);
   }
 }
 
@@ -183,10 +224,12 @@ async function validateAndCacheNavigation(cache, request, pathname, response) {
     await ensureBundleCached(cache, bundleUrl);
   }
 
-  await Promise.all([
-    cache.put(request, response.clone()),
-    cache.put(new Request(new URL(pathname, self.location.origin)), response.clone())
-  ]);
+  if (cache) {
+    await Promise.allSettled([
+      putInCache(cache, request, response.clone()),
+      putInCache(cache, new Request(new URL(pathname, self.location.origin)), response.clone())
+    ]);
+  }
 }
 
 async function ensureBundleCached(cache, bundleUrl) {
@@ -194,20 +237,21 @@ async function ensureBundleCached(cache, bundleUrl) {
   try {
     const response = await fetch(request);
     if (!(await isValidCssResponse(request.url, response))) throw new Error('bundle-response-invalid');
-    await cache.put(request, response.clone());
+    await putInCache(cache, request, response.clone());
     return response;
   } catch {
     const cached = await matchAnyShellCache(request);
     if (!(await isValidCssResponse(request.url, cached))) throw new Error('bundle-unavailable');
-    await cache.put(request, cached.clone());
+    await putInCache(cache, request, cached.clone());
     return cached;
   }
 }
 
 async function getValidCachedNavigation(cache, request, pathname) {
+  if (!cache) return null;
   const candidates = [
-    await cache.match(request),
-    await cache.match(new Request(new URL(pathname, self.location.origin)))
+    await matchCache(cache, request),
+    await matchCache(cache, new Request(new URL(pathname, self.location.origin)))
   ].filter(Boolean);
   for (const response of candidates) {
     const html = await response.clone().text();
@@ -226,7 +270,7 @@ function recoveryResponse(pathname) {
   const safePath = String(pathname || '/').replace(/[&<>"']/g, character => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[character]);
-  return new Response(`<!doctype html><html lang="pt-br"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atualizando o FS Fit</title><style>html{color-scheme:dark}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#0f1115;color:#f4f7f9;font:16px/1.5 system-ui,sans-serif}.box{max-width:480px;padding:28px;border:1px solid #30363d;border-radius:18px;background:#171b21;text-align:center}.brand{color:#b8e51c;font-weight:900}a{display:inline-block;margin-top:16px;padding:12px 18px;border-radius:10px;background:#b8e51c;color:#10130d;font-weight:800;text-decoration:none}</style><body><main class="box"><p class="brand">FS FIT</p><h1>Atualização em andamento</h1><p>Os arquivos visuais ainda não chegaram completos. A versão anterior foi preservada e nenhuma tela incompleta será exibida.</p><a href="${safePath}">Tentar novamente</a></main></body></html>`, {
+  return new Response(`<!doctype html><html lang="pt-br"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atualizando o FS Fit</title><style>html{color-scheme:dark}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#0f1115;color:#f4f7f9;font:16px/1.5 system-ui,sans-serif}.box{max-width:480px;padding:28px;border:1px solid #30363d;border-radius:18px;background:#171b21;text-align:center}.brand{color:#b8e51c;font-weight:900}a{display:inline-block;margin-top:16px;padding:12px 18px;border-radius:10px;background:#b8e51c;color:#10130d;font-weight:800;text-decoration:none}</style><body><main class="box"><p class="brand">FS FIT</p><h1>Atualização em andamento</h1><p>Os arquivos visuais ainda não chegaram completos. A versão anterior foi preservada e nenhuma tela incompleta será exibida.</p><a href="${safePath}">Tentar novamente</a><script>if('serviceWorker'in navigator){navigator.serviceWorker.getRegistration().then(function(r){if(r)return r.update()}).catch(function(){})}</script></main></body></html>`, {
     status: 503,
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
   });
@@ -235,11 +279,11 @@ function recoveryResponse(pathname) {
 async function cacheFirstBundle(request) {
   const cached = await matchAnyShellCache(request);
   if (await isValidCssResponse(request.url, cached)) return cached;
-  const cache = await caches.open(CACHE_NAME);
+  const cache = await openShellCache();
   try {
     const response = await fetch(request, { cache: 'no-store' });
     if (!(await isValidCssResponse(request.url, response))) throw new Error('bundle-response-invalid');
-    await cache.put(request, response.clone());
+    await putInCache(cache, request, response.clone());
     return response;
   } catch {
     return Response.error();
@@ -247,11 +291,11 @@ async function cacheFirstBundle(request) {
 }
 
 async function networkFirstAsset(request, pathname) {
-  const cache = await caches.open(CACHE_NAME);
+  const cache = await openShellCache();
   try {
     const response = await fetch(request, { cache: 'no-store' });
     if (!(await isValidAssetResponse(request, response))) throw new Error('invalid-asset-response');
-    cache.put(request, response.clone()).catch(() => undefined);
+    putInCache(cache, request, response.clone()).catch(() => undefined);
     return response;
   } catch {
     return (await matchAnyShellCache(request))
@@ -276,25 +320,32 @@ async function isValidCssResponse(url, response) {
 }
 
 async function matchAnyShellCache(request) {
-  const cacheKey = request instanceof Request
-    ? request
-    : new Request(new URL(request, self.location.origin));
-  const keys = (await caches.keys())
-    .filter(key => key.startsWith(CACHE_PREFIX))
-    .sort((a, b) => (a === CACHE_NAME ? -1 : b === CACHE_NAME ? 1 : b.localeCompare(a)));
-  for (const key of keys) {
-    const match = await (await caches.open(key)).match(cacheKey);
-    if (match) return match;
+  try {
+    const cacheKey = request instanceof Request
+      ? request
+      : new Request(new URL(request, self.location.origin));
+    const keys = (await caches.keys())
+      .filter(key => key.startsWith(CACHE_PREFIX))
+      .sort((a, b) => (a === CACHE_NAME ? -1 : b === CACHE_NAME ? 1 : b.localeCompare(a)));
+    for (const key of keys) {
+      const cache = await caches.open(key);
+      const match = await cache.match(cacheKey);
+      if (match) return match;
+    }
+  } catch {
+    return null;
   }
   return null;
 }
 
 async function staleWhileRevalidate(request, pathname) {
-  const cache = await caches.open(CACHE_NAME);
-  const cached = (await cache.match(request)) || (await cache.match(pathname));
+  const cache = await openShellCache();
+  const cached = cache
+    ? (await matchCache(cache, request)) || (await matchCache(cache, pathname))
+    : null;
   const networkPromise = fetch(request)
     .then(response => {
-      if (response?.ok) cache.put(request, response.clone()).catch(() => undefined);
+      if (response?.ok) putInCache(cache, request, response.clone()).catch(() => undefined);
       return response;
     })
     .catch(() => null);
