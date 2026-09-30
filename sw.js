@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_VERSION = 21;
+const CACHE_VERSION = 22;
 const CACHE_NAME = `${CACHE_PREFIX}v${CACHE_VERSION}`;
 const BUNDLE_MANIFEST_URL = '/css/bundles/manifest.json';
 
@@ -202,15 +202,28 @@ self.addEventListener('fetch', event => {
 
 async function networkFirstNavigation(request, pathname) {
   const cache = await openShellCache();
+  let response = null;
+
   try {
-    const response = await fetch(request, { cache: 'no-store' });
-    if (!response?.ok) throw new Error('navigation-response-invalid');
-    await validateAndCacheNavigation(cache, request, pathname, response);
-    return response;
-  } catch {
-    const cached = await getValidCachedNavigation(cache, request, pathname);
-    return cached || recoveryResponse(pathname);
+    response = await fetch(request, { cache: 'no-store' });
+  } catch (error) {
+    console.warn('FS Fit PWA: navegação sem resposta de rede; tentando cache.', error);
   }
+
+  if (response?.ok) {
+    try {
+      await validateAndCacheNavigation(cache, request, pathname, response);
+    } catch (error) {
+      console.warn(
+        'FS Fit PWA: página carregada pela rede, mas a atualização do cache ficou incompleta. A navegação continuará normalmente.',
+        error
+      );
+    }
+    return response;
+  }
+
+  const cached = await getValidCachedNavigation(cache, request, pathname);
+  return cached || recoveryResponse(pathname);
 }
 
 async function validateAndCacheNavigation(cache, request, pathname, response) {
@@ -248,21 +261,49 @@ async function ensureBundleCached(cache, bundleUrl) {
 }
 
 async function getValidCachedNavigation(cache, request, pathname) {
-  if (!cache) return null;
-  const candidates = [
-    await matchCache(cache, request),
-    await matchCache(cache, new Request(new URL(pathname, self.location.origin)))
-  ].filter(Boolean);
-  for (const response of candidates) {
-    const html = await response.clone().text();
-    const bundleHref = extractBundleHref(html);
-    if (!hasStylesheet(html)) return response;
-    if (!bundleHref) continue;
-    const bundleUrl = new URL(bundleHref, request.url);
-    if (!isHashedBundlePath(bundleUrl.pathname)) continue;
-    const bundle = await matchAnyShellCache(new Request(bundleUrl));
-    if (await isValidCssResponse(bundleUrl.href, bundle)) return response;
+  const requestCandidates = [
+    request,
+    new Request(new URL(pathname, self.location.origin))
+  ];
+  const cachesToCheck = [];
+
+  if (cache) cachesToCheck.push(cache);
+
+  try {
+    const keys = (await caches.keys())
+      .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+      .sort((a, b) => b.localeCompare(a));
+
+    for (const key of keys) {
+      try {
+        cachesToCheck.push(await caches.open(key));
+      } catch {
+        // Um cache antigo corrompido não deve impedir a recuperação por outros caches.
+      }
+    }
+  } catch {
+    // Se a enumeração falhar, ainda tentamos o cache atual quando disponível.
   }
+
+  for (const candidateCache of cachesToCheck) {
+    for (const candidateRequest of requestCandidates) {
+      const response = await matchCache(candidateCache, candidateRequest);
+      if (!response) continue;
+
+      const html = await response.clone().text();
+      const bundleHref = extractBundleHref(html);
+
+      if (!hasStylesheet(html)) return response;
+      if (!bundleHref) continue;
+
+      const bundleUrl = new URL(bundleHref, request.url);
+      if (!isHashedBundlePath(bundleUrl.pathname)) continue;
+
+      const bundle = await matchAnyShellCache(new Request(bundleUrl));
+      if (await isValidCssResponse(bundleUrl.href, bundle)) return response;
+    }
+  }
+
   return null;
 }
 
@@ -270,7 +311,7 @@ function recoveryResponse(pathname) {
   const safePath = String(pathname || '/').replace(/[&<>"']/g, character => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[character]);
-  return new Response(`<!doctype html><html lang="pt-br"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atualizando o FS Fit</title><style>html{color-scheme:dark}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#0f1115;color:#f4f7f9;font:16px/1.5 system-ui,sans-serif}.box{max-width:480px;padding:28px;border:1px solid #30363d;border-radius:18px;background:#171b21;text-align:center}.brand{color:#b8e51c;font-weight:900}a{display:inline-block;margin-top:16px;padding:12px 18px;border-radius:10px;background:#b8e51c;color:#10130d;font-weight:800;text-decoration:none}</style><body><main class="box"><p class="brand">FS FIT</p><h1>Atualização em andamento</h1><p>Os arquivos visuais ainda não chegaram completos. A versão anterior foi preservada e nenhuma tela incompleta será exibida.</p><a href="${safePath}">Tentar novamente</a><script>if('serviceWorker'in navigator){navigator.serviceWorker.getRegistration().then(function(r){if(r)return r.update()}).catch(function(){})}</script></main></body></html>`, {
+  return new Response(`<!doctype html><html lang="pt-br"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atualizando o FS Fit</title><style>html{color-scheme:dark}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:#0f1115;color:#f4f7f9;font:16px/1.5 system-ui,sans-serif}.box{max-width:480px;padding:28px;border:1px solid #30363d;border-radius:18px;background:#171b21;text-align:center}.brand{color:#b8e51c;font-weight:900}a{display:inline-block;margin-top:16px;padding:12px 18px;border-radius:10px;background:#b8e51c;color:#10130d;font-weight:800;text-decoration:none}</style><body><main class="box"><p class="brand">FS FIT</p><h1>Atualização em andamento</h1><p>Os arquivos visuais ainda não chegaram completos. A versão anterior foi preservada e nenhuma tela incompleta será exibida.</p><a href="${safePath}">Tentar novamente</a><script>if('serviceWorker'in navigator){let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!reloading){reloading=true;location.reload()}});navigator.serviceWorker.getRegistration().then(function(r){if(r)return r.update()}).catch(function(){})}</script></main></body></html>`, {
     status: 503,
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
   });
