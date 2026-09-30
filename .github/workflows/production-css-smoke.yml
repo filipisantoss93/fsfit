@@ -139,7 +139,12 @@ jobs:
           service_worker="$temp_dir/sw.js"
           curl --fail --silent --show-error --location \
             --output "$service_worker" "$site/sw.js"
-          grep --quiet --fixed-strings "const CACHE_VERSION = 20" "$service_worker" \
-            || { echo "::error::Service Worker v20 indisponível."; exit 1; }
+          expected_cache_version="$(grep -Eo 'const CACHE_VERSION = [0-9]+' sw.js | head -1)"
+          if [ -z "$expected_cache_version" ]; then
+            echo "::error::Não foi possível determinar CACHE_VERSION no sw.js local."
+            exit 1
+          fi
+          grep --quiet --fixed-strings "$expected_cache_version" "$service_worker" \
+            || { echo "::error::Service Worker publicado não corresponde ao $expected_cache_version local."; exit 1; }
 
           echo "Bundles críticos de Landing, Admin e Aluno estão íntegros em produção."
