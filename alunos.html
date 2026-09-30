@@ -169,11 +169,11 @@
             <fieldset class="student-fieldset">
               <legend>Informações pessoais</legend>
               <div class="grid grid-2 student-form-grid">
-                <div class="form-group"><label>Nome *</label><input name="nome" maxlength="120" autocomplete="name" required></div>
-                <div class="form-group"><label>WhatsApp *</label><input name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
-                <div class="form-group"><label>Sexo *</label><select name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
+                <div class="form-group"><label for="alunos-field-1">Nome *</label><input id="alunos-field-1" name="nome" maxlength="120" autocomplete="name" required></div>
+                <div class="form-group"><label for="alunos-field-2">WhatsApp *</label><input id="alunos-field-2" name="whatsapp" inputmode="numeric" autocomplete="tel" maxlength="11" minlength="11" pattern="[0-9]{11}" placeholder="DDD + número" required></div>
+                <div class="form-group"><label for="alunos-field-3">Sexo *</label><select id="alunos-field-3" name="sexo" required><option value="">Selecione</option><option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option></select></div>
                 <div class="form-group"><label>Data de nascimento</label><input name="data_nascimento" type="text" inputmode="numeric" autocomplete="bday" maxlength="10" placeholder="DD/MM/AAAA" aria-label="Data de nascimento no formato dia mês ano"></div>
-                <div class="form-group"><label>Idade calculada</label><input class="student-age-input" name="idade" readonly placeholder="Calculada automaticamente"></div>
+                <div class="form-group"><label for="alunos-field-4">Idade calculada</label><input id="alunos-field-4" class="student-age-input" name="idade" readonly placeholder="Calculada automaticamente"></div>
               </div>
             </fieldset>
 
@@ -181,27 +181,27 @@
               <legend>Agenda</legend>
               <p class="form-hint">Os dias são definidos pelo treino ativo. Cadastre aqui apenas o horário e o local habituais.</p>
               <div class="grid grid-3 student-form-grid">
-                <div class="form-group"><label>Período</label><select name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
-                <div class="form-group"><label>Horário</label><input name="horario_aula" type="time" step="60"></div>
-                <div class="form-group"><label>Local da aula</label><input name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
+                <div class="form-group"><label for="alunos-field-5">Período</label><select id="alunos-field-5" name="periodo_aula"><option value="">Selecione</option><option value="manha">Manhã</option><option value="tarde">Tarde</option><option value="noite">Noite</option></select></div>
+                <div class="form-group"><label for="alunos-field-6">Horário</label><input id="alunos-field-6" name="horario_aula" type="time" step="60"></div>
+                <div class="form-group"><label for="alunos-field-7">Local da aula</label><input id="alunos-field-7" name="local_aula" maxlength="180" placeholder="Ex.: Academia Central"></div>
               </div>
             </fieldset>
 
             <fieldset class="student-fieldset">
               <legend>Dados físicos iniciais</legend>
               <div class="grid grid-3 student-physical-grid">
-                <div class="form-group"><label>Altura (cm)</label><input name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
-                <div class="form-group"><label>Peso inicial (kg)</label><input name="peso_inicial_kg" type="number" min="20" max="400" step="0.1" placeholder="Ex.: 82,5"></div>
-                <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura_inicial" type="number" min="1" max="75" step="0.1" placeholder="Ex.: 18,5"></div>
+                <div class="form-group"><label for="alunos-field-8">Altura (cm)</label><input id="alunos-field-8" name="altura_cm" type="number" min="80" max="250" step="0.1" placeholder="Ex.: 175"></div>
+                <div class="form-group"><label for="alunos-field-9">Peso inicial (kg)</label><input id="alunos-field-9" name="peso_inicial_kg" type="number" min="20" max="400" step="0.1" placeholder="Ex.: 82,5"></div>
+                <div class="form-group"><label for="alunos-field-10">Gordura corporal (%)</label><input id="alunos-field-10" name="percentual_gordura_inicial" type="number" min="1" max="75" step="0.1" placeholder="Ex.: 18,5"></div>
               </div>
             </fieldset>
 
             <fieldset class="student-fieldset student-fieldset-last">
               <legend>Acompanhamento</legend>
-              <div class="form-group"><label>Objetivo</label><input name="objetivo" maxlength="240" placeholder="Ex.: hipertrofia, emagrecimento, condicionamento"></div>
+              <div class="form-group"><label for="alunos-field-11">Objetivo</label><input id="alunos-field-11" name="objetivo" maxlength="240" placeholder="Ex.: hipertrofia, emagrecimento, condicionamento"></div>
               <div class="grid grid-2 student-notes-grid">
-                <div class="form-group"><label>Restrições</label><textarea class="student-textarea" name="restricoes" placeholder="Lesões, limitações, alergias ou cuidados importantes"></textarea></div>
-                <div class="form-group"><label>Observações</label><textarea class="student-textarea" name="observacoes" placeholder="Informações gerais para o acompanhamento"></textarea></div>
+                <div class="form-group"><label for="alunos-field-12">Restrições</label><textarea id="alunos-field-12" class="student-textarea" name="restricoes" placeholder="Lesões, limitações, alergias ou cuidados importantes"></textarea></div>
+                <div class="form-group"><label for="alunos-field-13">Observações</label><textarea id="alunos-field-13" class="student-textarea" name="observacoes" placeholder="Informações gerais para o acompanhamento"></textarea></div>
               </div>
             </fieldset>
           </div>

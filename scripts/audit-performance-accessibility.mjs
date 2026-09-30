@@ -61,7 +61,9 @@ function auditHtml() {
       if (/\btype\s*=\s*["']hidden["']/i.test(attrs)) continue;
       const id = attrs.match(/\bid\s*=\s*["']([^"']+)["']/i)?.[1];
       const labelled = /\baria-label(?:ledby)?\s*=\s*["'][^"']+["']/i.test(attrs);
-      if (id && new RegExp(`<label\\b[^>]*for=["']${id}["']`, 'i').test(source)) continue;
+      const explicitLabel = id && new RegExp(`<label\\b[^>]*for=["']${id}["']`, 'i').test(source);
+      const wrappingLabel = [...source.matchAll(/<label\b[^>]*>[\s\S]*?<\/label>/gi)].some(label => label[0].includes(match[0]));
+      if (explicitLabel || wrappingLabel) continue;
       if (!labelled) warn(`${name}: input sem label associado detectável${id ? ` (#${id})` : ''}`);
     }
 
@@ -88,7 +90,7 @@ function auditJavaScript() {
     const disconnects = (source.match(/\.disconnect\s*\(/g) || []).length;
     if (observers > disconnects && !/fsfit-allow-persistent-observer:/i.test(source)) warn(`${name}: observer sem cleanup detectável`);
 
-    if (/addEventListener\(\s*["']submit["']/.test(source) && !/(?:disabled\s*=\s*true|setBusy\s*\(|aria-busy)/.test(source)) warn(`${name}: submit assíncrono sem bloqueio de ação duplicada detectável`);
+    if (/addEventListener\(\s*["']submit["']\s*,\s*async\b/.test(source) && !/(?:disabled\s*=\s*true|setBusy\s*\(|setSubmitting\s*\(|aria-busy)/.test(source)) warn(`${name}: submit assíncrono sem bloqueio de ação duplicada detectável`);
 
     if (/innerHTML\s*=\s*[`"'][\s\S]*(?:Carregando|Aguarde|Processando)/i.test(source) && !/(?:erro|error|vazio|empty|sucesso|success)/i.test(source)) warn(`${name}: estado de loading sem estados complementares detectáveis`);
 
@@ -97,7 +99,7 @@ function auditJavaScript() {
       if (!/aria-modal=["']true["']/.test(markup)) fail(`${name}: modal dinâmico sem aria-modal`);
       if (!/aria-label(?:ledby)?=["'][^"']+["']/.test(markup)) fail(`${name}: modal dinâmico sem nome acessível`);
     }
-    if (dynamicDialogMarkup.length && !/(?:Escape|keydown|focus\s*\(|tabindex)/.test(source)) warn(`${name}: modal dinâmico sem gestão de teclado/foco detectável`);
+    if (dynamicDialogMarkup.length && !/(?:Escape|keydown|focus\s*\(|tabindex|modal-focus-a11y)/.test(source)) warn(`${name}: modal dinâmico sem gestão de teclado/foco detectável`);
   }
   pass(`${jsFiles.length} módulo(s) JavaScript inspecionados`);
 }

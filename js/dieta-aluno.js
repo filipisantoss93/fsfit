@@ -38,6 +38,39 @@ let editingMealId = null;
 let selectedMealId = null;
 let plansCache = [];
 let mealsCache = [];
+const modalFocusReturn = new WeakMap();
+
+function openAccessibleModal(modal, focusTarget) {
+  if (!modal.classList.contains('open')) modalFocusReturn.set(modal, document.activeElement);
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('diet-modal-open');
+  focusTarget?.focus();
+}
+
+function closeAccessibleModal(modal) {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  const returnTarget = modalFocusReturn.get(modal);
+  if (returnTarget?.isConnected) returnTarget.focus();
+  modalFocusReturn.delete(modal);
+}
+
+function trapModalTab(event, modal) {
+  if (!modal.classList.contains('open') || event.key !== 'Tab') return;
+  const focusable = [...modal.querySelectorAll('a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])')]
+    .filter(element => !element.closest('.hidden') && element.getAttribute('aria-hidden') !== 'true');
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+    event.preventDefault();
+    first.focus();
+  }
+}
 
 const dayNames = { 1: 'Segunda-feira', 2: 'Terça-feira', 3: 'Quarta-feira', 4: 'Quinta-feira', 5: 'Sexta-feira', 6: 'Sábado', 7: 'Domingo' };
 
@@ -78,8 +111,7 @@ function resetMealForm() {
 }
 
 function closeMealModal() {
-  mealModal.classList.remove('open');
-  mealModal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(mealModal);
   document.body.classList.remove('diet-modal-open');
   selectedMealId = null;
 }
@@ -97,15 +129,11 @@ function openMealModal(mealId) {
     <div class="diet-detail"><small>Descrição</small><p>${esc(meal.descricao || 'Não informado')}</p></div>
     <div class="diet-detail"><small>Substituições</small><p>${esc(meal.substituicoes || 'Nenhuma substituição informada')}</p></div>
     <div class="diet-detail"><small>Ordem no plano</small><strong>${esc(String(meal.ordem || '—'))}</strong></div>`;
-  mealModal.classList.add('open');
-  mealModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('diet-modal-open');
-  mealModalEdit.focus();
+  openAccessibleModal(mealModal, mealModalEdit);
 }
 
 function closePlanModal() {
-  planModal.classList.remove('open');
-  planModal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(planModal);
   document.body.classList.remove('diet-modal-open');
   selectedPlanId = null;
   editingPlanId = null;
@@ -128,10 +156,7 @@ function showPlanForm(plan = null) {
   planModalTitle.textContent = plan ? 'Editar plano alimentar' : 'Novo plano alimentar';
   planModalView.classList.add('hidden');
   planForm.classList.remove('hidden');
-  planModal.classList.add('open');
-  planModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('diet-modal-open');
-  planForm.titulo.focus();
+  openAccessibleModal(planModal, planForm.titulo);
 }
 
 function openPlanModal(planIdToOpen) {
@@ -148,10 +173,7 @@ function openPlanModal(planIdToOpen) {
   planModalActivate.classList.toggle('hidden', Boolean(plan.ativo));
   planForm.classList.add('hidden');
   planModalView.classList.remove('hidden');
-  planModal.classList.add('open');
-  planModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('diet-modal-open');
-  planModalEdit.focus();
+  openAccessibleModal(planModal, planModalEdit);
 }
 
 function renderPlanList() {
@@ -342,6 +364,7 @@ async function deleteMeal(mealId) {
 
 planForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (planForm.dataset.submitting) return;
   const payload = {
     titulo: planForm.titulo.value.trim(),
     orientacoes: planForm.orientacoes.value.trim() || null,
@@ -355,6 +378,10 @@ planForm.addEventListener('submit', async event => {
     return showMessage(message, 'A data final não pode ser anterior à data inicial.', 'error');
   }
 
+  planForm.dataset.submitting = 'true';
+  const submitButton = planForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  try {
   let savedId = editingPlanId;
   if (editingPlanId) {
     const { error } = await supabase.from('planos_alimentares').update(payload).eq('id', editingPlanId).eq('personal_id', session.user.id);
@@ -376,10 +403,15 @@ planForm.addEventListener('submit', async event => {
   closePlanModal();
   await loadPlans();
   if (savedId && plansCache.some(plan => plan.id === savedId)) openPlanModal(savedId);
+  } finally {
+    delete planForm.dataset.submitting;
+    submitButton.disabled = false;
+  }
 });
 
 mealForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (mealForm.dataset.submitting) return;
   if (!planId) return showMessage(message, 'Crie ou ative um plano alimentar antes de adicionar refeições.', 'error');
   const days = selectedDays();
   if (!days.length) return showMessage(message, 'Selecione ao menos um dia da semana.', 'error');
@@ -395,6 +427,10 @@ mealForm.addEventListener('submit', async event => {
   };
   if (!payload.nome || !payload.descricao) return showMessage(message, 'Informe o nome e a descrição da refeição.', 'error');
 
+  mealForm.dataset.submitting = 'true';
+  const submitButton = mealForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  try {
   const result = editingMealId
     ? await supabase.from('refeicoes').update(payload).eq('id', editingMealId).eq('plano_alimentar_id', planId)
     : await supabase.from('refeicoes').insert(payload);
@@ -403,6 +439,10 @@ mealForm.addEventListener('submit', async event => {
   showMessage(message, editingMealId ? 'Refeição atualizada com sucesso.' : 'Refeição adicionada com sucesso.');
   resetMealForm();
   await loadMeals();
+  } finally {
+    delete mealForm.dataset.submitting;
+    submitButton.disabled = false;
+  }
 });
 
 newPlanButton.addEventListener('click', () => showPlanForm());
@@ -430,6 +470,7 @@ document.addEventListener('click', event => {
 });
 
 document.addEventListener('keydown', event => {
+  [planModal, mealModal].forEach(modal => trapModalTab(event, modal));
   if (event.key !== 'Escape') return;
   if (planModal.classList.contains('open')) closePlanModal();
   if (mealModal.classList.contains('open')) closeMealModal();

@@ -1,3 +1,4 @@
+import './modal-focus-a11y.js';
 import { supabase } from './supabase.js';
 import { showMessage } from './layout.js';
 

@@ -31,23 +31,23 @@
         <h2 id="form-title">Novo lembrete</h2>
         <form id="reminder-form">
           <div class="form-group">
-            <label>Título *</label>
-            <input name="titulo" maxlength="120" placeholder="Ex.: Hora do treino" required>
+            <label for="lembretes-aluno-field-1">Título *</label>
+            <input id="lembretes-aluno-field-1" name="titulo" maxlength="120" placeholder="Ex.: Hora do treino" required>
           </div>
 
           <div class="form-group">
-            <label>Mensagem *</label>
-            <textarea name="mensagem" maxlength="500" placeholder="Ex.: Seu treino de pernas está programado para hoje." required></textarea>
+            <label for="lembretes-aluno-field-2">Mensagem *</label>
+            <textarea id="lembretes-aluno-field-2" name="mensagem" maxlength="500" placeholder="Ex.: Seu treino de pernas está programado para hoje." required></textarea>
           </div>
 
           <div class="grid grid-2">
             <div class="form-group">
-              <label>Data e horário *</label>
-              <input name="agendado_para" type="datetime-local" required>
+              <label for="lembretes-aluno-field-3">Data e horário *</label>
+              <input id="lembretes-aluno-field-3" name="agendado_para" type="datetime-local" required>
             </div>
             <div class="form-group">
-              <label>Canal *</label>
-              <select name="canal" required>
+              <label for="lembretes-aluno-field-4">Canal *</label>
+              <select id="lembretes-aluno-field-4" name="canal" required>
                 <option value="push">Notificação no celular</option>
                 <option value="whatsapp">WhatsApp pelo personal — gratuito</option>
                 <option value="ambos">Notificação + WhatsApp gratuito</option>
@@ -57,8 +57,8 @@
 
           <div class="grid grid-2">
             <div class="form-group">
-              <label>Recorrência</label>
-              <select name="recorrencia">
+              <label for="lembretes-aluno-field-5">Recorrência</label>
+              <select id="lembretes-aluno-field-5" name="recorrencia">
                 <option value="">Não repetir</option>
                 <option value="interval">A cada intervalo</option>
                 <option value="daily">Todos os dias</option>
@@ -67,8 +67,8 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Status</label>
-              <select name="status">
+              <label for="lembretes-aluno-field-6">Status</label>
+              <select id="lembretes-aluno-field-6" name="status">
                 <option value="agendado">Agendado</option>
                 <option value="cancelado">Cancelado</option>
               </select>
@@ -77,12 +77,12 @@
 
           <div id="recurrence-interval-fields" class="grid grid-2 hidden">
             <div class="form-group">
-              <label>A cada</label>
-              <input name="intervalo_valor" type="number" min="1" max="999" step="1" value="30" inputmode="numeric">
+              <label for="lembretes-aluno-field-7">A cada</label>
+              <input id="lembretes-aluno-field-7" name="intervalo_valor" type="number" min="1" max="999" step="1" value="30" inputmode="numeric">
             </div>
             <div class="form-group">
-              <label>Unidade</label>
-              <select name="intervalo_unidade">
+              <label for="lembretes-aluno-field-8">Unidade</label>
+              <select id="lembretes-aluno-field-8" name="intervalo_unidade">
                 <option value="minutes">Minuto(s)</option>
                 <option value="hours">Hora(s)</option>
                 <option value="days">Dia(s)</option>

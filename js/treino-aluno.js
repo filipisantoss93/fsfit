@@ -43,6 +43,39 @@ let selectedExerciseId = null;
 let editingExerciseId = null;
 let workoutsCache = [];
 let workoutExercisesCache = [];
+const modalFocusReturn = new WeakMap();
+
+function openAccessibleModal(modal, focusTarget) {
+  if (!modal.classList.contains('open')) modalFocusReturn.set(modal, document.activeElement);
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('workout-modal-open');
+  focusTarget?.focus();
+}
+
+function closeAccessibleModal(modal) {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  const returnTarget = modalFocusReturn.get(modal);
+  if (returnTarget?.isConnected) returnTarget.focus();
+  modalFocusReturn.delete(modal);
+}
+
+function trapModalTab(event, modal) {
+  if (!modal.classList.contains('open') || event.key !== 'Tab') return;
+  const focusable = [...modal.querySelectorAll('a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])')]
+    .filter(element => !element.closest('.hidden') && element.getAttribute('aria-hidden') !== 'true');
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+    event.preventDefault();
+    first.focus();
+  }
+}
 
 const dayNames = { 1: 'Segunda-feira', 2: 'Terça-feira', 3: 'Quarta-feira', 4: 'Quinta-feira', 5: 'Sexta-feira', 6: 'Sábado', 7: 'Domingo' };
 
@@ -121,8 +154,7 @@ function syncWorkspaceContext(workout = selectedWorkout()) {
 }
 
 function closeWorkoutModal() {
-  workoutModal.classList.remove('open');
-  workoutModal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(workoutModal);
   selectedWorkoutId = null;
   editingWorkoutId = null;
   workoutForm.reset();
@@ -145,9 +177,7 @@ function showWorkoutForm(workout = null) {
   workoutModalTitle.textContent = workout ? 'Editar plano de treino' : 'Novo plano de treino';
   workoutModalView.classList.add('hidden');
   workoutForm.classList.remove('hidden');
-  workoutModal.classList.add('open');
-  workoutModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('workout-modal-open');
+  openAccessibleModal(workoutModal, workoutForm.nome);
   setTimeout(() => workoutForm.nome.focus(), 0);
 }
 
@@ -166,9 +196,7 @@ function openWorkoutModal(id) {
   workoutModalActivate.classList.toggle('hidden', workout.status === 'ativo');
   workoutForm.classList.add('hidden');
   workoutModalView.classList.remove('hidden');
-  workoutModal.classList.add('open');
-  workoutModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('workout-modal-open');
+  openAccessibleModal(workoutModal, workoutModalEdit);
 }
 
 function openExerciseModal(exerciseId = null) {
@@ -188,14 +216,11 @@ function openExerciseModal(exerciseId = null) {
   workoutExerciseForm.observacoes.value = data?.observacoes || '';
   document.querySelector('#exercise-modal-title').textContent = data ? 'Editar exercício' : 'Montar sequência';
   workoutExerciseForm.querySelector('[type="submit"]').textContent = data ? 'Salvar alteração' : 'Adicionar exercícios';
-  exerciseModal.classList.add('open');
-  exerciseModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('workout-modal-open');
+  openAccessibleModal(exerciseModal, workoutDaySelect);
 }
 
 function closeExerciseModal() {
-  exerciseModal.classList.remove('open');
-  exerciseModal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(exerciseModal);
   editingExerciseId = null;
   syncBodyModalState();
 }
@@ -217,14 +242,11 @@ function openExerciseDetailModal(id) {
     </div>
     <div class="workout-detail"><small>Observações</small><p>${esc(row.observacoes || 'Nenhuma observação informada.')}</p></div>
     ${ex.instrucoes ? `<div class="workout-detail"><small>Instruções</small><p>${esc(ex.instrucoes)}</p></div>` : ''}`;
-  exerciseDetailModal.classList.add('open');
-  exerciseDetailModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('workout-modal-open');
+  openAccessibleModal(exerciseDetailModal, exerciseDetailEdit);
 }
 
 function closeExerciseDetailModal() {
-  exerciseDetailModal.classList.remove('open');
-  exerciseDetailModal.setAttribute('aria-hidden', 'true');
+  closeAccessibleModal(exerciseDetailModal);
   selectedExerciseId = null;
   syncBodyModalState();
 }
@@ -435,6 +457,7 @@ async function deleteExercise(id) {
 
 workoutForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (workoutForm.dataset.submitting) return;
   const payload = {
     nome: workoutForm.nome.value.trim(),
     descricao: workoutForm.descricao.value.trim() || null,
@@ -446,6 +469,10 @@ workoutForm.addEventListener('submit', async event => {
   if (!payload.dias_semana.length) return showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
   if (payload.data_inicio && payload.data_fim && payload.data_fim < payload.data_inicio) return showMessage(message, 'A data final não pode ser anterior à data inicial.', 'error');
 
+  workoutForm.dataset.submitting = 'true';
+  const submitButton = workoutForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  try {
   let savedId = editingWorkoutId;
   if (editingWorkoutId) {
     const { error } = await supabase.from('treinos').update(payload).eq('id', editingWorkoutId).eq('personal_id', session.user.id);
@@ -467,10 +494,15 @@ workoutForm.addEventListener('submit', async event => {
   treinoId = savedId || treinoId;
   closeWorkoutModal();
   await loadWorkouts(treinoId);
+  } finally {
+    delete workoutForm.dataset.submitting;
+    submitButton.disabled = false;
+  }
 });
 
 workoutExerciseForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (workoutExerciseForm.dataset.submitting) return;
   if (!treinoId) return showMessage(message, 'Selecione um plano antes de adicionar exercícios.', 'error');
   const day = Number(workoutExerciseForm.dia_semana.value);
   const allowedDays = (selectedWorkout()?.dias_semana || []).map(Number);
@@ -486,6 +518,10 @@ workoutExerciseForm.addEventListener('submit', async event => {
     descanso_segundos: workoutExerciseForm.descanso_segundos.value ? Number(workoutExerciseForm.descanso_segundos.value) : null,
     observacoes: workoutExerciseForm.observacoes.value.trim() || null
   };
+  workoutExerciseForm.dataset.submitting = 'true';
+  const submitButton = workoutExerciseForm.querySelector('[type="submit"]');
+  submitButton.disabled = true;
+  try {
   const result = editingExerciseId
     ? await supabase.from('treino_exercicios').update(payload).eq('id', editingExerciseId).eq('treino_id', treinoId)
     : await supabase.from('treino_exercicios').insert(payload);
@@ -493,6 +529,10 @@ workoutExerciseForm.addEventListener('submit', async event => {
   closeExerciseModal();
   showMessage(message, editingExerciseId ? 'Exercício atualizado com sucesso.' : 'Exercício adicionado com sucesso.');
   await loadWorkoutExercises();
+  } finally {
+    delete workoutExerciseForm.dataset.submitting;
+    submitButton.disabled = false;
+  }
 });
 
 newWorkoutButton.addEventListener('click', () => showWorkoutForm());
@@ -517,6 +557,7 @@ document.addEventListener('click', event => {
 });
 
 document.addEventListener('keydown', event => {
+  [exerciseDetailModal, exerciseModal, workoutModal].forEach(modal => trapModalTab(event, modal));
   if (event.key !== 'Escape') return;
   if (exerciseDetailModal.classList.contains('open')) closeExerciseDetailModal();
   else if (exerciseModal.classList.contains('open')) closeExerciseModal();

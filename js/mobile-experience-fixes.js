@@ -1,3 +1,4 @@
+import './modal-focus-a11y.js';
 import { supabase } from './supabase.js';
 
 const LOADING_SELECTOR = 'p, td, .empty, .dashboard-empty, [data-loading]';

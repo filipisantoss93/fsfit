@@ -87,13 +87,13 @@
         </div>
       </div>
       <form id="plan-form" class="hidden">
-        <div class="form-group"><label>Título *</label><input name="titulo" maxlength="120" placeholder="Ex.: Plano alimentar - Hipertrofia" required></div>
+        <div class="form-group"><label for="diet-plan-title">Título *</label><input id="diet-plan-title" name="titulo" maxlength="120" placeholder="Ex.: Plano alimentar - Hipertrofia" required></div>
         <div class="grid grid-2">
-          <div class="form-group"><label>Data de início</label><input name="data_inicio" type="date"></div>
-          <div class="form-group"><label>Data de término</label><input name="data_fim" type="date"></div>
+          <div class="form-group"><label for="diet-plan-start">Data de início</label><input id="diet-plan-start" name="data_inicio" type="date"></div>
+          <div class="form-group"><label for="diet-plan-end">Data de término</label><input id="diet-plan-end" name="data_fim" type="date"></div>
         </div>
-        <div class="form-group"><label>Meta de água (ml/dia)</label><input name="agua_ml" type="number" min="0" max="15000" step="100" placeholder="Ex.: 3000"></div>
-        <div class="form-group"><label>Orientações gerais</label><textarea name="orientacoes" placeholder="Ex.: Preferir alimentos in natura, ajustar porções conforme orientação profissional..."></textarea></div>
+        <div class="form-group"><label for="diet-water-target">Meta de água (ml/dia)</label><input id="diet-water-target" name="agua_ml" type="number" min="0" max="15000" step="100" placeholder="Ex.: 3000"></div>
+        <div class="form-group"><label for="diet-plan-notes">Orientações gerais</label><textarea id="diet-plan-notes" name="orientacoes" placeholder="Ex.: Preferir alimentos in natura, ajustar porções conforme orientação profissional..."></textarea></div>
         <div class="diet-modal-actions">
           <button class="btn btn-primary" type="submit">Salvar plano</button>
           <button id="cancel-plan-edit" class="btn btn-neutral" type="button">Cancelar</button>
@@ -109,10 +109,10 @@
       <div class="diet-modal-kicker">REFEIÇÃO</div>
       <h2 id="meal-form-modal-title">Nova refeição</h2>
       <form id="meal-form">
-        <div class="form-group"><label>Nome da refeição *</label><input name="nome" maxlength="100" placeholder="Ex.: Café da manhã" required></div>
+        <div class="form-group"><label for="meal-name">Nome da refeição *</label><input id="meal-name" name="nome" maxlength="100" placeholder="Ex.: Café da manhã" required></div>
         <div class="grid grid-2">
-          <div class="form-group"><label>Horário</label><input name="horario" type="time"></div>
-          <div class="form-group"><label>Ordem</label><input name="ordem" type="number" min="1" max="50" value="1"></div>
+          <div class="form-group"><label for="meal-time">Horário</label><input id="meal-time" name="horario" type="time"></div>
+          <div class="form-group"><label for="meal-order">Ordem</label><input id="meal-order" name="ordem" type="number" min="1" max="50" value="1"></div>
         </div>
         <div class="form-group">
           <label>Dias da semana *</label>
@@ -126,8 +126,8 @@
             <label><input type="checkbox" value="7"> Dom</label>
           </div>
         </div>
-        <div class="form-group"><label>Descrição *</label><textarea name="descricao" placeholder="Ex.: 2 ovos, 1 fatia de pão integral, 1 banana..." required></textarea></div>
-        <div class="form-group"><label>Substituições</label><textarea name="substituicoes" placeholder="Ex.: Trocar banana por maçã; pão por tapioca..."></textarea></div>
+        <div class="form-group"><label for="meal-description">Descrição *</label><textarea id="meal-description" name="descricao" placeholder="Ex.: 2 ovos, 1 fatia de pão integral, 1 banana..." required></textarea></div>
+        <div class="form-group"><label for="meal-substitutions">Substituições</label><textarea id="meal-substitutions" name="substituicoes" placeholder="Ex.: Trocar banana por maçã; pão por tapioca..."></textarea></div>
         <div class="diet-modal-actions">
           <button class="btn btn-primary" type="submit">Adicionar refeição</button>
           <button class="btn btn-neutral" type="button" data-close-meal-form-modal>Cancelar</button>
@@ -142,7 +142,7 @@
       <button class="diet-modal-close" type="button" data-close-library-meal-modal aria-label="Fechar">×</button>
       <div class="diet-modal-kicker">BIBLIOTECA ALIMENTAR</div>
       <h2 id="library-meal-modal-title">Usar refeição salva</h2>
-      <div class="form-group"><label>Buscar refeição</label><input id="library-meal-search" type="search" placeholder="Ex.: Café da manhã, pré-treino, frango..."></div>
+      <div class="form-group"><label for="library-meal-search">Buscar refeição</label><input id="library-meal-search" type="search" placeholder="Ex.: Café da manhã, pré-treino, frango..." aria-label="Buscar refeição na biblioteca"></div>
       <div id="library-meal-list" class="diet-library-meal-list"><p>Carregando refeições...</p></div>
       <div class="diet-modal-actions">
         <a class="btn btn-primary" href="biblioteca-alimentar.html">+ Criar nova refeição</a>
@@ -158,7 +158,7 @@
       <div class="diet-modal-kicker">MODELOS DE DIETA</div>
       <h2 id="diet-model-picker-title">Usar modelo de dieta</h2>
       <p>O modelo cria um novo plano ativo para o aluno e copia todas as refeições e alimentos cadastrados.</p>
-      <div class="form-group"><label>Buscar modelo</label><input id="diet-model-picker-search" type="search" placeholder="Ex.: Hipertrofia, emagrecimento..."></div>
+      <div class="form-group"><label for="diet-model-picker-search">Buscar modelo</label><input id="diet-model-picker-search" type="search" placeholder="Ex.: Hipertrofia, emagrecimento..." aria-label="Buscar modelo de plano alimentar"></div>
       <div id="diet-model-picker-list" class="diet-library-meal-list"><p>Carregando modelos...</p></div>
       <div class="diet-modal-actions">
         <a class="btn btn-outline" href="modelos-dieta.html">Gerenciar modelos</a>

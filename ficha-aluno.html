@@ -83,12 +83,12 @@
           <form id="media-upload-form" class="sub-card media-form">
             <h3>Enviar arquivo</h3>
             <div class="form-group">
-              <label>Título opcional</label>
-              <input name="titulo" maxlength="120" placeholder="Ex.: Execução correta do exercício">
+              <label for="ficha-aluno-field-1">Título opcional</label>
+              <input id="ficha-aluno-field-1" name="titulo" maxlength="120" placeholder="Ex.: Execução correta do exercício">
             </div>
             <div class="form-group">
-              <label>Foto ou vídeo</label>
-              <input name="arquivo" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" required>
+              <label for="ficha-aluno-field-2">Foto ou vídeo</label>
+              <input id="ficha-aluno-field-2" name="arquivo" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" required>
               <small class="field-help">Formatos: JPG, PNG, WebP, MP4, WebM ou MOV. Máximo 50 MB.</small>
             </div>
             <button class="btn btn-primary" type="submit">Enviar mídia</button>
@@ -97,19 +97,19 @@
           <form id="media-link-form" class="sub-card media-form">
             <h3>Adicionar link</h3>
             <div class="form-group">
-              <label>Plataforma</label>
-              <select name="tipo" required>
+              <label for="ficha-aluno-field-3">Plataforma</label>
+              <select id="ficha-aluno-field-3" name="tipo" required>
                 <option value="youtube">YouTube</option>
                 <option value="instagram">Instagram</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Título opcional</label>
-              <input name="titulo" maxlength="120" placeholder="Ex.: Mobilidade para antes do treino">
+              <label for="ficha-aluno-field-4">Título opcional</label>
+              <input id="ficha-aluno-field-4" name="titulo" maxlength="120" placeholder="Ex.: Mobilidade para antes do treino">
             </div>
             <div class="form-group">
-              <label>Link da publicação ou vídeo</label>
-              <input name="url" type="url" inputmode="url" placeholder="https://..." required>
+              <label for="ficha-aluno-field-5">Link da publicação ou vídeo</label>
+              <input id="ficha-aluno-field-5" name="url" type="url" inputmode="url" placeholder="https://..." required>
             </div>
             <button class="btn btn-outline" type="submit">Adicionar link</button>
           </form>
@@ -134,7 +134,7 @@
             <form id="pin-form">
               <h3>Segurança</h3>
               <p>Defina ou altere o PIN de acesso do aluno.</p>
-              <div class="form-group"><label>Novo PIN de 4 números</label><input name="pin" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></div>
+              <div class="form-group"><label for="ficha-aluno-field-6">Novo PIN de 4 números</label><input id="ficha-aluno-field-6" name="pin" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required></div>
               <button class="btn btn-outline" type="submit">Alterar PIN</button>
             </form>
           </article>
@@ -149,10 +149,10 @@
           <div class="section-heading"><div><small>Acompanhamento</small><h2>Registrar peso</h2></div></div>
           <form id="weight-form">
             <div class="grid grid-2 compact-form-grid">
-              <div class="form-group"><label>Peso (kg) *</label><input name="peso_kg" type="number" min="20" max="400" step="0.1" required></div>
-              <div class="form-group"><label>Data *</label><input name="data_registro" type="date" required></div>
+              <div class="form-group"><label for="ficha-aluno-field-7">Peso (kg) *</label><input id="ficha-aluno-field-7" name="peso_kg" type="number" min="20" max="400" step="0.1" required></div>
+              <div class="form-group"><label for="ficha-aluno-field-8">Data *</label><input id="ficha-aluno-field-8" name="data_registro" type="date" required></div>
             </div>
-            <div class="form-group"><label>Observações</label><input name="observacoes" maxlength="240" placeholder="Ex.: medição em jejum"></div>
+            <div class="form-group"><label for="ficha-aluno-field-9">Observações</label><input id="ficha-aluno-field-9" name="observacoes" maxlength="240" placeholder="Ex.: medição em jejum"></div>
             <button class="btn btn-primary" type="submit">Adicionar peso</button>
           </form>
         </article>
@@ -163,20 +163,20 @@
             <div class="assessment-group">
               <h3>Composição corporal</h3>
               <div class="grid grid-2 compact-form-grid">
-                <div class="form-group"><label>Data *</label><input name="data_avaliacao" type="date" required></div>
-                <div class="form-group"><label>Gordura corporal (%)</label><input name="percentual_gordura" type="number" min="1" max="75" step="0.1"></div>
+                <div class="form-group"><label for="ficha-aluno-field-10">Data *</label><input id="ficha-aluno-field-10" name="data_avaliacao" type="date" required></div>
+                <div class="form-group"><label for="ficha-aluno-field-11">Gordura corporal (%)</label><input id="ficha-aluno-field-11" name="percentual_gordura" type="number" min="1" max="75" step="0.1"></div>
               </div>
             </div>
             <div class="assessment-group">
               <h3>Medidas</h3>
               <div class="grid grid-2 compact-form-grid">
-                <div class="form-group"><label>Cintura (cm)</label><input name="cintura_cm" type="number" min="30" max="250" step="0.1"></div>
-                <div class="form-group"><label>Quadril (cm)</label><input name="quadril_cm" type="number" min="30" max="250" step="0.1"></div>
-                <div class="form-group"><label>Braço (cm)</label><input name="braco_cm" type="number" min="10" max="100" step="0.1"></div>
-                <div class="form-group"><label>Coxa (cm)</label><input name="coxa_cm" type="number" min="20" max="150" step="0.1"></div>
+                <div class="form-group"><label for="ficha-aluno-field-12">Cintura (cm)</label><input id="ficha-aluno-field-12" name="cintura_cm" type="number" min="30" max="250" step="0.1"></div>
+                <div class="form-group"><label for="ficha-aluno-field-13">Quadril (cm)</label><input id="ficha-aluno-field-13" name="quadril_cm" type="number" min="30" max="250" step="0.1"></div>
+                <div class="form-group"><label for="ficha-aluno-field-14">Braço (cm)</label><input id="ficha-aluno-field-14" name="braco_cm" type="number" min="10" max="100" step="0.1"></div>
+                <div class="form-group"><label for="ficha-aluno-field-15">Coxa (cm)</label><input id="ficha-aluno-field-15" name="coxa_cm" type="number" min="20" max="150" step="0.1"></div>
               </div>
             </div>
-            <div class="form-group"><label>Observações</label><textarea class="compact-textarea" name="observacoes"></textarea></div>
+            <div class="form-group"><label for="ficha-aluno-field-16">Observações</label><textarea id="ficha-aluno-field-16" class="compact-textarea" name="observacoes"></textarea></div>
             <button class="btn btn-primary" type="submit">Salvar avaliação</button>
           </form>
         </article>
