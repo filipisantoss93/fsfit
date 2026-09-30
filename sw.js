@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_VERSION = 22;
+const CACHE_VERSION = 23;
 const CACHE_NAME = `${CACHE_PREFIX}v${CACHE_VERSION}`;
 const BUNDLE_MANIFEST_URL = '/css/bundles/manifest.json';
 
@@ -177,13 +177,14 @@ function hasStylesheet(html) {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin || url.pathname === '/sw.js') return;
 
-  if (event.request.mode === 'navigate') {
-    event.respondWith(networkFirstNavigation(event.request, url.pathname));
-    return;
-  }
+  // Navegações nunca devem ser bloqueadas pelo service worker.
+  // O navegador acessa a rede diretamente; assim uma atualização incompleta
+  // de CSS/cache não consegue prender o PWA em uma resposta 503.
+  if (event.request.mode === 'navigate') return;
 
   if (event.request.destination === 'style' && isHashedBundlePath(url.pathname)) {
     event.respondWith(cacheFirstBundle(event.request));
