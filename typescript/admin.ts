@@ -84,7 +84,7 @@ function formatDate(value: unknown): string {
 
 function formatDateTime(value: unknown): string {
   if (!value) return '—';
-  const date = new Date(value);
+  const date = new Date(String(value));
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('pt-BR');
 }
 
@@ -116,7 +116,7 @@ function safeImageUrl(value: unknown): string {
 }
 
 function monthLabel(value: unknown): string {
-  if (!/^\d{4}-\d{2}$/.test(String(value || ''))) return value || '—';
+  if (!/^\d{4}-\d{2}$/.test(String(value || ''))) return String(value || '—');
   const date = new Date(`${value}-01T12:00:00`);
   return date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '');
 }
@@ -135,15 +135,15 @@ async function requireAdmin(): Promise<void> {
 }
 
 function applySummary(summary: JsonRecord = {}): void {
-  document.querySelector<HTMLElement>('#stat-accounts')!.textContent = Number(summary.contas || 0);
-  document.querySelector<HTMLElement>('#stat-subscribers')!.textContent = Number(summary.assinantes || 0);
-  document.querySelector<HTMLElement>('#stat-trial')!.textContent = Number(summary.trial || 0);
-  document.querySelector<HTMLElement>('#stat-inactive')!.textContent = Number(summary.inativas || 0);
+  document.querySelector<HTMLElement>('#stat-accounts')!.textContent = String(Number(summary.contas || 0));
+  document.querySelector<HTMLElement>('#stat-subscribers')!.textContent = String(Number(summary.assinantes || 0));
+  document.querySelector<HTMLElement>('#stat-trial')!.textContent = String(Number(summary.trial || 0));
+  document.querySelector<HTMLElement>('#stat-inactive')!.textContent = String(Number(summary.inativas || 0));
   document.querySelector<HTMLElement>('#stat-revenue-month')!.textContent = formatMoney(summary.faturamento_mes);
   document.querySelector<HTMLElement>('#stat-revenue-total')!.textContent = formatMoney(summary.faturamento_total);
-  document.querySelector<HTMLElement>('#finance-approved')!.textContent = Number(summary.pagamentos_aprovados || 0);
-  document.querySelector<HTMLElement>('#finance-pending')!.textContent = Number(summary.pendentes || 0);
-  document.querySelector<HTMLElement>('#finance-cancelled')!.textContent = Number(summary.cancelados_estornados || 0);
+  document.querySelector<HTMLElement>('#finance-approved')!.textContent = String(Number(summary.pagamentos_aprovados || 0));
+  document.querySelector<HTMLElement>('#finance-pending')!.textContent = String(Number(summary.pendentes || 0));
+  document.querySelector<HTMLElement>('#finance-cancelled')!.textContent = String(Number(summary.cancelados_estornados || 0));
   document.querySelector<HTMLElement>('#finance-ticket')!.textContent = formatMoney(summary.ticket_medio);
 }
 
@@ -151,9 +151,9 @@ function applyManagementMetrics(metrics: JsonRecord = {}): void {
   document.querySelector<HTMLElement>('#metric-revenue-30')!.textContent = formatMoney(metrics.receita_30d);
   document.querySelector<HTMLElement>('#metric-revenue-periods')!.textContent = `7d: ${formatMoney(metrics.receita_7d)} · 90d: ${formatMoney(metrics.receita_90d)}`;
   document.querySelector<HTMLElement>('#metric-mrr')!.textContent = formatMoney(metrics.mrr);
-  document.querySelector<HTMLElement>('#metric-active-subscriptions')!.textContent = Number(metrics.assinaturas_ativas || 0);
-  document.querySelector<HTMLElement>('#metric-new-subscribers')!.textContent = Number(metrics.novos_assinantes_30d || 0);
-  document.querySelector<HTMLElement>('#metric-cancellations')!.textContent = Number(metrics.cancelamentos_30d || 0);
+  document.querySelector<HTMLElement>('#metric-active-subscriptions')!.textContent = String(Number(metrics.assinaturas_ativas || 0));
+  document.querySelector<HTMLElement>('#metric-new-subscribers')!.textContent = String(Number(metrics.novos_assinantes_30d || 0));
+  document.querySelector<HTMLElement>('#metric-cancellations')!.textContent = String(Number(metrics.cancelamentos_30d || 0));
   document.querySelector<HTMLElement>('#metric-conversion')!.textContent = formatPercent(metrics.conversao_trial_premium);
   document.querySelector<HTMLElement>('#metric-revenue-per-customer')!.textContent = `Receita média/cliente: ${formatMoney(metrics.receita_media_cliente)}`;
   renderRevenueTrend(metrics.tendencia_mensal || []);
@@ -323,7 +323,7 @@ function openUserModal(userId: string | undefined, { focusPlan = false }: { focu
 
   userModal.classList.remove('hidden');
   document.body.classList.add('admin-modal-open');
-  if (focusPlan) setTimeout(() => userModalContent.querySelector('#admin-modal-plan-select')?.focus(), 0);
+  if (focusPlan) setTimeout(() => userModalContent.querySelector<HTMLSelectElement>('#admin-modal-plan-select')?.focus(), 0);
 }
 
 async function loadSummary(): Promise<void> {
@@ -477,7 +477,7 @@ async function exportFinanceCsv(): Promise<void> {
 }
 
 function scheduleUserSearch(): void {
-  clearTimeout(userSearchTimer);
+  if (userSearchTimer !== null) clearTimeout(userSearchTimer);
   userSearchTimer = setTimeout(async () => {
     userPage = 1;
     try {
@@ -490,7 +490,7 @@ function scheduleUserSearch(): void {
 }
 
 function scheduleFinanceSearch(): void {
-  clearTimeout(financeSearchTimer);
+  if (financeSearchTimer !== null) clearTimeout(financeSearchTimer);
   financeSearchTimer = setTimeout(async () => {
     financePage = 1;
     try {
