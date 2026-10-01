@@ -85,6 +85,6 @@ export function removeUiCache(userId: string | null | undefined, scope: string):
 if (window.location.pathname.endsWith('/painel.html')) {
   Promise.resolve()
     // @ts-ignore The browser runtime resolves this existing JavaScript module.
-    .then(() => import('./painel-ui-cache.js?v=20261001-ts-ui-cache1'))
+    .then(() => import('./painel-ui-cache.js?v=20261001-ts-panel-cache1'))
     .catch(error => console.info('Cache visual do painel indisponível:', error?.message || error));
 }
