@@ -11,6 +11,7 @@ const initMode = process.argv.includes('--init');
 const failures = [];
 const changed = [];
 const expectedWrites = new Map();
+const THEME_RUNTIME_TAG = '<script src="/js/theme-runtime.js?v=20261001-theme1" data-fsfit-theme-runtime></script>';
 
 const criticalPages = [
   'index.html',
@@ -263,6 +264,13 @@ function bundleLink(url, sources) {
   return `<link rel="stylesheet" href="${url}" ${attributes.join(' ')}>`;
 }
 
+function ensureThemeRuntime(html) {
+  if (/\bdata-fsfit-theme-runtime\b/i.test(html)) return html;
+  const firstStylesheet = html.match(/<link\b[^>]*rel=(["'])stylesheet\1[^>]*>/i)?.[0];
+  if (firstStylesheet) return html.replace(firstStylesheet, `${THEME_RUNTIME_TAG}\n  ${firstStylesheet}`);
+  return html.replace(/<\/head>/i, `  ${THEME_RUNTIME_TAG}\n</head>`);
+}
+
 function expectedHtml(pageFile, html, url, sources) {
   let inserted = false;
   const link = bundleLink(url, sources);
@@ -324,7 +332,7 @@ for (const page of [...configuredPages].sort()) {
     continue;
   }
 
-  const html = fs.readFileSync(pageFile, 'utf8');
+  const html = ensureThemeRuntime(fs.readFileSync(pageFile, 'utf8'));
   const configuredStyles = config.pages[page]?.styles;
   if (!Array.isArray(configuredStyles) || configuredStyles.length === 0) {
     failures.push(`${page}: lista de estilos vazia ou inválida.`);

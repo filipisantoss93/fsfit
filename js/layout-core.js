@@ -31,7 +31,7 @@ function clearFsFitStorage() {
     try {
         for (let index = localStorage.length - 1; index >= 0; index -= 1) {
             const key = localStorage.key(index);
-            if (key?.startsWith('fsfit:'))
+            if (key?.startsWith('fsfit:') && key !== 'fsfit:theme-preference')
                 localStorage.removeItem(key);
         }
     }
@@ -135,6 +135,14 @@ export function renderHeader(active = '') {
           <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html">${icon('settings')}<span>Administração</span><span class="admin-support-nav-badge hidden" data-admin-support-badge>0</span></a></li>
         </ul>
         <div class="nav-footer">
+          <div class="fsfit-theme-setting">
+            <span class="fsfit-theme-setting-label">Tema</span>
+            <div class="fsfit-theme-control" role="group" aria-label="Tema visual">
+              <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Auto</button>
+              <button type="button" data-fsfit-theme-choice="light" aria-pressed="false">Claro</button>
+              <button type="button" data-fsfit-theme-choice="dark" aria-pressed="false">Escuro</button>
+            </div>
+          </div>
           <a id="sidebar-profile" class="sidebar-profile" href="perfil.html" data-page="perfil">
             <span id="sidebar-profile-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span>
             <span class="sidebar-profile-copy"><strong id="sidebar-profile-name">Personal</strong><small>Meu perfil</small></span>
