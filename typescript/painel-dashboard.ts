@@ -145,7 +145,7 @@ async function loadPublicProfile(): Promise<void> {
 
 function applyPublicProfileUrl(url: string): void {
   const card = document.querySelector('#public-link-card');
-  const linkText = document.querySelector('#dashboard-public-link');
+  const linkText = document.querySelector<HTMLElement>('#dashboard-public-link');
   const description = document.querySelector('#public-link-description');
   const openLink = document.querySelector<HTMLAnchorElement>('#open-dashboard-public-link');
   const copyButton = document.querySelector<HTMLButtonElement>('#copy-dashboard-public-link');
@@ -213,7 +213,7 @@ function bindRecentStudentRows(): void {
 
   list.addEventListener('keydown', event => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
-    const row = event.target.closest('[data-student-href]');
+    const row = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-student-href]') : null;
     if (!row) return;
     event.preventDefault();
     openRow(row);
@@ -412,7 +412,7 @@ function capitalize(value: string = ''): string {
 }
 
 function formatDate(value?: string): string {
-  const date = new Date(value);
+  const date = new Date(value || '');
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('pt-BR');
 }
 
