@@ -32,12 +32,12 @@ function esc(value: unknown = ''): string {
 
 function elapsed(value: unknown): string {
   if (!value) return '0 min';
-  const minutes = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 60000));
+  const minutes = Math.max(0, Math.floor((Date.now() - new Date(String(value)).getTime()) / 60000));
   return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)}h ${minutes % 60}min`;
 }
 
 function formatTime(value: unknown): string {
-  return value ? new Date(value).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+  return value ? new Date(String(value)).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
 }
 
 function sessionMeta(row: LiveRow): string {
@@ -269,7 +269,7 @@ async function finishSession(sessionId: string, studentName: string, button: HTM
 
 async function sendMessage(event: Event): Promise<void> {
   event.preventDefault();
-  if (!currentSessionId || !chatInput || !chatSubmit) return;
+  if (!currentSessionId || !chatForm || !chatInput || !chatSubmit) return;
   const message = chatInput.value.trim();
   if (!message) return;
 
