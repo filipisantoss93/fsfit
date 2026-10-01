@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'fsfit-shell-';
-const CACHE_VERSION = 23;
+const CACHE_VERSION = 24;
 const CACHE_NAME = `${CACHE_PREFIX}v${CACHE_VERSION}`;
 const BUNDLE_MANIFEST_URL = '/css/bundles/manifest.json';
 
@@ -17,7 +17,6 @@ const CORE_SHELL = [
 
 const OPTIONAL_SHELL = [
   '/js/ui-cache.js',
-  '/js/page-data-cache.js',
   '/js/painel-ui-cache.js',
   '/js/painel-dashboard.js',
   '/js/painel-visao-geral.js',
