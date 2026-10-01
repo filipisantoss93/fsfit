@@ -8,7 +8,7 @@ interface StudentMeta { id: string; created_at?: string; foto_perfil_url?: strin
 const session = await requireSession();
 if (!session) throw new Error('Sessão inválida');
 
-const list = document.querySelector<HTMLTableSectionElement>('#students-list');
+const list = document.querySelector<HTMLTableSectionElement>('#students-list')!;
 const filterNav = document.querySelector<HTMLElement>('#student-filter-nav');
 
 let activeFilter = 'all';
@@ -193,8 +193,8 @@ function appendRowsInOrder(sorted: HTMLTableRowElement[]): void {
 function sortRows(rows: HTMLTableRowElement[]): void {
   const sorted = [...rows].sort((a, b) => {
     if (activeFilter === 'new') {
-      const aTime = new Date(studentMeta.get(a.dataset.studentId)?.created_at || 0).getTime();
-      const bTime = new Date(studentMeta.get(b.dataset.studentId)?.created_at || 0).getTime();
+      const aTime = new Date(studentMeta.get(a.dataset.studentId || '')?.created_at || 0).getTime();
+      const bTime = new Date(studentMeta.get(b.dataset.studentId || '')?.created_at || 0).getTime();
       if (bTime !== aTime) return bTime - aTime;
     }
     return String(a.dataset.studentName || '').localeCompare(String(b.dataset.studentName || ''), 'pt-BR', { sensitivity: 'base' });
@@ -209,7 +209,7 @@ function applyFilter(): void {
   closeActionMenus();
   const rows = [...list.querySelectorAll<HTMLTableRowElement>('tr[data-student-id]')];
   rows.forEach(row => {
-    const id = row.dataset.studentId;
+    const id = row.dataset.studentId || '';
     const meta = studentMeta.get(id);
     let visible = true;
     if (activeFilter === 'in_class') visible = inClassIds.has(id);
@@ -220,7 +220,7 @@ function applyFilter(): void {
 
   sortRows(rows);
   const visibleRows = rows.filter(row => !row.hidden);
-  let empty = list.querySelector('.student-filter-empty-row');
+  let empty = list.querySelector<HTMLTableRowElement>('.student-filter-empty-row');
   if (!visibleRows.length && rows.length) {
     if (!empty) {
       empty = document.createElement('tr');
@@ -298,7 +298,7 @@ list?.addEventListener('keydown', event => {
     const openHost = event.target.closest('.student-row-actions.is-open');
     if (openHost) {
       event.preventDefault();
-      const trigger = openHost.querySelector('[data-student-menu-trigger]');
+      const trigger = openHost.querySelector<HTMLButtonElement>('[data-student-menu-trigger]');
       closeActionMenus();
       trigger?.focus();
     }
