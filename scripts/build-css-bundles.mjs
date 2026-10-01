@@ -276,7 +276,12 @@ function expectedHtml(pageFile, html, url, sources) {
     return link;
   });
   if (!inserted) throw new Error(`${relative(pageFile)} não possui ponto de inserção para o bundle.`);
-  return updated
+  const themeRuntime = '<script src="/js/theme-runtime.js?v=20261001-theme1" data-fsfit-theme-runtime></script>';
+  const themed = /\bdata-fsfit-theme-runtime\b/i.test(updated)
+    ? updated
+    : updated.replace(/(<link\b[^>]*data-fsfit-bundle[^>]*>)/i, `${themeRuntime}\n  $1`);
+
+  return themed
     .replace(/^[\t ]+$/gm, '')
     .replace(/(<link\b[^>]*data-fsfit-bundle[^>]*>\r?\n)(?:\r?\n)+/i, '$1')
     .replace(/\r?\n(?:\r?\n)+([\t ]*<\/head>)/i, '\n$1');
