@@ -92,7 +92,7 @@ async function cancelCardSubscription(access: JsonRecord, { removeCard = false, 
     if (errorBox) errorBox.hidden = true;
     try {
       const { data, error } = await supabase.functions.invoke('cancelar-assinatura-cartao-fsfit', {
-        body: { assinatura_id: access.assinatura_id, remover_cartao: removeCard }
+        body: { assinatura_id: access!.assinatura_id, remover_cartao: removeCard }
       });
       if (data?.erro) throw new Error(data.erro);
       if (error) throw error;
@@ -199,7 +199,7 @@ async function openCardForm({ access = null, plan = null, mode = 'subscribe' }: 
         content.innerHTML = '<div class="subscription-success"><strong>✅ Cartão atualizado</strong><span>As próximas cobranças automáticas usarão o novo cartão.</span></div>';
       } else {
         const payload = {
-          plano_id: plan.id,
+          plano_id: plan!.id,
           payment_token: tokenResult.payment_token,
           cartao_mascara: tokenResult.card_mask || null,
           customer: {
