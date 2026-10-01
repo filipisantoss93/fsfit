@@ -39,6 +39,9 @@ on:
       - 'js/config.js'
       - 'js/alunos-dashboard.js'
       - 'js/dieta-modelos-aluno.js'
+      - 'js/checkout-endereco.js'
+      - 'js/treino-aluno-app.js'
+      - 'js/page-module-loader.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -90,6 +93,9 @@ on:
       - 'js/config.js'
       - 'js/alunos-dashboard.js'
       - 'js/dieta-modelos-aluno.js'
+      - 'js/checkout-endereco.js'
+      - 'js/treino-aluno-app.js'
+      - 'js/page-module-loader.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -173,6 +179,9 @@ jobs:
             js/config.js \
             js/alunos-dashboard.js \
             js/dieta-modelos-aluno.js \
+            js/checkout-endereco.js \
+            js/treino-aluno-app.js \
+            js/page-module-loader.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
