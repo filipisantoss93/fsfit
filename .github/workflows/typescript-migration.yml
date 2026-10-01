@@ -228,7 +228,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -243,8 +243,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -260,17 +258,6 @@ jobs:
 
       - name: Build browser JavaScript
         run: npm run build:typescript
-
-      - name: Commit generated JavaScript for migration batch
-        if: github.event_name == 'pull_request'
-        run: |
-          if ! git diff --quiet -- js/mobile-more-swipe.js; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add js/mobile-more-swipe.js
-            git commit -m "Build mobile more navigation TypeScript output"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
 
       - name: Ensure generated JavaScript is committed
         run: |
