@@ -35,7 +35,7 @@ async function enhance(batchSelector: HTMLElement, categorySelect: HTMLSelectEle
     .order('nome');
   if (error) throw error;
 
-  const library = (data || []).map(item => ({
+  const library: any[] = (data || []).map((item: any) => ({
     ...item,
     categoria: (item.grupo_muscular || 'Outros').trim() || 'Outros',
     tipo_prescricao: item.tipo_prescricao || 'repeticoes'
@@ -108,7 +108,7 @@ async function enhance(batchSelector: HTMLElement, categorySelect: HTMLSelectEle
   }
 
   function categories(): string[] {
-    return [...new Set(library.map(item => item.categoria))].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+    return [...new Set(library.map((item: any) => String(item.categoria)))].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
   }
 
   function renderCategories(): void {
@@ -121,7 +121,7 @@ async function enhance(batchSelector: HTMLElement, categorySelect: HTMLSelectEle
   function renderOptions(): void {
     const selected = selectedIds();
     const term = normalize(search.value);
-    const filtered = library.filter(item => {
+    const filtered = library.filter((item: any) => {
       if (activeCategory && item.categoria !== activeCategory) return false;
       if (!term) return true;
       return normalize(`${item.nome} ${item.categoria} ${item.equipamento || ''}`).includes(term);
@@ -134,9 +134,9 @@ async function enhance(batchSelector: HTMLElement, categorySelect: HTMLSelectEle
     }
 
     const groups = new Map<string, any[]>();
-    filtered.forEach(item => {
+    filtered.forEach((item: any) => {
       if (!groups.has(item.categoria)) groups.set(item.categoria, []);
-      groups.get(item.categoria).push(item);
+      groups.get(item.categoria)!.push(item);
     });
 
     optionsHost.innerHTML = [...groups.entries()].map(([group, items]) => `
@@ -164,7 +164,7 @@ async function enhance(batchSelector: HTMLElement, categorySelect: HTMLSelectEle
 
     chips.hidden = total === 0;
     chips.innerHTML = [...selected].map(id => {
-      const item = library.find(exercise => String(exercise.id) === id);
+      const item = library.find((exercise: any) => String(exercise.id) === id);
       return `<button class="structured-exercise-picker-chip" type="button" data-remove-structured-chip="${escapeHtml(id)}">${escapeHtml(item?.nome || 'Exercício')} <span>×</span></button>`;
     }).join('');
   }
