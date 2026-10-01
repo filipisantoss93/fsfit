@@ -20,6 +20,8 @@ on:
       - 'js/agenda-student-search.js'
       - 'js/ficha-aluno-hierarquia.js'
       - 'js/painel-home-desktop-carousel.js'
+      - 'js/assinatura-experiencia.js'
+      - 'js/treino-exercicio-categorias.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -52,6 +54,8 @@ on:
       - 'js/agenda-student-search.js'
       - 'js/ficha-aluno-hierarquia.js'
       - 'js/painel-home-desktop-carousel.js'
+      - 'js/assinatura-experiencia.js'
+      - 'js/treino-exercicio-categorias.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -116,6 +120,8 @@ jobs:
             js/agenda-student-search.js \
             js/ficha-aluno-hierarquia.js \
             js/painel-home-desktop-carousel.js \
+            js/assinatura-experiencia.js \
+            js/treino-exercicio-categorias.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
