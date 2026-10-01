@@ -1,4 +1,4 @@
 import './dieta-aluno.js';
 import './dieta-biblioteca-refeicoes.js?v=20260716-1';
-import './dieta-modelos-aluno.js?v=20260716-1';
+import './dieta-modelos-aluno.js?v=20261001-ts-diet-models1';
 import './dieta-refeicao-modal.js?v=20260930-ts1';
