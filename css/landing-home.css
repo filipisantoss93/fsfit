@@ -790,3 +790,149 @@ body.ads-landing .lp-sticky-cta {
     min-height: 280px !important;
   }
 }
+
+/* FS Fit landing — tema claro */
+html[data-fsfit-theme="light"] body.ads-landing {
+  --lp-bg: #f5f7f8;
+  --lp-surface: #ffffff;
+  --lp-surface-2: #eef2f4;
+  --lp-border: rgba(23, 33, 43, .14);
+  --lp-text: #17212b;
+  --lp-muted: #5f6d79;
+  --lp-primary: #4f7f28;
+  --lp-primary-strong: #3f681f;
+  --lp-blue: #416f9e;
+  --lp-danger: #b44851;
+  --lp-warning: #8d650b;
+  --lp-shadow: 0 24px 64px rgba(28, 39, 49, .14);
+  background:
+    radial-gradient(circle at 78% 3%, rgba(79, 127, 40, .05), transparent 25%),
+    var(--lp-bg);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-header {
+  background: rgba(255, 255, 255, .92);
+  border-bottom-color: var(--lp-border);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-logo-mark,
+html[data-fsfit-theme="light"] body.ads-landing .lp-browser-bar,
+html[data-fsfit-theme="light"] body.ads-landing .lp-agenda-card,
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-card,
+html[data-fsfit-theme="light"] body.ads-landing .lp-auth-card,
+html[data-fsfit-theme="light"] body.ads-landing .lp-device-today {
+  background: var(--lp-surface-2);
+  border-color: var(--lp-border);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-browser,
+html[data-fsfit-theme="light"] body.ads-landing .lp-floating-note,
+html[data-fsfit-theme="light"] body.ads-landing .lp-sticky-cta,
+html[data-fsfit-theme="light"] body.ads-landing .lp-compare-card,
+html[data-fsfit-theme="light"] body.ads-landing .lp-feature,
+html[data-fsfit-theme="light"] body.ads-landing .lp-price-card,
+html[data-fsfit-theme="light"] body.ads-landing .lp-faq details,
+html[data-fsfit-theme="light"] body.ads-landing .lp-device-profile,
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-exercise,
+html[data-fsfit-theme="light"] body.ads-landing .lp-stat,
+html[data-fsfit-theme="light"] body.ads-landing .lp-agenda-row {
+  background: var(--lp-surface);
+  border-color: var(--lp-border);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-trust,
+html[data-fsfit-theme="light"] body.ads-landing .lp-student-section {
+  background: rgba(23, 33, 43, .02);
+  border-color: var(--lp-border);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-trust-item + .lp-trust-item,
+html[data-fsfit-theme="light"] body.ads-landing .lp-trust-item:nth-child(3),
+html[data-fsfit-theme="light"] body.ads-landing .lp-trust-item:nth-child(4),
+html[data-fsfit-theme="light"] body.ads-landing .lp-footer {
+  border-color: var(--lp-border);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-proof-list li,
+html[data-fsfit-theme="light"] body.ads-landing .lp-compare-list li,
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-tags span,
+html[data-fsfit-theme="light"] body.ads-landing .lp-price-features li,
+html[data-fsfit-theme="light"] body.ads-landing .lp-signup-points span,
+html[data-fsfit-theme="light"] body.ads-landing .lp-auth-card label {
+  color: var(--lp-text);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-microcopy,
+html[data-fsfit-theme="light"] body.ads-landing .lp-price-note {
+  color: var(--lp-muted);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-btn-primary,
+html[data-fsfit-theme="light"] body.ads-landing .lp-device-tabs span:first-child,
+html[data-fsfit-theme="light"] body.ads-landing .lp-device-action,
+html[data-fsfit-theme="light"] body.ads-landing .lp-student-button,
+html[data-fsfit-theme="light"] body.ads-landing .lp-price-badge,
+html[data-fsfit-theme="light"] body.ads-landing .lp-auth-card #auth-submit {
+  color: #ffffff;
+  background: var(--lp-primary);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-btn-primary:hover {
+  background: var(--lp-primary-strong);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-btn-outline {
+  color: var(--lp-text);
+  border-color: var(--lp-border);
+  background: transparent;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-btn-soft,
+html[data-fsfit-theme="light"] body.ads-landing .lp-eyebrow,
+html[data-fsfit-theme="light"] body.ads-landing .lp-feature-icon,
+html[data-fsfit-theme="light"] body.ads-landing .lp-value-number {
+  color: var(--lp-primary);
+  border-color: rgba(79, 127, 40, .24);
+  background: rgba(79, 127, 40, .08);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-auth-card input {
+  color: var(--lp-text);
+  border-color: var(--lp-border);
+  background: #ffffff;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-auth-card .message.error {
+  color: #a13f47;
+  border-color: rgba(180, 72, 81, .24);
+  background: rgba(180, 72, 81, .08);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-auth-card .message.success {
+  color: #416f24;
+  border-color: rgba(79, 127, 40, .24);
+  background: rgba(79, 127, 40, .08);
+}
+
+/* Mockups permanecem visualmente distintos, mas legíveis em tema claro. */
+html[data-fsfit-theme="light"] body.ads-landing .lp-phone,
+html[data-fsfit-theme="light"] body.ads-landing .lp-student-device {
+  background: #dfe5e8;
+  border-color: rgba(23, 33, 43, .16);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-phone-screen,
+html[data-fsfit-theme="light"] body.ads-landing .lp-student-device-screen {
+  background: linear-gradient(180deg, #ffffff, #eef3ef 30%, #f7f9fa);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-phone-notch {
+  background: #cfd6da;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-student-avatar,
+html[data-fsfit-theme="light"] body.ads-landing .lp-avatar-stack span {
+  color: var(--lp-text);
+  background: var(--lp-surface-2);
+  border-color: var(--lp-border);
+}
