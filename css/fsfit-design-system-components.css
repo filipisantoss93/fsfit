@@ -360,3 +360,58 @@ body.fsfit-saas .quick-action:hover {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* Seletor global de tema */
+.fsfit-theme-setting,
+.fsfit-more-theme {
+  display: grid;
+  gap: var(--fs-space-2);
+}
+
+.fsfit-theme-setting-label {
+  color: var(--fs-text-subtle);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.fsfit-theme-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--fs-space-1);
+  padding: var(--fs-space-1);
+  border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius-md);
+  background: var(--fs-surface-raised);
+}
+
+.fsfit-theme-control button {
+  min-height: 38px;
+  padding: 0 var(--fs-space-2);
+  border: 0;
+  border-radius: var(--fs-radius-sm);
+  background: transparent;
+  color: var(--fs-text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 800;
+}
+
+.fsfit-theme-control button:hover {
+  color: var(--fs-text);
+  background: var(--fs-surface-soft);
+}
+
+.fsfit-theme-control button.is-active,
+.fsfit-theme-control button[aria-pressed="true"] {
+  color: var(--fs-text-on-primary);
+  background: var(--fs-primary);
+}
+
+.fsfit-theme-control button:focus-visible {
+  outline: none;
+  box-shadow: var(--fs-focus-ring);
+}
