@@ -1,4 +1,4 @@
-import './modal-focus-a11y.js';
+import './modal-focus-a11y.js?v=20260930-ts1';
 import { supabase } from './supabase.js';
 import './painel-plano-free-ui.js?v=20260725-free-ui4';
 

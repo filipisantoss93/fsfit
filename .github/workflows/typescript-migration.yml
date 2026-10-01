@@ -6,11 +6,13 @@ on:
       - 'typescript/**/*.ts'
       - 'js/admin-search-clear.js'
       - 'js/admin-tabs.js'
+      - 'js/admin-assinatura-saude.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
       - 'js/exercise-picker-horizontal-scroll-fix.js'
       - 'js/library-row-click.js'
+      - 'js/modal-focus-a11y.js'
       - 'js/treino-aluno-empty-state-guard.js'
       - 'tsconfig.json'
       - 'package.json'
@@ -23,11 +25,13 @@ on:
       - 'typescript/**/*.ts'
       - 'js/admin-search-clear.js'
       - 'js/admin-tabs.js'
+      - 'js/admin-assinatura-saude.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
       - 'js/exercise-picker-horizontal-scroll-fix.js'
       - 'js/library-row-click.js'
+      - 'js/modal-focus-a11y.js'
       - 'js/treino-aluno-empty-state-guard.js'
       - 'tsconfig.json'
       - 'package.json'
@@ -72,11 +76,13 @@ jobs:
           git diff --exit-code -- \
             js/admin-search-clear.js \
             js/admin-tabs.js \
+            js/admin-assinatura-saude.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
             js/exercise-picker-horizontal-scroll-fix.js \
             js/library-row-click.js \
+            js/modal-focus-a11y.js \
             js/treino-aluno-empty-state-guard.js
 
       - name: Validate page script references

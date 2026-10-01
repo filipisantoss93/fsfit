@@ -1,4 +1,4 @@
-import './modal-focus-a11y.js';
+import './modal-focus-a11y.js?v=20260930-ts1';
 
 const DISMISS_KEY = 'fsfit_student_push_onboarding_dismissed_until';
 const DAY_MS = 24 * 60 * 60 * 1000;
