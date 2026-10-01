@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js';
+import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js?v=20261001-ts3';
 
 const token = localStorage.getItem('fsfit_aluno_token');
 const root = document.querySelector('#student-content');
