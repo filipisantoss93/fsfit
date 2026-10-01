@@ -581,7 +581,7 @@ function waitForElement(selector: string, timeout: number = 5000): Promise<HTMLE
 
   return new Promise<HTMLElement | null>(resolve => {
     const observer = new MutationObserver(() => {
-      const element = document.querySelector(selector);
+      const element = document.querySelector<HTMLElement>(selector);
       if (!element) return;
       observer.disconnect();
       resolve(element);
