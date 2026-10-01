@@ -745,3 +745,13 @@
     transition: none;
   }
 }
+
+
+/* Tema no shell lateral */
+.nav-footer .fsfit-theme-setting {
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius-md);
+  background: var(--fs-surface);
+}
