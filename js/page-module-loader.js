@@ -2,7 +2,7 @@ const LOADER_STATE_KEY = '__FSFIT_PAGE_MODULE_LOADER_STATE__';
 
 const MODULES = [
   { id: 'student-workflow-enhancements', pages: ['treino-aluno.html', 'ficha-aluno.html', 'financeiro.html', 'agenda.html'], source: './student-workflow-improvements.js?v=20260725-student-workflow1', errorMessage: 'Melhorias integradas do aluno indisponíveis:' },
-  { id: 'student-record-hierarchy', pages: ['ficha-aluno.html'], source: './ficha-aluno-hierarquia.js?v=20260725-hierarchy1', errorMessage: 'Hierarquia otimizada da ficha do aluno indisponível:' },
+  { id: 'student-record-hierarchy', pages: ['ficha-aluno.html'], source: './ficha-aluno-hierarquia.js?v=20261001-ts4', errorMessage: 'Hierarquia otimizada da ficha do aluno indisponível:' },
   { id: 'day-workout-customizer', pages: ['treino-aluno.html'], source: './treino-dia-personalizacao.js?v=20260725-day-custom1', errorMessage: 'Personalização do treino aplicado indisponível:' },
   { id: 'exercise-category-filter', pages: ['treino-aluno.html'], source: './treino-exercicio-categorias.js?v=20260725-category1', errorMessage: 'Categorias do seletor de exercícios indisponíveis:' },
   { id: 'student-session-controls', pages: ['aluno.html'], source: './aluno-sessao-controles.js?v=20260726-session1', errorMessage: 'Controles de sessão do aluno indisponíveis:' },
