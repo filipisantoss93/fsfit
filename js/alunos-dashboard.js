@@ -37,7 +37,86 @@ function initials(value = '') {
 }
 function isNew(createdAt) {
     const time = new Date(createdAt || 0).getTime();
-    return Number.isFinite(time) && time >= Date.now() - …979 tokens truncated…vel carregar o resumo dos alunos.</div>';
+    return Number.isFinite(time) && time >= Date.now() - (30 * 24 * 60 * 60 * 1000);
+}
+function avatar(student) {
+    const photo = String(student.foto_perfil_url || '').trim();
+    return `<span class="fs-dashboard-avatar" aria-hidden="true">${photo ? `<img src="${esc(photo)}" alt="" loading="lazy">` : esc(initials(student.nome))}</span>`;
+}
+function renderAttention(students) {
+    const count = attentionCount;
+    const list = attentionList;
+    count.textContent = String(students.length);
+    list.innerHTML = students.length
+        ? students.slice(0, 8).map(student => `
+      <a class="fs-dashboard-attention-item" href="ficha-aluno.html?id=${encodeURIComponent(student.id)}">
+        ${avatar(student)}
+        <span class="fs-dashboard-attention-copy">
+          <strong>${esc(student.nome)}</strong>
+          <small>${student.created_at ? `Cadastrado em ${new Date(student.created_at).toLocaleDateString('pt-BR')}` : 'Treino ainda não configurado'}</small>
+        </span>
+        <span class="fs-dashboard-status">Sem treino</span>
+      </a>`).join('')
+        : '<div class="fs-dashboard-empty">Todos os alunos possuem treino ativo.</div>';
+}
+async function loadDashboard() {
+    const [studentsResult, sessionsResult, workoutsResult] = await Promise.all([
+        supabase
+            .from('alunos')
+            .select('id,nome,created_at,foto_perfil_url,status')
+            .eq('personal_id', session.user.id)
+            .eq('status', 'ativo')
+            .order('created_at', { ascending: false }),
+        supabase.rpc('listar_sessoes_em_aula_personal'),
+        supabase
+            .from('treinos')
+            .select('aluno_id')
+            .eq('personal_id', session.user.id)
+            .eq('status', 'ativo')
+    ]);
+    if (studentsResult.error)
+        throw studentsResult.error;
+    if (sessionsResult.error)
+        console.warn('Não foi possível carregar sessões em aula:', sessionsResult.error);
+    if (workoutsResult.error)
+        console.warn('Não foi possível carregar treinos ativos:', workoutsResult.error);
+    const students = (studentsResult.data || []);
+    const liveIds = new Set((sessionsResult.data || [])
+        .filter(item => item.status === 'em_aula')
+        .map(item => String(item.aluno_id || ''))
+        .filter(Boolean));
+    const workoutIds = new Set((workoutsResult.data || [])
+        .map(item => String(item.aluno_id || ''))
+        .filter(Boolean));
+    const total = students.length;
+    const live = students.filter(student => liveIds.has(String(student.id))).length;
+    const activeWorkout = students.filter(student => workoutIds.has(String(student.id))).length;
+    const noWorkoutStudents = students.filter(student => !workoutIds.has(String(student.id)));
+    const newStudents = students.filter(student => isNew(student.created_at)).length;
+    totalNode.textContent = String(total);
+    liveNode.textContent = String(live);
+    activeNode.textContent = String(activeWorkout);
+    noWorkoutNode.textContent = String(noWorkoutStudents.length);
+    newNode.textContent = String(newStudents);
+    donutTotal.textContent = String(total);
+    legendActive.textContent = String(activeWorkout);
+    legendLive.textContent = String(live);
+    legendNoWorkout.textContent = String(noWorkoutStudents.length);
+    const activePercent = total ? Math.round((activeWorkout / total) * 100) : 0;
+    const livePercent = total ? Math.round((live / total) * 100) : 0;
+    donut.style.setProperty('--dashboard-active', `${activePercent}%`);
+    donut.style.setProperty('--dashboard-live', `${Math.min(activePercent + livePercent, 100)}%`);
+    renderAttention(noWorkoutStudents);
+}
+async function refresh() {
+    if (refreshTimer !== null)
+        window.clearTimeout(refreshTimer);
+    try {
+        await loadDashboard();
+    }
+    catch (error) {
+        console.error('Erro ao carregar dashboard de alunos:', error);
+        attentionList.innerHTML = '<div class="fs-dashboard-empty">Não foi possível carregar o resumo dos alunos.</div>';
     }
 }
 await refresh();
