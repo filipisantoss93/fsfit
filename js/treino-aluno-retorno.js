@@ -97,7 +97,7 @@ import('./treino-exercise-picker-sheet.js?v=20260721-picker-sheet1').catch(error
   console.error('Falha ao carregar seletor de exercícios do treino estruturado:', error);
 });
 
-import('./treino-aluno-app.js?v=20260725-simple-boot2').catch(error => {
+import('./treino-aluno-app.js?v=20261001-ts-simple-app1').catch(error => {
   console.error('Falha ao carregar a página simplificada de treinos:', error);
   document.body?.classList.add('workout-simple-fallback');
 });
