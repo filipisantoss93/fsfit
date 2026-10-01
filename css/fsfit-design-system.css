@@ -38,6 +38,8 @@
   --fs-primary-soft: rgba(131, 189, 69, .09);
   --fs-primary-border: rgba(131, 189, 69, .24);
   --fs-info: #6e94bd;
+  --fs-info-hover: #7ea5ce;
+  --fs-text-on-info: #0b0f14;
   --fs-info-soft: rgba(110, 148, 189, .10);
   --fs-info-border: rgba(110, 148, 189, .28);
   --fs-info-text: #a9c0d8;
@@ -165,6 +167,8 @@ html[data-fsfit-theme="light"] {
   --fs-primary-soft: rgba(73, 115, 38, .09);
   --fs-primary-border: rgba(73, 115, 38, .25);
   --fs-info: #416f9e;
+  --fs-info-hover: #365f89;
+  --fs-text-on-info: #ffffff;
   --fs-info-soft: rgba(65, 111, 158, .09);
   --fs-info-border: rgba(65, 111, 158, .24);
   --fs-info-text: #416f9e;
