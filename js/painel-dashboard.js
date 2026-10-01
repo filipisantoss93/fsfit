@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 import { renderHeader, requireSession, setGreeting } from './layout.js';
-import { patchUiCache, readUiCache } from './ui-cache.js';
+import { patchUiCache, readUiCache } from './ui-cache.js?v=20261001-ts-ui-cache1';
 
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
