@@ -24,7 +24,7 @@ if (hasDashboard) {
     },
     {
       id: 'painel-home-avatar',
-      source: './painel-home-avatar.js?v=20260724-home-avatar1',
+      source: './painel-home-avatar.js?v=20261001-ts-home-avatar1',
       errorMessage: 'Falha ao carregar a foto do aluno no card Agora:'
     },
     {
@@ -83,7 +83,7 @@ if (hasDashboard) {
     },
     {
       id: 'painel-agenda-modal-avatar',
-      source: './painel-agenda-modal-avatar.js?v=20260723-agenda-avatar3',
+      source: './painel-agenda-modal-avatar.js?v=20261001-ts-agenda-avatar1',
       errorMessage: 'Falha ao carregar a foto do aluno no modal da agenda de hoje:'
     }
   ]);
