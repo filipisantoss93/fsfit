@@ -63,7 +63,7 @@ function visibleUserIds(): string[] {
 function applyStudentCountsToRows(): void {
   if (!usersList) return;
 
-  usersList.querySelectorAll('tr[data-admin-user-id]').forEach(row => {
+  usersList.querySelectorAll<HTMLTableRowElement>('tr[data-admin-user-id]').forEach(row => {
     const userId = row.dataset.adminUserId;
     if (!userId || !studentCountCache.has(userId)) return;
 
@@ -123,11 +123,11 @@ async function enhanceStudentCountInModal(userId: string): Promise<void> {
 
 function compactUsersTable(): void {
   if (!usersList) return;
-  const table = usersList.closest('table');
+  const table = usersList.closest<HTMLTableElement>('table');
   if (!table) return;
   table.classList.add('admin-users-compact-table');
 
-  const header = table.querySelector('thead tr');
+  const header = table.querySelector<HTMLTableRowElement>('thead tr');
   if (header && !header.dataset.compactReady) {
     header.innerHTML = '<th>Usuário</th><th>Vencimento</th><th aria-label="Abrir detalhes"></th>';
     header.dataset.compactReady = 'true';
