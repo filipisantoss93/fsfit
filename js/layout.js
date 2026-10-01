@@ -57,7 +57,7 @@ function scheduleNonCriticalEnhancements() {
   window.setTimeout(() => {
     const page = currentPage();
     if (document.querySelector('[data-checkout-endereco], #checkout-endereco, [name="cep"]')) {
-      import('./checkout-endereco.js').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
+      import('./checkout-endereco.js?v=20261001-ts-address1').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
     }
     if (document.querySelector('.fsfit-more-sheet, [data-bottom-page="mais"]')) {
       import('./mobile-more-swipe.js?v=20260721-more-swipe1').catch(error => console.error('Não foi possível carregar os gestos do menu Mais:', error));
