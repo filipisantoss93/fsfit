@@ -219,7 +219,7 @@ function autoScroll(scrollParent: HTMLElement | Window, clientY: number): void {
   const edge = 72;
   const speed = 14;
 
-  if (scrollParent === window) {
+  if (!(scrollParent instanceof HTMLElement)) {
     if (clientY < edge) window.scrollBy(0, -speed);
     else if (clientY > window.innerHeight - edge) window.scrollBy(0, speed);
     return;
