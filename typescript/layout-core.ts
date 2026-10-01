@@ -80,7 +80,9 @@ async function signOutAndRedirect(): Promise<void> {
 }
 
 if (currentPage() !== 'ficha-aluno.html') {
+  // @ts-ignore Browser module keeps a cache-busting query string.
   import('./mobile-experience.js?v=20260721-mobile-polish1').catch(() => undefined);
+  // @ts-ignore Browser module keeps a cache-busting query string.
   import('./mobile-experience-fixes.js?v=20260721-mobile-polish2').catch(() => undefined);
 }
 
@@ -180,7 +182,7 @@ export function renderHeader(active: string = ''): void {
   };
 
   const handleDocumentClick = (event: MouseEvent): void => {
-    if (!host.contains(event.target)) {
+    if (!(event.target instanceof Node) || !host.contains(event.target)) {
       setMenuOpen(false);
       setNotificationsOpen(false);
     }
@@ -206,7 +208,7 @@ export function renderHeader(active: string = ''): void {
   notificationButton?.addEventListener('click', event => {
     event.stopPropagation();
     setMenuOpen(false);
-    setNotificationsOpen(notificationPanel?.hidden ?? true);
+    setNotificationsOpen(Boolean(notificationPanel?.hidden ?? true));
   });
 
   menu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
@@ -338,7 +340,7 @@ function escapeNotificationHtml(value: unknown = ''): string {
 }
 
 function formatNotificationDate(value: unknown): string {
-  const date = new Date(value);
+  const date = new Date(String(value ?? ''));
   if (Number.isNaN(date.getTime())) return '';
   return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
@@ -398,7 +400,7 @@ async function loadNotifications(session: SessionRecord): Promise<void> {
     updateAdminSupportBadges(supportUnreadCount);
 
     list.innerHTML = notifications.length
-      ? notifications.map(item => {
+      ? notifications.map((item: JsonRecord) => {
           const link = safeNotificationLink(item.link);
           const tag = link ? `a href="${escapeNotificationHtml(link)}"` : 'div';
           return `<${tag} class="notification-item ${item.lida ? '' : 'unread'}" data-notification-id="${item.id}"><span class="notification-dot" aria-hidden="true"></span><span class="notification-copy"><strong>${escapeNotificationHtml(item.titulo || 'Notificação')}</strong><span>${escapeNotificationHtml(item.mensagem || '')}</span><small>${escapeNotificationHtml(formatNotificationDate(item.created_at))}</small></span><span class="notification-chevron" aria-hidden="true">›</span></${link ? 'a' : 'div'}>`;
@@ -493,7 +495,7 @@ export async function setGreeting(session: SessionRecord | null): Promise<void> 
   }
   if (sidebarName) sidebarName.textContent = resolvedName;
   if (sidebarAvatar) {
-    const initials = resolvedName.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join('') || 'PF';
+    const initials = String(resolvedName).split(/\s+/).filter(Boolean).slice(0, 2).map((part: string) => part[0]?.toUpperCase()).join('') || 'PF';
     const avatarUrl = session.user?.user_metadata?.avatar_url || session.user?.user_metadata?.picture || '';
     if (avatarUrl) {
       sidebarAvatar.style.backgroundImage = `url("${String(avatarUrl).replace(/"/g, '%22')}")`;
