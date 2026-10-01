@@ -1,4 +1,5 @@
 import { supabase } from './supabase.js';
+// @ts-ignore Existing browser JavaScript re-export.
 import { renderHeader, requireSession, setGreeting, showMessage } from './layout.js';
 
 renderHeader('alunos');
@@ -34,7 +35,7 @@ if (!alunoId) {
 
 function esc(value: unknown = ''): string {
   const div = document.createElement('div');
-  div.textContent = value ?? '';
+  div.textContent = String(value ?? '');
   return div.innerHTML;
 }
 
@@ -80,7 +81,7 @@ function recurrenceLabel(value: string | null): string {
     'FREQ=DAILY': 'Diário',
     'FREQ=WEEKLY': 'Semanal',
     'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR': 'Seg. a sex.'
-  } as Record<string, string>)[value];
+  } as Record<string, string>)[String(value || '')];
   if (fixed) return fixed;
 
   const match = /^FREQ=(MINUTELY|HOURLY|DAILY);INTERVAL=([1-9]\d*)$/.exec(String(value || ''));
@@ -138,7 +139,7 @@ function toLocalInput(value: string | null): string {
 
 function hideInternalStatusField(): void {
   if (!form) return;
-  const statusField = form?.status?.closest('.form-group');
+  const statusField = form.status.closest('.form-group') as HTMLElement | null;
   if (statusField) statusField.hidden = true;
   if (form?.status) form.status.disabled = true;
 }
@@ -176,7 +177,7 @@ async function loadReminders(): Promise<void> {
     return;
   }
 
-  list.innerHTML = data?.length ? data.map(item => `
+  list.innerHTML = data?.length ? data.map((item: any) => `
     <tr>
       <td>${esc(formatDateTime(item.agendado_para))}</td>
       <td><strong>${esc(item.titulo)}</strong><br><small>${esc(item.mensagem)}</small></td>
