@@ -33,7 +33,7 @@
   position: absolute;
   inset: 0;
   border: 0;
-  background: rgba(0, 0, 0, .62);
+  background: var(--fs-overlay);
   opacity: 0;
   transition: opacity .24s ease;
   backdrop-filter: blur(3px);
@@ -55,7 +55,7 @@
   border: 1px solid rgba(255,255,255,.1);
   border-bottom: 0;
   border-radius: 24px 24px 0 0;
-  background: rgba(24,27,33,.98);
+  background: var(--fs-surface-overlay);
   box-shadow: 0 -24px 70px rgba(0,0,0,.5);
   transform: translateY(105%);
   transition: transform .28s cubic-bezier(.22,.75,.22,1);
@@ -130,7 +130,7 @@
   padding: 10px 12px;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 14px;
-  background: rgba(37,42,51,.74);
+  background: var(--fs-surface-raised);
   color: var(--text);
   cursor: pointer;
   text-align: left;
@@ -148,7 +148,7 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: rgba(50,215,75,.1);
+  background: var(--fs-primary-soft);
   color: var(--primary);
   font-size: .8rem;
   font-weight: 900;
@@ -176,20 +176,20 @@
 }
 
 .fsfit-more-item-chevron {
-  color: #6f7886;
+  color: var(--fs-text-subtle);
   font-size: 1.3rem;
   line-height: 1;
 }
 
 .fsfit-more-item.is-danger {
   margin-top: 4px;
-  border-color: rgba(255,90,95,.2);
-  color: #ffc6c8;
+  border-color: var(--fs-danger-border);
+  color: var(--fs-danger-text);
 }
 
 .fsfit-more-item.is-danger .fsfit-more-item-icon {
-  background: rgba(255,90,95,.1);
-  color: #ff777c;
+  background: var(--fs-danger-soft);
+  color: var(--fs-danger-text);
 }
 
 html.fsfit-sheet-open,
@@ -227,7 +227,7 @@ html.fsfit-sheet-open body {
     border: 1px solid rgba(255,255,255,.1);
     border-bottom: 0;
     border-radius: 18px 18px 0 0;
-    background: #15181e !important;
+    background: var(--fs-surface) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 -10px 30px rgba(0,0,0,.34) !important;
@@ -249,7 +249,7 @@ html.fsfit-sheet-open body {
     border: 0;
     border-radius: 12px;
     background: transparent;
-    color: #8f99a8;
+    color: var(--fs-text-muted);
     font: inherit;
     font-size: .63rem;
     font-weight: 800;
@@ -272,7 +272,7 @@ html.fsfit-sheet-open body {
   .fsfit-bottom-nav a.active,
   .fsfit-bottom-nav button.active,
   .fsfit-bottom-nav button.is-open {
-    background: rgba(50,215,75,.11);
+    background: var(--fs-primary-soft);
     color: var(--primary);
   }
 
@@ -333,52 +333,52 @@ html.fsfit-sheet-open body {
 
 /* FS Fit · identidade visual alinhada ao ícone oficial · 2026-07-23 */
 .fsfit-more-panel {
-  border-color: rgba(77,94,121,.42);
-  background: rgba(8,13,21,.985);
+  border-color: var(--fs-border-strong);
+  background: var(--fs-surface-overlay);
 }
 
 .fsfit-more-item {
-  border-color: rgba(77,94,121,.36);
-  background: rgba(16,24,36,.88);
+  border-color: var(--fs-border);
+  background: var(--fs-surface-raised);
 }
 
 .fsfit-more-item-icon {
-  background: rgba(184,229,28,.1);
+  background: var(--fs-primary-soft);
 }
 
 @media (max-width: 860px) {
   .fsfit-bottom-nav {
-    border-color: rgba(77,94,121,.42);
-    background: rgba(8,13,21,.985) !important;
+    border-color: var(--fs-border-strong);
+    background: var(--fs-surface-overlay) !important;
     box-shadow: 0 -12px 34px rgba(0,0,0,.42) !important;
   }
 
   .fsfit-bottom-nav a,
   .fsfit-bottom-nav button {
-    color: #8f9aab;
+    color: var(--fs-text-muted);
   }
 
   .fsfit-bottom-nav a.active,
   .fsfit-bottom-nav button.active,
   .fsfit-bottom-nav button.is-open {
-    background: rgba(184,229,28,.11);
+    background: var(--fs-primary-soft);
     color: var(--primary);
   }
 }
 
 /* FS Fit · correções iOS e refinamento da identidade · 2026-07-23 */
 html {
-  background-color: #060b12;
+  background-color: var(--fs-bg);
   color-scheme: dark;
 }
 
 body {
-  background-color: #060b12;
+  background-color: var(--fs-bg);
 }
 
 html.fsfit-sheet-open,
 html.fsfit-sheet-open body {
-  background-color: #060b12 !important;
+  background-color: var(--fs-bg) !important;
 }
 
 /* Evita o emoji amarelo nativo e mantém o sino dentro da paleta oficial. */
