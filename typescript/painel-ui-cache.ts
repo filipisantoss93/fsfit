@@ -126,7 +126,7 @@ function persist(): void {
   const hidden: Record<string, boolean> = {};
   ATTENTION_IDS.forEach(id => {
     const element = document.getElementById(id);
-    if (element) hidden[id] = element.hidden;
+    if (element) hidden[id] = Boolean(element.hidden);
   });
 
   writeUiCache(userId, SCOPE, {
