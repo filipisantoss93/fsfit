@@ -102,7 +102,7 @@ async function loadExerciseLibrary(): Promise<ExerciseLibraryItem[]> {
     if (categoryResult.error) console.warn('Categorias de exercícios indisponíveis:', categoryResult.error);
 
     const categoryRows = (Array.isArray(categoryResult.data) ? categoryResult.data : []) as ExerciseCategoryRow[];
-    const categoryNames = new Map(categoryRows.map(category => [String(category.id), category.nome]));
+    const categoryNames = new Map<string, string>(categoryRows.map(category => [String(category.id), String(category.nome || '')]));
     const exerciseRows = (Array.isArray(exerciseResult.data) ? exerciseResult.data : []) as Omit<ExerciseLibraryItem, 'category'>[];
     return exerciseRows.map(exercise => ({
       ...exercise,
@@ -115,7 +115,7 @@ async function loadExerciseLibrary(): Promise<ExerciseLibraryItem[]> {
     throw error;
   });
 
-  return libraryPromise;
+  return libraryPromise!;
 }
 
 function renderCategorizedExercises(): void {
