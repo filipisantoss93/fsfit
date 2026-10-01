@@ -61,6 +61,7 @@ function scheduleNonCriticalEnhancements(): void {
   window.setTimeout(() => {
     const page = currentPage();
     if (document.querySelector('[data-checkout-endereco], #checkout-endereco, [name="cep"]')) {
+      // @ts-ignore Existing browser JavaScript module.
       import('./checkout-endereco.js?v=20261001-ts-address1').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
     }
     if (document.querySelector('.fsfit-more-sheet, [data-bottom-page="mais"]')) {
@@ -257,7 +258,7 @@ function configureStudentRecordBackLink(): void {
   if (origin !== 'agenda') return;
   const date = params.get('data');
   backLink.textContent = '← Voltar para agenda';
-  backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? `agenda.html?data=${encodeURIComponent(date)}` : 'agenda.html';
+  backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? `agenda.html?data=${encodeURIComponent(date || '')}` : 'agenda.html';
 }
 
 export function renderHeader(active = ''): void {
@@ -277,7 +278,9 @@ export async function requireSession(): Promise<any> {
 }
 
 if (currentPage() === 'ficha-aluno.html') {
+  // @ts-ignore Existing browser JavaScript module.
   import('./ficha-treinos-salvos.js?v=20261001-ts1').catch(error => console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error));
+  // @ts-ignore Existing browser JavaScript module.
   import('./iniciar-treino-personal.js?v=20261001-ts-start1').catch(error => console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error));
   // @ts-ignore Existing browser JavaScript module.
   import('./ficha-aluno-ativacao.js?v=20260722-secure-activation1').catch(error => console.error('Não foi possível carregar o acesso seguro do aluno:', error));
