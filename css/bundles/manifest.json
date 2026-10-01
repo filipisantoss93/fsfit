@@ -11,7 +11,7 @@
     "/aluno-preview.html": "/css/bundles/fsfit.47ad7a7c5d3714db.css",
     "/aluno.html": "/css/bundles/fsfit.9edd32b55eb9b787.css",
     "/alunos.html": "/css/bundles/fsfit.6dfc4d4a25a08d4f.css",
-    "/assinatura.html": "/css/bundles/fsfit.9c058be6c2ded842.css",
+    "/assinatura.html": "/css/bundles/fsfit.9637969881e03bec.css",
     "/biblioteca-alimentar.html": "/css/bundles/fsfit.fadc50b9e16d87c6.css",
     "/biblioteca-exercicios.html": "/css/bundles/fsfit.eba6e8dff780cc79.css",
     "/cancelamento.html": "/css/bundles/fsfit.aa8816193a8e2171.css",
@@ -447,9 +447,9 @@
       ]
     },
     "assinatura.html": {
-      "url": "/css/bundles/fsfit.9c058be6c2ded842.css",
-      "sha256": "9c058be6c2ded842ca4ba4b34d7c6e93043f2ba0e8bbeb62f4c8033e50387674",
-      "bytes": 167966,
+      "url": "/css/bundles/fsfit.9637969881e03bec.css",
+      "sha256": "9637969881e03bec0a2938edc2cb7bc731d003e2fe9323fa54c324538e820b2a",
+      "bytes": 168164,
       "sourceCount": 30,
       "duplicatesRemoved": 0,
       "sources": [
