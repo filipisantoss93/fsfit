@@ -294,7 +294,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -309,8 +309,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: codex/typescript-migration-phase1
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -327,14 +325,5 @@ jobs:
       - name: Build browser JavaScript
         run: npm run build:typescript
 
-      - name: Commit generated JavaScript for final batch
-        run: |
-          if git diff --quiet -- js/financeiro.js; then
-            echo "Generated JavaScript already synchronized."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add js/financeiro.js
-          git commit -m "Compile final TypeScript finance output"
-          git push origin HEAD:codex/typescript-migration-phase1
+      - name: Ensure generated JavaScript is committed
+        run: git diff --exit-code -- js
