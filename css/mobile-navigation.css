@@ -86,7 +86,7 @@
   display: block;
   margin-bottom: 2px;
   color: var(--primary);
-  font-size: .68rem;
+  font-size:var(--fs-font-xs);
   font-weight: 900;
   letter-spacing: .09em;
   text-transform: uppercase;
@@ -171,7 +171,7 @@
 .fsfit-more-item-copy small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: .7rem;
+  font-size:var(--fs-font-xs);
   line-height: 1.3;
 }
 
@@ -251,7 +251,7 @@ html.fsfit-sheet-open body {
     background: transparent;
     color: var(--fs-text-muted);
     font: inherit;
-    font-size: .63rem;
+    font-size:var(--fs-font-xs);
     font-weight: 800;
     line-height: 1.05;
     cursor: pointer;
