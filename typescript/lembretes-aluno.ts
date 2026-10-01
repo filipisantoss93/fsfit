@@ -76,7 +76,7 @@ function parseRrule(value: string | null): { recurrence: string; intervalValue: 
 }
 
 function recurrenceLabel(value: string | null): string {
-  const fixed = {
+  const fixed = ({
     'FREQ=DAILY': 'Diário',
     'FREQ=WEEKLY': 'Semanal',
     'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR': 'Seg. a sex.'
@@ -104,7 +104,7 @@ function toggleIntervalFields(): void {
 }
 
 function channelLabel(value: string): string {
-  return {
+  return ({
     push: 'Notificação',
     whatsapp: 'WhatsApp manual',
     ambos: 'Notificação + WhatsApp'
@@ -112,7 +112,7 @@ function channelLabel(value: string): string {
 }
 
 function statusLabel(value: string | null): string {
-  return {
+  return ({
     agendado: 'AGENDADO',
     processando: 'PROCESSANDO',
     enviado: 'ENVIADO',
