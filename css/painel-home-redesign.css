@@ -25,7 +25,7 @@
 .home-now-dot.active{width:18px;background:var(--primary)}
 .home-now-swipe-hint{display:block;margin-top:6px;color:var(--muted);font-size:var(--fs-font-xs,.75rem)}
 .home-now-swipe-hint[hidden]{display:none!important}
-.home-now-action{position:relative;z-index:1;width:100%;min-height:48px;margin-top:18px;border:0;border-radius:13px;background:var(--primary);color:#07120a;font:inherit;font-size:.85rem;font-weight:950;cursor:pointer}
+.home-now-action{position:relative;z-index:1;width:100%;min-height:48px;margin-top:18px;border:0;border-radius:13px;background:var(--primary);color:var(--fs-text-on-primary);font:inherit;font-size:.85rem;font-weight:950;cursor:pointer}
 .home-now-action[hidden]{display:none!important}
 
 .home-day-card{padding:17px 18px!important}
@@ -106,3 +106,6 @@
   .home-summary-copy strong{font-size:.94rem}
   .home-summary-copy span{font-size:var(--fs-font-xs,.75rem)}
 }
+
+/* Tema claro: ações verdes sempre usam o texto semântico de alto contraste. */
+body.fsfit-saas .dashboard-tab[aria-selected="true"]{color:var(--fs-text-on-primary)!important}
