@@ -151,7 +151,7 @@ function normalizeManualAppointment(row: JsonRecord): AgendaEntry {
 
 function buildStudentRecordUrl(studentId: string | number, date: Date): string {
   const params = new URLSearchParams({
-    id: studentId,
+    id: String(studentId),
     origem: 'agenda',
     data: formatDateValue(date)
   });
@@ -265,7 +265,7 @@ async function loadDateSpecificData(date: Date): Promise<void> {
   if (cancellationsResult.error) console.error('Erro ao carregar cancelamentos da agenda:', cancellationsResult.error);
 
   manualAppointments = (appointmentsResult.data || []).map(normalizeManualAppointment);
-  cancelledStudentIds = new Set((cancellationsResult.data || []).map(row => String(row.aluno_id || '')).filter(Boolean));
+  cancelledStudentIds = new Set((cancellationsResult.data || []).map((row: JsonRecord) => String(row.aluno_id || '')).filter(Boolean));
 }
 
 async function selectDate(date: Date): Promise<void> {
