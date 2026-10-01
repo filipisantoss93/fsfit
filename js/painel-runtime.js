@@ -1,4 +1,4 @@
-import { loadRuntimeGroup, loadRuntimeSequence } from './page-module-loader.js';
+import { loadRuntimeGroup, loadRuntimeSequence } from './page-module-loader.js?v=20261001-ts-loader1';
 
 const hasDashboard = document.querySelector('#today-list') || document.querySelector('#live-students-list');
 
