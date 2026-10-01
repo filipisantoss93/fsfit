@@ -82,7 +82,7 @@ function currentUserId(): Promise<string> {
       throw error;
     });
   }
-  return currentUserIdPromise;
+  return currentUserIdPromise!;
 }
 
 async function loadTargetWorkout(): Promise<WorkoutTarget | null> {
