@@ -13,33 +13,38 @@
     "abrir-whatsapp-lembrete.html": {
       "styles": [
         "css/style.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ]
     },
     "acesso-aluno.html": {
       "styles": [
         "css/style.css",
         "css/fsfit-design-system.css",
-        "css/acesso-aluno.css"
+        "css/acesso-aluno.css",
+        "css/ux-consistency.css"
       ]
     },
     "admin-assinaturas.html": {
       "styles": [
         "css/style.css",
         "css/admin.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ]
     },
     "admin-contatos.html": {
       "styles": [
         "css/style.css",
-        "css/admin-contatos.css"
+        "css/admin-contatos.css",
+        "css/ux-consistency.css"
       ]
     },
     "admin.html": {
       "styles": [
         "css/style.css",
-        "css/admin.css"
+        "css/admin.css",
+        "css/ux-consistency.css"
       ]
     },
     "agenda.html": {
@@ -47,7 +52,8 @@
         "css/style.css",
         "css/header-menu.css",
         "css/mobile-navigation.css",
-        "css/agenda-bundle.css"
+        "css/agenda-bundle.css",
+        "css/ux-consistency.css"
       ]
     },
     "aluno-preview.html": {
@@ -56,13 +62,15 @@
         "css/fsfit-design-system.css",
         "css/aluno-midias.css",
         "css/aluno-treino-player.css",
-        "css/aluno-preview-padronizacao.css"
+        "css/aluno-preview-padronizacao.css",
+        "css/ux-consistency.css"
       ]
     },
     "aluno.html": {
       "styles": [
         "css/style.css",
-        "css/aluno.css"
+        "css/aluno.css",
+        "css/ux-consistency.css"
       ]
     },
     "alunos.html": {
@@ -73,28 +81,32 @@
         "css/dashboard-desktop.css",
         "css/alunos.css",
         "css/alunos-lista-compacta.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ]
     },
     "assinatura.html": {
       "styles": [
         "css/style.css",
         "css/header-menu.css",
-        "css/assinatura.css"
+        "css/assinatura.css",
+        "css/ux-consistency.css"
       ]
     },
     "biblioteca-alimentar.html": {
       "styles": [
         "css/style.css",
         "css/header-menu.css",
-        "css/biblioteca-alimentar.css"
+        "css/biblioteca-alimentar.css",
+        "css/ux-consistency.css"
       ]
     },
     "biblioteca-exercicios.html": {
       "styles": [
         "css/style.css",
         "css/header-menu.css",
-        "css/biblioteca-exercicios.css"
+        "css/biblioteca-exercicios.css",
+        "css/ux-consistency.css"
       ]
     },
     "cancelamento.html": {
@@ -105,7 +117,8 @@
     "contato.html": {
       "styles": [
         "css/style.css",
-        "css/contato.css"
+        "css/contato.css",
+        "css/ux-consistency.css"
       ]
     },
     "dieta-aluno.html": {
@@ -114,14 +127,16 @@
         "css/dieta-aluno.css",
         "css/dieta-planos.css",
         "css/dieta-aluno-padronizacao.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ]
     },
     "ficha-aluno.html": {
       "styles": [
         "css/style.css",
         "css/header-menu.css",
-        "css/ficha-aluno.css"
+        "css/ficha-aluno.css",
+        "css/ux-consistency.css"
       ]
     },
     "financeiro.html": {
@@ -129,7 +144,8 @@
         "css/style.css",
         "css/header-menu.css",
         "css/mobile-navigation.css",
-        "css/financeiro.css"
+        "css/financeiro.css",
+        "css/ux-consistency.css"
       ]
     },
     "index.html": {
@@ -142,14 +158,16 @@
     "lembretes-aluno.html": {
       "styles": [
         "css/style.css",
-        "css/lembretes-aluno.css"
+        "css/lembretes-aluno.css",
+        "css/ux-consistency.css"
       ]
     },
     "nova-senha.html": {
       "styles": [
         "css/style.css",
         "css/fsfit-design-system.css",
-        "css/nova-senha-padronizacao.css"
+        "css/nova-senha-padronizacao.css",
+        "css/ux-consistency.css"
       ]
     },
     "painel.html": {
@@ -158,14 +176,16 @@
         "css/header-menu.css",
         "css/mobile-navigation.css",
         "css/painel.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ]
     },
     "perfil.html": {
       "styles": [
         "css/style.css",
         "css/perfil-padronizacao.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ]
     },
     "personal.html": {
@@ -186,14 +206,16 @@
       "styles": [
         "css/style.css",
         "css/fsfit-design-system.css",
-        "css/recuperar-senha-padronizacao.css"
+        "css/recuperar-senha-padronizacao.css",
+        "css/ux-consistency.css"
       ]
     },
     "selecionar-personal.html": {
       "styles": [
         "css/style.css",
         "css/fsfit-design-system.css",
-        "css/selecionar-personal-padronizacao.css"
+        "css/selecionar-personal-padronizacao.css",
+        "css/ux-consistency.css"
       ]
     },
     "sistema-para-personal-trainer.html": {
@@ -211,13 +233,15 @@
     "treino-aluno.html": {
       "styles": [
         "css/style.css",
-        "css/treino-aluno.css"
+        "css/treino-aluno.css",
+        "css/ux-consistency.css"
       ]
     },
     "visualizar-aluno.html": {
       "styles": [
         "css/style.css",
-        "css/visualizar-aluno.css"
+        "css/visualizar-aluno.css",
+        "css/ux-consistency.css"
       ]
     }
   }
