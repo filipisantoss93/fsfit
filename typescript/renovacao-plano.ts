@@ -21,7 +21,7 @@ function formatDate(value: unknown): string {
 }
 
 function daysRemaining(value: unknown): number | null {
-  const date = new Date(value);
+  const date = new Date(String(value ?? ''));
   if (Number.isNaN(date.getTime())) return null;
   return Math.ceil((date.getTime() - Date.now()) / DAY_MS);
 }
@@ -55,7 +55,7 @@ function removeExistingCard(): void {
 
 function renderGooglePlayAccessCard(access: JsonRecord | null | undefined): void {
   removeExistingCard();
-  if (access?.admin) return;
+  if (!access || access.admin) return;
 
   const main = document.querySelector('main.container');
   const header = main?.querySelector('.page-header');
@@ -111,7 +111,7 @@ function renderGooglePlayAccessCard(access: JsonRecord | null | undefined): void
 
 function renderRenewalCard(access: JsonRecord | null | undefined): void {
   removeExistingCard();
-  if (access?.admin) return;
+  if (!access || access.admin) return;
 
   const main = document.querySelector('main.container');
   const header = main?.querySelector('.page-header');
