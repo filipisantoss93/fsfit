@@ -1,8 +1,8 @@
 /* FS Fit — integração compartilhada dos SVGs fora do editor de treino */
-import { makeSvg } from './exercise-svg-icons.js?v=20260801-svg2';
+import { makeSvg } from './exercise-svg-icons.js?v=20261001-ts2';
 import './exercise-svg-specific.js?v=20261001-ts1';
 import './exercise-svg-extended.js?v=20261001-ts1';
-import './exercise-svg-complete.js?v=20260801-complete1';
+import './exercise-svg-complete.js?v=20261001-ts2';
 
 const PAGE_SCOPE = 'fsfit-exercise-svg-page';
 const SELECTORS = [
