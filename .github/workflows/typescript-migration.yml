@@ -294,7 +294,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -309,8 +309,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -326,17 +324,6 @@ jobs:
 
       - name: Build browser JavaScript
         run: npm run build:typescript
-
-      - name: Synchronize remaining generated JavaScript
-        run: |
-          if git diff --quiet -- js/image-cropper.js js/painel-day-summary.js js/treino-modelo-livre.js; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add js/image-cropper.js js/painel-day-summary.js js/treino-modelo-livre.js
-          git commit -m "Synchronize final TypeScript JavaScript outputs"
-          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
 
       - name: Ensure generated JavaScript is committed
         run: git diff --exit-code -- js
