@@ -83,7 +83,7 @@ if (batchSelector && categorySelect && checkboxList) {
   }
 
   function restoreCategoryView(): void {
-    categorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+    categorySelect!.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   function renderSearchResults(value: string): void {
@@ -104,11 +104,11 @@ if (batchSelector && categorySelect && checkboxList) {
     });
 
     if (!filtered.length) {
-      checkboxList.innerHTML = '<p class="empty">Nenhum exercício encontrado para esta busca.</p>';
+      checkboxList!.innerHTML = '<p class="empty">Nenhum exercício encontrado para esta busca.</p>';
       return;
     }
 
-    checkboxList.innerHTML = filtered.map(item => {
+    checkboxList!.innerHTML = filtered.map(item => {
       const checked = selectedIds.has(String(item.id));
       const detail = [categoryName(item), item.equipamento, prescriptionLabel(item.tipo_prescricao)]
         .filter(Boolean)
