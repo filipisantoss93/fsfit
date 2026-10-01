@@ -1,6 +1,5 @@
 import { supabase } from './supabase.js';
 import * as core from './layout-core.js';
-import './page-data-cache.js?v=20261001-ts-page-cache1';
 import './shared-components.js?v=20261001-shared-ts1';
 
 export * from './layout-core.js';
