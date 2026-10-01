@@ -39,7 +39,7 @@ for (const page of uxPages) {
   if (!/<main\b/i.test(html)) failures.push(`${page}: sem elemento <main>`);
   if (!/<h1\b/i.test(html)) failures.push(`${page}: sem título H1`);
   const styles = config.pages?.[page]?.styles || [];
-  if (!styles.includes('css/ux-consistency.css')) failures.push(`${page}: sem camada ux-consistency.css no bundle`);
+  if (!styles.includes('css/style.css')) failures.push(`${page}: sem style.css global no bundle`);
 }
 
 for (const [page, expected] of expectedTitles) {
