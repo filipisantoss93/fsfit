@@ -149,7 +149,7 @@ if (!runtimeGlobal.__FSFIT_STUDENT_SESSION_RPC_ADAPTER__) {
     }
 
     const [safeName] = mapped;
-    const safeParams = { ...params, p_session_token: params.p_access_token };
+    const safeParams: Record<string, any> = { ...params, p_session_token: params.p_access_token };
     delete safeParams.p_access_token;
     return originalRpc(safeName, safeParams, options);
   };
