@@ -288,7 +288,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -303,8 +303,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: codex/typescript-migration-phase1
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -321,14 +319,143 @@ jobs:
       - name: Build browser JavaScript
         run: npm run build:typescript
 
-      - name: Commit generated JavaScript for current batch
+      - name: Ensure generated JavaScript is committed
         run: |
-          if git diff --quiet -- js/admin.js; then
-            echo "Generated JavaScript already synchronized."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add js/admin.js
-          git commit -m "Compile TypeScript output for admin dashboard"
-          git push origin HEAD:codex/typescript-migration-phase1
+          git diff --exit-code -- \
+            js/admin.js \
+            js/biblioteca-alimentar.js \
+            js/layout-core.js \
+            js/perfil.js \
+            js/painel-home-redesign.js \
+            js/painel-visao-geral.js \
+            js/treino-multidias.js \
+            js/mobile-more-swipe.js \
+            js/aulas-painel-quick-actions.js \
+            js/treino-aluno-semanal.js \
+            js/biblioteca-treinos.js \
+            js/treino-aluno-exercicios-avulsos.js \
+            js/ficha-aluno.js \
+            js/aula-aluno.js \
+            js/dieta-aluno.js \
+            js/aluno.js \
+            js/aulas-painel-editor.js \
+            js/treino-dia-personalizacao.js \
+            js/student-workflow-improvements.js \
+            js/mobile-experience.js \
+            js/biblioteca-exercicios.js \
+            js/aulas-painel-delete-controls.js \
+            js/painel-agenda-modal.js \
+            js/global-runtime-bootstrap.js \
+            js/acesso-aluno.js \
+            js/biblioteca-treinos-multiselect.js \
+            js/assinatura.js \
+            js/biblioteca-refeicoes-enhancements.js \
+            js/treino-exercise-picker-sheet.js \
+            js/mobile-experience-fixes.js \
+            js/lembretes-aluno.js \
+            js/admin-search-clear.js \
+            js/admin-tabs.js \
+            js/admin-assinatura-saude.js \
+            js/admin-forecast.js \
+            js/admin-funnel.js \
+            js/admin-retention.js \
+            js/admin-crm.js \
+            js/admin-attention.js \
+            js/admin-users-compact.js \
+            js/admin-cron-monitor.js \
+            js/aluno-notificacoes.js \
+            js/aluno-perfil.js \
+            js/pwa-install.js \
+            js/contato.js \
+            js/aluno-inicio.js \
+            js/aluno-financeiro.js \
+            js/supabase.js \
+            js/layout.js \
+            js/push-personal.js \
+            js/admin-contatos.js \
+            js/alunos-lista-compacta.js \
+            js/alunos.js \
+            js/auth.js \
+            js/personal-publico.js \
+            js/aluno-preview.js \
+            js/painel-dashboard.js \
+            js/aulas-painel.js \
+            js/agenda.js \
+            js/visualizar-aluno.js \
+            js/treino-busca-exercicios.js \
+            js/exercicio-drag-order.js \
+            js/painel-plano-free-ui.js \
+            js/painel-compact-enhancements.js \
+            js/ficha-aluno-ativacao.js \
+            js/dieta-biblioteca-refeicoes.js \
+            js/aluno-push-onboarding.js \
+            js/aulas-painel-exercise-controls.js \
+            js/aulas-painel-exercise-categories.js \
+            js/financeiro-transicoes-seguras.js \
+            js/treino-exercicio-regras.js \
+            js/student-avatars-personal.js \
+            js/painel-resumo-geral.js \
+            js/exercicio-drag-order-structured-sync.js \
+            js/exercise-svg-extended.js \
+            js/exercise-svg-complete.js \
+            js/exercise-svg-icons.js \
+            js/exercise-svg-specific.js \
+            js/ficha-treinos-salvos.js \
+            js/painel-agenda-modal-hotfix.js \
+            js/portal-aluno-tabs.js \
+            js/selecionar-personal.js \
+            js/agenda-student-search.js \
+            js/ficha-aluno-hierarquia.js \
+            js/painel-home-desktop-carousel.js \
+            js/assinatura-experiencia.js \
+            js/treino-exercicio-categorias.js \
+            js/ficha-aluno-acoes.js \
+            js/landing-ads.js \
+            js/aluno-sessao-controles.js \
+            js/shared-components.js \
+            js/assinatura-realtime.js \
+            js/abrir-whatsapp-lembrete.js \
+            js/sidebar-profile-photo.js \
+            js/library-dashboard-desktop.js \
+            js/ui-cache.js \
+            js/assinatura-cartao-status.js \
+            js/painel-agenda-modal-avatar.js \
+            js/painel-home-avatar.js \
+            js/inactive-account-guard.js \
+            js/config.js \
+            js/alunos-dashboard.js \
+            js/dieta-modelos-aluno.js \
+            js/checkout-endereco.js \
+            js/treino-aluno-app.js \
+            js/page-module-loader.js \
+            js/recuperar-senha.js \
+            js/exercise-svg-pages.js \
+            js/treino-aluno-retorno.js \
+            js/acesso-aluno-runtime.js \
+            js/assinatura-runtime.js \
+            js/biblioteca-alimentar-runtime.js \
+            js/biblioteca-runtime.js \
+            js/dieta-runtime.js \
+            js/lembretes-aluno-runtime.js \
+            js/perfil-runtime.js \
+            js/treino-aluno-runtime.js \
+            js/chat-aula-aluno.js \
+            js/iniciar-treino-personal.js \
+            js/historico-treinos-aluno.js \
+            js/nova-senha.js \
+            js/treino-sticky-exercise-save.js \
+            js/app-lifecycle-runtime.js \
+            js/painel-runtime.js \
+            js/ficha-aluno-runtime.js \
+            js/painel-ui-cache.js \
+            js/shared-mutation-runtime.js \
+            js/aulas-painel-delete-layout-fix.js \
+            js/biblioteca-treinos-layout.js \
+            js/dieta-refeicao-modal.js \
+            js/exercise-picker-horizontal-scroll-fix.js \
+            js/library-row-click.js \
+            js/modal-focus-a11y.js \
+            js/treino-aluno-empty-state-guard.js
+
+      - name: Validate page script references
+        run: node scripts/audit-page-scripts.mjs
