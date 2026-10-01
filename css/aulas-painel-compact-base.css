@@ -44,7 +44,7 @@
 
 .live-student-row:last-child { border-bottom: 0 !important; }
 .live-student-row:hover,
-.live-student-row:focus-visible { background: rgba(255,255,255,.035) !important; }
+.live-student-row:focus-visible { background: var(--fs-surface-tint-hover) !important; }
 .live-student-main { display: flex !important; align-items: center !important; gap: 12px !important; min-width: 0 !important; }
 .live-student-main > div { display: grid; gap: 3px; min-width: 0; }
 .live-student-main strong,
@@ -66,7 +66,7 @@
   align-items: center;
   justify-content: center;
   padding: 18px;
-  background: rgba(4,7,10,.82);
+  background: var(--fs-overlay);
   backdrop-filter: blur(6px);
 }
 
@@ -79,8 +79,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #151a1f;
-  border: 1px solid rgba(255,255,255,.12);
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-border-strong);
   border-radius: 14px;
   box-shadow: 0 24px 70px rgba(0,0,0,.45);
 }
@@ -111,9 +111,9 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.14);
-  background: #232a33;
-  color: #fff;
+  border: 1px solid var(--fs-border-strong);
+  background: var(--fs-surface-soft);
+  color: var(--fs-text);
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
@@ -128,7 +128,7 @@
   margin-bottom: 12px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgba(255,255,255,.035);
+  background: var(--fs-surface-tint-hover);
 }
 .live-session-progress-label span { color: var(--muted); font-size: .75rem; }
 .live-session-progress-label strong { font-size: .86rem; }
@@ -171,13 +171,13 @@
   width: min(1080px,100%);
   height: min(94dvh,1050px);
   overflow: hidden;
-  background: #151a1f;
-  border: 1px solid rgba(255,255,255,.12);
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-border-strong);
   border-radius: 14px;
   box-shadow: 0 24px 70px rgba(0,0,0,.5);
 }
 .live-workout-editor-close { position: absolute; top: 12px; right: 12px; z-index: 3; }
-.live-workout-editor-frame { width: 100%; height: 100%; border: 0; background: #151a1f; }
+.live-workout-editor-frame { width: 100%; height: 100%; border: 0; background: var(--fs-surface); }
 
 /* Mantém o handle de reordenação e todo o conteúdo do exercício na mesma linha. */
 .live-session-exercise-row {
@@ -190,7 +190,7 @@
   place-items: center;
   grid-column: 1;
   grid-row: 1;
-  color: #9aa3af;
+  color: var(--fs-text-muted);
   font-size: .82rem;
   font-weight: 900;
   line-height: 1;
@@ -249,7 +249,7 @@
     top: auto !important;
     z-index: 1 !important;
     width: 100% !important;
-    background: #1a1d23 !important;
+    background: var(--fs-surface-overlay) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -269,7 +269,7 @@
     padding-top: calc(var(--safe-area-top) + 4px) !important;
     border-top: 0 !important;
     border-radius: 0 0 14px 14px !important;
-    background: #1a1d23 !important;
+    background: var(--fs-surface-overlay) !important;
     box-shadow: 0 10px 28px rgba(0,0,0,.42) !important;
   }
 
@@ -287,7 +287,7 @@
     z-index: 179;
     height: calc(var(--safe-area-top) + 1px) !important;
     pointer-events: none;
-    background: #1a1d23;
+    background: var(--fs-surface-overlay);
     opacity: 0;
     transition: opacity .12s ease;
   }
