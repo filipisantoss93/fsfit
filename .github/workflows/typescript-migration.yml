@@ -7,6 +7,7 @@ on:
       - 'js/admin-search-clear.js'
       - 'js/admin-tabs.js'
       - 'js/admin-assinatura-saude.js'
+      - 'js/admin-forecast.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -26,6 +27,7 @@ on:
       - 'js/admin-search-clear.js'
       - 'js/admin-tabs.js'
       - 'js/admin-assinatura-saude.js'
+      - 'js/admin-forecast.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -77,6 +79,7 @@ jobs:
             js/admin-search-clear.js \
             js/admin-tabs.js \
             js/admin-assinatura-saude.js \
+            js/admin-forecast.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
