@@ -29,7 +29,6 @@ on:
       - 'js/assinatura-realtime.js'
       - 'js/abrir-whatsapp-lembrete.js'
       - 'js/sidebar-profile-photo.js'
-      - 'js/alunos-arquivamento.js'
       - 'js/library-dashboard-desktop.js'
       - 'js/ui-cache.js'
       - 'js/assinatura-cartao-status.js'
@@ -53,6 +52,11 @@ on:
       - 'js/lembretes-aluno-runtime.js'
       - 'js/perfil-runtime.js'
       - 'js/treino-aluno-runtime.js'
+      - 'js/chat-aula-aluno.js'
+      - 'js/iniciar-treino-personal.js'
+      - 'js/historico-treinos-aluno.js'
+      - 'js/nova-senha.js'
+      - 'js/treino-sticky-exercise-save.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -94,7 +98,6 @@ on:
       - 'js/assinatura-realtime.js'
       - 'js/abrir-whatsapp-lembrete.js'
       - 'js/sidebar-profile-photo.js'
-      - 'js/alunos-arquivamento.js'
       - 'js/library-dashboard-desktop.js'
       - 'js/ui-cache.js'
       - 'js/assinatura-cartao-status.js'
@@ -118,6 +121,11 @@ on:
       - 'js/lembretes-aluno-runtime.js'
       - 'js/perfil-runtime.js'
       - 'js/treino-aluno-runtime.js'
+      - 'js/chat-aula-aluno.js'
+      - 'js/iniciar-treino-personal.js'
+      - 'js/historico-treinos-aluno.js'
+      - 'js/nova-senha.js'
+      - 'js/treino-sticky-exercise-save.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -132,7 +140,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -147,6 +155,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -162,6 +172,17 @@ jobs:
 
       - name: Build browser JavaScript
         run: npm run build:typescript
+      - name: Synchronize generated JavaScript
+        run: |
+          if git diff --quiet -- js; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js
+          git commit -m "Synchronize generated TypeScript JavaScript"
+          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
+
       - name: Ensure generated JavaScript is committed
         run: |
           git diff --exit-code -- \
@@ -190,7 +211,6 @@ jobs:
             js/assinatura-realtime.js \
             js/abrir-whatsapp-lembrete.js \
             js/sidebar-profile-photo.js \
-            js/alunos-arquivamento.js \
             js/library-dashboard-desktop.js \
             js/ui-cache.js \
             js/assinatura-cartao-status.js \
@@ -214,6 +234,11 @@ jobs:
             js/lembretes-aluno-runtime.js \
             js/perfil-runtime.js \
             js/treino-aluno-runtime.js \
+            js/chat-aula-aluno.js \
+            js/iniciar-treino-personal.js \
+            js/historico-treinos-aluno.js \
+            js/nova-senha.js \
+            js/treino-sticky-exercise-save.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
