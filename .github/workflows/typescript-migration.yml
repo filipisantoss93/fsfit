@@ -24,6 +24,7 @@ on:
       - 'js/treino-exercicio-categorias.js'
       - 'js/ficha-aluno-acoes.js'
       - 'js/landing-ads.js'
+      - 'js/aluno-sessao-controles.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -60,6 +61,7 @@ on:
       - 'js/treino-exercicio-categorias.js'
       - 'js/ficha-aluno-acoes.js'
       - 'js/landing-ads.js'
+      - 'js/aluno-sessao-controles.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -128,6 +130,7 @@ jobs:
             js/treino-exercicio-categorias.js \
             js/ficha-aluno-acoes.js \
             js/landing-ads.js \
+            js/aluno-sessao-controles.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
