@@ -1,4 +1,4 @@
-import './shared-components.js';
+import './shared-components.js?v=20261001-shared-ts1';
 import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js?v=20261001-ts3';
 
 const content = document.querySelector('#student-content');
