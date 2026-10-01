@@ -180,7 +180,7 @@ function openWorkoutItem(id: string): void {
 function openMealItem(id: string): void {
   const item = mealItems.find(row => row.id === id);
   if (!item) return;
-  const days = (item.dias_semana || []).map(day => dayNames[Number(day)]).filter(Boolean).join(', ');
+  const days = (item.dias_semana || []).map((day: unknown) => dayNames[Number(day)]).filter(Boolean).join(', ');
   openDetail(item.nome || 'Refeição', `
     <div class="student-detail-grid">
       <div><small>Horário</small><strong>${esc(item.horario ? String(item.horario).slice(0, 5) : '—')}</strong></div>
