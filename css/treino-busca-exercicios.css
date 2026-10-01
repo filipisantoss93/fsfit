@@ -14,7 +14,7 @@
 .exercise-checkbox-option{padding:10px 11px;gap:10px}
 .exercise-checkbox-option input{width:20px!important;height:20px;flex-basis:20px}
 .exercise-checkbox-option strong{font-size:.9rem}
-.exercise-checkbox-option small{margin-top:2px;font-size:.72rem}
+.exercise-checkbox-option small{margin-top:2px;font-size:var(--fs-font-xs,.75rem)}
 .selected-exercises-section{margin-top:10px;padding-top:12px}
 .selected-exercises-heading{margin-bottom:9px}
 .selected-exercise-card{padding:11px}

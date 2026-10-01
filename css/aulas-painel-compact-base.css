@@ -17,7 +17,7 @@
   display: block;
   margin-bottom: 4px;
   color: var(--muted);
-  font-size: .7rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 800;
   letter-spacing: .08em;
 }
@@ -97,7 +97,7 @@
 .live-session-modal-header small {
   display: block;
   color: var(--primary);
-  font-size: .68rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 850;
   letter-spacing: .08em;
   margin-bottom: 5px;

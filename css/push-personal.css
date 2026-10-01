@@ -6,9 +6,9 @@
 .personal-push-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--fs-primary-soft);color:var(--primary);font-size:1.25rem}
 .personal-push-card[data-state="blocked"] .personal-push-icon{background:var(--fs-danger-soft);color:var(--fs-danger-text)}
 .personal-push-card[data-state="install"] .personal-push-icon{background:var(--fs-info-soft);color:var(--fs-info-text)}
-.personal-push-copy{min-width:0}.personal-push-copy small{display:block;margin-bottom:3px;color:var(--primary);font-size:.61rem;font-weight:950;letter-spacing:.08em}
+.personal-push-copy{min-width:0}.personal-push-copy small{display:block;margin-bottom:3px;color:var(--primary);font-size:var(--fs-font-xs,.75rem);font-weight:950;letter-spacing:.08em}
 .personal-push-card[data-state="blocked"] .personal-push-copy small{color:var(--fs-danger-text)}.personal-push-card[data-state="install"] .personal-push-copy small{color:var(--fs-info-text)}
-.personal-push-copy h2{margin:0;font-size:.93rem;line-height:1.2}.personal-push-copy p{margin:5px 0 0;color:var(--muted);font-size:.7rem;line-height:1.45}
-.personal-push-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}.personal-push-actions .btn{min-height:40px;padding-inline:12px;font-size:.72rem}
-.personal-push-feedback{display:block;min-height:17px;margin-top:8px;color:var(--muted);font-size:.65rem}.personal-push-feedback.success{color:var(--fs-success-text)}.personal-push-feedback.error{color:var(--fs-danger-text)}
+.personal-push-copy h2{margin:0;font-size:.93rem;line-height:1.2}.personal-push-copy p{margin:5px 0 0;color:var(--muted);font-size:var(--fs-font-xs,.75rem);line-height:1.45}
+.personal-push-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}.personal-push-actions .btn{min-height:40px;padding-inline:12px;font-size:var(--fs-font-xs,.75rem)}
+.personal-push-feedback{display:block;min-height:17px;margin-top:8px;color:var(--muted);font-size:var(--fs-font-xs,.75rem)}.personal-push-feedback.success{color:var(--fs-success-text)}.personal-push-feedback.error{color:var(--fs-danger-text)}
 @media(max-width:520px){.personal-push-card{grid-template-columns:40px minmax(0,1fr);gap:10px;padding:13px}.personal-push-icon{width:40px;height:40px;border-radius:13px}.personal-push-actions{display:grid;grid-template-columns:1fr}.personal-push-actions .btn{width:100%}}

@@ -226,7 +226,7 @@
 .diet-modal-kicker {
   margin-bottom: 7px;
   color: var(--primary);
-  font-size: .74rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 900;
   letter-spacing: .1em;
 }
@@ -254,7 +254,7 @@
   display: block;
   margin-bottom: 6px;
   color: var(--muted);
-  font-size: .72rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 900;
   letter-spacing: .06em;
   text-transform: uppercase;

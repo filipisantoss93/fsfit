@@ -35,7 +35,7 @@
   .personal-picker-content{padding-right:16px}
   .personal-picker-content h2{font-size:1rem}
   .personal-picker-description{font-size:.79rem}
-  .personal-picker-card .btn{width:100%;font-size:.73rem}
+  .personal-picker-card .btn{width:100%;font-size:var(--fs-font-xs,.75rem)}
 }
 @media(max-height:680px){
   .personal-picker-shell{padding-top:max(14px,env(safe-area-inset-top))}

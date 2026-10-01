@@ -23,7 +23,7 @@
   display:block;
   margin-bottom:5px;
   color:var(--warning);
-  font-size:.68rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight:900;
   letter-spacing:.08em;
 }
@@ -48,7 +48,7 @@
   display:block;
   margin-top:10px;
   color:var(--muted);
-  font-size:.72rem;
+  font-size:var(--fs-font-xs,.75rem);
   line-height:1.45;
 }
 
@@ -89,7 +89,7 @@
   display:block;
   margin-bottom:5px;
   color:var(--primary);
-  font-size:.68rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight:900;
   letter-spacing:.08em;
 }
@@ -118,7 +118,7 @@
 }
 .student-pix-summary small,
 .student-pix-summary strong { display:block; }
-.student-pix-summary small { color:var(--muted); font-size:.68rem; }
+.student-pix-summary small { color:var(--muted); font-size:var(--fs-font-xs,.75rem); }
 .student-pix-summary strong { margin-top:4px; }
 .student-pix-qr {
   display:grid;
@@ -140,7 +140,7 @@
 .student-pix-copy textarea {
   min-height:92px;
   resize:none;
-  font-size:.74rem;
+  font-size:var(--fs-font-xs,.75rem);
   line-height:1.4;
   word-break:break-all;
 }
@@ -153,7 +153,7 @@
 .student-pix-security-note {
   margin:14px 0 0;
   color:var(--muted);
-  font-size:.72rem;
+  font-size:var(--fs-font-xs,.75rem);
   line-height:1.45;
   text-align:center;
 }

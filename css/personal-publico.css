@@ -30,7 +30,7 @@
 .student-access-identity-placeholder{display:grid;place-items:center;background:rgba(50,215,75,.18);color:var(--primary);font-weight:900}
 .student-access-identity>div:last-child{min-width:0}
 .student-access-identity small,.student-access-identity strong,.student-access-identity span{display:block}
-.student-access-identity small{margin-bottom:3px;color:var(--primary);font-size:.68rem;font-weight:900;letter-spacing:.08em}
+.student-access-identity small{margin-bottom:3px;color:var(--primary);font-size:var(--fs-font-xs,.75rem);font-weight:900;letter-spacing:.08em}
 .student-access-identity strong{font-size:1.05rem;line-height:1.25}
 .student-access-identity span{margin-top:4px;color:var(--muted);font-size:.8rem;line-height:1.4}
 .public-profile-footer{text-align:center;opacity:.55;padding:8px 0}

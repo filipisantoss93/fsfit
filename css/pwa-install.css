@@ -57,7 +57,7 @@
   display: block;
   margin-bottom: 4px;
   color: var(--fs-primary);
-  font-size: .68rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 900;
   letter-spacing: .08em;
 }

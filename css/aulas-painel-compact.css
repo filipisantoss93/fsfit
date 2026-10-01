@@ -44,7 +44,7 @@
 
 .live-session-modal-actions [data-modal-cancel-checkin] .btn-action-icon { color: #ff8d94 !important; }
 .live-session-modal-actions [data-modal-cancel-checkin] .btn-action-title { font-size: .82rem !important; }
-.live-session-modal-actions [data-modal-cancel-checkin] .btn-action-description { font-size: .68rem !important; opacity: .78; }
+.live-session-modal-actions [data-modal-cancel-checkin] .btn-action-description { font-size:var(--fs-font-xs,.75rem) !important; opacity: .78; }
 
 @media (min-width: 1100px) {
   main.container { max-width: 1240px; }
@@ -75,7 +75,7 @@
   .home-summary-item { min-height: 54px; }
   .home-summary-icon { width: 38px !important; height: 38px !important; }
   .home-summary-copy strong { font-size: 1.08rem !important; }
-  .home-summary-copy span { font-size: .65rem !important; }
+  .home-summary-copy span { font-size:var(--fs-font-xs,.75rem) !important; }
   #dashboard-overview-panel .dashboard-overview-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   #dashboard-overview-panel .attention-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dashboard-tabs { display: none !important; }
