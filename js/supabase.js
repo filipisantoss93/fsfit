@@ -1,5 +1,5 @@
 import './inactive-account-guard.js?v=20261001-ts-inactive1';
-import { loadPageModules } from './page-module-loader.js?v=20260730-page-loader1';
+import { loadPageModules } from './page-module-loader.js?v=20261001-ts-loader1';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const SUPABASE_URL = 'https://jjpijncxlkwutbnkpsaw.supabase.co';
