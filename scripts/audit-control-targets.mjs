@@ -10,8 +10,14 @@ const sources = [...new Set(Object.values(manifest.bundles).flatMap(bundle => bu
   .sort();
 const failures = [];
 
-function isInteractive(selector) {
-  return /(^|[\s,>+~])button\b|(^|[\s,>+~])input\b|(^|[\s,>+~])select\b|\.btn(?:\b|-)|(?:^|[.#])[a-z0-9_-]*(?:button|btn|tab|pill|close)(?:\b|[-_:])/i.test(selector);
+function interactiveTarget(selector) {
+  return selector.split(',').some(part => {
+    const normalized = part
+      .replace(/::?[a-z-]+(?:\([^)]*\))?/gi, '')
+      .trim();
+    const last = normalized.split(/\s+|>|\+|~/).filter(Boolean).at(-1) || '';
+    return /^(?:button|input|select)(?:\b|[.#[:])|\.btn(?:\b|-)|\.[a-z0-9_-]*(?:button|btn|tab|pill|close)(?:\b|[-_:])/i.test(last);
+  });
 }
 
 function isCompactNativeInput(selector) {
@@ -26,7 +32,7 @@ for (const path of sources) {
   for (const match of css.matchAll(blockPattern)) {
     const selector = match[1].trim();
     const body = match[2];
-    if (!isInteractive(selector) || isCompactNativeInput(selector)) continue;
+    if (!interactiveTarget(selector) || isCompactNativeInput(selector)) continue;
 
     const minHeight = body.match(/min-height\s*:\s*(\d+(?:\.\d+)?)px/i);
     const fixedHeight = body.match(/(?:^|;)\s*height\s*:\s*(\d+(?:\.\d+)?)px/i);
