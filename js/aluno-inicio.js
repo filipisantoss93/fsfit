@@ -1,5 +1,5 @@
 import './shared-components.js';
-import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js';
+import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js?v=20261001-ts3';
 
 const content = document.querySelector('#student-content');
 const studentName = document.querySelector('#student-name');
