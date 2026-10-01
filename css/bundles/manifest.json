@@ -86,7 +86,6 @@
         "js/mobile-experience.js",
         "js/mobile-more-swipe.js",
         "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
         "js/page-module-loader.js",
         "js/shared-components.js",
         "js/sidebar-profile-photo.js",
@@ -189,7 +188,6 @@
         "js/mobile-experience.js",
         "js/mobile-more-swipe.js",
         "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
         "js/page-module-loader.js",
         "js/shared-components.js",
         "js/sidebar-profile-photo.js",
@@ -242,7 +240,6 @@
         "js/mobile-experience.js",
         "js/mobile-more-swipe.js",
         "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
         "js/page-module-loader.js",
         "js/shared-components.js",
         "js/sidebar-profile-photo.js",
@@ -289,7 +286,6 @@
         "js/mobile-experience.js",
         "js/mobile-more-swipe.js",
         "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
         "js/page-module-loader.js",
         "js/shared-components.js",
         "js/sidebar-profile-photo.js",
@@ -435,7 +431,6 @@
         "js/mobile-experience.js",
         "js/mobile-more-swipe.js",
         "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
         "js/page-module-loader.js",
         "js/shared-components.js",
         "js/sidebar-profile-photo.js",
@@ -502,870 +497,201 @@
         "js/mobile-experience.js",
         "js/mobile-more-swipe.js",
         "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
         "js/page-module-loader.js",
         "js/painel-agenda-modal-avatar.js",
         "js/painel-agenda-modal-hotfix.js",
         "js/painel-agenda-modal.js",
-        "js/painel-compact-enhancements.js",
-        "js/painel-day-summary.js",
-        "js/painel-home-avatar.js",
-        "js/painel-home-desktop-carousel.js",
-        "js/painel-home-redesign.js",
-        "js/painel-resumo-geral.js",
-        "js/painel-runtime.js",
-        "js/pwa-install.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "biblioteca-alimentar.html": {
-      "url": "/css/bundles/fsfit.ae1561eab8c31615.css",
-      "sha256": "ae1561eab8c31615031b0dffb4f1a2cf4617b5252f587fe8f72ea71a752fb5af",
-      "bytes": 130641,
-      "sourceCount": 22,
-      "duplicatesRemoved": 2,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/header-menu.css",
-        "css/exercise-picker-horizontal-scroll-fix.css",
-        "css/biblioteca-exercicios-padronizacao.css",
-        "css/biblioteca-exercicios.css",
-        "css/library-compact.css",
-        "css/biblioteca-alimentar-padronizacao.css",
-        "css/library-dashboard-desktop.css",
-        "css/biblioteca-alimentar.css",
-        "css/biblioteca-refeicoes-enhancements.css",
-        "css/mobile-more-swipe.css"
-      ],
-      "modules": [
-        "js/biblioteca-alimentar-runtime.js",
-        "js/biblioteca-alimentar.js",
-        "js/biblioteca-refeicoes-enhancements.js",
-        "js/checkout-endereco.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/library-dashboard-desktop.js",
-        "js/library-row-click.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "biblioteca-exercicios.html": {
-      "url": "/css/bundles/fsfit.95dc3eb972aaa007.css",
-      "sha256": "95dc3eb972aaa007a4a3347ea1a0130b535f2e69b201e8208cdcd7f688611e89",
-      "bytes": 132792,
-      "sourceCount": 24,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/header-menu.css",
-        "css/library-compact.css",
-        "css/exercise-picker-horizontal-scroll-fix.css",
-        "css/biblioteca-exercicios-padronizacao.css",
-        "css/library-dashboard-desktop.css",
-        "css/biblioteca-exercicios.css",
-        "css/biblioteca-treinos.css",
-        "css/biblioteca-treinos-multiselect.css",
-        "css/biblioteca-treinos-layout.css",
-        "css/mobile-more-swipe.css",
-        "css/exercise-svg-pages.css",
-        "css/exercise-svg-icons.css"
-      ],
-      "modules": [
-        "js/biblioteca-exercicios.js",
-        "js/biblioteca-runtime.js",
-        "js/biblioteca-treinos-layout.js",
-        "js/biblioteca-treinos-multiselect.js",
-        "js/biblioteca-treinos.js",
-        "js/checkout-endereco.js",
-        "js/exercise-picker-horizontal-scroll-fix.js",
-        "js/exercise-svg-complete.js",
-        "js/exercise-svg-extended.js",
-        "js/exercise-svg-icons.js",
-        "js/exercise-svg-pages.js",
-        "js/exercise-svg-specific.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/library-dashboard-desktop.js",
-        "js/library-row-click.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "cancelamento.html": {
-      "url": "/css/bundles/fsfit.2df1e47087266ee2.css",
-      "sha256": "2df1e47087266ee200c5cf7e1ad788fc6ac8cfe6757a6e7a117b4fc415d49bf0",
-      "bytes": 80788,
-      "sourceCount": 14,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/legal.css",
-        "css/legal-pages.css"
-      ],
-      "modules": []
-    },
-    "contato.html": {
-      "url": "/css/bundles/fsfit.14fe60fad69b59f2.css",
-      "sha256": "14fe60fad69b59f2f6c2ebf8680b63c240d19520b14ad4ab0d6f087a3d4a9168",
-      "bytes": 98887,
-      "sourceCount": 15,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/contato.css",
-        "css/header-menu.css",
-        "css/mobile-more-swipe.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/contato.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "dieta-aluno.html": {
-      "url": "/css/bundles/fsfit.16bb931c33f1f35d.css",
-      "sha256": "16bb931c33f1f35dd87dd935f9eda7651e9698c8817c2abb48b001dfd279549b",
-      "bytes": 115167,
-      "sourceCount": 18,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/dieta-aluno.css",
-        "css/dieta-planos.css",
-        "css/dieta-aluno-padronizacao.css",
-        "css/inline-cleanup.css",
-        "css/header-menu.css",
-        "css/mobile-more-swipe.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/dieta-aluno.js",
-        "js/dieta-biblioteca-refeicoes.js",
-        "js/dieta-modelos-aluno.js",
-        "js/dieta-refeicao-modal.js",
-        "js/dieta-runtime.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "ficha-aluno.html": {
-      "url": "/css/bundles/fsfit.300e2c306730af8c.css",
-      "sha256": "300e2c306730af8c10151bd8e1af7bec16c9e78300e00b7c818db5eeffb7d51e",
-      "bytes": 139276,
-      "sourceCount": 19,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/header-menu.css",
-        "css/ficha-aluno.css",
-        "css/mobile-more-swipe.css",
-        "css/student-avatars-personal.css",
-        "css/ficha-treinos-salvos.css",
-        "css/iniciar-treino-personal.css",
-        "css/student-workflow-improvements.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/ficha-aluno-acoes.js",
-        "js/ficha-aluno-ativacao.js",
-        "js/ficha-aluno-hierarquia.js",
-        "js/ficha-aluno-runtime.js",
-        "js/ficha-aluno.js",
-        "js/ficha-treinos-salvos.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/historico-treinos-aluno.js",
-        "js/inactive-account-guard.js",
-        "js/iniciar-treino-personal.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/student-avatars-personal.js",
-        "js/student-workflow-improvements.js",
-        "js/supabase.js"
-      ]
-    },
-    "financeiro.html": {
-      "url": "/css/bundles/fsfit.76228e01952a0328.css",
-      "sha256": "76228e01952a03288df4cccdd711b0614097b86cadf49088bbbc565300030fa4",
-      "bytes": 124374,
-      "sourceCount": 17,
-      "duplicatesRemoved": 1,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/header-menu.css",
-        "css/mobile-navigation.css",
-        "css/financeiro.css",
-        "css/mobile-more-swipe.css",
-        "css/student-avatars-personal.css",
-        "css/student-workflow-improvements.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/financeiro.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/student-avatars-personal.js",
-        "js/student-workflow-improvements.js",
-        "js/supabase.js"
-      ]
-    },
-    "index.html": {
-      "url": "/css/bundles/fsfit.3d9ae823c9f5aa1e.css",
-      "sha256": "3d9ae823c9f5aa1e535b23817d3eac22deebef4a2fdd8feb1a323e23fdc92d3a",
-      "bytes": 43788,
-      "sourceCount": 3,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/landing-ads.css",
-        "css/landing-home.css",
-        "css/inline-cleanup.css"
-      ],
-      "modules": [
-        "js/auth.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/landing-ads.js",
-        "js/page-module-loader.js",
-        "js/supabase.js"
-      ]
-    },
-    "lembretes-aluno.html": {
-      "url": "/css/bundles/fsfit.0f8d5b8d71e6d588.css",
-      "sha256": "0f8d5b8d71e6d588a44a0f0acb50c6ce120d2448c8a2a7952cdfa35f7dc5ce36",
-      "bytes": 102462,
-      "sourceCount": 16,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/lembretes-aluno-padronizacao.css",
-        "css/lembretes-aluno.css",
-        "css/header-menu.css",
-        "css/mobile-more-swipe.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/lembretes-aluno-runtime.js",
-        "js/lembretes-aluno.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "nova-senha.html": {
-      "url": "/css/bundles/fsfit.1a969cd3b54d4a48.css",
-      "sha256": "1a969cd3b54d4a48f36076fc9882afc85817d5183175935569d89392705fa9c4",
-      "bytes": 83373,
-      "sourceCount": 13,
-      "duplicatesRemoved": 2,
-      "sources": [
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/nova-senha-padronizacao.css"
-      ],
-      "modules": [
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/nova-senha.js",
-        "js/page-module-loader.js",
-        "js/supabase.js"
-      ]
-    },
-    "painel.html": {
-      "url": "/css/bundles/fsfit.e9c15a2d8da44e07.css",
-      "sha256": "e9c15a2d8da44e071577a5a56c501a3629eed755e162a378e8f719d79c219b76",
-      "bytes": 220035,
-      "sourceCount": 40,
-      "duplicatesRemoved": 1,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/header-menu.css",
-        "css/mobile-navigation.css",
-        "css/aulas.css",
-        "css/aulas-painel-compact-base.css",
-        "css/aulas-painel-compact.css",
-        "css/painel-resumo-geral.css",
-        "css/painel-core.css",
-        "css/painel-home-redesign.css",
-        "css/painel-visao-geral.css",
-        "css/painel.css",
-        "css/inline-cleanup.css",
-        "css/renovacao-plano.css",
-        "css/aulas-painel-editor.css",
-        "css/push-personal.css",
-        "css/mobile-more-swipe.css",
-        "css/student-avatars-personal.css",
-        "css/painel-plano-free-ui.css",
-        "css/painel-day-summary.css",
-        "css/painel-home-desktop-carousel.css",
-        "css/painel-home-avatar.css",
-        "css/painel-compact-enhancements.css",
-        "css/aulas-painel-exercise-controls.css",
-        "css/exercicio-drag-order.css",
-        "css/aulas-painel-quick-actions.css",
-        "css/aulas-painel-exercise-categories.css",
-        "css/aulas-painel-delete-controls.css",
-        "css/aulas-painel-delete-layout-fix.css",
-        "css/painel-agenda-modal.css",
-        "css/painel-agenda-modal-avatar.css"
-      ],
-      "modules": [
-        "js/assinatura-cartao-status.js",
-        "js/aulas-painel-delete-controls.js",
-        "js/aulas-painel-delete-layout-fix.js",
-        "js/aulas-painel-editor.js",
-        "js/aulas-painel-exercise-categories.js",
-        "js/aulas-painel-exercise-controls.js",
-        "js/aulas-painel-quick-actions.js",
-        "js/aulas-painel.js",
-        "js/checkout-endereco.js",
-        "js/exercicio-drag-order.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/painel-agenda-modal-avatar.js",
-        "js/painel-agenda-modal-hotfix.js",
-        "js/painel-agenda-modal.js",
-        "js/painel-compact-enhancements.js",
-        "js/painel-dashboard.js",
-        "js/painel-day-summary.js",
-        "js/painel-home-avatar.js",
-        "js/painel-home-desktop-carousel.js",
-        "js/painel-home-redesign.js",
-        "js/painel-plano-free-ui.js",
-        "js/painel-resumo-geral.js",
-        "js/painel-runtime.js",
-        "js/painel-ui-cache.js",
-        "js/painel-visao-geral.js",
-        "js/push-personal.js",
-        "js/pwa-install.js",
-        "js/renovacao-plano.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/student-avatars-personal.js",
-        "js/supabase.js",
-        "js/ui-cache.js"
-      ]
-    },
-    "perfil.html": {
-      "url": "/css/bundles/fsfit.a4c0b3dbccb8a33c.css",
-      "sha256": "a4c0b3dbccb8a33c3ca63c4129ea56f81fdf0d02028fc0d7e7ff4878646695a4",
-      "bytes": 112392,
-      "sourceCount": 16,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/perfil-padronizacao.css",
-        "css/inline-cleanup.css",
-        "css/header-menu.css",
-        "css/mobile-more-swipe.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/image-cropper.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/perfil-runtime.js",
-        "js/perfil.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js"
-      ]
-    },
-    "personal.html": {
-      "url": "/css/bundles/fsfit.911ac1ce6f24db0c.css",
-      "sha256": "911ac1ce6f24db0c682d7a81d176dc5f1a3fa215c1128ee9fc4f5d289fd1f0de",
-      "bytes": 93984,
-      "sourceCount": 15,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/personal-publico.css",
-        "css/personal-publico-padronizacao.css",
-        "css/inline-cleanup.css"
-      ],
-      "modules": [
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/page-module-loader.js",
-        "js/personal-publico.js",
-        "js/supabase.js"
-      ]
-    },
-    "privacidade.html": {
-      "url": "/css/bundles/fsfit.0e9999e397013526.css",
-      "sha256": "0e9999e39701352614c92903c799bbf3354d9cc5be1379475b4206221fba3433",
-      "bytes": 80689,
-      "sourceCount": 13,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/legal.css"
-      ],
-      "modules": []
-    },
-    "recuperar-senha.html": {
-      "url": "/css/bundles/fsfit.c7f1dc69edc94ce6.css",
-      "sha256": "c7f1dc69edc94ce6a30c57092da094f615e547b7af97ee93442c535494024402",
-      "bytes": 82888,
-      "sourceCount": 13,
-      "duplicatesRemoved": 2,
-      "sources": [
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/recuperar-senha-padronizacao.css"
-      ],
-      "modules": [
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/page-module-loader.js",
-        "js/recuperar-senha.js",
-        "js/supabase.js"
-      ]
-    },
-    "selecionar-personal.html": {
-      "url": "/css/bundles/fsfit.e88d5e4fa39eb5fb.css",
-      "sha256": "e88d5e4fa39eb5fbca94a2f40aea8d6391091eb6dfaa39f9ec9e1b776d0f06e9",
-      "bytes": 83386,
-      "sourceCount": 13,
-      "duplicatesRemoved": 2,
-      "sources": [
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/selecionar-personal-padronizacao.css"
-      ],
-      "modules": [
-        "js/selecionar-personal.js"
-      ]
-    },
-    "sistema-para-personal-trainer.html": {
-      "url": "/css/bundles/fsfit.3d9ae823c9f5aa1e.css",
-      "sha256": "3d9ae823c9f5aa1e535b23817d3eac22deebef4a2fdd8feb1a323e23fdc92d3a",
-      "bytes": 43788,
-      "sourceCount": 3,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/landing-ads.css",
-        "css/landing-home.css",
-        "css/inline-cleanup.css"
-      ],
-      "modules": [
-        "js/auth.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/landing-ads.js",
-        "js/page-module-loader.js",
-        "js/supabase.js"
-      ]
-    },
-    "termos.html": {
-      "url": "/css/bundles/fsfit.2df1e47087266ee2.css",
-      "sha256": "2df1e47087266ee200c5cf7e1ad788fc6ac8cfe6757a6e7a117b4fc415d49bf0",
-      "bytes": 80788,
-      "sourceCount": 14,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/legal.css",
-        "css/legal-pages.css"
-      ],
-      "modules": []
-    },
-    "treino-aluno.html": {
-      "url": "/css/bundles/fsfit.33057a9000dbc39b.css",
-      "sha256": "33057a9000dbc39b17b20a3f6a0e9817dbea061d5e08bfd64ae2ea1946403e8f",
-      "bytes": 143933,
-      "sourceCount": 25,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/treino-aluno.css",
-        "css/treino-aluno-retorno.css",
-        "css/treino-sticky-exercise-save.css",
-        "css/treino-exercise-picker-sheet.css",
-        "css/treino-multidias.css",
-        "css/treino-busca-exercicios.css",
-        "css/exercicio-drag-order.css",
-        "css/exercise-svg-icons.css",
-        "css/treino-aluno-empty-state-guard.css",
-        "css/header-menu.css",
-        "css/mobile-more-swipe.css",
-        "css/student-workflow-improvements.css",
-        "css/treino-dia-personalizacao.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/exercicio-drag-order-structured-sync.js",
-        "js/exercicio-drag-order.js",
-        "js/exercise-svg-complete.js",
-        "js/exercise-svg-extended.js",
-        "js/exercise-svg-icons.js",
-        "js/exercise-svg-specific.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/student-workflow-improvements.js",
-        "js/supabase.js",
-        "js/treino-aluno-app.js",
-        "js/treino-aluno-empty-state-guard.js",
-        "js/treino-aluno-exercicios-avulsos.js",
-        "js/treino-aluno-retorno.js",
-        "js/treino-aluno-runtime.js",
-        "js/treino-aluno-semanal.js",
-        "js/treino-aluno-simplificado.js",
-        "js/treino-aluno.js",
-        "js/treino-busca-exercicios.js",
-        "js/treino-dia-personalizacao.js",
-        "js/treino-exercicio-categorias.js",
-        "js/treino-exercicio-regras.js",
-        "js/treino-exercise-picker-sheet.js",
-        "js/treino-multidias.js",
-        "js/treino-sticky-exercise-save.js"
-      ]
-    },
-    "visualizar-aluno.html": {
-      "url": "/css/bundles/fsfit.25231bfa7c7ea6c8.css",
-      "sha256": "25231bfa7c7ea6c80a974ffaa29a19eae2f88cbd1af138c216c228a863dabba0",
-      "bytes": 169376,
-      "sourceCount": 26,
-      "duplicatesRemoved": 0,
-      "sources": [
-        "css/fsfit-design-system-components.css",
-        "css/fsfit-design-system.css",
-        "css/style-base.css",
-        "css/style-dashboard.css",
-        "css/style-brand.css",
-        "css/pull-to-refresh.css",
-        "css/sidebar-profile-avatar-fix.css",
-        "css/mobile-navigation.css",
-        "css/app-shell.css",
-        "css/image-cropper.css",
-        "css/pwa-install.css",
-        "css/style.css",
-        "css/aluno-midias-core.css",
-        "css/aluno-notificacoes.css",
-        "css/aluno-treino-player.css",
-        "css/aluno-inicio.css",
-        "css/aluno-perfil.css",
-        "css/aulas.css",
-        "css/aluno-financeiro.css",
-        "css/aluno.css",
-        "css/aluno-midias.css",
-        "css/visualizar-aluno.css",
-        "css/header-menu.css",
-        "css/mobile-more-swipe.css",
-        "css/exercise-svg-pages.css",
-        "css/exercise-svg-icons.css"
-      ],
-      "modules": [
-        "js/checkout-endereco.js",
-        "js/exercise-svg-complete.js",
-        "js/exercise-svg-extended.js",
-        "js/exercise-svg-icons.js",
-        "js/exercise-svg-pages.js",
-        "js/exercise-svg-specific.js",
-        "js/financeiro-transicoes-seguras.js",
-        "js/global-runtime-bootstrap.js",
-        "js/inactive-account-guard.js",
-        "js/layout-core.js",
-        "js/layout.js",
-        "js/mobile-experience-fixes.js",
-        "js/mobile-experience.js",
-        "js/mobile-more-swipe.js",
-        "js/modal-focus-a11y.js",
-        "js/page-data-cache.js",
-        "js/page-module-loader.js",
-        "js/shared-components.js",
-        "js/sidebar-profile-photo.js",
-        "js/supabase.js",
-        "js/visualizar-aluno.js"
-      ]
+        "js/painel…8592 tokens truncated…" aria-hidden="true">SA</span><span class="fsfit-more-item-copy"><strong>Sair</strong><small>Encerrar sua sessão no FS Fit</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></button>
+      </nav>
+    </section>`;
+
+  document.body.appendChild(sheet);
+  const panel = sheet.querySelector('.fsfit-more-panel');
+  const closeButton = sheet.querySelector('.fsfit-more-close');
+  const backdrop = sheet.querySelector('.fsfit-more-backdrop');
+  const publicPageButton = sheet.querySelector('[data-fsfit-public-page]');
+  const logoutButton = sheet.querySelector('[data-fsfit-logout]');
+  let previousFocus = null;
+
+  const focusableElements = () => Array.from(panel?.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])') || []);
+
+  const closeSheet = () => {
+    if (!sheet.classList.contains('is-open')) return;
+    sheet.classList.remove('is-open');
+    sheet.setAttribute('aria-hidden', 'true');
+    trigger.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
+    document.documentElement.classList.remove('fsfit-sheet-open');
+    previousFocus?.focus?.();
+  };
+
+  const openSheet = () => {
+    previousFocus = document.activeElement;
+    sheet.classList.add('is-open');
+    sheet.setAttribute('aria-hidden', 'false');
+    trigger.classList.add('is-open');
+    trigger.setAttribute('aria-expanded', 'true');
+    document.documentElement.classList.add('fsfit-sheet-open');
+    requestAnimationFrame(() => closeButton?.focus());
+  };
+
+  const handleKeydown = event => {
+    if (!sheet.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      closeSheet();
+      return;
     }
-  }
+    if (event.key !== 'Tab') return;
+    const focusable = focusableElements();
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  backdrop?.addEventListener('click', closeSheet);
+  closeButton?.addEventListener('click', closeSheet);
+  sheet.querySelectorAll('a.fsfit-more-item').forEach(link => link.addEventListener('click', closeSheet));
+
+  publicPageButton?.addEventListener('click', async () => {
+    publicPageButton.disabled = true;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return window.location.assign('perfil.html');
+      const { data: publicProfile, error } = await supabase.from('perfis_publicos').select('slug').eq('personal_id', session.user.id).maybeSingle();
+      if (!error && publicProfile?.slug) return window.location.assign(`/p/${encodeURIComponent(publicProfile.slug)}`);
+      window.location.assign('perfil.html');
+    } catch (error) {
+      console.error('Não foi possível abrir a página pública:', error);
+      window.location.assign('perfil.html');
+    } finally {
+      publicPageButton.disabled = false;
+    }
+  });
+
+  logoutButton?.addEventListener('click', () => {
+    closeSheet();
+    document.querySelector('#logout-button')?.click();
+  });
+
+  document.addEventListener('keydown', handleKeydown);
+  trigger.addEventListener('click', openSheet);
+  mobileMoreCleanup = () => {
+    document.removeEventListener('keydown', handleKeydown);
+    trigger.removeEventListener('click', openSheet);
+    document.documentElement.classList.remove('fsfit-sheet-open');
+  };
+
+  return { openSheet, closeSheet };
 }
+
+function ensureMobileBottomNav(active = '') {
+  document.querySelector('.fsfit-bottom-nav')?.remove();
+  const page = currentPage();
+  const inferredActive = active || page.replace(/\.html$/i, '');
+  const primaryPages = new Set(['painel', 'alunos', 'agenda', 'financeiro']);
+  const nav = document.createElement('nav');
+  nav.className = 'fsfit-bottom-nav';
+  nav.setAttribute('aria-label', 'Navegação principal');
+
+  const items = [
+    { key: 'painel', href: 'painel.html', icon: '⌂', label: 'Início' },
+    { key: 'alunos', href: 'alunos.html', icon: '◎', label: 'Alunos' },
+    { key: 'agenda', href: 'agenda.html', icon: '▦', label: 'Agenda' },
+    { key: 'financeiro', href: 'financeiro.html', icon: '$', label: 'Financeiro' }
+  ];
+
+  items.forEach(item => {
+    const link = document.createElement('a');
+    link.href = item.href;
+    link.dataset.bottomPage = item.key;
+    link.innerHTML = `<span aria-hidden="true">${item.icon}</span>${item.label}`;
+    if (inferredActive === item.key || page === item.href) link.classList.add('active');
+    nav.appendChild(link);
+  });
+
+  const moreButton = document.createElement('button');
+  moreButton.type = 'button';
+  moreButton.dataset.bottomPage = 'mais';
+  moreButton.innerHTML = '<span aria-hidden="true">•••</span>Mais';
+  moreButton.setAttribute('aria-label', 'Abrir mais opções');
+  moreButton.setAttribute('aria-expanded', 'false');
+  moreButton.setAttribute('aria-haspopup', 'dialog');
+  if (!primaryPages.has(inferredActive)) moreButton.classList.add('active');
+  nav.appendChild(moreButton);
+
+  document.body.appendChild(nav);
+  ensureMobileMoreSheet(moreButton);
+}
+
+function configureStudentRecordBackLink() {
+  if (currentPage() !== 'ficha-aluno.html') return;
+  const backLink = document.querySelector('.record-back-link');
+  if (!backLink) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const origin = params.get('origem');
+  if (origin === 'aula') {
+    backLink.textContent = '← Voltar para aula';
+    backLink.href = 'painel.html#live-students-list';
+    return;
+  }
+
+  if (origin === 'painel') {
+    backLink.textContent = '← Voltar ao painel';
+    backLink.href = 'painel.html#today-list';
+    backLink.addEventListener('click', event => {
+      let canReturnToSavedPanel = false;
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(PANEL_RETURN_SCROLL_KEY) || 'null');
+        canReturnToSavedPanel = Boolean(saved && Number.isFinite(Number(saved.y)) && Date.now() - Number(saved.savedAt || 0) < 2 * 60 * 60 * 1000);
+      } catch {}
+      if (!canReturnToSavedPanel || window.history.length <= 1) return;
+      event.preventDefault();
+      sessionStorage.setItem(PANEL_RESTORE_SCROLL_KEY, '1');
+      window.history.back();
+    });
+    return;
+  }
+
+  if (origin !== 'agenda') return;
+  const date = params.get('data');
+  backLink.textContent = '← Voltar para agenda';
+  backLink.href = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? `agenda.html?data=${encodeURIComponent(date)}` : 'agenda.html';
+}
+
+export function renderHeader(active = '') {
+  ensureDesktopShellStyles();
+  core.renderHeader(active);
+  ensureMobileBottomNav(active);
+  configureStudentRecordBackLink();
+  scheduleNonCriticalEnhancements();
+}
+
+export async function setGreeting(session) {
+  return core.setGreeting(session);
+}
+
+export async function requireSession() {
+  return core.requireSession();
+}
+
+if (currentPage() === 'ficha-aluno.html') {
+  import('./ficha-treinos-salvos.js?v=20261001-ts1').catch(error => console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error));
+  import('./iniciar-treino-personal.js?v=20260719-start-workout1').catch(error => console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error));
+  import('./ficha-aluno-ativacao.js?v=20260722-secure-activation1').catch(error => console.error('Não foi possível carregar o acesso seguro do aluno:', error));
+}
+
+Promise.resolve().then(() => {
+  const active = inferShellActivePage();
+  if (!active) return;
+  const host = document.querySelector('#header-container');
+  if (!host || host.querySelector('.main-header')) return;
+  renderHeader(active);
+});
