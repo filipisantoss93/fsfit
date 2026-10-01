@@ -445,7 +445,7 @@ async function loadUpcomingAgenda(personalId: string): Promise<ScheduleEntry[]> 
     const manualByDate = new Map<string, JsonRecord[]>();
     (appointmentsResult.data || []).forEach((row: JsonRecord) => {
       if (!manualByDate.has(row.data)) manualByDate.set(row.data, []);
-      manualByDate.get(row.data).push({
+      manualByDate.get(row.data)!.push({
         date: row.data,
         studentId: String(row.aluno_id || ''),
         name: row.alunos?.nome || 'Aluno',
@@ -562,7 +562,7 @@ function capitalize(value: string = ''): string {
 }
 
 function setText(selector: string, value: unknown): void {
-  const element = document.querySelector(selector);
+  const element = document.querySelector<HTMLElement>(selector);
   if (element) element.textContent = String(value ?? '');
 }
 
