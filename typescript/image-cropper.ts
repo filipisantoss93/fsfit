@@ -88,7 +88,7 @@ async function cropImage(file: File, config: CropConfig, index = 0, total = 1): 
     document.body.appendChild(modal);
 
     function bounds(): { maxX: number; maxY: number } {
-      const rect = stage.getBoundingClientRect();
+      const rect = stage!.getBoundingClientRect();
       const renderedW = img.naturalWidth * baseScale * scale;
       const renderedH = img.naturalHeight * baseScale * scale;
       return { maxX: Math.max(0, (renderedW - rect.width) / 2), maxY: Math.max(0, (renderedH - rect.height) / 2) };
@@ -102,13 +102,13 @@ async function cropImage(file: File, config: CropConfig, index = 0, total = 1): 
 
     function render(): void {
       clamp();
-      preview.style.width = `${img.naturalWidth * baseScale}px`;
-      preview.style.height = `${img.naturalHeight * baseScale}px`;
-      preview.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
+      preview!.style.width = `${img.naturalWidth * baseScale}px`;
+      preview!.style.height = `${img.naturalHeight * baseScale}px`;
+      preview!.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
     }
 
     function initialize(): void {
-      const rect = stage.getBoundingClientRect();
+      const rect = stage!.getBoundingClientRect();
       baseScale = Math.max(rect.width / img.naturalWidth, rect.height / img.naturalHeight);
       render();
     }
@@ -127,13 +127,13 @@ async function cropImage(file: File, config: CropConfig, index = 0, total = 1): 
       scale = Number(zoom.value);
       render();
     });
-    stage.addEventListener('pointerdown', event => {
+    stage!.addEventListener('pointerdown', event => {
       dragging = true;
       lastX = event.clientX;
       lastY = event.clientY;
-      stage.setPointerCapture(event.pointerId);
+      stage!.setPointerCapture(event.pointerId);
     });
-    stage.addEventListener('pointermove', event => {
+    stage!.addEventListener('pointermove', event => {
       if (!dragging) return;
       offsetX += event.clientX - lastX;
       offsetY += event.clientY - lastY;
@@ -141,8 +141,8 @@ async function cropImage(file: File, config: CropConfig, index = 0, total = 1): 
       lastY = event.clientY;
       render();
     });
-    stage.addEventListener('pointerup', () => { dragging = false; });
-    stage.addEventListener('pointercancel', () => { dragging = false; });
+    stage!.addEventListener('pointerup', () => { dragging = false; });
+    stage!.addEventListener('pointercancel', () => { dragging = false; });
 
     modal.querySelector('.fsfit-cropper-close')?.addEventListener('click', () => finish(null));
     modal.querySelector('.fsfit-cropper-cancel')?.addEventListener('click', () => finish(null));
@@ -154,7 +154,7 @@ async function cropImage(file: File, config: CropConfig, index = 0, total = 1): 
       apply.disabled = true;
       apply.textContent = 'Preparando...';
       try {
-        const rect = stage.getBoundingClientRect();
+        const rect = stage!.getBoundingClientRect();
         const canvas = document.createElement('canvas');
         canvas.width = config.width;
         canvas.height = config.height;
