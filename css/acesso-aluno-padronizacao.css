@@ -1,9 +1,9 @@
 /* FS Fit — padronização da página pública de acesso do aluno */
-.student-page{min-height:100dvh;background:radial-gradient(circle at 50% -15%,rgba(50,215,75,.1),transparent 34%),var(--background,#0f1115)}
+.student-page{min-height:100dvh;background:radial-gradient(circle at 50% -15%,rgba(50,215,75,.1),transparent 34%),var(--fs-bg,var(--background))}
 .student-shell{width:min(calc(100% - 24px),540px);min-height:100dvh;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom));box-sizing:border-box}
 .student-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 2px 18px;padding:0}
 .student-header .auth-logo{display:inline-flex;align-items:baseline;gap:3px;text-decoration:none}.student-header .auth-logo strong{font-size:1.35rem}.student-header .auth-logo span{color:var(--primary);font-size:1.35rem;font-weight:900}.student-header p{margin:0;color:var(--muted);font-size:.75rem;font-weight:800;letter-spacing:.04em}
-.student-access-card{width:100%;max-width:none!important;margin:0!important;padding:22px!important;border-radius:22px!important;background:linear-gradient(145deg,rgba(28,33,40,.98),rgba(20,24,29,.98))!important;box-shadow:0 22px 70px rgba(0,0,0,.32)!important}
+.student-access-card{width:100%;max-width:none!important;margin:0!important;padding:22px!important;border-radius:22px!important;background:linear-gradient(145deg,var(--fs-surface-raised),var(--fs-surface))!important;box-shadow:0 22px 70px rgba(0,0,0,.32)!important}
 .student-access-card>.hero-badge{min-height:27px;padding:0 9px;font-size:.61rem}
 .student-access-card h1{margin:13px 0 7px!important;font-size:clamp(1.7rem,8vw,2.1rem);letter-spacing:-.035em;line-height:1.06}
 .student-access-card>#access-description{margin:0 0 18px;color:var(--muted);font-size:.83rem;line-height:1.5}
