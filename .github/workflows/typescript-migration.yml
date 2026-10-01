@@ -293,6 +293,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: codex/typescript-migration-phase1
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
