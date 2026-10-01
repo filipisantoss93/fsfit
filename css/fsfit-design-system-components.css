@@ -137,16 +137,16 @@ body.fsfit-saas .btn-secondary {
 
 body.fsfit-saas .btn-outline,
 body.fsfit-saas .btn-neutral {
-  color: #d7dde2;
+  color: var(--fs-text);
   border-color: var(--fs-border-strong);
   background: transparent;
   box-shadow: none;
 }
 
 body.fsfit-saas .btn-danger {
-  color: #f2c4c7;
-  border-color: rgba(215, 109, 115, .32);
-  background: rgba(215, 109, 115, .08);
+  color: var(--fs-danger-text);
+  border-color: var(--fs-danger-border);
+  background: var(--fs-danger-soft);
   box-shadow: none;
 }
 
@@ -231,28 +231,28 @@ body.fsfit-saas .tag {
   border: 1px solid var(--fs-primary-border);
   border-radius: var(--fs-radius-pill);
   background: var(--fs-primary-soft);
-  color: #a9ce7d;
+  color: var(--fs-success-text);
 }
 
 body.fsfit-saas .badge-info,
 body.fsfit-saas .status-info {
-  border-color: rgba(110, 148, 189, .28);
-  background: rgba(110, 148, 189, .10);
-  color: #a9c0d8;
+  border-color: var(--fs-info-border);
+  background: var(--fs-info-soft);
+  color: var(--fs-info-text);
 }
 
 body.fsfit-saas .badge-warning,
 body.fsfit-saas .status-warning {
-  border-color: rgba(212, 173, 83, .28);
-  background: rgba(212, 173, 83, .10);
-  color: #e1c47d;
+  border-color: var(--fs-warning-border);
+  background: var(--fs-warning-soft);
+  color: var(--fs-warning-text);
 }
 
 body.fsfit-saas .badge-danger,
 body.fsfit-saas .status-danger {
-  border-color: rgba(215, 109, 115, .28);
-  background: rgba(215, 109, 115, .10);
-  color: #eca2a7;
+  border-color: var(--fs-danger-border);
+  background: var(--fs-danger-soft);
+  color: var(--fs-danger-text);
 }
 
 /* Tabelas e listas */

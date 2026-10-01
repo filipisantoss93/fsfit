@@ -3,7 +3,7 @@ body.password-recovery-page{min-height:100svh;margin:0;background:radial-gradien
 .password-recovery-header{display:flex;justify-content:center;padding:6px 0 18px}
 .password-recovery-header .auth-logo{text-decoration:none}
 .password-recovery-main{display:grid;align-items:center}
-.password-recovery-card{position:relative;overflow:hidden;padding:26px;border:1px solid rgba(174,255,20,.2);border-radius:24px;background:linear-gradient(150deg,rgba(174,255,20,.075),rgba(255,255,255,.018) 38%,var(--surface));box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.password-recovery-card{position:relative;overflow:hidden;padding:26px;border:1px solid rgba(174,255,20,.2);border-radius:24px;background:linear-gradient(150deg,var(--fs-primary-soft),var(--fs-surface-tint) 38%,var(--surface));box-shadow:0 24px 70px rgba(0,0,0,.28)}
 .password-recovery-card::before{content:"";position:absolute;width:180px;height:180px;right:-90px;top:-100px;border-radius:50%;background:radial-gradient(circle,rgba(174,255,20,.15),transparent 67%);pointer-events:none}
 .password-recovery-kicker{position:relative;display:inline-flex;margin-bottom:14px;padding:6px 9px;border:1px solid rgba(174,255,20,.25);border-radius:999px;color:var(--primary);font-size:.68rem;font-weight:900;letter-spacing:.09em}
 .password-recovery-card h1{position:relative;margin:0;font-size:clamp(1.75rem,8vw,2.25rem);line-height:1.08}
@@ -13,7 +13,7 @@ body.password-recovery-page{min-height:100svh;margin:0;background:radial-gradien
 .password-recovery-card label{font-size:.78rem;font-weight:800}
 .password-recovery-card input{min-height:52px;border-radius:14px;font-size:16px}
 .password-recovery-submit{width:100%;min-height:50px;border-radius:14px}
-.password-recovery-help{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;margin-top:18px;padding:13px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.025)}
+.password-recovery-help{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;margin-top:18px;padding:13px;border:1px solid var(--border);border-radius:14px;background:var(--fs-surface-tint)}
 .password-recovery-help-icon{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:rgba(174,255,20,.12);color:var(--primary);font-weight:900}
 .password-recovery-help strong,.password-recovery-help span{display:block}
 .password-recovery-help strong{font-size:.8rem}

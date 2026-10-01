@@ -10,6 +10,7 @@ on:
       - 'scripts/build-css-bundles.mjs'
       - 'scripts/audit-css-pages.mjs'
       - 'scripts/audit-css-runtime.mjs'
+      - 'scripts/audit-theme-contrast.mjs'
       - '.github/workflows/auditoria-css.yml'
   push:
     branches: [main]
@@ -21,6 +22,7 @@ on:
       - 'scripts/build-css-bundles.mjs'
       - 'scripts/audit-css-pages.mjs'
       - 'scripts/audit-css-runtime.mjs'
+      - 'scripts/audit-theme-contrast.mjs'
       - '.github/workflows/auditoria-css.yml'
 
 permissions:
@@ -44,6 +46,9 @@ jobs:
 
       - name: Auditar contrato de CSS em runtime
         run: node scripts/audit-css-runtime.mjs
+
+      - name: Auditar contraste dos temas
+        run: node scripts/audit-theme-contrast.mjs
 
       - name: Auditar referências, duplicações e arquivos de origem
         run: node scripts/audit-css-pages.mjs

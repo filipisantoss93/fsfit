@@ -3,15 +3,15 @@
   padding:17px;
   border:1px solid rgba(255,193,7,.28);
   border-radius:16px;
-  background:linear-gradient(135deg,rgba(255,193,7,.11),rgba(255,255,255,.02));
+  background:linear-gradient(135deg,var(--fs-warning-soft),var(--fs-surface-tint));
 }
 .student-payment-alert.overdue {
   border-color:rgba(255,107,107,.35);
-  background:linear-gradient(135deg,rgba(255,107,107,.12),rgba(255,255,255,.02));
+  background:linear-gradient(135deg,var(--fs-danger-soft),var(--fs-surface-tint));
 }
 .student-payment-alert.waiting {
   border-color:rgba(50,215,75,.28);
-  background:linear-gradient(135deg,rgba(50,215,75,.09),rgba(255,255,255,.02));
+  background:linear-gradient(135deg,var(--fs-success-soft),var(--fs-surface-tint));
 }
 .student-payment-alert-header {
   display:flex;
@@ -27,7 +27,7 @@
   font-weight:900;
   letter-spacing:.08em;
 }
-.student-payment-alert.overdue small { color:#ff7b7b; }
+.student-payment-alert.overdue small { color:var(--fs-danger-text); }
 .student-payment-alert.waiting small { color:var(--primary); }
 .student-payment-alert h2 { margin:0 0 5px; font-size:1.05rem; }
 .student-payment-alert p { margin:0; color:var(--muted); font-size:.83rem; }
@@ -65,7 +65,7 @@
   position:absolute;
   inset:0;
   border:0;
-  background:rgba(0,0,0,.72);
+  background:var(--fs-overlay);
 }
 .student-pix-dialog {
   position:relative;

@@ -28,10 +28,10 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--border, #343a46);
+  border: 1px solid var(--fs-border, var(--border));
   border-radius: 14px;
-  background: var(--surface, #181b21);
-  color: var(--text, #f5f7fb);
+  background: var(--fs-surface, var(--surface));
+  color: var(--fs-text, var(--text));
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -56,7 +56,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--page-bg, #0f1115);
+  border: 2px solid var(--fs-bg, var(--background));
   border-radius: 999px;
   background: #ff3b30;
   color: #fff;
@@ -82,7 +82,7 @@
   width: 100%;
   height: 100%;
   border: 0;
-  background: rgba(0, 0, 0, 0.64);
+  background: var(--fs-overlay);
   cursor: default;
 }
 
@@ -96,10 +96,10 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border, #343a46);
+  border: 1px solid var(--fs-border, var(--border));
   border-bottom: 0;
   border-radius: 24px 24px 0 0;
-  background: var(--surface, #181b21);
+  background: var(--fs-surface, var(--surface));
   box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.35);
 }
 
@@ -109,7 +109,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 20px 20px 14px;
-  border-bottom: 1px solid var(--border, #343a46);
+  border-bottom: 1px solid var(--fs-border, var(--border));
 }
 
 .student-sheet-header h2 {
@@ -123,7 +123,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border, #343a46);
+  border: 1px solid var(--fs-border, var(--border));
   border-radius: 12px;
   background: transparent;
   color: inherit;
@@ -136,7 +136,7 @@
   display: flex;
   gap: 10px;
   padding: 12px 20px;
-  border-bottom: 1px solid var(--border, #343a46);
+  border-bottom: 1px solid var(--fs-border, var(--border));
 }
 
 .student-sheet-toolbar .btn {
@@ -155,7 +155,7 @@
   gap: 12px;
   padding: 15px 10px;
   border: 0;
-  border-bottom: 1px solid var(--border, #343a46);
+  border-bottom: 1px solid var(--fs-border, var(--border));
   background: transparent;
   color: inherit;
   text-align: left;
@@ -167,7 +167,7 @@
 }
 
 .student-notification-item.unread {
-  background: rgba(49, 125, 255, 0.08);
+  background: var(--fs-info-soft);
 }
 
 .student-notification-dot {
@@ -179,7 +179,7 @@
 }
 
 .student-notification-item.unread .student-notification-dot {
-  background: #317dff;
+  background: var(--fs-info);
 }
 
 .student-notification-copy {
@@ -193,18 +193,18 @@
 }
 
 .student-notification-copy span {
-  color: var(--muted, #b9c0cc);
+  color: var(--fs-text-muted, var(--muted));
   line-height: 1.45;
 }
 
 .student-notification-copy small {
-  color: var(--muted, #8f98a6);
+  color: var(--fs-text-muted, var(--muted));
 }
 
 .student-notification-empty {
   margin: 0;
   padding: 34px 18px;
-  color: var(--muted, #aeb5c0);
+  color: var(--fs-text-muted, var(--muted));
   text-align: center;
 }
 
@@ -215,9 +215,9 @@
 
 .student-settings-group {
   padding: 18px;
-  border: 1px solid var(--border, #343a46);
+  border: 1px solid var(--fs-border, var(--border));
   border-radius: 18px;
-  background: var(--page-bg, #0f1115);
+  background: var(--fs-bg, var(--background));
 }
 
 .student-settings-group h3 {
@@ -226,7 +226,7 @@
 
 .student-settings-group p {
   margin: 0 0 16px;
-  color: var(--muted, #b9c0cc);
+  color: var(--fs-text-muted, var(--muted));
   line-height: 1.5;
 }
 
