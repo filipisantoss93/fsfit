@@ -76,7 +76,7 @@
   border-radius: 999px;
   background: var(--danger);
   color: #fff;
-  font-size: .62rem;
+  font-size:var(--fs-font-xs);
   font-weight: 900;
   line-height: 1;
 }
@@ -109,7 +109,7 @@
   display: block;
   margin-bottom: 3px;
   color: var(--muted);
-  font-size: .65rem;
+  font-size:var(--fs-font-xs);
   font-weight: 900;
   letter-spacing: .09em;
 }
@@ -131,7 +131,7 @@
   border: 0;
   background: none;
   cursor: pointer;
-  font-size: .72rem;
+  font-size:var(--fs-font-xs);
   font-weight: 800;
 }
 
@@ -198,7 +198,7 @@
 
 .notification-copy small {
   color: var(--fs-text-muted);
-  font-size: .68rem;
+  font-size:var(--fs-font-xs);
 }
 
 .notification-chevron {
@@ -254,7 +254,7 @@
   border-radius: 999px;
   background: var(--danger);
   color: #fff;
-  font-size: .68rem;
+  font-size:var(--fs-font-xs);
   font-weight: 900;
   line-height: 1;
 }
@@ -424,7 +424,7 @@
     border-radius: 50%;
     background: var(--fs-surface-soft) center / cover no-repeat;
     color: var(--text);
-    font-size: .73rem;
+    font-size:var(--fs-font-xs);
     font-weight: 900;
   }
 
@@ -451,7 +451,7 @@
 
   .sidebar-profile-copy small {
     color: var(--muted);
-    font-size: .68rem;
+    font-size:var(--fs-font-xs);
   }
 
   .sidebar-profile > .nav-icon {
@@ -635,7 +635,7 @@
     display: block;
     padding: 2px 10px 6px;
     color: var(--fs-text-subtle);
-    font-size: .62rem;
+    font-size:var(--fs-font-xs);
     font-weight: 900;
     letter-spacing: .11em;
   }
