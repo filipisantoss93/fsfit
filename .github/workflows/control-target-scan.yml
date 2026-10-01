@@ -1,0 +1,27 @@
+name: Control target scan
+
+on:
+  push:
+    branches:
+      - review/buttons-controls-alignment
+    paths:
+      - 'css/**/*.css'
+      - 'scripts/audit-control-targets.mjs'
+      - '.github/workflows/control-target-scan.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: review/buttons-controls-alignment
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Scan interactive controls
+        run: node scripts/audit-control-targets.mjs
