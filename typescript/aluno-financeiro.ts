@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-const alertCard = document.querySelector<HTMLElement>('#student-payment-alert');
+const alertCard = document.querySelector<HTMLElement>('#student-payment-alert')!;
 const alertTitle = document.querySelector<HTMLElement>('#student-payment-title')!;
 const alertText = document.querySelector<HTMLElement>('#student-payment-text')!;
 const alertValue = document.querySelector<HTMLElement>('#student-payment-value')!;
@@ -190,8 +190,8 @@ function renderPixModal(charge: PaymentData | null = null): void {
   pixPayload = automatic ? String(charge?.pix_copia_cola || '') : buildPixPayload(payment!);
   if (!pixPayload) return;
 
-  pixAmount.textContent = formatCurrency(payment.valor);
-  pixDueDate.textContent = formatDate(payment.vencimento);
+  pixAmount.textContent = formatCurrency(payment!.valor);
+  pixDueDate.textContent = formatDate(payment!.vencimento);
   pixCodeField.value = pixPayload;
   qrHost.innerHTML = '';
   copyButton?.classList.remove('hidden');
@@ -331,7 +331,7 @@ async function informPaid(button: HTMLButtonElement): Promise<void> {
 openPixButton?.addEventListener('click', async () => {
   if (!canGeneratePix(payment)) return;
   try {
-    if (payment.pix_automatico) {
+    if (payment?.pix_automatico) {
       const charge = await createAutomaticPix();
       if (!charge) return;
       renderPixModal(charge);
