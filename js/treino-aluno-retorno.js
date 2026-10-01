@@ -2,6 +2,11 @@ globalThis.__FSFIT_WORKOUT_PUBLICATION_GUARD__ = true;
 const params = new URLSearchParams(window.location.search);
 const embedded = params.get('embed') === '1';
 const backLink = document.querySelector('#back-link');
+const studentId = params.get('id');
+if (!embedded && backLink && studentId) {
+    backLink.href = `ficha-aluno.html?id=${encodeURIComponent(studentId)}`;
+    backLink.textContent = '← Ficha do aluno';
+}
 if (embedded && window.parent !== window && backLink) {
     backLink.href = '#';
     backLink.textContent = '← Voltar';

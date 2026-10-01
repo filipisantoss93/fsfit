@@ -2,35 +2,35 @@
   "version": 1,
   "pages": {
     "/": "/css/bundles/fsfit.7151448c6711e4cb.css",
-    "/abrir-whatsapp-lembrete.html": "/css/bundles/fsfit.71ca1c9d6db9eb77.css",
-    "/acesso-aluno.html": "/css/bundles/fsfit.ad6403e801805c9a.css",
-    "/admin-assinaturas.html": "/css/bundles/fsfit.aeaf69f5d5bf4960.css",
-    "/admin-contatos.html": "/css/bundles/fsfit.949429efd55057ec.css",
-    "/admin.html": "/css/bundles/fsfit.8f4cfc2fbebd0675.css",
-    "/agenda.html": "/css/bundles/fsfit.032c72c90a121fea.css",
-    "/aluno-preview.html": "/css/bundles/fsfit.bffa111d6051a2df.css",
-    "/aluno.html": "/css/bundles/fsfit.b65988b84afa8daa.css",
-    "/alunos.html": "/css/bundles/fsfit.0420aedfe10ceca3.css",
-    "/assinatura.html": "/css/bundles/fsfit.1c607b086fd47b89.css",
-    "/biblioteca-alimentar.html": "/css/bundles/fsfit.80a012589b2ef288.css",
-    "/biblioteca-exercicios.html": "/css/bundles/fsfit.393cb319bb5d25ca.css",
+    "/abrir-whatsapp-lembrete.html": "/css/bundles/fsfit.72246c86e2da4d86.css",
+    "/acesso-aluno.html": "/css/bundles/fsfit.b63f60e3d245dd7e.css",
+    "/admin-assinaturas.html": "/css/bundles/fsfit.da1570d23c5d7ae9.css",
+    "/admin-contatos.html": "/css/bundles/fsfit.8ca0b0b0cd3a9b08.css",
+    "/admin.html": "/css/bundles/fsfit.a9aba5f01836413f.css",
+    "/agenda.html": "/css/bundles/fsfit.ec82952830d0611a.css",
+    "/aluno-preview.html": "/css/bundles/fsfit.e93da8537a15c0cd.css",
+    "/aluno.html": "/css/bundles/fsfit.7a9342ebcdd12fe7.css",
+    "/alunos.html": "/css/bundles/fsfit.bf2179347cf23ed1.css",
+    "/assinatura.html": "/css/bundles/fsfit.723aa8f6d4380a4b.css",
+    "/biblioteca-alimentar.html": "/css/bundles/fsfit.87dc587d98336588.css",
+    "/biblioteca-exercicios.html": "/css/bundles/fsfit.1b532a0655cd4ea6.css",
     "/cancelamento.html": "/css/bundles/fsfit.a60465855cdc2e6d.css",
-    "/contato.html": "/css/bundles/fsfit.f773815649d161ed.css",
-    "/dieta-aluno.html": "/css/bundles/fsfit.3c901b1fdf185743.css",
-    "/ficha-aluno.html": "/css/bundles/fsfit.ca4dac6cea88a811.css",
-    "/financeiro.html": "/css/bundles/fsfit.c0924abf1d3cb82f.css",
-    "/lembretes-aluno.html": "/css/bundles/fsfit.cc3425492238e4ef.css",
-    "/nova-senha.html": "/css/bundles/fsfit.f2eec9a632e4bc3e.css",
-    "/painel.html": "/css/bundles/fsfit.6f19f3a8461a1cb8.css",
-    "/perfil.html": "/css/bundles/fsfit.f2692da5b10bfd06.css",
+    "/contato.html": "/css/bundles/fsfit.6b426d45c1f485d3.css",
+    "/dieta-aluno.html": "/css/bundles/fsfit.a15a95ef53410be4.css",
+    "/ficha-aluno.html": "/css/bundles/fsfit.79060e8b6ccfd580.css",
+    "/financeiro.html": "/css/bundles/fsfit.5949974dc7216856.css",
+    "/lembretes-aluno.html": "/css/bundles/fsfit.64921ea2740c9a4e.css",
+    "/nova-senha.html": "/css/bundles/fsfit.258fa0acad4d91bb.css",
+    "/painel.html": "/css/bundles/fsfit.0ee3c9a9a148a4c1.css",
+    "/perfil.html": "/css/bundles/fsfit.9f6a702f6e58cfc5.css",
     "/personal.html": "/css/bundles/fsfit.aac7ba12e0b2505b.css",
     "/privacidade.html": "/css/bundles/fsfit.0eb4124f691058c2.css",
-    "/recuperar-senha.html": "/css/bundles/fsfit.d0d286da0561e921.css",
-    "/selecionar-personal.html": "/css/bundles/fsfit.e216aeef7aa8afe1.css",
+    "/recuperar-senha.html": "/css/bundles/fsfit.ac22e1e6aa6f438f.css",
+    "/selecionar-personal.html": "/css/bundles/fsfit.1ddb4632d3788b5f.css",
     "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/termos.html": "/css/bundles/fsfit.a60465855cdc2e6d.css",
-    "/treino-aluno.html": "/css/bundles/fsfit.6f35368c1f0f9f05.css",
-    "/visualizar-aluno.html": "/css/bundles/fsfit.f207e3eb5c5c97bd.css"
+    "/treino-aluno.html": "/css/bundles/fsfit.a63283a607bdcc50.css",
+    "/visualizar-aluno.html": "/css/bundles/fsfit.4859fe38bd1375b0.css"
   },
   "criticalPages": [
     "/",
@@ -42,20 +42,20 @@
     "/painel.html"
   ],
   "criticalBundles": [
-    "/css/bundles/fsfit.032c72c90a121fea.css",
-    "/css/bundles/fsfit.0420aedfe10ceca3.css",
-    "/css/bundles/fsfit.6f19f3a8461a1cb8.css",
+    "/css/bundles/fsfit.0ee3c9a9a148a4c1.css",
+    "/css/bundles/fsfit.5949974dc7216856.css",
     "/css/bundles/fsfit.7151448c6711e4cb.css",
-    "/css/bundles/fsfit.ad6403e801805c9a.css",
-    "/css/bundles/fsfit.b65988b84afa8daa.css",
-    "/css/bundles/fsfit.c0924abf1d3cb82f.css"
+    "/css/bundles/fsfit.7a9342ebcdd12fe7.css",
+    "/css/bundles/fsfit.b63f60e3d245dd7e.css",
+    "/css/bundles/fsfit.bf2179347cf23ed1.css",
+    "/css/bundles/fsfit.ec82952830d0611a.css"
   ],
   "bundles": {
     "abrir-whatsapp-lembrete.html": {
-      "url": "/css/bundles/fsfit.71ca1c9d6db9eb77.css",
-      "sha256": "71ca1c9d6db9eb77d7e75b3318b8c96d47297b4ece3a45c241142ad99aa43758",
-      "bytes": 105119,
-      "sourceCount": 15,
+      "url": "/css/bundles/fsfit.72246c86e2da4d86.css",
+      "sha256": "72246c86e2da4d86a7dd050e4e6165b3c9f4cdb603adf19926d43bd5d75d02fe",
+      "bytes": 108709,
+      "sourceCount": 16,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -71,6 +71,7 @@
         "css/pwa-install.css",
         "css/style.css",
         "css/inline-cleanup.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -94,10 +95,10 @@
       ]
     },
     "acesso-aluno.html": {
-      "url": "/css/bundles/fsfit.ad6403e801805c9a.css",
-      "sha256": "ad6403e801805c9a003a5c4ab969dd91b55dafbf78d0acf2ae66989fe83a5875",
-      "bytes": 91397,
-      "sourceCount": 14,
+      "url": "/css/bundles/fsfit.b63f60e3d245dd7e.css",
+      "sha256": "b63f60e3d245dd7e5a5004b91f28e8f664f91cd0935709fb16ee049aa2d6f7b4",
+      "bytes": 94987,
+      "sourceCount": 15,
       "duplicatesRemoved": 2,
       "sources": [
         "css/style-base.css",
@@ -113,7 +114,8 @@
         "css/fsfit-design-system-components.css",
         "css/fsfit-design-system.css",
         "css/acesso-aluno-padronizacao.css",
-        "css/acesso-aluno.css"
+        "css/acesso-aluno.css",
+        "css/ux-consistency.css"
       ],
       "modules": [
         "js/acesso-aluno-runtime.js",
@@ -127,10 +129,10 @@
       ]
     },
     "admin-assinaturas.html": {
-      "url": "/css/bundles/fsfit.aeaf69f5d5bf4960.css",
-      "sha256": "aeaf69f5d5bf49604485a8b4ca13f2d388fc5a4703b77cea6977f6393b91fa13",
-      "bytes": 117497,
-      "sourceCount": 16,
+      "url": "/css/bundles/fsfit.da1570d23c5d7ae9.css",
+      "sha256": "da1570d23c5d7ae9e742d43469571e0d699f94c164827b3c159c79c37c3fd7fd",
+      "bytes": 121087,
+      "sourceCount": 17,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -148,7 +150,8 @@
         "css/admin-final-bundle.css",
         "css/admin-forecast.css",
         "css/admin.css",
-        "css/inline-cleanup.css"
+        "css/inline-cleanup.css",
+        "css/ux-consistency.css"
       ],
       "modules": [
         "js/admin-assinatura-saude.js",
@@ -157,10 +160,10 @@
       ]
     },
     "admin-contatos.html": {
-      "url": "/css/bundles/fsfit.949429efd55057ec.css",
-      "sha256": "949429efd55057ec2ccf824c8d4e1417b5ffc3c7b467a7a47c28310efe5a51b4",
-      "bytes": 109671,
-      "sourceCount": 15,
+      "url": "/css/bundles/fsfit.8ca0b0b0cd3a9b08.css",
+      "sha256": "8ca0b0b0cd3a9b08d64ff6216fdbd56975a68ffb7ed2803a51caa31231a3bfd9",
+      "bytes": 113261,
+      "sourceCount": 16,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -176,6 +179,7 @@
         "css/pwa-install.css",
         "css/style.css",
         "css/admin-contatos.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -199,10 +203,10 @@
       ]
     },
     "admin.html": {
-      "url": "/css/bundles/fsfit.8f4cfc2fbebd0675.css",
-      "sha256": "8f4cfc2fbebd06754cd9324f531f545f842bd8e61cac025c2a205b0063650c42",
-      "bytes": 131206,
-      "sourceCount": 17,
+      "url": "/css/bundles/fsfit.a9aba5f01836413f.css",
+      "sha256": "a9aba5f01836413fa32613a28f7cf0068c530444a6b0ccc9caa35c1fd74fa1a5",
+      "bytes": 134796,
+      "sourceCount": 18,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -220,6 +224,7 @@
         "css/admin-final-bundle.css",
         "css/admin-forecast.css",
         "css/admin.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -252,10 +257,10 @@
       ]
     },
     "agenda.html": {
-      "url": "/css/bundles/fsfit.032c72c90a121fea.css",
-      "sha256": "032c72c90a121feadeca4eaa766e3d45e59b5e8fcf0065ee489ad7fe52d9627c",
-      "bytes": 127014,
-      "sourceCount": 19,
+      "url": "/css/bundles/fsfit.ec82952830d0611a.css",
+      "sha256": "ec82952830d0611add20026322552fd5e47ea9444e2b9211126ee5d52176bead",
+      "bytes": 130604,
+      "sourceCount": 20,
       "duplicatesRemoved": 1,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -274,6 +279,7 @@
         "css/agenda.css",
         "css/agenda-padronizacao.css",
         "css/agenda-bundle.css",
+        "css/ux-consistency.css",
         "css/mobile-more-swipe.css",
         "css/student-avatars-personal.css",
         "css/student-workflow-improvements.css"
@@ -301,10 +307,10 @@
       ]
     },
     "aluno-preview.html": {
-      "url": "/css/bundles/fsfit.bffa111d6051a2df.css",
-      "sha256": "bffa111d6051a2df8b65cab51203c36d14cf68358307cc8eac8028a1d4b6e4ba",
-      "bytes": 145100,
-      "sourceCount": 22,
+      "url": "/css/bundles/fsfit.e93da8537a15c0cd.css",
+      "sha256": "e93da8537a15c0cd87e12964a58af8813e416527147152b38f95f7979bf3a4b2",
+      "bytes": 148690,
+      "sourceCount": 23,
       "duplicatesRemoved": 3,
       "sources": [
         "css/style-base.css",
@@ -328,7 +334,8 @@
         "css/aluno.css",
         "css/aluno-midias.css",
         "css/aluno-treino-player.css",
-        "css/aluno-preview-padronizacao.css"
+        "css/aluno-preview-padronizacao.css",
+        "css/ux-consistency.css"
       ],
       "modules": [
         "js/aluno-preview.js",
@@ -340,10 +347,10 @@
       ]
     },
     "aluno.html": {
-      "url": "/css/bundles/fsfit.b65988b84afa8daa.css",
-      "sha256": "b65988b84afa8daa94e197a055b1140173839a1e89aca20aac2b89e919a48edb",
-      "bytes": 146844,
-      "sourceCount": 24,
+      "url": "/css/bundles/fsfit.7a9342ebcdd12fe7.css",
+      "sha256": "7a9342ebcdd12fe74f9e344f0c55b1f96ca4d6245cb13e90df6228fd9d217afa",
+      "bytes": 150434,
+      "sourceCount": 25,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -366,6 +373,7 @@
         "css/aulas.css",
         "css/aluno-financeiro.css",
         "css/aluno.css",
+        "css/ux-consistency.css",
         "css/portal-aluno-tabs.css",
         "css/aluno-push-onboarding.css",
         "css/exercise-svg-pages.css",
@@ -397,10 +405,10 @@
       ]
     },
     "alunos.html": {
-      "url": "/css/bundles/fsfit.0420aedfe10ceca3.css",
-      "sha256": "0420aedfe10ceca3ba448d3c571343333f92ce1427a99e7160cb5e0ebb5bbdf6",
-      "bytes": 130449,
-      "sourceCount": 21,
+      "url": "/css/bundles/fsfit.bf2179347cf23ed1.css",
+      "sha256": "bf2179347cf23ed139419cf91aa75f67754186dc2abb518a303d2c70c4a2d269",
+      "bytes": 134039,
+      "sourceCount": 22,
       "duplicatesRemoved": 1,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -423,6 +431,7 @@
         "css/alunos.css",
         "css/alunos-lista-compacta.css",
         "css/inline-cleanup.css",
+        "css/ux-consistency.css",
         "css/mobile-more-swipe.css"
       ],
       "modules": [
@@ -447,10 +456,10 @@
       ]
     },
     "assinatura.html": {
-      "url": "/css/bundles/fsfit.1c607b086fd47b89.css",
-      "sha256": "1c607b086fd47b89c68dbfea72ff1b882ec557c40ed841b4836b7a8e1c934abe",
-      "bytes": 164412,
-      "sourceCount": 30,
+      "url": "/css/bundles/fsfit.723aa8f6d4380a4b.css",
+      "sha256": "723aa8f6d4380a4bbe4a430fb569c95b058e0db7770708aeaf1f3881cf00e94c",
+      "bytes": 168002,
+      "sourceCount": 31,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -467,6 +476,7 @@
         "css/style.css",
         "css/header-menu.css",
         "css/assinatura.css",
+        "css/ux-consistency.css",
         "css/assinatura-gerenciamento.css",
         "css/mobile-more-swipe.css",
         "css/painel-home-redesign.css",
@@ -525,10 +535,10 @@
       ]
     },
     "biblioteca-alimentar.html": {
-      "url": "/css/bundles/fsfit.80a012589b2ef288.css",
-      "sha256": "80a012589b2ef288c5540426a5ddd1fe22547015eb22038fa954e50e5ef80a98",
-      "bytes": 137669,
-      "sourceCount": 22,
+      "url": "/css/bundles/fsfit.87dc587d98336588.css",
+      "sha256": "87dc587d98336588caf479758a02466c844c5e6b49c8aeac6b9624399f9c3901",
+      "bytes": 141259,
+      "sourceCount": 23,
       "duplicatesRemoved": 2,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -551,6 +561,7 @@
         "css/biblioteca-alimentar-padronizacao.css",
         "css/library-dashboard-desktop.css",
         "css/biblioteca-alimentar.css",
+        "css/ux-consistency.css",
         "css/biblioteca-refeicoes-enhancements.css",
         "css/mobile-more-swipe.css"
       ],
@@ -578,10 +589,10 @@
       ]
     },
     "biblioteca-exercicios.html": {
-      "url": "/css/bundles/fsfit.393cb319bb5d25ca.css",
-      "sha256": "393cb319bb5d25ca95edf836cbcc649278ae105abc0ec9367c89fd8e8fd769b2",
-      "bytes": 139755,
-      "sourceCount": 24,
+      "url": "/css/bundles/fsfit.1b532a0655cd4ea6.css",
+      "sha256": "1b532a0655cd4ea6e6591a753b9e06c6d1a58b7d5a1e737baee313ad29476d2f",
+      "bytes": 143345,
+      "sourceCount": 25,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -602,6 +613,7 @@
         "css/biblioteca-exercicios-padronizacao.css",
         "css/library-dashboard-desktop.css",
         "css/biblioteca-exercicios.css",
+        "css/ux-consistency.css",
         "css/biblioteca-treinos.css",
         "css/biblioteca-treinos-multiselect.css",
         "css/biblioteca-treinos-layout.css",
@@ -667,10 +679,10 @@
       ]
     },
     "contato.html": {
-      "url": "/css/bundles/fsfit.f773815649d161ed.css",
-      "sha256": "f773815649d161ed87ea75b908e189143e97148859932796684817414aa5f534",
-      "bytes": 105109,
-      "sourceCount": 15,
+      "url": "/css/bundles/fsfit.6b426d45c1f485d3.css",
+      "sha256": "6b426d45c1f485d369849cd69dbfb111db78fab7b562e8e1a891c9e145481faf",
+      "bytes": 108699,
+      "sourceCount": 16,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -686,6 +698,7 @@
         "css/pwa-install.css",
         "css/style.css",
         "css/contato.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -709,10 +722,10 @@
       ]
     },
     "dieta-aluno.html": {
-      "url": "/css/bundles/fsfit.3c901b1fdf185743.css",
-      "sha256": "3c901b1fdf1857434c6bc08512ef4bff8cbdd800d272fe9ebe5a2a3bbb050dda",
-      "bytes": 121710,
-      "sourceCount": 18,
+      "url": "/css/bundles/fsfit.a15a95ef53410be4.css",
+      "sha256": "a15a95ef53410be488ed5cc023c223b3489b624e2a7a2b65d995be316d8f9ffe",
+      "bytes": 125300,
+      "sourceCount": 19,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -731,6 +744,7 @@
         "css/dieta-planos.css",
         "css/dieta-aluno-padronizacao.css",
         "css/inline-cleanup.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -758,10 +772,10 @@
       ]
     },
     "ficha-aluno.html": {
-      "url": "/css/bundles/fsfit.ca4dac6cea88a811.css",
-      "sha256": "ca4dac6cea88a81171a0b0e7902705b4dadc67c3fdfed261336dde6be5c6db2d",
-      "bytes": 146581,
-      "sourceCount": 19,
+      "url": "/css/bundles/fsfit.79060e8b6ccfd580.css",
+      "sha256": "79060e8b6ccfd58064560f39147994834a1b073bb53fd20ad31bc6874d69bb3e",
+      "bytes": 150171,
+      "sourceCount": 20,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -778,6 +792,7 @@
         "css/style.css",
         "css/header-menu.css",
         "css/ficha-aluno.css",
+        "css/ux-consistency.css",
         "css/mobile-more-swipe.css",
         "css/student-avatars-personal.css",
         "css/ficha-treinos-salvos.css",
@@ -813,10 +828,10 @@
       ]
     },
     "financeiro.html": {
-      "url": "/css/bundles/fsfit.c0924abf1d3cb82f.css",
-      "sha256": "c0924abf1d3cb82f7ec753d5111bb788f68a9308b5f1bb84f6d92d3455d8e998",
-      "bytes": 131192,
-      "sourceCount": 17,
+      "url": "/css/bundles/fsfit.5949974dc7216856.css",
+      "sha256": "5949974dc72168567c847f4d48520fc1ebdb8b3520b33ec1be5e802479649eb3",
+      "bytes": 134782,
+      "sourceCount": 18,
       "duplicatesRemoved": 1,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -833,6 +848,7 @@
         "css/header-menu.css",
         "css/mobile-navigation.css",
         "css/financeiro.css",
+        "css/ux-consistency.css",
         "css/mobile-more-swipe.css",
         "css/student-avatars-personal.css",
         "css/student-workflow-improvements.css"
@@ -880,10 +896,10 @@
       ]
     },
     "lembretes-aluno.html": {
-      "url": "/css/bundles/fsfit.cc3425492238e4ef.css",
-      "sha256": "cc3425492238e4ef9a2cce4629a94402a807ccf6912ade8711b3c873fa8a92f0",
-      "bytes": 108847,
-      "sourceCount": 16,
+      "url": "/css/bundles/fsfit.64921ea2740c9a4e.css",
+      "sha256": "64921ea2740c9a4e9a5530eae9d0d18f394c95d93828c88fdd1c0ee65f16a2be",
+      "bytes": 112437,
+      "sourceCount": 17,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -900,6 +916,7 @@
         "css/style.css",
         "css/lembretes-aluno-padronizacao.css",
         "css/lembretes-aluno.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -924,10 +941,10 @@
       ]
     },
     "nova-senha.html": {
-      "url": "/css/bundles/fsfit.f2eec9a632e4bc3e.css",
-      "sha256": "f2eec9a632e4bc3ed5d9e1a1d287bad5d4a5bb19697bd51424de5fe266f5f226",
-      "bytes": 88950,
-      "sourceCount": 13,
+      "url": "/css/bundles/fsfit.258fa0acad4d91bb.css",
+      "sha256": "258fa0acad4d91bb1c1063b34cbae8ff77e30557f923141ae18c426b4747dd7e",
+      "bytes": 92540,
+      "sourceCount": 14,
       "duplicatesRemoved": 2,
       "sources": [
         "css/style-base.css",
@@ -942,7 +959,8 @@
         "css/style.css",
         "css/fsfit-design-system-components.css",
         "css/fsfit-design-system.css",
-        "css/nova-senha-padronizacao.css"
+        "css/nova-senha-padronizacao.css",
+        "css/ux-consistency.css"
       ],
       "modules": [
         "js/global-runtime-bootstrap.js",
@@ -954,10 +972,10 @@
       ]
     },
     "painel.html": {
-      "url": "/css/bundles/fsfit.6f19f3a8461a1cb8.css",
-      "sha256": "6f19f3a8461a1cb834a83950713b1eb28caff0bd4928bbb98b2f4747c0dc37a7",
-      "bytes": 229306,
-      "sourceCount": 40,
+      "url": "/css/bundles/fsfit.0ee3c9a9a148a4c1.css",
+      "sha256": "0ee3c9a9a148a4c1ae067f8c58c59333061309365b1f1ba2ed4db4e6d3e0f074",
+      "bytes": 232896,
+      "sourceCount": 41,
       "duplicatesRemoved": 1,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -982,6 +1000,7 @@
         "css/painel-visao-geral.css",
         "css/painel.css",
         "css/inline-cleanup.css",
+        "css/ux-consistency.css",
         "css/renovacao-plano.css",
         "css/aulas-painel-editor.css",
         "css/push-personal.css",
@@ -1048,10 +1067,10 @@
       ]
     },
     "perfil.html": {
-      "url": "/css/bundles/fsfit.f2692da5b10bfd06.css",
-      "sha256": "f2692da5b10bfd06b95da430db08ded8566eb43cc0fb0c48ce1c82fe294b13ea",
-      "bytes": 118827,
-      "sourceCount": 16,
+      "url": "/css/bundles/fsfit.9f6a702f6e58cfc5.css",
+      "sha256": "9f6a702f6e58cfc529872529b25fd72bb7b28d5c893362829e03793ed7a49b86",
+      "bytes": 122417,
+      "sourceCount": 17,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -1068,6 +1087,7 @@
         "css/style.css",
         "css/perfil-padronizacao.css",
         "css/inline-cleanup.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css"
       ],
@@ -1150,10 +1170,10 @@
       ]
     },
     "recuperar-senha.html": {
-      "url": "/css/bundles/fsfit.d0d286da0561e921.css",
-      "sha256": "d0d286da0561e9218d6b2eeed86dce978b09e1b9d22819e828c96527397f3a0e",
-      "bytes": 88433,
-      "sourceCount": 13,
+      "url": "/css/bundles/fsfit.ac22e1e6aa6f438f.css",
+      "sha256": "ac22e1e6aa6f438ff47a29393cc816420b111f5a952d8952a4f17135d6a5a741",
+      "bytes": 92023,
+      "sourceCount": 14,
       "duplicatesRemoved": 2,
       "sources": [
         "css/style-base.css",
@@ -1168,7 +1188,8 @@
         "css/style.css",
         "css/fsfit-design-system-components.css",
         "css/fsfit-design-system.css",
-        "css/recuperar-senha-padronizacao.css"
+        "css/recuperar-senha-padronizacao.css",
+        "css/ux-consistency.css"
       ],
       "modules": [
         "js/global-runtime-bootstrap.js",
@@ -1180,10 +1201,10 @@
       ]
     },
     "selecionar-personal.html": {
-      "url": "/css/bundles/fsfit.e216aeef7aa8afe1.css",
-      "sha256": "e216aeef7aa8afe1ff5bb96eed5c1e9ea196a81ef2aa72ae86629c926a2c2f99",
-      "bytes": 88930,
-      "sourceCount": 13,
+      "url": "/css/bundles/fsfit.1ddb4632d3788b5f.css",
+      "sha256": "1ddb4632d3788b5f3a20cfc89d92fa8cc26fd6524f44e8bcbc5e1294e256f207",
+      "bytes": 92520,
+      "sourceCount": 14,
       "duplicatesRemoved": 2,
       "sources": [
         "css/style-base.css",
@@ -1198,7 +1219,8 @@
         "css/style.css",
         "css/fsfit-design-system-components.css",
         "css/fsfit-design-system.css",
-        "css/selecionar-personal-padronizacao.css"
+        "css/selecionar-personal-padronizacao.css",
+        "css/ux-consistency.css"
       ],
       "modules": [
         "js/selecionar-personal.js",
@@ -1253,10 +1275,10 @@
       ]
     },
     "treino-aluno.html": {
-      "url": "/css/bundles/fsfit.6f35368c1f0f9f05.css",
-      "sha256": "6f35368c1f0f9f053cf8c89dee4b554d40b0aec245ffdb7d7b4bebb4a15ef5f2",
-      "bytes": 150798,
-      "sourceCount": 25,
+      "url": "/css/bundles/fsfit.a63283a607bdcc50.css",
+      "sha256": "a63283a607bdcc5082ce9b78620d9e75d1ee8310e35fd6ea40e699741c4576dd",
+      "bytes": 154388,
+      "sourceCount": 26,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -1272,6 +1294,7 @@
         "css/pwa-install.css",
         "css/style.css",
         "css/treino-aluno.css",
+        "css/ux-consistency.css",
         "css/treino-aluno-retorno.css",
         "css/treino-sticky-exercise-save.css",
         "css/treino-exercise-picker-sheet.css",
@@ -1326,10 +1349,10 @@
       ]
     },
     "visualizar-aluno.html": {
-      "url": "/css/bundles/fsfit.f207e3eb5c5c97bd.css",
-      "sha256": "f207e3eb5c5c97bd75e775757e1f22fb66d1aa6ff1b1abb29092936a7e947bd7",
-      "bytes": 177644,
-      "sourceCount": 26,
+      "url": "/css/bundles/fsfit.4859fe38bd1375b0.css",
+      "sha256": "4859fe38bd1375b0fa1db453d7510bf2853811d87f28a0d745fe1e96c1964c87",
+      "bytes": 181234,
+      "sourceCount": 27,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -1354,6 +1377,7 @@
         "css/aluno.css",
         "css/aluno-midias.css",
         "css/visualizar-aluno.css",
+        "css/ux-consistency.css",
         "css/header-menu.css",
         "css/mobile-more-swipe.css",
         "css/exercise-svg-pages.css",
