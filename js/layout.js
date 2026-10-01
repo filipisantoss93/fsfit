@@ -272,7 +272,7 @@ export async function requireSession() {
 
 if (currentPage() === 'ficha-aluno.html') {
   import('./ficha-treinos-salvos.js?v=20261001-ts1').catch(error => console.error('Não foi possível carregar os treinos salvos na ficha do aluno:', error));
-  import('./iniciar-treino-personal.js?v=20260719-start-workout1').catch(error => console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error));
+  import('./iniciar-treino-personal.js?v=20261001-ts-start1').catch(error => console.error('Não foi possível carregar a ação de iniciar treino do aluno:', error));
   import('./ficha-aluno-ativacao.js?v=20260722-secure-activation1').catch(error => console.error('Não foi possível carregar o acesso seguro do aluno:', error));
 }
 
