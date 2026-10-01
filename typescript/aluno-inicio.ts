@@ -1,0 +1,266 @@
+// @ts-ignore Existing browser JavaScript module.
+import './shared-components.js?v=20261001-shared-ts1';
+// @ts-ignore Existing browser JavaScript module.
+import { ensureStudentPortalMainTabs, showStudentPortalTab } from './portal-aluno-tabs.js?v=20261001-ts3';
+
+const content = document.querySelector<HTMLElement>('#student-content');
+const studentName = document.querySelector<HTMLElement>('#student-name');
+const trainerName = document.querySelector<HTMLElement>('#trainer-name');
+const workoutContent = document.querySelector<HTMLElement>('#workout-content');
+const dietContent = document.querySelector<HTMLElement>('#diet-content');
+const observations = document.querySelector<HTMLElement>('#student-observations');
+const homeTitle = document.querySelector<HTMLElement>('#student-home-title');
+const homeDate = document.querySelector<HTMLElement>('#student-home-date');
+const homeSubtitle = document.querySelector<HTMLElement>('#student-home-subtitle');
+const workoutStatus = document.querySelector<HTMLElement>('#student-home-workout-status');
+const workoutDetail = document.querySelector<HTMLElement>('#student-home-workout-detail');
+const dietStatus = document.querySelector<HTMLElement>('#student-home-diet-status');
+const dietDetail = document.querySelector<HTMLElement>('#student-home-diet-detail');
+const homeObservation = document.querySelector<HTMLElement>('#student-home-observation');
+const homeObservationText = document.querySelector<HTMLElement>('#student-home-observation-text');
+const homeWhatsapp = document.querySelector<HTMLAnchorElement>('#student-home-whatsapp');
+const settingsWhatsapp = document.querySelector<HTMLAnchorElement>('#whatsapp-button');
+const primaryWorkoutButton = document.querySelector<HTMLButtonElement>('#student-home-open-workout');
+
+let syncScheduled = false;
+let upcomingSignature = '';
+let upcomingRows: HTMLElement[] = [];
+
+function setText(node: Element | null, value: string): void {
+  if (node && node.textContent !== value) node.textContent = value;
+}
+
+function firstName(value: unknown = ''): string {
+  return String(value).trim().split(/\s+/)[0] || 'Aluno';
+}
+
+function greeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Bom dia';
+  if (hour < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
+
+function formattedToday(): string {
+  const text = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function syncBottomActive(target: string): void {
+  document.querySelectorAll<HTMLButtonElement>('.student-dashboard-bottom-nav button').forEach(button => {
+    const value = button.dataset.dashboardMain;
+    button.classList.toggle('active', value === target);
+    button.setAttribute('aria-current', value === target ? 'page' : 'false');
+  });
+}
+
+function activatePlanTab(target: string): boolean {
+  const tab = document.querySelector(`[data-student-tab="${target}"]`);
+  const panel = document.querySelector(`[data-student-panel="${target}"]`);
+  if (!tab || !panel) return false;
+
+  document.querySelectorAll('[data-student-tab]').forEach(item => item.classList.toggle('active', item === tab));
+  document.querySelectorAll('[data-student-panel]').forEach(item => item.classList.toggle('active', item === panel));
+  showStudentPortalTab('agenda');
+  syncBottomActive(target === 'treino' ? 'agenda' : 'inicio');
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  return true;
+}
+
+function activateMain(target: string): void {
+  if (target === 'inicio') {
+    showStudentPortalTab('agenda');
+    activatePlanTab('inicio');
+  } else if (target === 'live') {
+    showStudentPortalTab('live');
+    syncBottomActive('live');
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  } else if (target === 'agenda') {
+    showStudentPortalTab('agenda');
+    activatePlanTab('treino');
+    syncBottomActive('agenda');
+  } else if (target === 'chat') {
+    showStudentPortalTab('chat');
+    syncBottomActive('chat');
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
+}
+
+function agendaSummary(host: HTMLElement | null, singular: string, plural: string, emptyText: string): { title: string; detail: string; rows: number } {
+  const rows = host?.querySelectorAll('.student-compact-row').length || 0;
+  const headerText = host?.querySelector('.student-agenda-day-header span')?.textContent?.trim() || '';
+  if (!rows) return { title: emptyText, detail: headerText || 'Nada programado para hoje', rows: 0 };
+  return { title: `${rows} ${rows === 1 ? singular : plural}`, detail: headerText || 'Programado para hoje', rows };
+}
+
+function syncWhatsapp(): void {
+  if (!homeWhatsapp || !settingsWhatsapp) return;
+  const href = settingsWhatsapp.getAttribute('href') || '';
+  if (href) {
+    homeWhatsapp.href = href;
+    homeWhatsapp.classList.add('visible');
+  } else {
+    homeWhatsapp.removeAttribute('href');
+    homeWhatsapp.classList.remove('visible');
+  }
+}
+
+function ensureDashboardChrome(): void {
+  if (!content) return;
+  ensureStudentPortalMainTabs();
+  document.querySelector('.student-trainer-dashboard-chip')?.remove();
+
+  if (!document.querySelector('.student-dashboard-summary')) {
+    const summary = document.createElement('section');
+    summary.className = 'student-dashboard-summary';
+    summary.innerHTML = '<div><span class="student-dashboard-summary-icon">◒</span><p><strong id="student-dashboard-exercises">0</strong><small>exercícios hoje</small></p></div><div><span class="student-dashboard-summary-icon">◎</span><p><strong id="student-dashboard-progress">0%</strong><small>Meta semanal</small></p></div><button type="button" data-plan-target="dieta"><span class="student-dashboard-summary-icon">♨</span><p><strong id="student-dashboard-meals">0</strong><small>refeições hoje</small></p></button>';
+    document.querySelector('.student-today-grid')?.insertAdjacentElement('afterend', summary);
+  }
+
+  if (!document.querySelector('#student-dashboard-upcoming')) {
+    const upcoming = document.createElement('section');
+    upcoming.className = 'student-dashboard-section';
+    upcoming.innerHTML = '<header>PRÓXIMOS COMPROMISSOS</header><div id="student-dashboard-upcoming" class="student-dashboard-upcoming"></div>';
+    homeObservation?.insertAdjacentElement('beforebegin', upcoming);
+  }
+
+  if (!document.querySelector('.student-dashboard-quick-grid')) {
+    const quick = document.createElement('section');
+    quick.className = 'student-dashboard-section';
+    quick.innerHTML = '<header>ACESSOS RÁPIDOS</header><div class="student-dashboard-quick-grid"><button type="button" data-plan-target="treino"><span>⌁</span>Treinos</button><button type="button" data-dashboard-action="settings"><span>◉</span>Meu perfil</button><button type="button" data-plan-target="dieta"><span>☑</span>Alimentação</button><button type="button" data-plan-target="observacoes"><span>▤</span>Orientações</button></div>';
+    homeObservation?.insertAdjacentElement('afterend', quick);
+  }
+
+  if (!document.querySelector('.student-dashboard-bottom-nav')) {
+    const bottom = document.createElement('nav');
+    bottom.className = 'student-dashboard-bottom-nav';
+    bottom.setAttribute('aria-label', 'Navegação principal');
+    bottom.innerHTML = '<button class="active" type="button" data-dashboard-main="inicio" aria-current="page"><span>⌂</span>Início</button><button type="button" data-dashboard-main="live" aria-current="false"><span>♜</span>Aula</button><button type="button" data-dashboard-main="agenda" aria-current="false"><span>▣</span>Agenda</button><button type="button" data-dashboard-main="chat" aria-current="false"><span>◌</span>Chat</button>';
+    document.body.appendChild(bottom);
+  }
+}
+
+function handleNavigation(event: Event): void {
+  if (!(event.target instanceof Element)) return;
+  const control = event.target.closest<HTMLElement>('[data-dashboard-main], [data-dashboard-action], [data-plan-target], [data-student-home-target], #student-home-open-workout, [data-upcoming-index]');
+  if (!control) return;
+
+  const isDashboardControl = control.matches('[data-dashboard-main], [data-dashboard-action], [data-plan-target], [data-upcoming-index]');
+  if (isDashboardControl) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
+  if (control.dataset.dashboardMain) {
+    activateMain(control.dataset.dashboardMain);
+    return;
+  }
+
+  const planTarget = control.dataset.planTarget || control.dataset.studentHomeTarget;
+  if (planTarget) {
+    event.preventDefault();
+    activatePlanTab(planTarget);
+    return;
+  }
+
+  if (control.id === 'student-home-open-workout') {
+    event.preventDefault();
+    activateMain('live');
+    return;
+  }
+
+  if (control.dataset.upcomingIndex != null) {
+    const source = upcomingRows[Number(control.dataset.upcomingIndex)];
+    activatePlanTab('treino');
+    requestAnimationFrame(() => source?.click());
+    return;
+  }
+
+  if (control.dataset.dashboardAction === 'settings') {
+    document.querySelector('#student-settings-button')?.click();
+  }
+}
+
+document.addEventListener('click', handleNavigation, true);
+
+document.addEventListener('student-main-tab-change', event => {
+  const target = (event as CustomEvent<{ target?: string }>).detail?.target;
+  if (target === 'agenda') {
+    const treinoAtivo = document.querySelector('[data-student-panel="treino"]')?.classList.contains('active');
+    syncBottomActive(treinoAtivo ? 'agenda' : 'inicio');
+  }
+  if (target === 'live') syncBottomActive('live');
+  if (target === 'chat') syncBottomActive('chat');
+});
+
+function renderUpcoming(): void {
+  const host = document.querySelector('#student-dashboard-upcoming');
+  if (!host) return;
+
+  upcomingRows = [...(workoutContent?.querySelectorAll<HTMLElement>('.student-compact-row') || [])].slice(0, 3);
+  const signature = upcomingRows.map(row => row.textContent?.trim() || '').join('|');
+  if (signature === upcomingSignature) return;
+  upcomingSignature = signature;
+
+  if (!upcomingRows.length) {
+    host.innerHTML = '<p class="student-empty-inline">Nenhum compromisso programado.</p>';
+    return;
+  }
+
+  host.innerHTML = upcomingRows.map((row, index) => {
+    const title = row.querySelector('strong')?.textContent?.trim() || `Treino ${index + 1}`;
+    const detail = row.querySelector('.student-compact-main span')?.textContent?.trim() || 'Programação disponível';
+    return `<button class="student-dashboard-upcoming-row" type="button" data-upcoming-index="${index}"><span>♜</span><div><strong>${title}</strong><small>${detail}</small></div><b>›</b></button>`;
+  }).join('');
+}
+
+function syncHome(): void {
+  if (!content || content.classList.contains('hidden')) return;
+  ensureDashboardChrome();
+
+  const name = studentName?.textContent?.trim() || 'Aluno';
+  const trainer = trainerName?.textContent?.trim() || 'seu personal';
+  setText(homeTitle, `${greeting()}, ${firstName(name)}`);
+  setText(homeDate, formattedToday());
+  setText(homeSubtitle, `Veja o que ${trainer} preparou para você hoje.`);
+
+  const workout = agendaSummary(workoutContent, 'exercício', 'exercícios', 'Dia de descanso');
+  setText(workoutStatus, workout.title);
+  setText(workoutDetail, workout.rows ? 'Abrir treino de hoje' : 'Consulte os próximos dias');
+  setText(primaryWorkoutButton, workout.rows ? 'Iniciar treino de hoje' : 'Ver área de aula');
+  setText(document.querySelector('#student-dashboard-exercises'), String(workout.rows));
+
+  const diet = agendaSummary(dietContent, 'refeição', 'refeições', 'Sem refeições hoje');
+  setText(dietStatus, diet.title);
+  setText(dietDetail, diet.rows ? 'Ver alimentação de hoje' : 'Consulte o plano alimentar');
+  setText(document.querySelector('#student-dashboard-meals'), String(diet.rows));
+
+  const observationText = observations?.textContent?.trim() || '';
+  const hasObservation = Boolean(observationText && !/Nenhuma (observação|orientação)/i.test(observationText));
+  homeObservation?.classList.toggle('hidden', !hasObservation);
+  if (hasObservation) setText(homeObservationText, observationText);
+
+  renderUpcoming();
+  syncWhatsapp();
+}
+
+function scheduleSync(): void {
+  if (syncScheduled) return;
+  syncScheduled = true;
+  requestAnimationFrame(() => {
+    syncScheduled = false;
+    syncHome();
+  });
+}
+
+const dataObserver = new MutationObserver(scheduleSync);
+if (workoutContent) dataObserver.observe(workoutContent, { childList: true, subtree: true });
+if (dietContent) dataObserver.observe(dietContent, { childList: true, subtree: true });
+if (observations) dataObserver.observe(observations, { childList: true, characterData: true, subtree: true });
+if (settingsWhatsapp) dataObserver.observe(settingsWhatsapp, { attributes: true, attributeFilter: ['href'] });
+
+ensureDashboardChrome();
+window.addEventListener('load', scheduleSync, { once: true });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) scheduleSync(); });
+setTimeout(scheduleSync, 150);
+setTimeout(scheduleSync, 700);
