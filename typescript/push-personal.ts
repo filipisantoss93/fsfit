@@ -166,7 +166,7 @@ async function ensureSubscription(): Promise<PushSubscription> {
   if (!current) {
     current = await currentRegistration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(await getPublicKey())
+      applicationServerKey: urlBase64ToUint8Array(await getPublicKey()) as BufferSource
     });
   }
   await syncSubscription(current);
