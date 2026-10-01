@@ -221,7 +221,11 @@ async function loadStudent() {
     throw error;
   }
   document.querySelector('#student-name').textContent = `Plano alimentar · ${data.nome}`;
-  document.querySelector('#back-link').href = `ficha-aluno.html?id=${data.id}`;
+  const backLink = document.querySelector<HTMLAnchorElement>('#back-link');
+  if (backLink) {
+    backLink.href = `ficha-aluno.html?id=${data.id}`;
+    backLink.textContent = '← Ficha do aluno';
+  }
 }
 
 async function loadPlans() {

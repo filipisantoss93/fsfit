@@ -151,6 +151,7 @@ async function loadStudent() {
         return;
     studentName.textContent = `Lembretes de ${data.nome}`;
     backLink.href = `ficha-aluno.html?id=${data.id}`;
+    backLink.textContent = '← Ficha do aluno';
 }
 async function loadReminders() {
     if (!list)

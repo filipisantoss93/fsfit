@@ -6,6 +6,12 @@ type WorkoutRuntimeGlobal = typeof globalThis & { __FSFIT_WORKOUT_PUBLICATION_GU
 const params = new URLSearchParams(window.location.search);
 const embedded = params.get('embed') === '1';
 const backLink = document.querySelector<HTMLAnchorElement>('#back-link');
+const studentId = params.get('id');
+
+if (!embedded && backLink && studentId) {
+  backLink.href = `ficha-aluno.html?id=${encodeURIComponent(studentId)}`;
+  backLink.textContent = '← Ficha do aluno';
+}
 
 if (embedded && window.parent !== window && backLink) {
   backLink.href = '#';
