@@ -98,12 +98,18 @@ body.fsfit-saas .tile {
 
 /* Botões */
 body.fsfit-saas .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fs-space-2);
   min-height: var(--fs-touch-target);
   padding: 0 var(--fs-space-4);
   border-radius: var(--fs-radius-sm);
   box-shadow: none;
   font-weight: 750;
-  line-height: 1;
+  line-height: 1.2;
+  text-align: center;
+  vertical-align: middle;
 }
 
 body.fsfit-saas .btn-sm {
@@ -414,4 +420,22 @@ body.fsfit-saas .quick-action:hover {
 .fsfit-theme-control button:focus-visible {
   outline: none;
   box-shadow: var(--fs-focus-ring);
+}
+
+
+/* Alinhamento consistente de grupos de ações */
+body.fsfit-saas .actions,
+body.fsfit-saas .page-header > .actions,
+body.fsfit-saas .card-actions,
+body.fsfit-saas .modal-actions,
+body.fsfit-saas .modal-footer {
+  align-items: center;
+}
+
+body.fsfit-saas .btn > :where(svg, img, .icon, [aria-hidden="true"]) {
+  flex: 0 0 auto;
+}
+
+body.fsfit-saas .btn > :where(span, strong) {
+  min-width: 0;
 }
