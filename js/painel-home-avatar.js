@@ -1,161 +1,149 @@
+// @ts-ignore The browser runtime resolves this existing JavaScript module.
 import { supabase } from './supabase.js';
-
 const isDashboard = (window.location.pathname.split('/').pop() || '') === 'painel.html';
-
 if (isDashboard) {
-  const icon = await waitForElement('#home-now-icon');
-  const action = await waitForElement('#home-now-action');
-  const liveList = document.querySelector('#live-students-list');
-
-  if (icon && action) {
-    const sessionById = new Map();
-    const photoByStudentId = new Map();
-    let loading = false;
-
-    function initials(value = '') {
-      const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
-      return (parts.slice(0, 2).map(part => part.charAt(0)).join('') || 'A').toUpperCase();
-    }
-
-    function resetAvatarState() {
-      icon.classList.remove('has-student-avatar', 'has-profile-photo');
-      delete icon.dataset.avatarSignature;
-    }
-
-    function renderAvatar() {
-      if (action.dataset.mode !== 'live' || !action.dataset.sessionId) {
-        resetAvatarState();
-        return;
-      }
-
-      const session = sessionById.get(action.dataset.sessionId);
-      if (!session) return;
-
-      const photo = photoByStudentId.get(session.studentId);
-      const signature = photo
-        ? `photo:${session.sessionId}:${photo}`
-        : `initials:${session.sessionId}:${session.name}`;
-
-      if (icon.dataset.avatarSignature === signature) return;
-      icon.dataset.avatarSignature = signature;
-      icon.classList.add('has-student-avatar');
-      icon.classList.toggle('has-profile-photo', Boolean(photo));
-      icon.replaceChildren();
-
-      if (photo) {
-        const image = document.createElement('img');
-        image.src = photo;
-        image.alt = '';
-        image.decoding = 'async';
-        image.loading = 'eager';
-        image.addEventListener('error', () => {
-          photoByStudentId.set(session.studentId, '');
-          delete icon.dataset.avatarSignature;
-          renderAvatar();
-        }, { once: true });
-        icon.appendChild(image);
-        return;
-      }
-
-      icon.textContent = initials(session.name);
-    }
-
-    async function loadMissingPhotos(rows) {
-      const missingIds = [...new Set(rows
-        .map(row => String(row.aluno_id || ''))
-        .filter(studentId => studentId && !photoByStudentId.has(studentId)))];
-
-      if (!missingIds.length) return;
-      missingIds.forEach(studentId => photoByStudentId.set(studentId, ''));
-
-      const { data, error } = await supabase
-        .from('alunos')
-        .select('id,foto_perfil_url')
-        .in('id', missingIds);
-
-      if (error) throw error;
-
-      (data || []).forEach(student => {
-        photoByStudentId.set(String(student.id), student.foto_perfil_url || '');
-      });
-    }
-
-    async function refreshSessions() {
-      if (loading) return;
-      loading = true;
-
-      try {
-        const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
-        if (error) throw error;
-
-        const rows = Array.isArray(data) ? data : [];
-        sessionById.clear();
-        rows.forEach(row => {
-          const sessionId = String(row.sessao_id || '');
-          const studentId = String(row.aluno_id || '');
-          if (!sessionId || !studentId) return;
-          sessionById.set(sessionId, {
-            sessionId,
-            studentId,
-            name: row.aluno_nome || 'Aluno'
-          });
+    const icon = await waitForElement('#home-now-icon');
+    const action = await waitForElement('#home-now-action');
+    const liveList = document.querySelector('#live-students-list');
+    if (icon && action) {
+        const avatarIcon = icon;
+        const actionControl = action;
+        const sessionById = new Map();
+        const photoByStudentId = new Map();
+        let loading = false;
+        function initials(value = '') {
+            const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
+            return (parts.slice(0, 2).map(part => part.charAt(0)).join('') || 'A').toUpperCase();
+        }
+        function resetAvatarState() {
+            avatarIcon.classList.remove('has-student-avatar', 'has-profile-photo');
+            delete avatarIcon.dataset.avatarSignature;
+        }
+        function renderAvatar() {
+            if (actionControl.dataset.mode !== 'live' || !actionControl.dataset.sessionId) {
+                resetAvatarState();
+                return;
+            }
+            const session = sessionById.get(actionControl.dataset.sessionId);
+            if (!session)
+                return;
+            const photo = photoByStudentId.get(session.studentId);
+            const signature = photo
+                ? `photo:${session.sessionId}:${photo}`
+                : `initials:${session.sessionId}:${session.name}`;
+            if (avatarIcon.dataset.avatarSignature === signature)
+                return;
+            avatarIcon.dataset.avatarSignature = signature;
+            avatarIcon.classList.add('has-student-avatar');
+            avatarIcon.classList.toggle('has-profile-photo', Boolean(photo));
+            avatarIcon.replaceChildren();
+            if (photo) {
+                const image = document.createElement('img');
+                image.src = photo;
+                image.alt = '';
+                image.decoding = 'async';
+                image.loading = 'eager';
+                image.addEventListener('error', () => {
+                    photoByStudentId.set(session.studentId, '');
+                    delete avatarIcon.dataset.avatarSignature;
+                    renderAvatar();
+                }, { once: true });
+                avatarIcon.appendChild(image);
+                return;
+            }
+            avatarIcon.textContent = initials(session.name);
+        }
+        async function loadMissingPhotos(rows) {
+            const missingIds = [...new Set(rows
+                    .map(row => String(row.aluno_id || ''))
+                    .filter(studentId => studentId && !photoByStudentId.has(studentId)))];
+            if (!missingIds.length)
+                return;
+            missingIds.forEach(studentId => photoByStudentId.set(studentId, ''));
+            const { data, error } = await supabase
+                .from('alunos')
+                .select('id,foto_perfil_url')
+                .in('id', missingIds);
+            if (error)
+                throw error;
+            (data || []).forEach(student => {
+                photoByStudentId.set(String(student.id), student.foto_perfil_url || '');
+            });
+        }
+        async function refreshSessions() {
+            if (loading)
+                return;
+            loading = true;
+            try {
+                const { data, error } = await supabase.rpc('listar_sessoes_em_aula_personal');
+                if (error)
+                    throw error;
+                const rows = Array.isArray(data) ? data : [];
+                sessionById.clear();
+                rows.forEach((row) => {
+                    const sessionId = String(row.sessao_id || '');
+                    const studentId = String(row.aluno_id || '');
+                    if (!sessionId || !studentId)
+                        return;
+                    sessionById.set(sessionId, {
+                        sessionId,
+                        studentId,
+                        name: row.aluno_nome || 'Aluno'
+                    });
+                });
+                await loadMissingPhotos(rows);
+                renderAvatar();
+            }
+            catch (error) {
+                console.warn('Não foi possível carregar a foto do aluno no card Agora:', error);
+                renderAvatar();
+            }
+            finally {
+                loading = false;
+            }
+        }
+        new MutationObserver(() => {
+            renderAvatar();
+            const sessionId = actionControl.dataset.sessionId;
+            if (actionControl.dataset.mode === 'live' && sessionId && !sessionById.has(sessionId)) {
+                refreshSessions().catch(console.error);
+            }
+        }).observe(actionControl, {
+            attributes: true,
+            attributeFilter: ['data-mode', 'data-session-id', 'hidden']
         });
-
-        await loadMissingPhotos(rows);
-        renderAvatar();
-      } catch (error) {
-        console.warn('Não foi possível carregar a foto do aluno no card Agora:', error);
-        renderAvatar();
-      } finally {
-        loading = false;
-      }
+        if (liveList) {
+            new MutationObserver(() => {
+                refreshSessions().catch(console.error);
+            }).observe(liveList, { childList: true, subtree: true });
+        }
+        window.setInterval(() => {
+            if (document.visibilityState === 'visible')
+                refreshSessions().catch(console.error);
+        }, 15000);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible')
+                refreshSessions().catch(console.error);
+        });
+        await refreshSessions();
     }
-
-    new MutationObserver(() => {
-      renderAvatar();
-      const sessionId = action.dataset.sessionId;
-      if (action.dataset.mode === 'live' && sessionId && !sessionById.has(sessionId)) {
-        refreshSessions().catch(console.error);
-      }
-    }).observe(action, {
-      attributes: true,
-      attributeFilter: ['data-mode', 'data-session-id', 'hidden']
-    });
-
-    if (liveList) {
-      new MutationObserver(() => {
-        refreshSessions().catch(console.error);
-      }).observe(liveList, { childList: true, subtree: true });
-    }
-
-    window.setInterval(() => {
-      if (document.visibilityState === 'visible') refreshSessions().catch(console.error);
-    }, 15000);
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') refreshSessions().catch(console.error);
-    });
-
-    await refreshSessions();
-  }
 }
-
 function waitForElement(selector, timeout = 8000) {
-  const existing = document.querySelector(selector);
-  if (existing) return Promise.resolve(existing);
-
-  return new Promise(resolve => {
-    const observer = new MutationObserver(() => {
-      const element = document.querySelector(selector);
-      if (!element) return;
-      observer.disconnect();
-      resolve(element);
+    const existing = document.querySelector(selector);
+    if (existing)
+        return Promise.resolve(existing);
+    return new Promise(resolve => {
+        const observer = new MutationObserver(() => {
+            const element = document.querySelector(selector);
+            if (!element)
+                return;
+            observer.disconnect();
+            resolve(element);
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        window.setTimeout(() => {
+            observer.disconnect();
+            resolve(document.querySelector(selector));
+        }, timeout);
     });
-
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-    window.setTimeout(() => {
-      observer.disconnect();
-      resolve(document.querySelector(selector));
-    }, timeout);
-  });
 }
