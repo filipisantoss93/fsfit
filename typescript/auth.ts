@@ -144,7 +144,7 @@ function clearFormErrors(): void {
   }
 }
 
-function showFieldError(text: string, field: Element | null): void {
+function showFieldError(text: string, field: HTMLElement | null): void {
   if (field) {
     field.setAttribute('aria-invalid', 'true');
     if (message?.id) field.setAttribute('aria-describedby', message.id);
@@ -166,8 +166,9 @@ form?.addEventListener('input', event => {
 
 form?.addEventListener('change', event => {
   const field = event.target;
-  field?.removeAttribute?.('aria-invalid');
-  if (field?.getAttribute?.('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
+  if (!(field instanceof Element)) return;
+  field.removeAttribute('aria-invalid');
+  if (field.getAttribute('aria-describedby') === message?.id) field.removeAttribute('aria-describedby');
   if (message?.classList.contains('show')) {
     message.textContent = '';
     message.className = 'message';
