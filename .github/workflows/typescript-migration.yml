@@ -35,6 +35,9 @@ on:
       - 'js/assinatura-cartao-status.js'
       - 'js/painel-agenda-modal-avatar.js'
       - 'js/painel-home-avatar.js'
+      - 'js/page-data-cache.js'
+      - 'js/inactive-account-guard.js'
+      - 'js/config.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -82,6 +85,9 @@ on:
       - 'js/assinatura-cartao-status.js'
       - 'js/painel-agenda-modal-avatar.js'
       - 'js/painel-home-avatar.js'
+      - 'js/page-data-cache.js'
+      - 'js/inactive-account-guard.js'
+      - 'js/config.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -161,6 +167,9 @@ jobs:
             js/assinatura-cartao-status.js \
             js/painel-agenda-modal-avatar.js \
             js/painel-home-avatar.js \
+            js/page-data-cache.js \
+            js/inactive-account-guard.js \
+            js/config.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
