@@ -17,6 +17,9 @@ on:
       - 'js/painel-agenda-modal-hotfix.js'
       - 'js/portal-aluno-tabs.js'
       - 'js/selecionar-personal.js'
+      - 'js/agenda-student-search.js'
+      - 'js/ficha-aluno-hierarquia.js'
+      - 'js/painel-home-desktop-carousel.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -46,6 +49,9 @@ on:
       - 'js/painel-agenda-modal-hotfix.js'
       - 'js/portal-aluno-tabs.js'
       - 'js/selecionar-personal.js'
+      - 'js/agenda-student-search.js'
+      - 'js/ficha-aluno-hierarquia.js'
+      - 'js/painel-home-desktop-carousel.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -107,6 +113,9 @@ jobs:
             js/painel-agenda-modal-hotfix.js \
             js/portal-aluno-tabs.js \
             js/selecionar-personal.js \
+            js/agenda-student-search.js \
+            js/ficha-aluno-hierarquia.js \
+            js/painel-home-desktop-carousel.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
