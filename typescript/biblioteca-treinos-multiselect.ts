@@ -1,4 +1,6 @@
 // @ts-nocheck Legacy module preserved during structural TypeScript migration.
+export {};
+
 const SELECTOR_TIMEOUT_MS = 10000;
 
 waitForWorkoutBuilder().catch(error => {
