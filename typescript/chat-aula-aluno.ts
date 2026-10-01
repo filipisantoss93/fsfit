@@ -17,6 +17,7 @@ type ChatState = {
 const root = document.querySelector<HTMLElement>('#student-content');
 const sessionToken = localStorage.getItem('fsfit_aluno_token');
 if (!root || !sessionToken) throw new Error('Portal do aluno indisponível');
+const studentRoot: HTMLElement = root;
 
 let accessToken: string | null = null;
 let chatBox: HTMLElement | null = null;
@@ -56,8 +57,8 @@ function ensureBox(sessionId: string): HTMLElement {
       <button class="btn btn-primary" type="submit">Enviar</button>
     </form>`;
 
-  const tabs = root.querySelector('.student-plan-tabs');
-  root.insertBefore(chatBox, tabs);
+  const tabs = studentRoot.querySelector('.student-plan-tabs');
+  studentRoot.insertBefore(chatBox, tabs);
   chatBox.querySelector<HTMLFormElement>('#student-live-chat-form')?.addEventListener('submit', event => {
     void sendMessage(event);
   });
