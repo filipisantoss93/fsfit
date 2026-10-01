@@ -192,7 +192,7 @@ async function openCardForm({ access = null, plan = null, mode = 'subscribe' }: 
       const { tokenResult, holderName, holderDocument } = await tokenizeCard(content);
       if (isReplace) {
         const { data, error } = await supabase.functions.invoke('atualizar-assinatura-cartao-fsfit', {
-          body: { assinatura_id: access.assinatura_id, payment_token: tokenResult.payment_token, cartao_mascara: tokenResult.card_mask || null }
+          body: { assinatura_id: access!.assinatura_id, payment_token: tokenResult.payment_token, cartao_mascara: tokenResult.card_mask || null }
         });
         if (data?.erro) throw new Error(data.erro);
         if (error) throw error;
