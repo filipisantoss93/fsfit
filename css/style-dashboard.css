@@ -1,7 +1,7 @@
 @media (max-width: 390px) {
   .student-record-title { align-items: flex-start; }
   .student-record-title h1 { font-size: 1.82rem; }
-  .hero-badge { padding: 5px 8px; font-size: .68rem; }
+  .hero-badge { padding: 5px 8px; font-size:var(--fs-font-xs); }
   .metric-card { padding: 12px 10px; }
   .compact-form-grid { grid-template-columns: 1fr; }
   .dashboard-stats .stat { padding: 11px 14px 12px; }
@@ -31,7 +31,7 @@
 .recent-student-row.is-locked { cursor: not-allowed; opacity: .58; }
 .recent-student-person { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .recent-student-person strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; }
-.recent-student-avatar { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 50%; background: var(--surface-light); color: var(--text); font-size: .72rem; font-weight: 850; }
+.recent-student-avatar { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 50%; background: var(--surface-light); color: var(--text); font-size:var(--fs-font-xs); font-weight: 850; }
 .recent-student-chevron { padding-right: 4px; color: var(--muted); text-align: right; font-size: 1.5rem; line-height: 1; }
 @media (max-width: 620px) {
   .hero h1 { font-size: 2.1rem; line-height: 1.06; }
@@ -43,7 +43,7 @@
   .student-record-title h1 { font-size: 1.62rem; }
   .recent-students-card { padding: 15px; }
   .recent-students-table th, .recent-students-table td { padding: 12px 6px; }
-  .recent-student-avatar { flex-basis: 31px; width: 31px; height: 31px; font-size: .68rem; }
+  .recent-student-avatar { flex-basis: 31px; width: 31px; height: 31px; font-size:var(--fs-font-xs); }
   .recent-student-person strong { font-size: .84rem; }
   .recent-students-table td:nth-child(2) { font-size: .8rem; }
 }
@@ -66,7 +66,7 @@ body.fsfit-dashboard-modern .dashboard-summary-card.is-students { --summary-acce
 body.fsfit-dashboard-modern .dashboard-summary-card.is-today { --summary-accent: var(--secondary); }
 body.fsfit-dashboard-modern .dashboard-summary-card.is-revenue { --summary-accent: var(--fs-success); }
 body.fsfit-dashboard-modern .dashboard-summary-card.is-pending { --summary-accent: var(--warning); }
-body.fsfit-dashboard-modern .dashboard-summary-card small { min-height: 0; margin-bottom: 10px; font-size: .69rem; letter-spacing: .01em; }
+body.fsfit-dashboard-modern .dashboard-summary-card small { min-height: 0; margin-bottom: 10px; font-size:var(--fs-font-xs); letter-spacing: .01em; }
 body.fsfit-dashboard-modern .dashboard-summary-card strong { font-size: 1.35rem; }
 body.fsfit-dashboard-modern .attention-card { position: relative; margin-bottom: 16px; padding: 20px; overflow: hidden; border-color: var(--fs-warning-border); background: linear-gradient(135deg,var(--fs-warning-soft),var(--fs-surface) 42%); box-shadow: 0 14px 38px rgba(0,0,0,.22); }
 body.fsfit-dashboard-modern .attention-card::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px; background: var(--warning); }
@@ -81,7 +81,7 @@ body.fsfit-dashboard-modern .quick-action { position: relative; min-height: 84px
 body.fsfit-dashboard-modern .quick-action::after { content: '›'; position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--fs-text-subtle); font-size: 1.35rem; line-height: 1; }
 body.fsfit-dashboard-modern .quick-action:hover { transform: translateY(-1px); border-color: var(--fs-info-border); background: var(--fs-surface-soft); }
 body.fsfit-dashboard-modern .quick-action strong { font-size: .86rem; }
-body.fsfit-dashboard-modern .quick-action small { font-size: .69rem; }
+body.fsfit-dashboard-modern .quick-action small { font-size:var(--fs-font-xs); }
 body.fsfit-dashboard-modern .dashboard-public-link-compact, body.fsfit-dashboard-modern .dashboard-activity-card { box-shadow: none; border-color: var(--fs-border); }
 
 @media (max-width: 860px) {
@@ -139,7 +139,7 @@ body.fsfit-dashboard-modern .dashboard-public-link-compact, body.fsfit-dashboard
   body.fsfit-dashboard-modern .quick-actions-grid { grid-template-columns: 1fr; gap: 8px; }
   body.fsfit-dashboard-modern .quick-action { min-height: 68px; padding: 12px 38px 12px 14px; }
   body.fsfit-dashboard-modern .quick-action strong { font-size: .88rem; }
-  body.fsfit-dashboard-modern .quick-action small { font-size: .7rem; }
+  body.fsfit-dashboard-modern .quick-action small { font-size:var(--fs-font-xs); }
 }
 
 /* FS Fit · identidade visual alinhada ao ícone oficial · 2026-07-23
