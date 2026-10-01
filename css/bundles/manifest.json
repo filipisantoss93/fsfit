@@ -11,7 +11,7 @@
     "/aluno-preview.html": "/css/bundles/fsfit.47ad7a7c5d3714db.css",
     "/aluno.html": "/css/bundles/fsfit.9edd32b55eb9b787.css",
     "/alunos.html": "/css/bundles/fsfit.6dfc4d4a25a08d4f.css",
-    "/assinatura.html": "/css/bundles/fsfit.9637969881e03bec.css",
+    "/assinatura.html": "/css/bundles/fsfit.452c4c157affbd82.css",
     "/biblioteca-alimentar.html": "/css/bundles/fsfit.fadc50b9e16d87c6.css",
     "/biblioteca-exercicios.html": "/css/bundles/fsfit.eba6e8dff780cc79.css",
     "/cancelamento.html": "/css/bundles/fsfit.aa8816193a8e2171.css",
@@ -21,7 +21,7 @@
     "/financeiro.html": "/css/bundles/fsfit.2505d2a1dc426a64.css",
     "/lembretes-aluno.html": "/css/bundles/fsfit.a82ea20822b50334.css",
     "/nova-senha.html": "/css/bundles/fsfit.740ce7eb5b3acb8b.css",
-    "/painel.html": "/css/bundles/fsfit.fdac6d88aa93f6ff.css",
+    "/painel.html": "/css/bundles/fsfit.3936169b9d6f4376.css",
     "/perfil.html": "/css/bundles/fsfit.a874ce0b71d888f6.css",
     "/personal.html": "/css/bundles/fsfit.580c9cd0a7978770.css",
     "/privacidade.html": "/css/bundles/fsfit.3c5ae2b49cfb2e4d.css",
@@ -44,11 +44,11 @@
   "criticalBundles": [
     "/css/bundles/fsfit.2505d2a1dc426a64.css",
     "/css/bundles/fsfit.33581ed61bafd7f6.css",
+    "/css/bundles/fsfit.3936169b9d6f4376.css",
     "/css/bundles/fsfit.6dfc4d4a25a08d4f.css",
     "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/css/bundles/fsfit.78e97bb437a0848d.css",
-    "/css/bundles/fsfit.9edd32b55eb9b787.css",
-    "/css/bundles/fsfit.fdac6d88aa93f6ff.css"
+    "/css/bundles/fsfit.9edd32b55eb9b787.css"
   ],
   "bundles": {
     "abrir-whatsapp-lembrete.html": {
@@ -447,9 +447,9 @@
       ]
     },
     "assinatura.html": {
-      "url": "/css/bundles/fsfit.9637969881e03bec.css",
-      "sha256": "9637969881e03bec0a2938edc2cb7bc731d003e2fe9323fa54c324538e820b2a",
-      "bytes": 168164,
+      "url": "/css/bundles/fsfit.452c4c157affbd82.css",
+      "sha256": "452c4c157affbd82c8c50bc87bd59dbf79ba369eb26ec33de428a87ec40273f0",
+      "bytes": 168154,
       "sourceCount": 30,
       "duplicatesRemoved": 0,
       "sources": [
@@ -954,9 +954,9 @@
       ]
     },
     "painel.html": {
-      "url": "/css/bundles/fsfit.fdac6d88aa93f6ff.css",
-      "sha256": "fdac6d88aa93f6ffae1a1546621dcb31368593d8770181a1075fb537e2f93b53",
-      "bytes": 233058,
+      "url": "/css/bundles/fsfit.3936169b9d6f4376.css",
+      "sha256": "3936169b9d6f43760fcda1d75691fdad86b67df74c9c9f0691d58b64664ccc77",
+      "bytes": 233048,
       "sourceCount": 40,
       "duplicatesRemoved": 1,
       "sources": [
