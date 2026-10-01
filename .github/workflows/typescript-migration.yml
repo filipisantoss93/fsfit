@@ -29,6 +29,9 @@ on:
       - 'js/assinatura-realtime.js'
       - 'js/abrir-whatsapp-lembrete.js'
       - 'js/sidebar-profile-photo.js'
+      - 'js/alunos-arquivamento.js'
+      - 'js/library-dashboard-desktop.js'
+      - 'js/ui-cache.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -70,6 +73,9 @@ on:
       - 'js/assinatura-realtime.js'
       - 'js/abrir-whatsapp-lembrete.js'
       - 'js/sidebar-profile-photo.js'
+      - 'js/alunos-arquivamento.js'
+      - 'js/library-dashboard-desktop.js'
+      - 'js/ui-cache.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -143,6 +149,9 @@ jobs:
             js/assinatura-realtime.js \
             js/abrir-whatsapp-lembrete.js \
             js/sidebar-profile-photo.js \
+            js/alunos-arquivamento.js \
+            js/library-dashboard-desktop.js \
+            js/ui-cache.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
