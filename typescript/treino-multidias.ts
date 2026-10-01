@@ -77,7 +77,7 @@ durationField.parentElement?.insertBefore(distanceField, durationField.nextSibli
 
 function esc(value: unknown = ''): string {
   const div = document.createElement('div');
-  div.textContent = value ?? '';
+  div.textContent = String(value ?? '');
   return div.innerHTML;
 }
 
@@ -149,7 +149,7 @@ function configSummary(item: ExerciseItem | null | undefined, config: ExerciseCo
 }
 
 function renderSelectedBuilder(): void {
-  const items = selectedExerciseIds.map(exerciseById).filter(Boolean);
+  const items = selectedExerciseIds.map(exerciseById).filter((item): item is ExerciseItem => Boolean(item));
   selectedSection?.classList.toggle('hidden', items.length === 0);
   if (selectedCount) selectedCount.textContent = String(items.length);
   if (saveButton && !editingExerciseId) saveButton.textContent = items.length ? `Adicionar ${items.length} ${items.length === 1 ? 'exercício' : 'exercícios'}` : 'Adicionar exercícios';
@@ -246,7 +246,7 @@ async function loadExerciseLibrary(): Promise<void> {
     .or(`global.eq.true,personal_id.eq.${session.user.id}`)
     .order('nome');
   if (error) throw error;
-  exerciseLibrary = (data || []).map(item => ({ ...item, tipo_prescricao: item.tipo_prescricao || 'repeticoes' }));
+  exerciseLibrary = (data || []).map((item: ExerciseItem) => ({ ...item, tipo_prescricao: item.tipo_prescricao || 'repeticoes' }));
   const categories = [...new Set(exerciseLibrary.map(categoryName))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   const options = '<option value="">Selecione uma categoria</option>' + categories.map(category => `<option value="${esc(category)}">${esc(category)}</option>`).join('');
   if (batchCategorySelect) batchCategorySelect.innerHTML = options;
@@ -311,7 +311,7 @@ async function getNextOrders(days: number[]): Promise<Record<number, number>> {
   if (error) throw error;
   const nextOrders: Record<number, number> = {};
   for (const day of days) {
-    const maxOrder = (data || []).filter(row => Number(row.dia_semana) === Number(day)).reduce((max, row) => Math.max(max, Number(row.ordem) || 0), 0);
+    const maxOrder = (data || []).filter((row: Record<string, unknown>) => Number(row.dia_semana) === Number(day)).reduce((max: number, row: Record<string, unknown>) => Math.max(max, Number(row.ordem) || 0), 0);
     nextOrders[day] = maxOrder + 1;
   }
   return nextOrders;
@@ -343,6 +343,7 @@ function syncConfigFromEvent(event: Event): void {
   const field = target.dataset.configField;
   if (!card || !field) return;
   const id = card.dataset.selectedExercise;
+  if (!id) return;
   const config = selectedConfigs.get(id) || defaultConfig(exerciseById(id));
   config[field as keyof ExerciseConfig] = target.value as never;
   selectedConfigs.set(id, config);
@@ -357,6 +358,7 @@ selectedBuilder?.addEventListener('click', event => {
   const remove = target.closest<HTMLElement>('[data-remove-selected]');
   if (remove) {
     const id = remove.dataset.removeSelected;
+    if (!id) return;
     selectedExerciseIds = selectedExerciseIds.filter(item => item !== id);
     selectedConfigs.delete(id);
     renderExerciseCheckboxes(batchCategorySelect?.value || '');
@@ -366,8 +368,8 @@ selectedBuilder?.addEventListener('click', event => {
 
   const toggle = target.closest<HTMLElement>('[data-toggle-selected-config]');
   if (!toggle) return;
-  const card = toggle.closest('[data-selected-exercise]');
-  const panel = card?.querySelector('.selected-exercise-config-panel');
+  const card = toggle.closest<HTMLElement>('[data-selected-exercise]');
+  const panel = card?.querySelector<HTMLElement>('.selected-exercise-config-panel');
   if (!card || !panel) return;
   const expanded = !card.classList.contains('expanded');
   card.classList.toggle('expanded', expanded);
@@ -379,7 +381,7 @@ document.querySelector('#open-exercise-modal')?.addEventListener('click', () => 
 document.addEventListener('click', event => {
   const target = event.target as HTMLElement;
   const detailRow = target.closest<HTMLElement>('[data-open-exercise-detail]');
-  if (detailRow) editingExerciseId = detailRow.dataset.openExerciseDetail;
+  if (detailRow) editingExerciseId = detailRow.dataset.openExerciseDetail || null;
   if (target.closest('#exercise-detail-edit')) setTimeout(() => prepareExerciseEdit(editingExerciseId), 0);
 });
 
@@ -395,6 +397,7 @@ form?.addEventListener('submit', async (event: SubmitEvent) => {
   if (!days.length) return showMessage(message, 'Selecione pelo menos um dia da semana.', 'error');
   if (!targetWorkoutId) await refreshTargetWorkout();
   if (!targetWorkoutId) return showMessage(message, 'Selecione um plano antes de adicionar exercícios.', 'error');
+  if (!saveButton) return;
 
   saveButton.disabled = true;
   try {
@@ -435,6 +438,7 @@ form?.addEventListener('submit', async (event: SubmitEvent) => {
       for (const day of days) {
         selectedExerciseIds.forEach((exerciseId, index) => {
           const exercise = exerciseById(exerciseId);
+          if (!exercise) throw new Error('Exercício não encontrado.');
           const config = selectedConfigs.get(exerciseId) || defaultConfig(exercise);
           const type = exercise?.tipo_prescricao || 'repeticoes';
           const duration = config.duracao_minutos ? Number(config.duracao_minutos) : null;
