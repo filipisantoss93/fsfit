@@ -1,4 +1,4 @@
-import './inactive-account-guard.js?v=20260730-inactive-account1';
+import './inactive-account-guard.js?v=20261001-ts-inactive1';
 import { loadPageModules } from './page-module-loader.js?v=20260730-page-loader1';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
