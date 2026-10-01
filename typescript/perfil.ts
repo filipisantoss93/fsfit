@@ -152,7 +152,7 @@ async function copyCurrentPublicLink(button: HTMLButtonElement): Promise<void> {
 }
 
 copyPublicLinkButton?.addEventListener('click', event => copyCurrentPublicLink(event.currentTarget as HTMLButtonElement));
-summaryCopyLink?.addEventListener('click', event => copyCurrentPublicLink(event.currentTarget));
+summaryCopyLink?.addEventListener('click', event => copyCurrentPublicLink(event.currentTarget as HTMLButtonElement));
 
 [viewPublicLink, summaryViewPage].forEach(link => {
   link?.addEventListener('click', event => {
@@ -502,7 +502,8 @@ workplaceFile.addEventListener('change', async () => {
     showMessage(message, 'Foto enviada. Salve as alterações para confirmar.');
   } catch (error) {
     console.error(error);
-    showMessage(message, error.message || 'Não foi possível enviar a foto.', 'error');
+    const detail = error instanceof Error ? error.message : '';
+    showMessage(message, detail || 'Não foi possível enviar a foto.', 'error');
   } finally {
     workplaceFile.disabled = false;
     workplaceFile.value = '';
