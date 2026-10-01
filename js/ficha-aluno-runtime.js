@@ -1,5 +1,5 @@
 import './ficha-aluno.js?v=20260726-ux2';
-import './historico-treinos-aluno.js?v=20260726-ux2';
+import './historico-treinos-aluno.js?v=20261001-ts-history1';
 import { supabase } from './supabase.js';
 import { requireSession, showMessage } from './layout.js';
 
