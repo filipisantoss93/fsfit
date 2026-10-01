@@ -1,14 +1,16 @@
 // @ts-ignore The browser runtime resolves this existing JavaScript module.
 import { supabase } from './supabase.js';
 
-interface ExerciseLibraryItem {
+interface RawExerciseLibraryItem {
   id: string | number;
   nome?: string | null;
   grupo_muscular?: string | null;
   equipamento?: string | null;
   categoria_id?: string | number | null;
+}
+
+interface ExerciseLibraryItem extends RawExerciseLibraryItem {
   category: string;
-  [key: string]: unknown;
 }
 
 interface ExerciseCategoryRow {
@@ -103,7 +105,7 @@ async function loadExerciseLibrary(): Promise<ExerciseLibraryItem[]> {
 
     const categoryRows = (Array.isArray(categoryResult.data) ? categoryResult.data : []) as ExerciseCategoryRow[];
     const categoryNames = new Map<string, string>(categoryRows.map(category => [String(category.id), String(category.nome || '')]));
-    const exerciseRows = (Array.isArray(exerciseResult.data) ? exerciseResult.data : []) as Omit<ExerciseLibraryItem, 'category'>[];
+    const exerciseRows = (Array.isArray(exerciseResult.data) ? exerciseResult.data : []) as RawExerciseLibraryItem[];
     return exerciseRows.map(exercise => ({
       ...exercise,
       category: String(
