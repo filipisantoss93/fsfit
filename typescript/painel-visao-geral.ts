@@ -103,7 +103,7 @@ function setupHomeDashboard(): void {
   const legacyTabs = Array.from(tabs.querySelectorAll<HTMLButtonElement>('[data-dashboard-tab]'));
   const legacyPanels = ['dashboard-overview-panel', 'dashboard-agenda-panel', 'dashboard-live-panel']
     .map(id => document.getElementById(id))
-    .filter(Boolean);
+    .filter((panel): panel is HTMLElement => Boolean(panel));
 
   const activateHome = (shouldFocus: boolean = false): void => {
     legacyTabs.forEach(tab => {
@@ -215,7 +215,7 @@ function setupHomeDashboard(): void {
     const studentLink = document.querySelector<HTMLAnchorElement>('#home-next-student-link');
     if (studentLink) {
       studentLink.textContent = 'Ver aluno';
-      studentLink.href = nextRow.tagName === 'A' && nextRow.getAttribute('href') ? nextRow.getAttribute('href') : 'alunos.html';
+      studentLink.href = nextRow.tagName === 'A' ? (nextRow.getAttribute('href') || 'alunos.html') : 'alunos.html';
     }
   };
 
@@ -405,7 +405,7 @@ async function ensureCurrentCharges(activeStudents: StudentRecord[]): Promise<vo
 
   if (existingError) throw existingError;
 
-  const existingIds = new Set((existing || []).map(item => item.aluno_id));
+  const existingIds = new Set((existing || []).map((item: JsonRecord) => item.aluno_id));
   const rows = eligibleStudents
     .filter(student => !existingIds.has(student.id))
     .map(student => ({
@@ -487,7 +487,7 @@ function renderRecentActivity(students: StudentRecord[], payments: PaymentRecord
 
 function finalizeAttention(): void {
   const card = document.querySelector<HTMLElement>('.attention-card');
-  const loading = document.querySelector('#attention-loading');
+  const loading = document.querySelector<HTMLElement>('#attention-loading');
   const empty = document.querySelector<HTMLElement>('#attention-empty');
   const items = Array.from(document.querySelectorAll<HTMLElement>('[data-attention-item]'));
   const hasVisibleItems = items.some(item => !item.hidden);
@@ -498,7 +498,7 @@ function finalizeAttention(): void {
 }
 
 function toggleAttentionItem(selector: string, visible: boolean): void {
-  const element = document.querySelector(selector);
+  const element = document.querySelector<HTMLElement>(selector);
   if (element) element.hidden = !visible;
 }
 
@@ -549,8 +549,8 @@ function formatRelativeTime(value: string): string {
 }
 
 function setText(selector: string, value: unknown): void {
-  const element = document.querySelector(selector);
-  if (element) element.textContent = value;
+  const element = document.querySelector<HTMLElement>(selector);
+  if (element) element.textContent = String(value ?? '');
 }
 
 function escapeHtml(value: unknown = ''): string {
