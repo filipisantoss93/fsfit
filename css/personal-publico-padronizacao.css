@@ -2,7 +2,7 @@
 body{background:radial-gradient(circle at 50% -12%,rgba(174,255,20,.07),transparent 34%),var(--background)}
 .public-profile-shell{width:min(calc(100% - 24px),780px);padding:calc(env(safe-area-inset-top,0px) + 12px) 0 calc(env(safe-area-inset-bottom,0px) + 36px)}
 .public-profile-card,.student-access-card{margin-bottom:12px;border-radius:20px}
-#public-profile{position:relative;overflow:hidden;padding:20px;background:linear-gradient(145deg,rgba(174,255,20,.09),rgba(23,27,33,.97) 44%,var(--surface));border-color:rgba(174,255,20,.2)}
+#public-profile{position:relative;overflow:hidden;padding:20px;background:linear-gradient(145deg,var(--fs-primary-soft),var(--fs-surface-raised) 44%,var(--surface));border-color:rgba(174,255,20,.2)}
 #public-profile::after{content:"";position:absolute;top:-90px;right:-90px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(174,255,20,.13),transparent 69%);pointer-events:none}
 .public-return-actions,.public-profile-top,.public-profile-quick-actions{position:relative;z-index:1}
 .public-return-actions{margin-bottom:16px}
@@ -14,7 +14,7 @@ body{background:radial-gradient(circle at 50% -12%,rgba(174,255,20,.07),transpar
 .public-profile-specialty-summary{margin-top:6px;font-size:.82rem}
 .public-profile-quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:18px}
 .public-profile-quick-actions .btn{width:100%;min-height:44px;padding:8px 12px;justify-content:center;border-radius:12px;font-size:.8rem}
-.student-access-card{position:relative;padding:18px;border-color:rgba(174,255,20,.2);background:rgba(23,27,33,.94)}
+.student-access-card{position:relative;padding:18px;border-color:rgba(174,255,20,.2);background:var(--fs-surface-overlay)}
 .student-access-card::before{content:"Acesso privado";display:inline-flex;margin-bottom:8px;color:var(--primary);font-size:.64rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
 .student-access-card>.hero-badge{display:none}
 .student-access-card h2{margin:0 0 5px;font-size:1.28rem}
