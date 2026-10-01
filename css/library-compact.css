@@ -4,7 +4,7 @@
 .exercise-library-item-title h3{margin:0!important;font-size:1rem!important;line-height:1.25}
 .exercise-library-item p{margin:3px 0 0!important;font-size:.84rem!important;line-height:1.35}
 .library-instructions{display:-webkit-box!important;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:2}
-.library-badge{min-height:22px!important;padding:3px 7px!important;font-size:.6rem!important}
+.library-badge{min-height:22px!important;padding:3px 7px!important;font-size:var(--fs-font-xs,.75rem)!important}
 .library-item-actions{gap:6px!important}
 .library-item-actions .btn{min-height:38px!important;padding:0 12px!important;font-size:.8rem!important}
 .food-library-item{padding:12px 48px 12px 14px!important;gap:12px!important;border-radius:14px!important;align-items:center!important;position:relative}
@@ -12,7 +12,7 @@
 .food-library-item h3{margin:0 0 4px!important;font-size:1rem!important;line-height:1.25}
 .food-library-item p{margin:3px 0!important;font-size:.84rem!important;line-height:1.35}
 .food-macros{margin-top:6px!important;gap:5px!important}
-.food-macro-chip{padding:3px 6px!important;font-size:.68rem!important}
+.food-macro-chip{padding:3px 6px!important;font-size:var(--fs-font-xs,.75rem)!important}
 .food-library-item>.actions{gap:6px!important}
 .food-library-item>.actions .btn{min-height:38px!important;padding:0 12px!important;font-size:.8rem!important}
 .exercise-library-item [data-edit-exercise],.food-library-item [data-edit-food]{display:none!important}

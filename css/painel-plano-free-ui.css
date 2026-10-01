@@ -20,7 +20,7 @@
 .free-access-redirect-copy {
   min-width: 0;
   flex: 1 1 auto;
-  font-size: .72rem;
+  font-size:var(--fs-font-xs,.75rem);
   line-height: 1.4;
 }
 
@@ -33,7 +33,7 @@
 .free-access-redirect-action {
   flex: 0 0 auto;
   color: var(--primary);
-  font-size: .69rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 900;
   white-space: nowrap;
 }
@@ -72,7 +72,7 @@
   display: block;
   margin-bottom: 3px;
   color: var(--primary);
-  font-size: .6rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 900;
   letter-spacing: .08em;
 }
@@ -87,7 +87,7 @@
   display: block;
   margin-top: 2px;
   color: var(--muted);
-  font-size: .68rem;
+  font-size:var(--fs-font-xs,.75rem);
   line-height: 1.35;
 }
 
@@ -103,7 +103,7 @@
   min-height: 38px;
   padding: 8px 12px;
   border-radius: 10px;
-  font-size: .7rem;
+  font-size:var(--fs-font-xs,.75rem);
   white-space: nowrap;
 }
 

@@ -55,7 +55,7 @@
   background:var(--surface-light);
   color:var(--muted);
   font:inherit;
-  font-size:.7rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight:850;
   white-space:nowrap;
   cursor:pointer;
@@ -69,7 +69,7 @@
   border-radius:999px;
   background:rgba(255,255,255,.06);
   color:inherit;
-  font-size:.58rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-style:normal;
   font-weight:950;
 }
@@ -90,7 +90,7 @@
 }
 .live-quick-category-heading strong{
   color:var(--text);
-  font-size:.74rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight:950;
   letter-spacing:.045em;
   text-transform:uppercase;
@@ -104,7 +104,7 @@
   border-radius:999px;
   background:rgba(177,255,0,.08);
   color:var(--primary);
-  font-size:.62rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight:950;
 }
 @media(min-width:721px){
@@ -121,8 +121,8 @@
   }
   .live-quick-action-header{padding:15px 14px 12px!important}
   .live-quick-action-header h3{font-size:1.08rem!important}
-  .live-quick-action-header p{font-size:.71rem!important}
+  .live-quick-action-header p{font-size:var(--fs-font-xs,.75rem)!important}
   .live-quick-action-body{padding:11px 12px calc(16px + env(safe-area-inset-bottom,0px))!important}
-  .live-quick-category-chip{min-height:34px;padding:6px 9px;font-size:.66rem}
+  .live-quick-category-chip{min-height:34px;padding:6px 9px;font-size:var(--fs-font-xs,.75rem)}
   .live-quick-option{min-height:54px!important}
 }

@@ -371,7 +371,7 @@ body.fsfit-saas .quick-action:hover {
 
 .fsfit-theme-setting-label {
   color: var(--fs-text-subtle);
-  font-size: .72rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 800;
   letter-spacing: .04em;
   text-transform: uppercase;

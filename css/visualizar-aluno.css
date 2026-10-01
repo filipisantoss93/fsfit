@@ -129,7 +129,7 @@ body.student-page {
 .student-section-heading > span { color: var(--student-muted); }
 .student-day-selector { display: grid; grid-template-columns: repeat(7,1fr); gap: 7px; margin-bottom: 18px; overflow-x: auto; }
 .student-day-button { min-width: 62px; min-height: 60px; border: 1px solid var(--student-border); border-radius: 13px; background: var(--fs-surface); color: var(--student-muted); font-weight: 800; }
-.student-day-button small { display: block; margin-top: 3px; color: var(--student-green); font-size: .62rem; }
+.student-day-button small { display: block; margin-top: 3px; color: var(--student-green); font-size:var(--fs-font-xs); }
 .student-day-button.active { border-color: var(--student-green); background: rgba(139,198,63,.14); color: var(--student-text); }
 .student-agenda-day { border: 1px solid var(--fs-border); border-radius: 17px; overflow: hidden; }
 .student-agenda-day-header { padding: 15px 18px; display: flex; justify-content: space-between; background: var(--fs-surface-tint); }

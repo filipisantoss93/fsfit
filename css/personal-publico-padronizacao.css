@@ -15,7 +15,7 @@ body{background:radial-gradient(circle at 50% -12%,rgba(174,255,20,.07),transpar
 .public-profile-quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:18px}
 .public-profile-quick-actions .btn{width:100%;min-height:44px;padding:8px 12px;justify-content:center;border-radius:12px;font-size:.8rem}
 .student-access-card{position:relative;padding:18px;border-color:rgba(174,255,20,.2);background:var(--fs-surface-overlay)}
-.student-access-card::before{content:"Acesso privado";display:inline-flex;margin-bottom:8px;color:var(--primary);font-size:.64rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.student-access-card::before{content:"Acesso privado";display:inline-flex;margin-bottom:8px;color:var(--primary);font-size:var(--fs-font-xs,.75rem);font-weight:900;letter-spacing:.1em;text-transform:uppercase}
 .student-access-card>.hero-badge{display:none}
 .student-access-card h2{margin:0 0 5px;font-size:1.28rem}
 .student-access-card>p{margin:0 0 16px;font-size:.84rem;line-height:1.48}
@@ -48,7 +48,7 @@ body{background:radial-gradient(circle at 50% -12%,rgba(174,255,20,.07),transpar
   .public-profile-location{font-size:.8rem}
   .public-profile-specialty-summary{font-size:.76rem;-webkit-line-clamp:2}
   .public-profile-quick-actions{margin-top:14px}
-  .public-profile-quick-actions .btn{min-height:42px;padding:7px 8px;font-size:.74rem}
+  .public-profile-quick-actions .btn{min-height:42px;padding:7px 8px;font-size:var(--fs-font-xs,.75rem)}
   .student-access-card h2{font-size:1.18rem}
   .public-profile-content{gap:16px}
 }

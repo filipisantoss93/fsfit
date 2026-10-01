@@ -26,7 +26,7 @@
 .meal-food-option small{display:block;margin-top:4px;color:var(--muted,#a7acb8);font-size:.82rem}
 .meal-food-option small:empty{display:none}
 .meal-food-option:has(input:checked){border-color:rgba(50,215,75,.55);background:rgba(50,215,75,.08)}
-.meal-food-option:after{content:'Selecionar';font-size:.72rem;font-weight:800;color:var(--muted,#a7acb8);padding:6px 9px;border:1px solid var(--fs-border);border-radius:9px}
+.meal-food-option:after{content:'Selecionar';font-size:var(--fs-font-xs,.75rem);font-weight:800;color:var(--muted,#a7acb8);padding:6px 9px;border:1px solid var(--fs-border);border-radius:9px}
 .meal-food-option:has(input:checked):after{content:'Selecionado';color:var(--primary,#32d74b);border-color:rgba(50,215,75,.35)}
 .meal-selected-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:18px 0 10px}
 .meal-selected-items{display:grid;gap:10px}
@@ -41,7 +41,7 @@
 
 @media(max-width:760px){
   .food-action-bar{grid-template-columns:repeat(3,minmax(92px,1fr));padding:7px}
-  .food-action-bar .food-action-button{min-height:40px;padding:7px 9px;font-size:.74rem}
+  .food-action-bar .food-action-button{min-height:40px;padding:7px 9px;font-size:var(--fs-font-xs,.75rem)}
   .food-library-item,.meal-library-item{flex-direction:column}
   .meal-selected-row{grid-template-columns:1fr 1fr}
   .meal-selected-row-name{grid-column:1/-1}
@@ -57,5 +57,5 @@
 
 @media(max-width:420px){
   .food-action-bar{gap:6px;margin-bottom:14px;padding:6px}
-  .food-action-bar .food-action-button{padding:7px 6px;font-size:.7rem}
+  .food-action-bar .food-action-button{padding:7px 6px;font-size:var(--fs-font-xs,.75rem)}
 }

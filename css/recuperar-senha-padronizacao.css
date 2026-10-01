@@ -5,7 +5,7 @@ body.password-recovery-page{min-height:100svh;margin:0;background:radial-gradien
 .password-recovery-main{display:grid;align-items:center}
 .password-recovery-card{position:relative;overflow:hidden;padding:26px;border:1px solid rgba(174,255,20,.2);border-radius:24px;background:linear-gradient(150deg,var(--fs-primary-soft),var(--fs-surface-tint) 38%,var(--surface));box-shadow:0 24px 70px rgba(0,0,0,.28)}
 .password-recovery-card::before{content:"";position:absolute;width:180px;height:180px;right:-90px;top:-100px;border-radius:50%;background:radial-gradient(circle,rgba(174,255,20,.15),transparent 67%);pointer-events:none}
-.password-recovery-kicker{position:relative;display:inline-flex;margin-bottom:14px;padding:6px 9px;border:1px solid rgba(174,255,20,.25);border-radius:999px;color:var(--primary);font-size:.68rem;font-weight:900;letter-spacing:.09em}
+.password-recovery-kicker{position:relative;display:inline-flex;margin-bottom:14px;padding:6px 9px;border:1px solid rgba(174,255,20,.25);border-radius:999px;color:var(--primary);font-size:var(--fs-font-xs,.75rem);font-weight:900;letter-spacing:.09em}
 .password-recovery-card h1{position:relative;margin:0;font-size:clamp(1.75rem,8vw,2.25rem);line-height:1.08}
 .password-recovery-description{position:relative;margin:10px 0 20px;color:var(--muted);font-size:.92rem;line-height:1.55}
 .password-recovery-card .message.show{margin-bottom:16px}

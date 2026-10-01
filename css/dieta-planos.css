@@ -68,7 +68,7 @@
   border-radius: 999px;
   background: rgba(50, 215, 75, .14);
   color: var(--primary);
-  font-size: .68rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-style: normal;
   font-weight: 900;
   letter-spacing: .06em;
@@ -137,7 +137,7 @@
   display: block;
   margin-bottom: 6px;
   color: var(--muted);
-  font-size: .72rem;
+  font-size:var(--fs-font-xs,.75rem);
   font-weight: 900;
   letter-spacing: .05em;
   text-transform: uppercase;

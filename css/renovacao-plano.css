@@ -5,7 +5,7 @@
 .plan-renewal-card.trial{border-color:rgba(50,215,75,.35);background:var(--fs-success-soft)}
 .plan-renewal-card.subscription-active{border-color:rgba(50,215,75,.35);background:var(--fs-success-soft)}
 .plan-renewal-card.subscription-canceled{border-color:rgba(120,130,145,.35);background:rgba(120,130,145,.08)}
-.plan-renewal-copy{min-width:0}.plan-renewal-copy small{display:block;margin-bottom:4px;font-size:.72rem;font-weight:900;letter-spacing:.08em;color:var(--muted)}
+.plan-renewal-copy{min-width:0}.plan-renewal-copy small{display:block;margin-bottom:4px;font-size:var(--fs-font-xs,.75rem);font-weight:900;letter-spacing:.08em;color:var(--muted)}
 .plan-renewal-copy strong{display:block;font-size:1rem}.plan-renewal-copy span{display:block;margin-top:4px;color:var(--muted);font-size:.86rem}
 .plan-renewal-actions{display:flex;gap:10px;flex:0 0 auto;flex-wrap:wrap}
 .plan-modal-backdrop{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:18px;background:var(--fs-overlay);backdrop-filter:blur(4px)}

@@ -55,7 +55,7 @@
   body.ads-landing .lp-sticky-copy span{
     display:block;
     margin-top:2px;
-    font-size:.62rem;
+    font-size:var(--fs-font-xs,.75rem);
     line-height:1.2;
   }
   body.ads-landing .lp-sticky-cta .lp-btn{

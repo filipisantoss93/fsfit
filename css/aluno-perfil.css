@@ -80,7 +80,7 @@
   display: block;
   margin-top: 6px;
   color: var(--muted);
-  font-size: .74rem;
+  font-size:var(--fs-font-xs,.75rem);
   line-height: 1.4;
 }
 
