@@ -78,7 +78,7 @@ if (hasDashboard) {
     },
     {
       id: 'painel-agenda-modal-hotfix',
-      source: './painel-agenda-modal-hotfix.js?v=20260723-agenda-modal-hotfix4',
+      source: './painel-agenda-modal-hotfix.js?v=20261001-ts1',
       errorMessage: 'Falha ao carregar correção do modal da agenda de hoje:'
     },
     {
