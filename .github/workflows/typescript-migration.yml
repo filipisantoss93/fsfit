@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'typescript/**/*.ts'
+      - 'js/painel-visao-geral.js'
+      - 'js/treino-multidias.js'
       - 'js/mobile-more-swipe.js'
       - 'js/aulas-painel-quick-actions.js'
       - 'js/treino-aluno-semanal.js'
@@ -140,6 +142,8 @@ on:
       - main
     paths:
       - 'typescript/**/*.ts'
+      - 'js/painel-visao-geral.js'
+      - 'js/treino-multidias.js'
       - 'js/mobile-more-swipe.js'
       - 'js/aulas-painel-quick-actions.js'
       - 'js/treino-aluno-semanal.js'
@@ -308,6 +312,8 @@ jobs:
       - name: Ensure generated JavaScript is committed
         run: |
           git diff --exit-code -- \
+            js/painel-visao-geral.js \
+            js/treino-multidias.js \
             js/mobile-more-swipe.js \
             js/aulas-painel-quick-actions.js \
             js/treino-aluno-semanal.js \
