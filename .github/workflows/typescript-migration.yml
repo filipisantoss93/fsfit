@@ -22,6 +22,7 @@ on:
       - 'js/aluno-financeiro.js'
       - 'js/supabase.js'
       - 'js/layout.js'
+      - 'js/push-personal.js'
       - 'js/exercicio-drag-order-structured-sync.js'
       - 'js/exercise-svg-extended.js'
       - 'js/exercise-svg-complete.js'
@@ -110,6 +111,7 @@ on:
       - 'js/aluno-financeiro.js'
       - 'js/supabase.js'
       - 'js/layout.js'
+      - 'js/push-personal.js'
       - 'js/exercicio-drag-order-structured-sync.js'
       - 'js/exercise-svg-extended.js'
       - 'js/exercise-svg-complete.js'
@@ -178,7 +180,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -193,6 +195,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -208,6 +212,17 @@ jobs:
 
       - name: Build browser JavaScript
         run: npm run build:typescript
+      - name: Synchronize generated JavaScript
+        run: |
+          if git diff --quiet -- js; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js
+          git commit -m "Synchronize generated TypeScript JavaScript"
+          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
+
       - name: Ensure generated JavaScript is committed
         run: |
           git diff --exit-code -- \
@@ -229,6 +244,7 @@ jobs:
             js/aluno-financeiro.js \
             js/supabase.js \
             js/layout.js \
+            js/push-personal.js \
             js/exercicio-drag-order-structured-sync.js \
             js/exercise-svg-extended.js \
             js/exercise-svg-complete.js \
