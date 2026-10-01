@@ -65,7 +65,7 @@ if (hasDashboard) {
     },
     {
       id: 'aulas-painel-delete-layout-fix',
-      source: './aulas-painel-delete-layout-fix.js?v=20260724-live-delete-layout1',
+      source: './aulas-painel-delete-layout-fix.js?v=20260930-ts1',
       errorMessage: 'Falha ao carregar layout da exclusão de exercícios em aula:'
     }
   ]);

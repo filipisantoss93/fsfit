@@ -5,6 +5,9 @@ on:
     paths:
       - 'typescript/**/*.ts'
       - 'js/admin-search-clear.js'
+      - 'js/aulas-painel-delete-layout-fix.js'
+      - 'js/exercise-picker-horizontal-scroll-fix.js'
+      - 'js/library-row-click.js'
       - 'tsconfig.json'
       - 'package.json'
       - 'package-lock.json'
@@ -15,6 +18,9 @@ on:
     paths:
       - 'typescript/**/*.ts'
       - 'js/admin-search-clear.js'
+      - 'js/aulas-painel-delete-layout-fix.js'
+      - 'js/exercise-picker-horizontal-scroll-fix.js'
+      - 'js/library-row-click.js'
       - 'tsconfig.json'
       - 'package.json'
       - 'package-lock.json'
