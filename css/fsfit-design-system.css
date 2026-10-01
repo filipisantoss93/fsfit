@@ -81,6 +81,13 @@
   --fs-control-height-lg: 48px;
   --fs-touch-target: 44px;
 
+  /* Tipografia funcional: evitar microtexto em telas operacionais. */
+  --fs-font-xs: .75rem;
+  --fs-font-sm: .8125rem;
+  --fs-font-base: .9375rem;
+  --fs-leading-tight: 1.3;
+  --fs-leading-normal: 1.5;
+
   /* Elevação e foco */
   --fs-shadow-sm: 0 8px 24px rgba(0, 0, 0, .18);
   --fs-shadow-md: 0 18px 48px rgba(0, 0, 0, .28);
