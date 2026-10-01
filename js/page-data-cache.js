@@ -9,5 +9,4 @@
 // módulos específicos de cada página. O cache leve e não estrutural pode ser
 // reintroduzido futuramente usando dados serializados e funções oficiais de render,
 // sem copiar HTML do DOM.
-
 export {};
