@@ -98,7 +98,7 @@ body.fsfit-saas .tile {
 
 /* Botões */
 body.fsfit-saas .btn {
-  min-height: var(--fs-control-height);
+  min-height: var(--fs-touch-target);
   padding: 0 var(--fs-space-4);
   border-radius: var(--fs-radius-sm);
   box-shadow: none;
@@ -107,7 +107,7 @@ body.fsfit-saas .btn {
 }
 
 body.fsfit-saas .btn-sm {
-  min-height: var(--fs-control-height-sm);
+  min-height: var(--fs-touch-target);
   padding-inline: var(--fs-space-3);
 }
 
@@ -160,7 +160,7 @@ body.fsfit-saas .btn[aria-disabled="true"] {
 body.fsfit-saas input,
 body.fsfit-saas select,
 body.fsfit-saas textarea {
-  min-height: var(--fs-control-height);
+  min-height: var(--fs-touch-target);
   border: 1px solid var(--fs-border);
   border-radius: var(--fs-radius-sm);
   background: var(--fs-surface-raised);
@@ -337,7 +337,7 @@ body.fsfit-saas .quick-action:hover {
   }
 
   body.fsfit-saas .btn {
-    min-height: 41px;
+    min-height: var(--fs-touch-target);
     border-radius: var(--fs-radius-sm);
   }
 
@@ -388,7 +388,7 @@ body.fsfit-saas .quick-action:hover {
 }
 
 .fsfit-theme-control button {
-  min-height: 38px;
+  min-height: var(--fs-touch-target);
   padding: 0 var(--fs-space-2);
   border: 0;
   border-radius: var(--fs-radius-sm);
