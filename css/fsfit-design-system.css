@@ -14,6 +14,9 @@
   --fs-surface: #111820;
   --fs-surface-raised: #161e28;
   --fs-surface-soft: #1a232e;
+  --fs-surface-tint: rgba(255, 255, 255, .025);
+  --fs-surface-tint-hover: rgba(255, 255, 255, .055);
+  --fs-surface-tint-strong: rgba(255, 255, 255, .09);
   --fs-surface-overlay: rgba(17, 24, 32, .96);
   --fs-glass: rgba(7, 11, 18, .9);
   --fs-overlay: rgba(4, 7, 11, .72);
@@ -25,7 +28,7 @@
   /* Texto */
   --fs-text: #eef2f5;
   --fs-text-muted: #929da9;
-  --fs-text-subtle: #73808d;
+  --fs-text-subtle: #778491;
   --fs-text-on-primary: #0d1409;
 
   /* Marca e estados */
@@ -35,9 +38,21 @@
   --fs-primary-soft: rgba(131, 189, 69, .09);
   --fs-primary-border: rgba(131, 189, 69, .24);
   --fs-info: #6e94bd;
+  --fs-info-soft: rgba(110, 148, 189, .10);
+  --fs-info-border: rgba(110, 148, 189, .28);
+  --fs-info-text: #a9c0d8;
   --fs-warning: #d4ad53;
+  --fs-warning-soft: rgba(212, 173, 83, .10);
+  --fs-warning-border: rgba(212, 173, 83, .28);
+  --fs-warning-text: #e1c47d;
   --fs-danger: #d76d73;
+  --fs-danger-soft: rgba(215, 109, 115, .10);
+  --fs-danger-border: rgba(215, 109, 115, .28);
+  --fs-danger-text: #eca2a7;
   --fs-success: var(--fs-primary);
+  --fs-success-soft: var(--fs-primary-soft);
+  --fs-success-border: var(--fs-primary-border);
+  --fs-success-text: #a9ce7d;
 
   /* Raios */
   --fs-radius-xs: 4px;
@@ -129,6 +144,9 @@ html[data-fsfit-theme="light"] {
   --fs-surface: #ffffff;
   --fs-surface-raised: #eef2f4;
   --fs-surface-soft: #e5eaed;
+  --fs-surface-tint: rgba(23, 33, 43, .025);
+  --fs-surface-tint-hover: rgba(23, 33, 43, .055);
+  --fs-surface-tint-strong: rgba(23, 33, 43, .09);
   --fs-surface-overlay: rgba(255, 255, 255, .96);
   --fs-glass: rgba(255, 255, 255, .9);
   --fs-overlay: rgba(19, 29, 38, .42);
@@ -138,7 +156,7 @@ html[data-fsfit-theme="light"] {
 
   --fs-text: #17212b;
   --fs-text-muted: #53616e;
-  --fs-text-subtle: #687886;
+  --fs-text-subtle: #5f6d79;
   --fs-text-on-primary: #ffffff;
 
   --fs-primary: #497326;
@@ -147,9 +165,21 @@ html[data-fsfit-theme="light"] {
   --fs-primary-soft: rgba(73, 115, 38, .09);
   --fs-primary-border: rgba(73, 115, 38, .25);
   --fs-info: #416f9e;
+  --fs-info-soft: rgba(65, 111, 158, .09);
+  --fs-info-border: rgba(65, 111, 158, .24);
+  --fs-info-text: #416f9e;
   --fs-warning: #8d650b;
+  --fs-warning-soft: rgba(141, 101, 11, .09);
+  --fs-warning-border: rgba(141, 101, 11, .24);
+  --fs-warning-text: #8d650b;
   --fs-danger: #b44851;
+  --fs-danger-soft: rgba(180, 72, 81, .09);
+  --fs-danger-border: rgba(180, 72, 81, .24);
+  --fs-danger-text: #b44851;
   --fs-success: #497326;
+  --fs-success-soft: rgba(73, 115, 38, .09);
+  --fs-success-border: rgba(73, 115, 38, .25);
+  --fs-success-text: #497326;
 
   --fs-shadow-sm: 0 8px 24px rgba(28, 39, 49, .08);
   --fs-shadow-md: 0 18px 48px rgba(28, 39, 49, .12);
