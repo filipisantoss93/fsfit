@@ -1,0 +1,60 @@
+name: TypeScript migration checks
+
+on:
+  pull_request:
+    paths:
+      - 'typescript/**/*.ts'
+      - 'js/admin-search-clear.js'
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/typescript-migration.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'typescript/**/*.ts'
+      - 'js/admin-search-clear.js'
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/typescript-migration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: typescript-migration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    name: Typecheck and verify generated browser module
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install TypeScript compiler
+        run: npm ci
+
+      - name: Check TypeScript types
+        run: npm run typecheck
+
+      - name: Build browser JavaScript
+        run: npm run build:typescript
+
+      - name: Ensure generated JavaScript is committed
+        run: git diff --exit-code -- js/admin-search-clear.js
+
+      - name: Validate page script references
+        run: node scripts/audit-page-scripts.mjs

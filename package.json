@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "build:typescript": "tsc --project tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
