@@ -106,9 +106,11 @@ async function loadExerciseLibrary(): Promise<ExerciseLibraryItem[]> {
     const exerciseRows = (Array.isArray(exerciseResult.data) ? exerciseResult.data : []) as Omit<ExerciseLibraryItem, 'category'>[];
     return exerciseRows.map(exercise => ({
       ...exercise,
-      category: categoryNames.get(String(exercise.categoria_id || ''))
+      category: String(
+        categoryNames.get(String(exercise.categoria_id || ''))
         || exercise.grupo_muscular
         || 'Outros'
+      )
     }));
   })().catch(error => {
     libraryPromise = null;
