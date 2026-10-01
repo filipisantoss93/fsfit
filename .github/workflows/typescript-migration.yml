@@ -319,4 +319,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add js/treino-multidias.js js/painel-visao-geral.js
           git commit -m "Compile TypeScript outputs for workout and dashboard"
-          git push
+          git push origin HEAD:codex/typescript-migration-phase1
