@@ -177,7 +177,7 @@ function handleNavigation(event: Event): void {
   }
 
   if (control.dataset.dashboardAction === 'settings') {
-    document.querySelector('#student-settings-button')?.click();
+    document.querySelector<HTMLButtonElement>('#student-settings-button')?.click();
   }
 }
 
