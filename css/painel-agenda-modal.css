@@ -8,7 +8,7 @@ body.today-workout-dashboard-open{overflow:hidden}
 .today-workout-dashboard-header small{display:block;margin-bottom:5px;color:var(--primary);font-size:var(--fs-font-xs,.75rem);font-weight:900;letter-spacing:.08em}
 .today-workout-dashboard-header h2{margin:0;font-size:1.5rem}
 .today-workout-dashboard-header p{margin:5px 0 0;color:var(--muted);font-size:.82rem}
-.today-workout-dashboard-close{flex:0 0 42px;width:42px;height:42px;border:1px solid var(--border);border-radius:50%;background:var(--surface-light);color:var(--text);font-size:1.6rem;line-height:1;cursor:pointer}
+.today-workout-dashboard-close{flex:0 0 42px;width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:var(--surface-light);color:var(--text);font-size:1.6rem;line-height:1;cursor:pointer}
 .today-workout-dashboard-body{padding:18px 20px}
 .today-workout-loading,.today-workout-empty{padding:22px 14px;border:1px dashed var(--border);border-radius:14px;color:var(--muted);text-align:center;font-size:.82rem}
 .today-workout-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}

@@ -38,9 +38,7 @@
   font-size: 1.15rem;
 }
 
-.fsfit-cropper-close {
-  width: 38px;
-  height: 38px;
+.fsfit-cropper-close {width:44px;height:44px;
   border: 1px solid var(--border, #303640);
   border-radius: 11px;
   background: transparent;

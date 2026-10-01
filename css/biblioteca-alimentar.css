@@ -5,7 +5,7 @@
 
 .food-library-page{padding-bottom:48px}
 .food-action-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 18px;padding:8px;border:1px solid var(--border);border-radius:16px;background:var(--fs-surface-overlay)}
-.food-action-bar .food-action-button{width:100%;min-width:0;min-height:42px;padding:8px 10px;justify-content:center;white-space:nowrap;font-size:.78rem;font-weight:850}
+.food-action-bar .food-action-button{width:100%;min-width:0;min-height:44px;padding:8px 10px;justify-content:center;white-space:nowrap;font-size:.78rem;font-weight:850}
 .meal-library-section{margin-top:20px}
 .meal-library-list{display:grid;gap:14px}
 .food-library-item,.meal-library-item{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:18px;border:1px solid var(--fs-border);border-radius:16px;background:var(--fs-surface-tint)}
@@ -41,7 +41,7 @@
 
 @media(max-width:760px){
   .food-action-bar{grid-template-columns:repeat(3,minmax(92px,1fr));padding:7px}
-  .food-action-bar .food-action-button{min-height:40px;padding:7px 9px;font-size:var(--fs-font-xs,.75rem)}
+  .food-action-bar .food-action-button{min-height:44px;padding:7px 9px;font-size:var(--fs-font-xs,.75rem)}
   .food-library-item,.meal-library-item{flex-direction:column}
   .meal-selected-row{grid-template-columns:1fr 1fr}
   .meal-selected-row-name{grid-column:1/-1}

@@ -13,7 +13,7 @@ button { color: inherit; }
 .logo-nav span, .auth-logo span { font-weight: 700; }
 .user-greeting { margin-left: auto; color: var(--muted); font-size: .86rem; font-weight: 700; }
 .nav-menu { display: flex; align-items: center; gap: 7px; margin: 0; padding: 0; list-style: none; }
-.nav-menu a, .nav-menu button { min-height: 42px; padding: 0 13px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); cursor: pointer; font-size: .83rem; font-weight: 700; }
+.nav-menu a, .nav-menu button { min-height: 44px; padding: 0 13px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); cursor: pointer; font-size: .83rem; font-weight: 700; }
 .nav-menu a:hover, .nav-menu a.active { color: var(--text); background: var(--surface-light); }
 .nav-menu .logout { color: #ffb1b4; border: 1px solid rgba(255,90,95,.45); }
 .menu-mobile-btn { display: none; margin-left: auto; border: 0; background: transparent; font-size: 1.65rem; cursor: pointer; }
@@ -109,13 +109,13 @@ td small { color: var(--muted); }
 #error-state { color: var(--fs-danger-text) !important; }
 .student-record-container { max-width: 1040px; }
 .student-record-header { margin-bottom: 20px; }
-.record-back-link { display: inline-flex; align-items: center; min-height: 38px; margin-bottom: 14px; color: var(--secondary); font-size: .88rem; font-weight: 800; }
+.record-back-link { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 14px; color: var(--secondary); font-size: .88rem; font-weight: 800; }
 .student-record-title { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
 .student-record-title h1 { margin: 0 0 4px; font-size: clamp(1.9rem, 4.7vw, 2.8rem); letter-spacing: -.04em; }
 .student-record-title p { margin: 0; color: var(--muted); font-size: .92rem; }
 .record-tabs { position: sticky; top: calc(84px + var(--safe-area-top)); z-index: 20; display: flex; gap: 6px; margin: 0 0 20px; padding: 6px; overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--fs-surface-overlay); backdrop-filter: blur(12px); scrollbar-width: none; }
 .record-tabs::-webkit-scrollbar { display: none; }
-.record-tab { flex: 1 0 auto; min-height: 42px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; font-size: .84rem; font-weight: 800; }
+.record-tab { flex: 1 0 auto; min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; font-size: .84rem; font-weight: 800; }
 .record-tab.active { background: var(--surface-light); color: var(--text); }
 .record-tab-panel { display: none; }
 .record-tab-panel.active { display: block; }
@@ -185,7 +185,7 @@ td small { color: var(--muted); }
   .quick-action strong { font-size: .85rem; }
   .quick-action small { font-size:var(--fs-font-xs,.75rem); }
   .actions .btn { width: 100%; }
-  .btn { min-height: 43px; padding-inline: 15px; font-size: .85rem; }
+  .btn { min-height: 44px; padding-inline: 15px; font-size: .85rem; }
   .btn-action-tile { min-height: 64px; padding: 10px 12px; }
   .btn-action-title { font-size: .87rem; }
   .btn-action-description { font-size:var(--fs-font-xs,.75rem); }
@@ -195,7 +195,7 @@ td small { color: var(--muted); }
   .student-record-title h1 { font-size: 1.95rem; }
   .student-record-title p { font-size: .88rem; }
   .record-tabs { top: calc(84px + var(--safe-area-top)); margin-inline: -2px; }
-  .record-tab { min-height: 40px; padding-inline: 12px; }
+  .record-tab { min-height: 44px; padding-inline: 12px; }
   .section-heading { margin-bottom: 15px; }
   .section-heading h2 { font-size: 1.34rem; }
   .metric-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }

@@ -1,36 +1,36 @@
 {
   "version": 1,
   "pages": {
-    "/": "/css/bundles/fsfit.890d98c91114eeb1.css",
-    "/abrir-whatsapp-lembrete.html": "/css/bundles/fsfit.087f49fb3dc04967.css",
-    "/acesso-aluno.html": "/css/bundles/fsfit.052e8bcdc08662ff.css",
-    "/admin-assinaturas.html": "/css/bundles/fsfit.fa7f7cfbf36061cc.css",
-    "/admin-contatos.html": "/css/bundles/fsfit.f7e683d0eb73d66d.css",
-    "/admin.html": "/css/bundles/fsfit.45cd7eacba7dc22f.css",
-    "/agenda.html": "/css/bundles/fsfit.dcd43ad0d1a52eb4.css",
-    "/aluno-preview.html": "/css/bundles/fsfit.f28c8f020063a966.css",
-    "/aluno.html": "/css/bundles/fsfit.18dd1d55c1a6fe88.css",
-    "/alunos.html": "/css/bundles/fsfit.b6d43168f9a1e027.css",
-    "/assinatura.html": "/css/bundles/fsfit.7be245d3e26c6cf6.css",
-    "/biblioteca-alimentar.html": "/css/bundles/fsfit.7b9f3b08f904f2cb.css",
-    "/biblioteca-exercicios.html": "/css/bundles/fsfit.b87495dfc4df7a31.css",
-    "/cancelamento.html": "/css/bundles/fsfit.b72fc5a02cdeb400.css",
-    "/contato.html": "/css/bundles/fsfit.42c0427cadf2a096.css",
-    "/dieta-aluno.html": "/css/bundles/fsfit.527b51b71048e209.css",
-    "/ficha-aluno.html": "/css/bundles/fsfit.d66c981a704d171d.css",
-    "/financeiro.html": "/css/bundles/fsfit.e787ba7e63aebefd.css",
-    "/lembretes-aluno.html": "/css/bundles/fsfit.9f85137e8d528297.css",
-    "/nova-senha.html": "/css/bundles/fsfit.14975dd09db0bf12.css",
-    "/painel.html": "/css/bundles/fsfit.3a34e37baa678157.css",
-    "/perfil.html": "/css/bundles/fsfit.0b0d0a235b739980.css",
-    "/personal.html": "/css/bundles/fsfit.d4d26e6238f05d3b.css",
-    "/privacidade.html": "/css/bundles/fsfit.a07e7e3ee6f19fc4.css",
-    "/recuperar-senha.html": "/css/bundles/fsfit.0a8d51026f685e63.css",
-    "/selecionar-personal.html": "/css/bundles/fsfit.ccaa93f55292d66c.css",
-    "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.890d98c91114eeb1.css",
-    "/termos.html": "/css/bundles/fsfit.b72fc5a02cdeb400.css",
-    "/treino-aluno.html": "/css/bundles/fsfit.77326d15b1ac1360.css",
-    "/visualizar-aluno.html": "/css/bundles/fsfit.45fa8c34ca991eb1.css"
+    "/": "/css/bundles/fsfit.7151448c6711e4cb.css",
+    "/abrir-whatsapp-lembrete.html": "/css/bundles/fsfit.71ca1c9d6db9eb77.css",
+    "/acesso-aluno.html": "/css/bundles/fsfit.ad6403e801805c9a.css",
+    "/admin-assinaturas.html": "/css/bundles/fsfit.aeaf69f5d5bf4960.css",
+    "/admin-contatos.html": "/css/bundles/fsfit.949429efd55057ec.css",
+    "/admin.html": "/css/bundles/fsfit.8f4cfc2fbebd0675.css",
+    "/agenda.html": "/css/bundles/fsfit.032c72c90a121fea.css",
+    "/aluno-preview.html": "/css/bundles/fsfit.bffa111d6051a2df.css",
+    "/aluno.html": "/css/bundles/fsfit.b65988b84afa8daa.css",
+    "/alunos.html": "/css/bundles/fsfit.0420aedfe10ceca3.css",
+    "/assinatura.html": "/css/bundles/fsfit.1c607b086fd47b89.css",
+    "/biblioteca-alimentar.html": "/css/bundles/fsfit.80a012589b2ef288.css",
+    "/biblioteca-exercicios.html": "/css/bundles/fsfit.393cb319bb5d25ca.css",
+    "/cancelamento.html": "/css/bundles/fsfit.a60465855cdc2e6d.css",
+    "/contato.html": "/css/bundles/fsfit.f773815649d161ed.css",
+    "/dieta-aluno.html": "/css/bundles/fsfit.3c901b1fdf185743.css",
+    "/ficha-aluno.html": "/css/bundles/fsfit.ca4dac6cea88a811.css",
+    "/financeiro.html": "/css/bundles/fsfit.c0924abf1d3cb82f.css",
+    "/lembretes-aluno.html": "/css/bundles/fsfit.cc3425492238e4ef.css",
+    "/nova-senha.html": "/css/bundles/fsfit.f2eec9a632e4bc3e.css",
+    "/painel.html": "/css/bundles/fsfit.6f19f3a8461a1cb8.css",
+    "/perfil.html": "/css/bundles/fsfit.f2692da5b10bfd06.css",
+    "/personal.html": "/css/bundles/fsfit.aac7ba12e0b2505b.css",
+    "/privacidade.html": "/css/bundles/fsfit.0eb4124f691058c2.css",
+    "/recuperar-senha.html": "/css/bundles/fsfit.d0d286da0561e921.css",
+    "/selecionar-personal.html": "/css/bundles/fsfit.e216aeef7aa8afe1.css",
+    "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.7151448c6711e4cb.css",
+    "/termos.html": "/css/bundles/fsfit.a60465855cdc2e6d.css",
+    "/treino-aluno.html": "/css/bundles/fsfit.6f35368c1f0f9f05.css",
+    "/visualizar-aluno.html": "/css/bundles/fsfit.f207e3eb5c5c97bd.css"
   },
   "criticalPages": [
     "/",
@@ -42,19 +42,19 @@
     "/painel.html"
   ],
   "criticalBundles": [
-    "/css/bundles/fsfit.052e8bcdc08662ff.css",
-    "/css/bundles/fsfit.18dd1d55c1a6fe88.css",
-    "/css/bundles/fsfit.3a34e37baa678157.css",
-    "/css/bundles/fsfit.890d98c91114eeb1.css",
-    "/css/bundles/fsfit.b6d43168f9a1e027.css",
-    "/css/bundles/fsfit.dcd43ad0d1a52eb4.css",
-    "/css/bundles/fsfit.e787ba7e63aebefd.css"
+    "/css/bundles/fsfit.032c72c90a121fea.css",
+    "/css/bundles/fsfit.0420aedfe10ceca3.css",
+    "/css/bundles/fsfit.6f19f3a8461a1cb8.css",
+    "/css/bundles/fsfit.7151448c6711e4cb.css",
+    "/css/bundles/fsfit.ad6403e801805c9a.css",
+    "/css/bundles/fsfit.b65988b84afa8daa.css",
+    "/css/bundles/fsfit.c0924abf1d3cb82f.css"
   ],
   "bundles": {
     "abrir-whatsapp-lembrete.html": {
-      "url": "/css/bundles/fsfit.087f49fb3dc04967.css",
-      "sha256": "087f49fb3dc0496744f269d5b5d133666cfc711c5d367f3546ccb44f747a3190",
-      "bytes": 104585,
+      "url": "/css/bundles/fsfit.71ca1c9d6db9eb77.css",
+      "sha256": "71ca1c9d6db9eb77d7e75b3318b8c96d47297b4ece3a45c241142ad99aa43758",
+      "bytes": 105119,
       "sourceCount": 15,
       "duplicatesRemoved": 0,
       "sources": [
@@ -94,9 +94,9 @@
       ]
     },
     "acesso-aluno.html": {
-      "url": "/css/bundles/fsfit.052e8bcdc08662ff.css",
-      "sha256": "052e8bcdc08662ff9593b465f22ac1650d1b6fedd2bdcb13254d0037c777ab67",
-      "bytes": 90843,
+      "url": "/css/bundles/fsfit.ad6403e801805c9a.css",
+      "sha256": "ad6403e801805c9a003a5c4ab969dd91b55dafbf78d0acf2ae66989fe83a5875",
+      "bytes": 91397,
       "sourceCount": 14,
       "duplicatesRemoved": 2,
       "sources": [
@@ -127,9 +127,9 @@
       ]
     },
     "admin-assinaturas.html": {
-      "url": "/css/bundles/fsfit.fa7f7cfbf36061cc.css",
-      "sha256": "fa7f7cfbf36061cc2dfcc143a7b05a5d80eed596080d6d877bfe4ee308eae125",
-      "bytes": 116963,
+      "url": "/css/bundles/fsfit.aeaf69f5d5bf4960.css",
+      "sha256": "aeaf69f5d5bf49604485a8b4ca13f2d388fc5a4703b77cea6977f6393b91fa13",
+      "bytes": 117497,
       "sourceCount": 16,
       "duplicatesRemoved": 0,
       "sources": [
@@ -157,9 +157,9 @@
       ]
     },
     "admin-contatos.html": {
-      "url": "/css/bundles/fsfit.f7e683d0eb73d66d.css",
-      "sha256": "f7e683d0eb73d66ded7b9e13e5699b6e8b8e286679538e725055d8369af962dc",
-      "bytes": 109117,
+      "url": "/css/bundles/fsfit.949429efd55057ec.css",
+      "sha256": "949429efd55057ec2ccf824c8d4e1417b5ffc3c7b467a7a47c28310efe5a51b4",
+      "bytes": 109671,
       "sourceCount": 15,
       "duplicatesRemoved": 0,
       "sources": [
@@ -199,9 +199,9 @@
       ]
     },
     "admin.html": {
-      "url": "/css/bundles/fsfit.45cd7eacba7dc22f.css",
-      "sha256": "45cd7eacba7dc22f6203b32b2c254c655fb09e0bbd42cda7227c7bda8785603c",
-      "bytes": 130652,
+      "url": "/css/bundles/fsfit.8f4cfc2fbebd0675.css",
+      "sha256": "8f4cfc2fbebd06754cd9324f531f545f842bd8e61cac025c2a205b0063650c42",
+      "bytes": 131206,
       "sourceCount": 17,
       "duplicatesRemoved": 0,
       "sources": [
@@ -252,9 +252,9 @@
       ]
     },
     "agenda.html": {
-      "url": "/css/bundles/fsfit.dcd43ad0d1a52eb4.css",
-      "sha256": "dcd43ad0d1a52eb47ecc49a7fc42367a8b2c5f1b55d8d68c0e4e3be9ddce59d1",
-      "bytes": 126460,
+      "url": "/css/bundles/fsfit.032c72c90a121fea.css",
+      "sha256": "032c72c90a121feadeca4eaa766e3d45e59b5e8fcf0065ee489ad7fe52d9627c",
+      "bytes": 127014,
       "sourceCount": 19,
       "duplicatesRemoved": 1,
       "sources": [
@@ -301,9 +301,9 @@
       ]
     },
     "aluno-preview.html": {
-      "url": "/css/bundles/fsfit.f28c8f020063a966.css",
-      "sha256": "f28c8f020063a966eaeab9fc37631705718b34c2decfe48cd8ef4b66ca1547a4",
-      "bytes": 144560,
+      "url": "/css/bundles/fsfit.bffa111d6051a2df.css",
+      "sha256": "bffa111d6051a2df8b65cab51203c36d14cf68358307cc8eac8028a1d4b6e4ba",
+      "bytes": 145100,
       "sourceCount": 22,
       "duplicatesRemoved": 3,
       "sources": [
@@ -340,9 +340,9 @@
       ]
     },
     "aluno.html": {
-      "url": "/css/bundles/fsfit.18dd1d55c1a6fe88.css",
-      "sha256": "18dd1d55c1a6fe880bc893565442af4ed8a99ffd77dbc86f2437f1e6f6680593",
-      "bytes": 146305,
+      "url": "/css/bundles/fsfit.b65988b84afa8daa.css",
+      "sha256": "b65988b84afa8daa94e197a055b1140173839a1e89aca20aac2b89e919a48edb",
+      "bytes": 146844,
       "sourceCount": 24,
       "duplicatesRemoved": 0,
       "sources": [
@@ -397,9 +397,9 @@
       ]
     },
     "alunos.html": {
-      "url": "/css/bundles/fsfit.b6d43168f9a1e027.css",
-      "sha256": "b6d43168f9a1e0273f1990a047e54fc2e71adb348734b52cc88e60474518f95f",
-      "bytes": 129928,
+      "url": "/css/bundles/fsfit.0420aedfe10ceca3.css",
+      "sha256": "0420aedfe10ceca3ba448d3c571343333f92ce1427a99e7160cb5e0ebb5bbdf6",
+      "bytes": 130449,
       "sourceCount": 21,
       "duplicatesRemoved": 1,
       "sources": [
@@ -447,9 +447,9 @@
       ]
     },
     "assinatura.html": {
-      "url": "/css/bundles/fsfit.7be245d3e26c6cf6.css",
-      "sha256": "7be245d3e26c6cf6459b98f844a07c0fd7e4964ff8b58b983ea66aed5be9f91e",
-      "bytes": 163858,
+      "url": "/css/bundles/fsfit.1c607b086fd47b89.css",
+      "sha256": "1c607b086fd47b89c68dbfea72ff1b882ec557c40ed841b4836b7a8e1c934abe",
+      "bytes": 164412,
       "sourceCount": 30,
       "duplicatesRemoved": 0,
       "sources": [
@@ -525,9 +525,9 @@
       ]
     },
     "biblioteca-alimentar.html": {
-      "url": "/css/bundles/fsfit.7b9f3b08f904f2cb.css",
-      "sha256": "7b9f3b08f904f2cb69aa0b7e3bcd34ef43cedfb7ddb2f6806a69ea66e26a598d",
-      "bytes": 137115,
+      "url": "/css/bundles/fsfit.80a012589b2ef288.css",
+      "sha256": "80a012589b2ef288c5540426a5ddd1fe22547015eb22038fa954e50e5ef80a98",
+      "bytes": 137669,
       "sourceCount": 22,
       "duplicatesRemoved": 2,
       "sources": [
@@ -578,9 +578,9 @@
       ]
     },
     "biblioteca-exercicios.html": {
-      "url": "/css/bundles/fsfit.b87495dfc4df7a31.css",
-      "sha256": "b87495dfc4df7a313930d1fcc4a92bc24481fd7f9d611ec24b78e6c248f8b493",
-      "bytes": 139201,
+      "url": "/css/bundles/fsfit.393cb319bb5d25ca.css",
+      "sha256": "393cb319bb5d25ca95edf836cbcc649278ae105abc0ec9367c89fd8e8fd769b2",
+      "bytes": 139755,
       "sourceCount": 24,
       "duplicatesRemoved": 0,
       "sources": [
@@ -641,9 +641,9 @@
       ]
     },
     "cancelamento.html": {
-      "url": "/css/bundles/fsfit.b72fc5a02cdeb400.css",
-      "sha256": "b72fc5a02cdeb4001f2aed97bbdbc6a099dfa63b001fbb28cfd2cc0ae49a1a37",
-      "bytes": 85760,
+      "url": "/css/bundles/fsfit.a60465855cdc2e6d.css",
+      "sha256": "a60465855cdc2e6d0ac366a882767be9e2caa75ffbf9f3929349c165eebe9c8d",
+      "bytes": 86314,
       "sourceCount": 14,
       "duplicatesRemoved": 0,
       "sources": [
@@ -667,9 +667,9 @@
       ]
     },
     "contato.html": {
-      "url": "/css/bundles/fsfit.42c0427cadf2a096.css",
-      "sha256": "42c0427cadf2a0966cf8a04f4a2c7cab8c8d90e82e8f5d5ba694bfa3d1b91ab8",
-      "bytes": 104555,
+      "url": "/css/bundles/fsfit.f773815649d161ed.css",
+      "sha256": "f773815649d161ed87ea75b908e189143e97148859932796684817414aa5f534",
+      "bytes": 105109,
       "sourceCount": 15,
       "duplicatesRemoved": 0,
       "sources": [
@@ -709,9 +709,9 @@
       ]
     },
     "dieta-aluno.html": {
-      "url": "/css/bundles/fsfit.527b51b71048e209.css",
-      "sha256": "527b51b71048e209e7c6b8913ba1812ff1ba1527180505bf64f5ccd8d7e7b9ab",
-      "bytes": 121184,
+      "url": "/css/bundles/fsfit.3c901b1fdf185743.css",
+      "sha256": "3c901b1fdf1857434c6bc08512ef4bff8cbdd800d272fe9ebe5a2a3bbb050dda",
+      "bytes": 121710,
       "sourceCount": 18,
       "duplicatesRemoved": 0,
       "sources": [
@@ -758,9 +758,9 @@
       ]
     },
     "ficha-aluno.html": {
-      "url": "/css/bundles/fsfit.d66c981a704d171d.css",
-      "sha256": "d66c981a704d171d02164c7aea5290b03635e7e1c4715d9c23312af2d081cd10",
-      "bytes": 146038,
+      "url": "/css/bundles/fsfit.ca4dac6cea88a811.css",
+      "sha256": "ca4dac6cea88a81171a0b0e7902705b4dadc67c3fdfed261336dde6be5c6db2d",
+      "bytes": 146581,
       "sourceCount": 19,
       "duplicatesRemoved": 0,
       "sources": [
@@ -813,9 +813,9 @@
       ]
     },
     "financeiro.html": {
-      "url": "/css/bundles/fsfit.e787ba7e63aebefd.css",
-      "sha256": "e787ba7e63aebefdb2fdd3f409f94ba99c5e33b6eab06cee522a26ec5f8dbcc7",
-      "bytes": 130638,
+      "url": "/css/bundles/fsfit.c0924abf1d3cb82f.css",
+      "sha256": "c0924abf1d3cb82f7ec753d5111bb788f68a9308b5f1bb84f6d92d3455d8e998",
+      "bytes": 131192,
       "sourceCount": 17,
       "duplicatesRemoved": 1,
       "sources": [
@@ -859,9 +859,9 @@
       ]
     },
     "index.html": {
-      "url": "/css/bundles/fsfit.890d98c91114eeb1.css",
-      "sha256": "890d98c91114eeb174334c9e6c23c184cf66847aa3cfc34a3005243abbd58b2b",
-      "bytes": 49297,
+      "url": "/css/bundles/fsfit.7151448c6711e4cb.css",
+      "sha256": "7151448c6711e4cba044e45abdcb7a4dedf8b3a7c6046fba63c76e5ca333baca",
+      "bytes": 49276,
       "sourceCount": 3,
       "duplicatesRemoved": 0,
       "sources": [
@@ -880,9 +880,9 @@
       ]
     },
     "lembretes-aluno.html": {
-      "url": "/css/bundles/fsfit.9f85137e8d528297.css",
-      "sha256": "9f85137e8d5282972b45de10185b567f4d7e019c2ef5acc65878bd38b6d7c339",
-      "bytes": 108293,
+      "url": "/css/bundles/fsfit.cc3425492238e4ef.css",
+      "sha256": "cc3425492238e4ef9a2cce4629a94402a807ccf6912ade8711b3c873fa8a92f0",
+      "bytes": 108847,
       "sourceCount": 16,
       "duplicatesRemoved": 0,
       "sources": [
@@ -924,9 +924,9 @@
       ]
     },
     "nova-senha.html": {
-      "url": "/css/bundles/fsfit.14975dd09db0bf12.css",
-      "sha256": "14975dd09db0bf120a5ba15a1cdc0687ee687dd11b36799b3abfb4f3a850c358",
-      "bytes": 88396,
+      "url": "/css/bundles/fsfit.f2eec9a632e4bc3e.css",
+      "sha256": "f2eec9a632e4bc3ed5d9e1a1d287bad5d4a5bb19697bd51424de5fe266f5f226",
+      "bytes": 88950,
       "sourceCount": 13,
       "duplicatesRemoved": 2,
       "sources": [
@@ -954,9 +954,9 @@
       ]
     },
     "painel.html": {
-      "url": "/css/bundles/fsfit.3a34e37baa678157.css",
-      "sha256": "3a34e37baa678157728ecd6ea8075fdc1c2c73d91e5b0287ca8cf9cb03ce317b",
-      "bytes": 228789,
+      "url": "/css/bundles/fsfit.6f19f3a8461a1cb8.css",
+      "sha256": "6f19f3a8461a1cb834a83950713b1eb28caff0bd4928bbb98b2f4747c0dc37a7",
+      "bytes": 229306,
       "sourceCount": 40,
       "duplicatesRemoved": 1,
       "sources": [
@@ -1048,9 +1048,9 @@
       ]
     },
     "perfil.html": {
-      "url": "/css/bundles/fsfit.0b0d0a235b739980.css",
-      "sha256": "0b0d0a235b739980a150316c6eb64ce344acc587fa2085dde5ddc72637461ab9",
-      "bytes": 118293,
+      "url": "/css/bundles/fsfit.f2692da5b10bfd06.css",
+      "sha256": "f2692da5b10bfd06b95da430db08ded8566eb43cc0fb0c48ce1c82fe294b13ea",
+      "bytes": 118827,
       "sourceCount": 16,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1093,9 +1093,9 @@
       ]
     },
     "personal.html": {
-      "url": "/css/bundles/fsfit.d4d26e6238f05d3b.css",
-      "sha256": "d4d26e6238f05d3be5e0d873a05085950fb7912aecd1564aa8ffcf33df985dc2",
-      "bytes": 99057,
+      "url": "/css/bundles/fsfit.aac7ba12e0b2505b.css",
+      "sha256": "aac7ba12e0b2505bcbaf0c612b1152fe27c50dc0b84c7962deee796e23d2ead4",
+      "bytes": 99591,
       "sourceCount": 15,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1125,9 +1125,9 @@
       ]
     },
     "privacidade.html": {
-      "url": "/css/bundles/fsfit.a07e7e3ee6f19fc4.css",
-      "sha256": "a07e7e3ee6f19fc4c8b8fad3be8502035b05e40610c0b371896efedc2f20f153",
-      "bytes": 85661,
+      "url": "/css/bundles/fsfit.0eb4124f691058c2.css",
+      "sha256": "0eb4124f691058c2f62aeb1ae6c30a09f0f82dee913d0d1dc3aa4b782022c791",
+      "bytes": 86215,
       "sourceCount": 13,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1150,9 +1150,9 @@
       ]
     },
     "recuperar-senha.html": {
-      "url": "/css/bundles/fsfit.0a8d51026f685e63.css",
-      "sha256": "0a8d51026f685e63e67415e9328e61beed6f1d53f3dd2817255c42cde843cc8d",
-      "bytes": 87879,
+      "url": "/css/bundles/fsfit.d0d286da0561e921.css",
+      "sha256": "d0d286da0561e9218d6b2eeed86dce978b09e1b9d22819e828c96527397f3a0e",
+      "bytes": 88433,
       "sourceCount": 13,
       "duplicatesRemoved": 2,
       "sources": [
@@ -1180,9 +1180,9 @@
       ]
     },
     "selecionar-personal.html": {
-      "url": "/css/bundles/fsfit.ccaa93f55292d66c.css",
-      "sha256": "ccaa93f55292d66c6f77c5aac9267d79dfc1a88ff9d1a873f7f3c759e1b00acb",
-      "bytes": 88376,
+      "url": "/css/bundles/fsfit.e216aeef7aa8afe1.css",
+      "sha256": "e216aeef7aa8afe1ff5bb96eed5c1e9ea196a81ef2aa72ae86629c926a2c2f99",
+      "bytes": 88930,
       "sourceCount": 13,
       "duplicatesRemoved": 2,
       "sources": [
@@ -1206,9 +1206,9 @@
       ]
     },
     "sistema-para-personal-trainer.html": {
-      "url": "/css/bundles/fsfit.890d98c91114eeb1.css",
-      "sha256": "890d98c91114eeb174334c9e6c23c184cf66847aa3cfc34a3005243abbd58b2b",
-      "bytes": 49297,
+      "url": "/css/bundles/fsfit.7151448c6711e4cb.css",
+      "sha256": "7151448c6711e4cba044e45abdcb7a4dedf8b3a7c6046fba63c76e5ca333baca",
+      "bytes": 49276,
       "sourceCount": 3,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1227,9 +1227,9 @@
       ]
     },
     "termos.html": {
-      "url": "/css/bundles/fsfit.b72fc5a02cdeb400.css",
-      "sha256": "b72fc5a02cdeb4001f2aed97bbdbc6a099dfa63b001fbb28cfd2cc0ae49a1a37",
-      "bytes": 85760,
+      "url": "/css/bundles/fsfit.a60465855cdc2e6d.css",
+      "sha256": "a60465855cdc2e6d0ac366a882767be9e2caa75ffbf9f3929349c165eebe9c8d",
+      "bytes": 86314,
       "sourceCount": 14,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1253,9 +1253,9 @@
       ]
     },
     "treino-aluno.html": {
-      "url": "/css/bundles/fsfit.77326d15b1ac1360.css",
-      "sha256": "77326d15b1ac13606e0c908b84d149325eed4e90e07b8171dc00587d3a33d951",
-      "bytes": 150247,
+      "url": "/css/bundles/fsfit.6f35368c1f0f9f05.css",
+      "sha256": "6f35368c1f0f9f053cf8c89dee4b554d40b0aec245ffdb7d7b4bebb4a15ef5f2",
+      "bytes": 150798,
       "sourceCount": 25,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1326,9 +1326,9 @@
       ]
     },
     "visualizar-aluno.html": {
-      "url": "/css/bundles/fsfit.45fa8c34ca991eb1.css",
-      "sha256": "45fa8c34ca991eb1ffb564afa5ad855336cc100e9b2cb3be6322f8ac5f4870bf",
-      "bytes": 177108,
+      "url": "/css/bundles/fsfit.f207e3eb5c5c97bd.css",
+      "sha256": "f207e3eb5c5c97bd75e775757e1f22fb66d1aa6ff1b1abb29092936a7e947bd7",
+      "bytes": 177644,
       "sourceCount": 26,
       "duplicatesRemoved": 0,
       "sources": [

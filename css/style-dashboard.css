@@ -10,7 +10,7 @@
 
 /* FS Fit · refinamento visual moderno 2026-07-20 */
 .card { border-radius: 14px; box-shadow: 0 14px 42px rgba(0,0,0,.3); }
-.btn { min-height: 42px; padding-inline: 15px; border-radius: 10px; font-size: .84rem; }
+.btn { min-height:44px; padding-inline: 15px; border-radius: 10px; font-size: .84rem; }
 .btn[data-icon]::before { content: attr(data-icon); display: inline-grid; place-items: center; flex: 0 0 auto; min-width: 1.05em; font-size: 1.05em; line-height: 1; font-weight: 900; }
 .btn-action-tile { border-radius: 10px; }
 .page-header h1 { font-size: clamp(1.65rem, 3.8vw, 2.25rem); letter-spacing: -.035em; }
@@ -38,7 +38,7 @@
   .page-header h1 { font-size: 1.55rem; }
   .page-header p { font-size: .84rem; }
   .card { border-radius: 13px; }
-  .btn { min-height: 41px; border-radius: 9px; font-size: .82rem; }
+  .btn { min-height:44px; border-radius: 9px; font-size: .82rem; }
   .section-heading h2, .quick-actions h2, .card > h2 { font-size: 1.14rem; }
   .student-record-title h1 { font-size: 1.62rem; }
   .recent-students-card { padding: 15px; }

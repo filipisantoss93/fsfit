@@ -7,7 +7,7 @@
 .food-library-panel-hidden{display:none!important}
 .meal-library-section{margin-top:20px}
 .meal-library-actions{display:flex;gap:8px;flex-wrap:wrap}
-.meal-library-actions .btn{min-height:40px;padding:0 13px;font-size:.82rem}
+.meal-library-actions .btn{min-height:44px;padding:0 13px;font-size:.82rem}
 @media(max-width:560px){
   .food-library-view-tabs{position:sticky;top:calc(82px + var(--safe-area-top));z-index:18;margin-inline:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
   .food-library-view-tab{min-height:44px;padding:0 9px;font-size:.82rem}

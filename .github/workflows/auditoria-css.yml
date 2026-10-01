@@ -12,6 +12,7 @@ on:
       - 'scripts/audit-css-runtime.mjs'
       - 'scripts/audit-theme-contrast.mjs'
       - 'scripts/audit-typography-legibility.mjs'
+      - 'scripts/audit-control-targets.mjs'
       - '.github/workflows/auditoria-css.yml'
   push:
     branches: [main]
@@ -25,6 +26,7 @@ on:
       - 'scripts/audit-css-runtime.mjs'
       - 'scripts/audit-theme-contrast.mjs'
       - 'scripts/audit-typography-legibility.mjs'
+      - 'scripts/audit-control-targets.mjs'
       - '.github/workflows/auditoria-css.yml'
 
 permissions:
@@ -54,6 +56,9 @@ jobs:
 
       - name: Auditar legibilidade tipográfica
         run: node scripts/audit-typography-legibility.mjs
+
+      - name: Auditar alvos de interação
+        run: node scripts/audit-control-targets.mjs
 
       - name: Auditar referências, duplicações e arquivos de origem
         run: node scripts/audit-css-pages.mjs

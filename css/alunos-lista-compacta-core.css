@@ -1,5 +1,5 @@
 .student-filter-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; gap: 5px; width: 100%; margin: 0 0 14px; padding: 5px; border: 1px solid var(--fs-border, var(--border)); border-radius: var(--fs-radius-md, 8px); background: var(--fs-surface, rgba(10,16,25,.72)); }
-.student-filter-pill { min-width: 0; min-height: 40px; padding: 7px 8px; border: 0; border-radius: var(--fs-radius-sm, 6px); background: transparent; color: var(--fs-text-muted, var(--muted)); font: inherit; font-size: .78rem; font-weight: 850; white-space: nowrap; cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease; }
+.student-filter-pill { min-width: 0; min-height:44px; padding: 7px 8px; border: 0; border-radius: var(--fs-radius-sm, 6px); background: transparent; color: var(--fs-text-muted, var(--muted)); font: inherit; font-size: .78rem; font-weight: 850; white-space: nowrap; cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease; }
 .student-filter-pill:hover { color: var(--fs-text, var(--text)); background: var(--fs-surface-raised, rgba(255,255,255,.045)); }
 .student-filter-pill.active { background: var(--fs-primary-soft, rgba(131,189,69,.09)); color: var(--fs-primary, var(--primary)); box-shadow: inset 0 0 0 1px var(--fs-primary-border, rgba(131,189,69,.24)); }
 .student-filter-pill:focus-visible { outline: none; box-shadow: var(--fs-focus-ring, 0 0 0 3px rgba(131,189,69,.16)); }
@@ -31,7 +31,7 @@
 .student-actions-trigger:hover, .student-actions-trigger:focus-visible, .student-row-actions.is-open .student-actions-trigger { border-color: var(--fs-border, var(--border)); background: var(--fs-surface-soft, rgba(255,255,255,.055)); color: var(--fs-text, var(--text)); outline: none; }
 .student-actions-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 50; width: 210px; padding: 7px; border: 1px solid var(--fs-border-strong, var(--border)); border-radius: var(--fs-radius-md, 8px); background: var(--fs-surface, #111820); box-shadow: var(--fs-shadow-md, 0 18px 48px rgba(0,0,0,.28)); cursor: default; }
 .student-actions-menu[hidden] { display: none; }
-.student-actions-menu button { display: flex; width: 100%; min-height: 42px; align-items: center; padding: 9px 11px; border: 0; border-radius: var(--fs-radius-sm, 6px); background: transparent; color: var(--fs-text, var(--text)); font: inherit; font-size: .8rem; font-weight: 750; text-align: left; cursor: pointer; }
+.student-actions-menu button { display: flex; width: 100%; min-height:44px; align-items: center; padding: 9px 11px; border: 0; border-radius: var(--fs-radius-sm, 6px); background: transparent; color: var(--fs-text, var(--text)); font: inherit; font-size: .8rem; font-weight: 750; text-align: left; cursor: pointer; }
 .student-actions-menu button:hover, .student-actions-menu button:focus-visible { background: var(--fs-surface-raised, rgba(255,255,255,.065)); outline: none; }
 .student-actions-menu button.is-danger { color: #eca2a7; }
 .student-actions-menu button.is-danger:hover, .student-actions-menu button.is-danger:focus-visible { background: rgba(215,109,115,.09); }
@@ -49,7 +49,7 @@
 @media (min-width: 1280px) { .responsive-students tbody { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 620px) {
   .student-filter-nav { position: sticky; top: max(8px, env(safe-area-inset-top)); z-index: 8; gap: 4px; margin-bottom: 11px; padding: 4px; background: var(--fs-surface, #111820); box-shadow: 0 8px 22px rgba(0,0,0,.22); }
-  .student-filter-pill { min-height: 38px; padding: 6px 3px; font-size:var(--fs-font-xs,.75rem); }
+  .student-filter-pill { min-height:44px; padding: 6px 3px; font-size:var(--fs-font-xs,.75rem); }
   .responsive-students { overflow: visible !important; }
   .responsive-students tbody { gap: 8px; }
   .student-compact-row { padding: 10px 9px 10px 11px; border-radius: var(--fs-radius-md, 8px); }
@@ -63,7 +63,7 @@
   .student-actions-trigger { width: 34px; height: 34px; }
   .student-compact-arrow { width: 22px; font-size: 1.4rem; }
   .student-actions-menu { position: absolute; top: calc(100% + 6px); right: 0; bottom: auto; width: min(220px, calc(100vw - 48px)); padding: 7px; border-radius: var(--fs-radius-md, 8px); }
-  .student-actions-menu button { min-height: 42px; font-size: .8rem; }
+  .student-actions-menu button { min-height:44px; font-size: .8rem; }
 }
 @media (max-width: 390px) {
   .student-filter-pill { font-size:var(--fs-font-xs,.75rem); }

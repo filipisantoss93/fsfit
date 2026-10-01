@@ -101,9 +101,9 @@
 .fsfit-more-close {
   display: grid;
   place-items: center;
-  flex: 0 0 42px;
-  width: 42px;
-  height: 42px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 50%;
@@ -122,7 +122,7 @@
 .fsfit-more-item {
   position: relative;
   display: grid;
-  grid-template-columns: 42px minmax(0,1fr) auto;
+  grid-template-columns: 44px minmax(0,1fr) auto;
   align-items: center;
   gap: 12px;
   width: 100%;
@@ -145,8 +145,8 @@
 .fsfit-more-item-icon {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   background: var(--fs-primary-soft);
   color: var(--primary);

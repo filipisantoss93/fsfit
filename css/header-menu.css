@@ -419,8 +419,8 @@
   .sidebar-profile-avatar {
     display: grid;
     place-items: center;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--fs-surface-soft) center / cover no-repeat;
     color: var(--text);
@@ -469,7 +469,7 @@
     align-items: center;
     gap: 12px;
     width: 100%;
-    min-height: 42px;
+    min-height: 44px;
     padding: 0 14px;
     border: 0;
     border-radius: 11px;
@@ -706,14 +706,14 @@
   }
 
   .logo-nav strong {
-    min-width: 40px;
-    height: 40px;
+    min-width: 44px;
+    height: 44px;
   }
 
   .notification-button,
   .menu-mobile-btn {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
   }
 
   .nav-menu {
