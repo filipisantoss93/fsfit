@@ -269,7 +269,7 @@ pinForm.addEventListener('submit', async event => {
     const result = await invoke({ action: 'login', telefone: phone, pin, personal_slug: slug });
     saveSession(result);
   } catch (error) {
-    show(error.message);
+    show(errorMessage(error));
   } finally {
     button.disabled = false;
   }
@@ -290,7 +290,7 @@ activationForm.addEventListener('submit', async event => {
     const result = await invoke({ action: 'activate', telefone: phone, activation_code: activationCode, pin, personal_slug: slug });
     saveSession(result);
   } catch (error) {
-    show(error.message);
+    show(errorMessage(error));
   } finally {
     button.disabled = false;
   }
