@@ -25,6 +25,7 @@ on:
       - 'js/ficha-aluno-acoes.js'
       - 'js/landing-ads.js'
       - 'js/aluno-sessao-controles.js'
+      - 'js/shared-components.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -62,6 +63,7 @@ on:
       - 'js/ficha-aluno-acoes.js'
       - 'js/landing-ads.js'
       - 'js/aluno-sessao-controles.js'
+      - 'js/shared-components.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -131,6 +133,7 @@ jobs:
             js/ficha-aluno-acoes.js \
             js/landing-ads.js \
             js/aluno-sessao-controles.js \
+            js/shared-components.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
