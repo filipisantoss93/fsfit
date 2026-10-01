@@ -9,20 +9,20 @@
 
 /* Dashboard consolidado — aluno.html */
 :root {
-  --student-dashboard-bg:#080c0f;
-  --student-dashboard-surface:#0d151a;
-  --student-dashboard-border:#25323a;
-  --student-dashboard-text:#f4f7f8;
-  --student-dashboard-muted:#98a4af;
-  --student-dashboard-green:#8bc63f;
-  --student-dashboard-green-soft:rgba(139,198,63,.14);
+  --student-dashboard-bg:var(--fs-bg);
+  --student-dashboard-surface:var(--fs-surface);
+  --student-dashboard-border:var(--fs-border);
+  --student-dashboard-text:var(--fs-text);
+  --student-dashboard-muted:var(--fs-text-muted);
+  --student-dashboard-green:var(--fs-primary);
+  --student-dashboard-green-soft:var(--fs-primary-soft);
 }
 
 body.student-page {
   margin:0;
   min-height:100vh;
   color:var(--student-dashboard-text);
-  background:radial-gradient(circle at 50% -12%,rgba(139,198,63,.07),transparent 30%),var(--student-dashboard-bg);
+  background:radial-gradient(circle at 50% -12%,var(--fs-primary-soft),transparent 30%),var(--student-dashboard-bg);
   padding-bottom:calc(74px + env(safe-area-inset-bottom));
 }
 
@@ -37,22 +37,22 @@ body.student-page {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  background:rgba(8,12,15,.96);
+  border-bottom:1px solid var(--fs-border);
+  background:var(--fs-surface-overlay);
   backdrop-filter:blur(16px)
 }
 .student-header-identity{display:flex;align-items:center;gap:11px}
 .student-header-identity p{display:none}
 .student-header-bar .auth-logo{display:inline-flex;align-items:center;gap:10px;font-size:1.65rem}
-.student-header-bar .auth-logo strong{color:#a8df31;font-size:1.25em;font-style:italic;letter-spacing:-.12em}
-.student-header-bar .auth-logo span{color:#fff;font-weight:800;letter-spacing:-.04em}
+.student-header-bar .auth-logo strong{color:var(--student-dashboard-green);font-size:1.25em;font-style:italic;letter-spacing:-.12em}
+.student-header-bar .auth-logo span{color:var(--student-dashboard-text);font-weight:800;letter-spacing:-.04em}
 .student-header-actions{display:flex;gap:9px}
 .student-icon-button{
   width:46px;height:46px;border:1px solid var(--student-dashboard-border);border-radius:15px;
-  background:#0d161b;color:#f4f7f8;display:grid;place-items:center;position:relative
+  background:var(--fs-surface-raised);color:var(--student-dashboard-text);display:grid;place-items:center;position:relative
 }
 .student-icon-button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8}
-.student-notification-badge{position:absolute;top:-6px;right:-5px;min-width:21px;height:21px;border-radius:999px;display:grid;place-items:center;background:#71c42a;color:#fff;font-size:.68rem;font-weight:900}
+.student-notification-badge{position:absolute;top:-6px;right:-5px;min-width:21px;height:21px;border-radius:999px;display:grid;place-items:center;background:var(--fs-primary);color:var(--student-dashboard-text);font-size:.68rem;font-weight:900}
 
 .student-state{margin:20px 0;padding:22px;border:1px solid var(--student-dashboard-border);border-radius:18px;background:var(--student-dashboard-surface);text-align:center;color:var(--student-dashboard-muted)}
 #student-content{padding-top:14px}
@@ -61,16 +61,16 @@ body.student-page {
   margin:0 0 14px;padding:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
   align-items:center;gap:13px;border:0;background:transparent
 }
-.student-profile-avatar{width:66px;height:66px;border-radius:50%;border:2px solid rgba(139,198,63,.46);background:linear-gradient(145deg,#26343e,#102619);font-size:1.35rem;font-weight:900}
+.student-profile-avatar{width:66px;height:66px;border-radius:50%;border:2px solid var(--fs-primary-border);background:linear-gradient(145deg,var(--fs-surface-soft),var(--fs-primary-soft));font-size:1.35rem;font-weight:900}
 .student-profile-summary-copy h1{margin:0 0 3px;font-size:clamp(1.55rem,4vw,2rem);letter-spacing:-.04em}
 .student-profile-summary-copy p{margin:0;color:var(--student-dashboard-muted);font-size:.92rem}
 .student-profile-summary-copy .updated{display:none!important}
 
 .student-trainer-dashboard-chip{
   min-width:168px;padding:7px 10px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
-  border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.025);color:#fff;text-decoration:none
+  border:1px solid var(--fs-border);border-radius:16px;background:var(--fs-surface-tint);color:var(--student-dashboard-text);text-decoration:none
 }
-.student-trainer-dashboard-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#26333b;color:#fff;font-size:.82rem;font-weight:900}
+.student-trainer-dashboard-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--fs-surface-soft);color:var(--student-dashboard-text);font-size:.82rem;font-weight:900}
 .student-trainer-dashboard-chip small{display:block;color:var(--student-dashboard-muted);font-size:.64rem}
 .student-trainer-dashboard-chip strong{display:block;margin-top:1px;font-size:.88rem}
 .student-trainer-dashboard-chip b{color:var(--student-dashboard-green);font-size:1rem}
@@ -82,12 +82,12 @@ body.student-page {
 
 .student-today-hero{
   min-height:208px;padding:20px;position:relative;overflow:hidden;border:1px solid var(--student-dashboard-border);
-  border-radius:20px;background:radial-gradient(circle at 86% 25%,rgba(139,198,63,.14),transparent 25%),linear-gradient(145deg,#0f181d,#0a1115)
+  border-radius:20px;background:radial-gradient(circle at 86% 25%,var(--fs-primary-soft),transparent 25%),linear-gradient(145deg,var(--fs-surface-raised),var(--fs-surface))
 }
 .student-today-hero::after{
   content:"FS\A FIT";white-space:pre;position:absolute;right:20px;bottom:18px;width:92px;height:128px;
-  border:1px solid rgba(139,198,63,.2);border-radius:50px 50px 20px 20px;display:grid;place-items:center;text-align:center;
-  color:var(--student-dashboard-green);font-size:1.25rem;font-weight:900;line-height:1.05;background:radial-gradient(circle,rgba(139,198,63,.2),transparent 63%),#111b20
+  border:1px solid var(--fs-primary-border);border-radius:50px 50px 20px 20px;display:grid;place-items:center;text-align:center;
+  color:var(--student-dashboard-green);font-size:1.25rem;font-weight:900;line-height:1.05;background:radial-gradient(circle,var(--fs-primary-soft),transparent 63%),var(--fs-surface-raised)
 }
 .student-today-hero small{color:var(--student-dashboard-green);font-size:.72rem;font-weight:900;letter-spacing:.12em}
 .student-today-hero h2{max-width:62%;margin:38px 0 7px;font-size:1.7rem;letter-spacing:-.045em}
@@ -95,7 +95,7 @@ body.student-page {
 
 .student-today-grid{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .student-today-card{
-  min-height:108px;padding:15px;border:1px solid var(--student-dashboard-border);border-radius:17px;background:var(--student-dashboard-surface);color:#fff;text-align:left
+  min-height:108px;padding:15px;border:1px solid var(--student-dashboard-border);border-radius:17px;background:var(--student-dashboard-surface);color:var(--student-dashboard-text);text-align:left
 }
 .student-today-card small{display:block;color:var(--student-dashboard-green);font-size:.68rem;font-weight:900;letter-spacing:.11em}
 .student-today-card strong{display:block;margin-top:9px;font-size:1.12rem}
@@ -108,32 +108,32 @@ body.student-page {
   margin-top:12px;min-height:78px;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden;
   border:1px solid var(--student-dashboard-border);border-radius:17px;background:var(--student-dashboard-surface)
 }
-.student-dashboard-summary>div,.student-dashboard-summary>button{padding:12px;display:flex;align-items:center;gap:9px;border:0;border-right:1px solid rgba(255,255,255,.07);background:transparent;color:#fff;text-align:left}
+.student-dashboard-summary>div,.student-dashboard-summary>button{padding:12px;display:flex;align-items:center;gap:9px;border:0;border-right:1px solid var(--fs-border);background:transparent;color:var(--student-dashboard-text);text-align:left}
 .student-dashboard-summary>:last-child{border-right:0}
 .student-dashboard-summary-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto;background:var(--student-dashboard-green-soft);color:var(--student-dashboard-green);font-size:1rem}
 .student-dashboard-summary strong,.student-dashboard-summary small{display:block}
 .student-dashboard-summary strong{font-size:1rem}
 .student-dashboard-summary small{margin-top:2px;color:var(--student-dashboard-muted);font-size:.7rem}
 
-.student-dashboard-section{margin-top:12px;padding:16px;border:1px solid var(--student-dashboard-border);border-radius:18px;background:linear-gradient(145deg,#0e171c,#0a1115)}
+.student-dashboard-section{margin-top:12px;padding:16px;border:1px solid var(--student-dashboard-border);border-radius:18px;background:linear-gradient(145deg,var(--fs-surface-raised),var(--fs-surface))}
 .student-dashboard-section>header{margin-bottom:8px;color:var(--student-dashboard-green);font-size:.72rem;font-weight:900;letter-spacing:.11em}
 .student-dashboard-upcoming{display:grid}
-.student-dashboard-upcoming-row{min-height:54px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border-bottom:1px solid rgba(255,255,255,.07)}
+.student-dashboard-upcoming-row{min-height:54px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--fs-border)}
 .student-dashboard-upcoming-row:last-child{border-bottom:0}
 .student-dashboard-upcoming-row>span{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--student-dashboard-green-soft);color:var(--student-dashboard-green);font-size:.9rem}
 .student-dashboard-upcoming-row strong,.student-dashboard-upcoming-row small{display:block}
 .student-dashboard-upcoming-row strong{font-size:.88rem}
 .student-dashboard-upcoming-row small{margin-top:2px;color:var(--student-dashboard-muted);font-size:.72rem}
-.student-dashboard-upcoming-row b{color:#67737c;font-size:1.2rem}
+.student-dashboard-upcoming-row b{color:var(--fs-text-subtle);font-size:1.2rem}
 
-.student-home-note{margin-top:12px;border-radius:18px;background:linear-gradient(145deg,#101a1f,#0b1216)}
+.student-home-note{margin-top:12px;border-radius:18px;background:linear-gradient(145deg,var(--fs-surface-raised),var(--fs-surface))}
 .student-home-note button{min-height:92px;padding:16px}
 .student-home-note small{color:var(--student-dashboard-green);font-size:.7rem}
-.student-home-note p{font-size:.88rem;color:#d7dde1;line-height:1.45}
+.student-home-note p{font-size:.88rem;color:var(--fs-text);line-height:1.45}
 .student-home-note span{font-size:.72rem}
 
 .student-dashboard-quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.student-dashboard-quick-grid button{min-height:76px;padding:10px 5px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.025);color:#e8edf0;font:inherit;font-size:.74rem}
+.student-dashboard-quick-grid button{min-height:76px;padding:10px 5px;border:1px solid var(--fs-border);border-radius:14px;background:var(--fs-surface-tint);color:var(--fs-text);font:inherit;font-size:.74rem}
 .student-dashboard-quick-grid button span{display:block;margin-bottom:6px;font-size:1.15rem}
 
 .student-section-heading{margin:0 0 10px;padding:16px;border:1px solid var(--student-dashboard-border);border-radius:17px;background:var(--student-dashboard-surface)}
@@ -142,7 +142,7 @@ body.student-page {
 .student-dashboard-bottom-nav{
   position:fixed;z-index:40;left:0;right:0;bottom:0;min-height:calc(64px + env(safe-area-inset-bottom));
   padding:5px max(14px,env(safe-area-inset-left)) calc(5px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));
-  display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.08);background:rgba(8,12,15,.97);backdrop-filter:blur(18px)
+  display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--fs-border);background:var(--fs-surface-overlay);backdrop-filter:blur(18px)
 }
 .student-dashboard-bottom-nav button{border:0;background:transparent;color:var(--student-dashboard-muted);font:inherit;font-size:.7rem;font-weight:800}
 .student-dashboard-bottom-nav button span{display:block;margin-bottom:2px;font-size:1.15rem}
@@ -176,6 +176,6 @@ body.student-page {
   .student-today-grid{grid-template-columns:1fr}
   .student-home-primary{grid-template-columns:1fr}
   .student-dashboard-summary{grid-template-columns:1fr}
-  .student-dashboard-summary>div,.student-dashboard-summary>button{border-right:0;border-bottom:1px solid rgba(255,255,255,.07)}
+  .student-dashboard-summary>div,.student-dashboard-summary>button{border-right:0;border-bottom:1px solid var(--fs-border)}
   .student-dashboard-summary>:last-child{border-bottom:0}
 }
