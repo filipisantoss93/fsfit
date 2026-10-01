@@ -2,7 +2,7 @@
 #dashboard-home-panel.home-redesign{display:grid;gap:14px}
 #dashboard-home-panel.home-redesign[hidden]{display:none!important}
 .dashboard-home-header{margin-bottom:16px!important}
-.dashboard-home-header .dashboard-user-greeting{margin:0!important;color:var(--text)!important;font-size:1.55rem!important;font-weight:950!important;letter-spacing:-.035em!important;line-height:1.12!important}
+.dashboard-home-header .dashboard-user-greeting{margin:0;color:var(--text)!important;font-size:1.55rem!important;font-weight:950!important;letter-spacing:-.035em!important;line-height:1.12!important}
 .dashboard-welcome-line{margin:7px 0 0!important;color:var(--muted)!important;font-size:.9rem!important}
 
 .home-now-card{position:relative;overflow:hidden;padding:22px!important;border-left:4px solid var(--primary)!important;background:linear-gradient(120deg,rgba(177,255,0,.1),rgba(18,28,31,.82) 48%,rgba(9,22,31,.94))!important;touch-action:pan-y pinch-zoom}
