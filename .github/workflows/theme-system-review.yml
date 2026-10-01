@@ -16,19 +16,6 @@ on:
       - '.github/workflows/theme-system-review.yml'
 
 
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'typescript/theme-runtime.ts'
-      - 'typescript/layout-core.ts'
-      - 'typescript/layout.ts'
-      - 'css/fsfit-design-system.css'
-      - 'css/fsfit-design-system-components.css'
-      - 'css/header-menu.css'
-      - 'css/mobile-more-swipe.css'
-      - 'scripts/build-css-bundles.mjs'
-      - '.github/workflows/theme-system-review.yml'
 permissions:
   contents: write
 
