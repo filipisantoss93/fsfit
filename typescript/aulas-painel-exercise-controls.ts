@@ -1,0 +1,237 @@
+// @ts-ignore The browser runtime resolves this existing JavaScript module.
+import { supabase } from './supabase.js';
+
+interface ExerciseDetails {
+  series?: number | string | null;
+  repeticoes?: string | null;
+  carga?: string | null;
+  descanso_segundos?: number | string | null;
+  concluido?: boolean | null;
+  [key: string]: unknown;
+}
+
+interface ExerciseProgressResult {
+  total_exercicios?: number | string | null;
+  exercicios_concluidos?: number | string | null;
+}
+
+interface LiveExerciseForm extends HTMLFormElement {
+  series?: HTMLInputElement;
+  repeticoes?: HTMLInputElement;
+  descanso_segundos?: HTMLInputElement;
+  concluido?: HTMLInputElement;
+}
+
+const sessionModal = document.querySelector<HTMLElement>('#live-session-modal');
+const progress = document.querySelector<HTMLElement>('#live-session-modal-progress');
+
+let selectedExerciseId = '';
+let selectedExerciseRow: HTMLElement | null = null;
+let loadRequest = 0;
+let lastDetails: ExerciseDetails | null = null;
+
+if (sessionModal) {
+  ensureExtraFields();
+  bindExerciseRows();
+  bindSaveOverride();
+}
+
+function ensureExtraFields(): void {
+  const form = document.querySelector<HTMLFormElement>('#live-exercise-edit-form');
+  const grid = form?.querySelector<HTMLElement>('.live-exercise-edit-grid');
+  if (!form || !grid || form.querySelector('#live-exercise-rest')) return;
+
+  const restGroup = document.createElement('div');
+  restGroup.className = 'form-group live-exercise-rest-field';
+  restGroup.innerHTML = '<label for="live-exercise-rest">Descanso (segundos)</label><input id="live-exercise-rest" name="descanso_segundos" type="number" min="0" max="3600" step="1" placeholder="Ex.: 60">';
+  grid.appendChild(restGroup);
+
+  const completion = document.createElement('label');
+  completion.className = 'live-exercise-completion';
+  completion.innerHTML = `
+    <input id="live-exercise-completed" name="concluido" type="checkbox">
+    <span class="live-exercise-completion-copy">
+      <strong>Marcar exercício como concluído</strong>
+      <small>Atualiza imediatamente o progresso desta aula.</small>
+    </span>`;
+  grid.after(completion);
+
+  const subtitle = document.querySelector<HTMLElement>('#live-exercise-edit-subtitle');
+  if (subtitle) subtitle.textContent = 'Edite séries, repetições e descanso ou marque este exercício como concluído.';
+}
+
+function currentSessionId(): string {
+  return sessionModal?.getAttribute('data-current-session-id') || '';
+}
+
+function bindExerciseRows(): void {
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+    const row = event.target.closest<HTMLElement>('.live-session-exercise-row[data-live-exercise-id]');
+    if (!row || !sessionModal?.contains(row)) return;
+
+    selectedExerciseId = row.dataset.liveExerciseId || '';
+    selectedExerciseRow = row;
+    ensureExtraFields();
+
+    const requestId = ++loadRequest;
+    window.setTimeout(() => loadExerciseState(requestId), 0);
+  });
+}
+
+async function loadExerciseState(requestId: number): Promise<void> {
+  const sessionId = currentSessionId();
+  if (!sessionId || !selectedExerciseId) return;
+
+  const { data, error } = await supabase.rpc('obter_exercicio_sessao_personal', {
+    p_sessao_id: sessionId,
+    p_treino_exercicio_id: selectedExerciseId
+  });
+
+  if (requestId !== loadRequest || !selectedExerciseId) return;
+  if (error) {
+    console.error('Erro ao carregar estado do exercício em aula:', error);
+    return;
+  }
+
+  const details = (Array.isArray(data) ? data[0] : data) as ExerciseDetails | null;
+  if (!details) return;
+  lastDetails = details;
+
+  const modal = document.querySelector<HTMLElement>('#live-exercise-edit-modal');
+  if (!modal?.classList.contains('open')) return;
+
+  const series = modal.querySelector<HTMLInputElement>('#live-exercise-series');
+  const repetitions = modal.querySelector<HTMLInputElement>('#live-exercise-repetitions');
+  const rest = modal.querySelector<HTMLInputElement>('#live-exercise-rest');
+  const completed = modal.querySelector<HTMLInputElement>('#live-exercise-completed');
+
+  if (series) series.value = details.series == null ? '' : String(details.series);
+  if (repetitions) repetitions.value = details.repeticoes ?? '';
+  if (rest) rest.value = details.descanso_segundos == null ? '' : String(details.descanso_segundos);
+  if (completed) completed.checked = Boolean(details.concluido);
+
+  updateExerciseRow(Boolean(details.concluido), details);
+}
+
+function bindSaveOverride(): void {
+  document.addEventListener('submit', event => {
+    if (!(event.target instanceof Element)) return;
+    const form = event.target.closest<LiveExerciseForm>('#live-exercise-edit-form');
+    if (!form) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    saveExercise(form).catch(error => {
+      console.error('Erro ao salvar exercício durante a aula:', error);
+      alert(error instanceof Error ? error.message : 'Não foi possível atualizar este exercício.');
+    });
+  }, true);
+}
+
+async function saveExercise(form: LiveExerciseForm): Promise<void> {
+  const sessionId = currentSessionId();
+  if (!sessionId || !selectedExerciseId) throw new Error('Exercício ou aula não identificados.');
+
+  const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  const seriesRaw = String(form.series?.value || '').trim();
+  const repetitions = String(form.repeticoes?.value || '').trim();
+  const restRaw = String(form.descanso_segundos?.value || '').trim();
+  const completed = Boolean(form.concluido?.checked);
+  const series = seriesRaw ? Number(seriesRaw) : null;
+  const rest = restRaw ? Number(restRaw) : null;
+
+  if (series != null && (!Number.isInteger(series) || series < 1 || series > 20)) {
+    throw new Error('Informe uma quantidade de séries entre 1 e 20.');
+  }
+  if (rest != null && (!Number.isInteger(rest) || rest < 0 || rest > 3600)) {
+    throw new Error('Informe o descanso em segundos entre 0 e 3600.');
+  }
+
+  const originalText = submit?.textContent || 'Salvar';
+  if (submit) {
+    submit.disabled = true;
+    submit.textContent = 'Salvando...';
+  }
+
+  try {
+    const { data, error } = await supabase.rpc('atualizar_exercicio_sessao_personal', {
+      p_sessao_id: sessionId,
+      p_treino_exercicio_id: selectedExerciseId,
+      p_series: series,
+      p_repeticoes: repetitions || null,
+      p_descanso_segundos: rest,
+      p_concluido: completed
+    });
+    if (error) throw error;
+
+    const result = (Array.isArray(data) ? data[0] : data) as ExerciseProgressResult | null;
+    const details: ExerciseDetails = {
+      ...(lastDetails || {}),
+      series,
+      repeticoes: repetitions || null,
+      descanso_segundos: rest,
+      concluido: completed
+    };
+    lastDetails = details;
+    updateExerciseRow(completed, details);
+    updateProgress(result);
+    closeExerciseModal();
+  } finally {
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = originalText;
+    }
+  }
+}
+
+function updateProgress(result: ExerciseProgressResult | null): void {
+  if (!progress || !result) return;
+  const total = Number(result.total_exercicios ?? 0);
+  const done = Number(result.exercicios_concluidos ?? 0);
+  progress.textContent = `${done}/${total} concluídos`;
+}
+
+function updateExerciseRow(completed: boolean, details: ExerciseDetails = {}): void {
+  const row = selectedExerciseRow;
+  if (!row) return;
+
+  row.classList.toggle('is-completed', completed);
+  const copy = row.querySelector<HTMLElement>('.live-session-exercise-copy');
+  if (!copy) return;
+
+  const strong = copy.querySelector<HTMLElement>('strong');
+  if (strong && !strong.parentElement?.classList.contains('live-session-exercise-title-line')) {
+    const line = document.createElement('span');
+    line.className = 'live-session-exercise-title-line';
+    strong.before(line);
+    line.appendChild(strong);
+  }
+
+  const line = copy.querySelector<HTMLElement>('.live-session-exercise-title-line');
+  line?.querySelector('.live-exercise-completed-badge')?.remove();
+  if (completed && line) {
+    const badge = document.createElement('span');
+    badge.className = 'live-exercise-completed-badge';
+    badge.textContent = 'CONCLUÍDO';
+    line.appendChild(badge);
+  }
+
+  const meta = copy.querySelector<HTMLElement>(':scope > span:not(.live-session-exercise-title-line)');
+  if (meta) {
+    meta.textContent = [
+      details.series ? `${details.series} séries` : null,
+      details.repeticoes ? `${details.repeticoes} rep.` : null,
+      details.carga || null,
+      details.descanso_segundos != null ? `${details.descanso_segundos}s descanso` : null
+    ].filter(Boolean).join(' • ') || 'Sem prescrição detalhada';
+  }
+}
+
+function closeExerciseModal(): void {
+  const modal = document.querySelector<HTMLElement>('#live-exercise-edit-modal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}

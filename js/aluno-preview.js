@@ -1,5 +1,5 @@
+// @ts-ignore Existing browser JavaScript module.
 import { supabase } from './supabase.js';
-
 const loading = document.querySelector('#loading-state');
 const errorState = document.querySelector('#error-state');
 const content = document.querySelector('#student-content');
@@ -13,105 +13,98 @@ const detailModal = document.querySelector('#student-detail-modal');
 const detailTitle = document.querySelector('#student-detail-title');
 const detailBody = document.querySelector('#student-detail-body');
 const alunoId = new URLSearchParams(location.search).get('id');
-
 const dayNames = {
-  1: 'Segunda-feira',
-  2: 'Terça-feira',
-  3: 'Quarta-feira',
-  4: 'Quinta-feira',
-  5: 'Sexta-feira',
-  6: 'Sábado',
-  7: 'Domingo'
+    1: 'Segunda-feira',
+    2: 'Terça-feira',
+    3: 'Quarta-feira',
+    4: 'Quinta-feira',
+    5: 'Sexta-feira',
+    6: 'Sábado',
+    7: 'Domingo'
 };
-
 const dayShortNames = {
-  1: 'Seg',
-  2: 'Ter',
-  3: 'Qua',
-  4: 'Qui',
-  5: 'Sex',
-  6: 'Sáb',
-  7: 'Dom'
+    1: 'Seg',
+    2: 'Ter',
+    3: 'Qua',
+    4: 'Qui',
+    5: 'Sex',
+    6: 'Sáb',
+    7: 'Dom'
 };
-
 function todayDayNumber() {
-  const day = new Date().getDay();
-  return day === 0 ? 7 : day;
+    const day = new Date().getDay();
+    return day === 0 ? 7 : day;
 }
-
 let workoutItems = [];
 let mealItems = [];
 let selectedWorkoutDay = todayDayNumber();
 let selectedDietDay = todayDayNumber();
-
 function esc(value = '') {
-  const div = document.createElement('div');
-  div.textContent = value ?? '';
-  return div.innerHTML;
+    const div = document.createElement('div');
+    div.textContent = String(value ?? '');
+    return div.innerHTML;
 }
-
 function youtubeEmbedUrl(url) {
-  try {
-    const parsed = new URL(String(url || '').trim());
-    const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
-    let id = '';
-    if (host === 'youtu.be') id = parsed.pathname.split('/').filter(Boolean)[0] || '';
-    if (host === 'youtube.com' || host === 'm.youtube.com') {
-      id = parsed.searchParams.get('v') || '';
-      if (!id && parsed.pathname.startsWith('/shorts/')) id = parsed.pathname.split('/')[2] || '';
-      if (!id && parsed.pathname.startsWith('/embed/')) id = parsed.pathname.split('/')[2] || '';
-      if (!id && parsed.pathname.startsWith('/live/')) id = parsed.pathname.split('/')[2] || '';
+    try {
+        const parsed = new URL(String(url || '').trim());
+        const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+        let id = '';
+        if (host === 'youtu.be')
+            id = parsed.pathname.split('/').filter(Boolean)[0] || '';
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+            id = parsed.searchParams.get('v') || '';
+            if (!id && parsed.pathname.startsWith('/shorts/'))
+                id = parsed.pathname.split('/')[2] || '';
+            if (!id && parsed.pathname.startsWith('/embed/'))
+                id = parsed.pathname.split('/')[2] || '';
+            if (!id && parsed.pathname.startsWith('/live/'))
+                id = parsed.pathname.split('/')[2] || '';
+        }
+        return id ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0` : null;
     }
-    return id ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0` : null;
-  } catch {
-    return null;
-  }
+    catch {
+        return null;
+    }
 }
-
 function setupTabs() {
-  const tabs = [...document.querySelectorAll('[data-student-tab]')];
-  const panels = [...document.querySelectorAll('[data-student-panel]')];
-  tabs.forEach(tab => tab.addEventListener('click', () => {
-    const target = tab.dataset.studentTab;
-    tabs.forEach(item => item.classList.toggle('active', item === tab));
-    panels.forEach(panel => panel.classList.toggle('active', panel.dataset.studentPanel === target));
-  }));
+    const tabs = [...document.querySelectorAll('[data-student-tab]')];
+    const panels = [...document.querySelectorAll('[data-student-panel]')];
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+        const target = tab.dataset.studentTab;
+        tabs.forEach(item => item.classList.toggle('active', item === tab));
+        panels.forEach(panel => panel.classList.toggle('active', panel.dataset.studentPanel === target));
+    }));
 }
-
 function openDetail(title, html) {
-  detailTitle.textContent = title;
-  detailBody.innerHTML = html;
-  detailModal.classList.add('open');
-  detailModal.setAttribute('aria-hidden', 'false');
-  document.body.classList.add('student-detail-open');
+    detailTitle.textContent = title;
+    detailBody.innerHTML = html;
+    detailModal.classList.add('open');
+    detailModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('student-detail-open');
 }
-
 function closeDetail() {
-  detailModal.classList.remove('open');
-  detailModal.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('student-detail-open');
+    detailModal.classList.remove('open');
+    detailModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('student-detail-open');
 }
-
 function workoutSummary(item) {
-  return [
-    item.series != null ? `${item.series} séries` : null,
-    item.repeticoes ? `${item.repeticoes} repetições` : null
-  ].filter(Boolean).join(' • ') || 'Ver detalhes';
+    return [
+        item.series != null ? `${item.series} séries` : null,
+        item.repeticoes ? `${item.repeticoes} repetições` : null
+    ].filter(Boolean).join(' • ') || 'Ver detalhes';
 }
-
 function weekdayNav(selectedDay, type) {
-  return `<div class="student-weekday-nav" aria-label="Dias da semana">
+    return `<div class="student-weekday-nav" aria-label="Dias da semana">
     ${Object.entries(dayShortNames).map(([day, label]) => `
       <button class="student-weekday-button ${Number(day) === Number(selectedDay) ? 'active' : ''}" type="button" data-${type}-day="${day}">
         ${label}
       </button>`).join('')}
   </div>`;
 }
-
 function renderWorkoutAgenda(items = workoutItems) {
-  workoutItems = items || [];
-  const rows = workoutItems.filter(item => Number(item.dia_semana) === Number(selectedWorkoutDay));
-  workoutContent.innerHTML = `
+    workoutItems = items || [];
+    const rows = workoutItems.filter(item => Number(item.dia_semana) === Number(selectedWorkoutDay));
+    workoutContent.innerHTML = `
     ${weekdayNav(selectedWorkoutDay, 'workout')}
     <section class="student-agenda-day student-agenda-day-single">
       <div class="student-agenda-day-header">
@@ -130,13 +123,12 @@ function renderWorkoutAgenda(items = workoutItems) {
       </div>
     </section>`;
 }
-
 function renderDietAgenda(items = mealItems) {
-  mealItems = items || [];
-  const rows = mealItems
-    .filter(item => (item.dias_semana || []).map(Number).includes(Number(selectedDietDay)))
-    .sort((a, b) => String(a.horario || '').localeCompare(String(b.horario || '')) || Number(a.ordem || 0) - Number(b.ordem || 0));
-  dietContent.innerHTML = `
+    mealItems = items || [];
+    const rows = mealItems
+        .filter(item => (item.dias_semana || []).map(Number).includes(Number(selectedDietDay)))
+        .sort((a, b) => String(a.horario || '').localeCompare(String(b.horario || '')) || Number(a.ordem || 0) - Number(b.ordem || 0));
+    dietContent.innerHTML = `
     ${weekdayNav(selectedDietDay, 'diet')}
     <section class="student-agenda-day student-agenda-day-single">
       <div class="student-agenda-day-header">
@@ -152,13 +144,13 @@ function renderDietAgenda(items = mealItems) {
       </div>
     </section>`;
 }
-
 function openWorkoutItem(id) {
-  const item = workoutItems.find(row => row.id === id);
-  if (!item) return;
-  const ex = item.exercicios || {};
-  const embed = youtubeEmbedUrl(ex.video_url);
-  openDetail(ex.nome || 'Exercício', `
+    const item = workoutItems.find(row => row.id === id);
+    if (!item)
+        return;
+    const ex = item.exercicios || {};
+    const embed = youtubeEmbedUrl(ex.video_url);
+    openDetail(ex.nome || 'Exercício', `
     <div class="student-detail-grid">
       <div><small>Dia</small><strong>${esc(dayNames[item.dia_semana] || 'Não informado')}</strong></div>
       <div><small>Séries</small><strong>${esc(String(item.series ?? '—'))}</strong></div>
@@ -173,12 +165,12 @@ function openWorkoutItem(id) {
     ${embed ? `<div class="student-detail-video"><iframe src="${esc(embed)}" title="Vídeo demonstrativo de ${esc(ex.nome || 'exercício')}" loading="lazy" allowfullscreen></iframe></div>` : ''}
   `);
 }
-
 function openMealItem(id) {
-  const item = mealItems.find(row => row.id === id);
-  if (!item) return;
-  const days = (item.dias_semana || []).map(day => dayNames[Number(day)]).filter(Boolean).join(', ');
-  openDetail(item.nome || 'Refeição', `
+    const item = mealItems.find(row => row.id === id);
+    if (!item)
+        return;
+    const days = (item.dias_semana || []).map((day) => dayNames[Number(day)]).filter(Boolean).join(', ');
+    openDetail(item.nome || 'Refeição', `
     <div class="student-detail-grid">
       <div><small>Horário</small><strong>${esc(item.horario ? String(item.horario).slice(0, 5) : '—')}</strong></div>
       <div><small>Ordem</small><strong>${esc(String(item.ordem || '—'))}</strong></div>
@@ -188,130 +180,136 @@ function openMealItem(id) {
     ${item.substituicoes ? `<div class="student-detail-block"><small>Substituições</small><p>${esc(item.substituicoes)}</p></div>` : ''}
   `);
 }
-
 function mediaTypeLabel(type) {
-  return { foto: 'Foto', video: 'Vídeo', youtube: 'YouTube', instagram: 'Instagram' }[type] || 'Mídia';
+    const labels = { foto: 'Foto', video: 'Vídeo', youtube: 'YouTube', instagram: 'Instagram' };
+    return labels[type] || 'Mídia';
 }
-
 function renderStudentMedia(items) {
-  if (!Array.isArray(items) || !items.length) {
-    studentMediaSection.classList.add('hidden');
-    return;
-  }
-  studentMediaList.innerHTML = items.map(item => {
-    let preview = '';
-    if (item.tipo === 'foto') {
-      preview = `<div class="student-portal-media-preview"><img src="${esc(item.url)}" alt="${esc(item.titulo || 'Foto compartilhada pelo personal')}" loading="lazy"></div>`;
-    } else if (item.tipo === 'video') {
-      preview = `<div class="student-portal-media-preview"><video src="${esc(item.url)}" controls preload="metadata"></video></div>`;
-    } else if (item.tipo === 'youtube') {
-      const embed = youtubeEmbedUrl(item.url);
-      preview = embed
-        ? `<div class="student-portal-media-preview"><iframe src="${esc(embed)}" title="${esc(item.titulo || 'Vídeo do YouTube')}" loading="lazy" allowfullscreen></iframe></div>`
-        : `<a class="student-portal-media-preview student-portal-media-preview-link" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer"><div><strong>Abrir no YouTube</strong><span>Assistir vídeo →</span></div></a>`;
-    } else {
-      preview = `<a class="student-portal-media-preview student-portal-media-preview-link" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer"><div><strong>Abrir no Instagram</strong><span>Ver publicação →</span></div></a>`;
+    if (!Array.isArray(items) || !items.length) {
+        studentMediaSection.classList.add('hidden');
+        return;
     }
-    return `<article class="student-portal-media-card">${preview}<div class="student-portal-media-body"><span class="student-portal-media-type">${mediaTypeLabel(item.tipo)}</span><h3 class="student-portal-media-title">${esc(item.titulo || mediaTypeLabel(item.tipo))}</h3></div></article>`;
-  }).join('');
-  studentMediaSection.classList.remove('hidden');
+    studentMediaList.innerHTML = items.map(item => {
+        let preview = '';
+        if (item.tipo === 'foto') {
+            preview = `<div class="student-portal-media-preview"><img src="${esc(item.url)}" alt="${esc(item.titulo || 'Foto compartilhada pelo personal')}" loading="lazy"></div>`;
+        }
+        else if (item.tipo === 'video') {
+            preview = `<div class="student-portal-media-preview"><video src="${esc(item.url)}" controls preload="metadata"></video></div>`;
+        }
+        else if (item.tipo === 'youtube') {
+            const embed = youtubeEmbedUrl(item.url);
+            preview = embed
+                ? `<div class="student-portal-media-preview"><iframe src="${esc(embed)}" title="${esc(item.titulo || 'Vídeo do YouTube')}" loading="lazy" allowfullscreen></iframe></div>`
+                : `<a class="student-portal-media-preview student-portal-media-preview-link" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer"><div><strong>Abrir no YouTube</strong><span>Assistir vídeo →</span></div></a>`;
+        }
+        else {
+            preview = `<a class="student-portal-media-preview student-portal-media-preview-link" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer"><div><strong>Abrir no Instagram</strong><span>Ver publicação →</span></div></a>`;
+        }
+        return `<article class="student-portal-media-card">${preview}<div class="student-portal-media-body"><span class="student-portal-media-type">${mediaTypeLabel(item.tipo)}</span><h3 class="student-portal-media-title">${esc(item.titulo || mediaTypeLabel(item.tipo))}</h3></div></article>`;
+    }).join('');
+    studentMediaSection.classList.remove('hidden');
 }
-
 async function load() {
-  if (!alunoId) throw new Error('Aluno não informado.');
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('Entre como personal trainer para visualizar este portal.');
-
-  const [studentResult, portalResult, workoutResult, dietResult, mediaResult] = await Promise.all([
-    supabase.from('alunos').select('id,nome,objetivo,observacoes').eq('id', alunoId).eq('personal_id', session.user.id).single(),
-    supabase.rpc('get_aluno_portal_preview', { p_aluno_id: alunoId }),
-    supabase.from('treinos').select('id,nome,descricao,dias_semana,updated_at').eq('aluno_id', alunoId).eq('personal_id', session.user.id).eq('status', 'ativo').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
-    supabase.from('planos_alimentares').select('id,titulo,orientacoes,agua_ml,data_inicio,data_fim,updated_at').eq('aluno_id', alunoId).eq('personal_id', session.user.id).eq('ativo', true).order('updated_at', { ascending: false }).limit(1).maybeSingle(),
-    supabase.from('aluno_midias').select('id,tipo,titulo,url,created_at').eq('aluno_id', alunoId).eq('personal_id', session.user.id).order('created_at', { ascending: false })
-  ]);
-
-  if (studentResult.error) throw studentResult.error;
-  if (portalResult.error) throw portalResult.error;
-  if (workoutResult.error) throw workoutResult.error;
-  if (dietResult.error) throw dietResult.error;
-
-  const portal = Array.isArray(portalResult.data) ? portalResult.data[0] : portalResult.data;
-  const student = studentResult.data;
-  const workout = workoutResult.data;
-  const diet = dietResult.data;
-
-  document.querySelector('#student-name').textContent = student.nome || portal?.aluno_nome || 'Aluno';
-  document.querySelector('#trainer-name').textContent = portal?.personal_nome || 'Seu personal trainer';
-  document.querySelector('#student-observations').textContent = String(student.observacoes || '').trim() || 'Nenhuma observação publicada ainda.';
-
-  const updatedAt = portal?.plano_atualizado_em || workout?.updated_at || diet?.updated_at;
-  if (updatedAt) document.querySelector('#updated-at').textContent = `Atualizado em ${new Date(updatedAt).toLocaleString('pt-BR')}`;
-
-  if (workout) {
-    workoutPlanName.textContent = workout.nome || '';
-    const { data: exercises, error } = await supabase
-      .from('treino_exercicios')
-      .select('id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,exercicios(nome,grupo_muscular,equipamento,instrucoes,video_url)')
-      .eq('treino_id', workout.id)
-      .order('dia_semana')
-      .order('ordem');
-    if (error) throw error;
-    renderWorkoutAgenda(exercises || []);
-  } else {
-    workoutPlanName.textContent = 'Nenhum plano ativo';
-    renderWorkoutAgenda([]);
-  }
-
-  if (diet) {
-    dietPlanName.textContent = diet.titulo || '';
-    const { data: meals, error } = await supabase
-      .from('refeicoes')
-      .select('id,nome,horario,descricao,substituicoes,ordem,dias_semana')
-      .eq('plano_alimentar_id', diet.id)
-      .order('ordem')
-      .order('horario');
-    if (error) throw error;
-    renderDietAgenda(meals || []);
-  } else {
-    dietPlanName.textContent = 'Nenhum plano ativo';
-    renderDietAgenda([]);
-  }
-
-  renderStudentMedia(mediaResult.error ? [] : (mediaResult.data || []));
-  setupTabs();
-
-  loading.classList.add('hidden');
-  content.classList.remove('hidden');
+    if (!alunoId)
+        throw new Error('Aluno não informado.');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session)
+        throw new Error('Entre como personal trainer para visualizar este portal.');
+    const [studentResult, portalResult, workoutResult, dietResult, mediaResult] = await Promise.all([
+        supabase.from('alunos').select('id,nome,objetivo,observacoes').eq('id', alunoId).eq('personal_id', session.user.id).single(),
+        supabase.rpc('get_aluno_portal_preview', { p_aluno_id: alunoId }),
+        supabase.from('treinos').select('id,nome,descricao,dias_semana,updated_at').eq('aluno_id', alunoId).eq('personal_id', session.user.id).eq('status', 'ativo').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+        supabase.from('planos_alimentares').select('id,titulo,orientacoes,agua_ml,data_inicio,data_fim,updated_at').eq('aluno_id', alunoId).eq('personal_id', session.user.id).eq('ativo', true).order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+        supabase.from('aluno_midias').select('id,tipo,titulo,url,created_at').eq('aluno_id', alunoId).eq('personal_id', session.user.id).order('created_at', { ascending: false })
+    ]);
+    if (studentResult.error)
+        throw studentResult.error;
+    if (portalResult.error)
+        throw portalResult.error;
+    if (workoutResult.error)
+        throw workoutResult.error;
+    if (dietResult.error)
+        throw dietResult.error;
+    const portal = Array.isArray(portalResult.data) ? portalResult.data[0] : portalResult.data;
+    const student = studentResult.data;
+    const workout = workoutResult.data;
+    const diet = dietResult.data;
+    document.querySelector('#student-name').textContent = student.nome || portal?.aluno_nome || 'Aluno';
+    document.querySelector('#trainer-name').textContent = portal?.personal_nome || 'Seu personal trainer';
+    document.querySelector('#student-observations').textContent = String(student.observacoes || '').trim() || 'Nenhuma observação publicada ainda.';
+    const updatedAt = portal?.plano_atualizado_em || workout?.updated_at || diet?.updated_at;
+    if (updatedAt)
+        document.querySelector('#updated-at').textContent = `Atualizado em ${new Date(updatedAt).toLocaleString('pt-BR')}`;
+    if (workout) {
+        workoutPlanName.textContent = workout.nome || '';
+        const { data: exercises, error } = await supabase
+            .from('treino_exercicios')
+            .select('id,dia_semana,ordem,series,repeticoes,carga,descanso_segundos,observacoes,exercicios(nome,grupo_muscular,equipamento,instrucoes,video_url)')
+            .eq('treino_id', workout.id)
+            .order('dia_semana')
+            .order('ordem');
+        if (error)
+            throw error;
+        renderWorkoutAgenda(exercises || []);
+    }
+    else {
+        workoutPlanName.textContent = 'Nenhum plano ativo';
+        renderWorkoutAgenda([]);
+    }
+    if (diet) {
+        dietPlanName.textContent = diet.titulo || '';
+        const { data: meals, error } = await supabase
+            .from('refeicoes')
+            .select('id,nome,horario,descricao,substituicoes,ordem,dias_semana')
+            .eq('plano_alimentar_id', diet.id)
+            .order('ordem')
+            .order('horario');
+        if (error)
+            throw error;
+        renderDietAgenda(meals || []);
+    }
+    else {
+        dietPlanName.textContent = 'Nenhum plano ativo';
+        renderDietAgenda([]);
+    }
+    renderStudentMedia(mediaResult.error ? [] : (mediaResult.data || []));
+    setupTabs();
+    loading.classList.add('hidden');
+    content.classList.remove('hidden');
 }
-
-workoutContent?.addEventListener('click', event => {
-  const dayButton = event.target.closest('[data-workout-day]');
-  if (dayButton) {
-    selectedWorkoutDay = Number(dayButton.dataset.workoutDay);
-    renderWorkoutAgenda();
-    return;
-  }
-  const button = event.target.closest('[data-workout-item]');
-  if (button) openWorkoutItem(button.dataset.workoutItem);
+workoutContent.addEventListener('click', event => {
+    if (!(event.target instanceof Element))
+        return;
+    const dayButton = event.target.closest('[data-workout-day]');
+    if (dayButton) {
+        selectedWorkoutDay = Number(dayButton.dataset.workoutDay);
+        renderWorkoutAgenda();
+        return;
+    }
+    const button = event.target.closest('[data-workout-item]');
+    if (button?.dataset.workoutItem)
+        openWorkoutItem(button.dataset.workoutItem);
 });
-
-dietContent?.addEventListener('click', event => {
-  const dayButton = event.target.closest('[data-diet-day]');
-  if (dayButton) {
-    selectedDietDay = Number(dayButton.dataset.dietDay);
-    renderDietAgenda();
-    return;
-  }
-  const button = event.target.closest('[data-meal-item]');
-  if (button) openMealItem(button.dataset.mealItem);
+dietContent.addEventListener('click', event => {
+    if (!(event.target instanceof Element))
+        return;
+    const dayButton = event.target.closest('[data-diet-day]');
+    if (dayButton) {
+        selectedDietDay = Number(dayButton.dataset.dietDay);
+        renderDietAgenda();
+        return;
+    }
+    const button = event.target.closest('[data-meal-item]');
+    if (button?.dataset.mealItem)
+        openMealItem(button.dataset.mealItem);
 });
-
 document.querySelectorAll('[data-close-student-detail]').forEach(button => button.addEventListener('click', closeDetail));
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeDetail(); });
-
+document.addEventListener('keydown', event => { if (event.key === 'Escape')
+    closeDetail(); });
 load().catch(error => {
-  console.error(error);
-  loading.classList.add('hidden');
-  errorState.textContent = error.message || 'Não foi possível carregar a pré-visualização.';
-  errorState.classList.remove('hidden');
+    console.error(error);
+    loading.classList.add('hidden');
+    errorState.textContent = error instanceof Error && error.message ? error.message : 'Não foi possível carregar a pré-visualização.';
+    errorState.classList.remove('hidden');
 });

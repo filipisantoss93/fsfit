@@ -1,104 +1,122 @@
+// @ts-nocheck Legacy module preserved during structural TypeScript migration.
 import { supabase } from './supabase.js';
 import { renderHeader, ensurePersonalProfile, getAccessStatus, setGreeting } from './layout.js';
-
 function formatDate(value, includeTime = false) {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return includeTime
-    ? date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-    : date.toLocaleDateString('pt-BR');
+    if (!value)
+        return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime()))
+        return '—';
+    return includeTime
+        ? date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+        : date.toLocaleDateString('pt-BR');
 }
-
 function money(cents) {
-  return (Number(cents || 0) / 100).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  });
+    return (Number(cents || 0) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
 }
-
 function paymentLabel(value) {
-  if (value === 'cartao') return 'Cartão de crédito';
-  if (value === 'pix') return 'PIX';
-  return 'Não definido';
+    if (value === 'cartao')
+        return 'Cartão de crédito';
+    if (value === 'pix')
+        return 'PIX';
+    return 'Não definido';
 }
-
 function subscriptionStatus(access) {
-  if (access?.admin) return 'Acesso administrativo';
-  if (access?.assinatura_status === 'cancelada' && access?.acesso_premium) return 'Cancelada · acesso vigente';
-  if (access?.assinatura_status === 'inadimplente') return 'Pagamento pendente';
-  if (access?.assinatura_status === 'pendente') return 'Em processamento';
-  if (access?.tipo_acesso === 'pago') return 'Ativa';
-  if (access?.tipo_acesso === 'trial') return 'Período gratuito';
-  if (access?.tipo_acesso === 'free') return 'Plano Free';
-  return access?.assinatura_status || 'Sem assinatura ativa';
+    if (access?.admin)
+        return 'Acesso administrativo';
+    if (access?.assinatura_status === 'cancelada' && access?.acesso_premium)
+        return 'Cancelada · acesso vigente';
+    if (access?.assinatura_status === 'inadimplente')
+        return 'Pagamento pendente';
+    if (access?.assinatura_status === 'pendente')
+        return 'Em processamento';
+    if (access?.tipo_acesso === 'pago')
+        return 'Ativa';
+    if (access?.tipo_acesso === 'trial')
+        return 'Período gratuito';
+    if (access?.tipo_acesso === 'free')
+        return 'Plano Free';
+    return access?.assinatura_status || 'Sem assinatura ativa';
 }
-
 function statusClass(access) {
-  if (access?.assinatura_status === 'inadimplente' || access?.assinatura_status === 'cancelada') return 'failed';
-  if (access?.assinatura_status === 'pendente' || access?.tipo_acesso === 'trial') return 'pending';
-  if (access?.tipo_acesso === 'pago' || access?.acesso_premium) return 'paid';
-  return '';
+    if (access?.assinatura_status === 'inadimplente' || access?.assinatura_status === 'cancelada')
+        return 'failed';
+    if (access?.assinatura_status === 'pendente' || access?.tipo_acesso === 'trial')
+        return 'pending';
+    if (access?.tipo_acesso === 'pago' || access?.acesso_premium)
+        return 'paid';
+    return '';
 }
-
 function planLabel(access) {
-  if (access?.tipo_acesso === 'trial') return 'FS Fit · 7 dias grátis';
-  if (access?.tipo_acesso === 'free') return 'FS Fit Free';
-  if (access?.tipo_acesso === 'pago') return 'FS Fit';
-  return 'FS Fit';
+    if (access?.tipo_acesso === 'trial')
+        return 'FS Fit · 7 dias grátis';
+    if (access?.tipo_acesso === 'free')
+        return 'FS Fit Free';
+    if (access?.tipo_acesso === 'pago')
+        return 'FS Fit';
+    return 'FS Fit';
 }
-
 function priceLabel(access) {
-  if (!access?.preco_contratado_centavos) return '';
-  const suffix = access?.meio_pagamento === 'cartao' ? '/mês' : '';
-  return `${money(access.preco_contratado_centavos)}${suffix}`;
+    if (!access?.preco_contratado_centavos)
+        return '';
+    const suffix = access?.meio_pagamento === 'cartao' ? '/mês' : '';
+    return `${money(access.preco_contratado_centavos)}${suffix}`;
 }
-
 function validityLabel(access) {
-  if (access?.acesso_valido_ate) return formatDate(access.acesso_valido_ate);
-  if (access?.tipo_acesso === 'free') return 'Sem vencimento';
-  return 'Sem período ativo';
+    if (access?.acesso_valido_ate)
+        return formatDate(access.acesso_valido_ate);
+    if (access?.tipo_acesso === 'free')
+        return 'Sem vencimento';
+    return 'Sem período ativo';
 }
-
 function renewalLabel(access) {
-  if (access?.meio_pagamento === 'cartao') {
-    if (access?.renovacao_automatica) return 'Automática';
-    if (access?.acesso_premium) return 'Cancelada';
-    return 'Desativada';
-  }
-  if (access?.meio_pagamento === 'pix') return 'Manual via PIX';
-  return '—';
+    if (access?.meio_pagamento === 'cartao') {
+        if (access?.renovacao_automatica)
+            return 'Automática';
+        if (access?.acesso_premium)
+            return 'Cancelada';
+        return 'Desativada';
+    }
+    if (access?.meio_pagamento === 'pix')
+        return 'Manual via PIX';
+    return '—';
 }
-
 function nextChargeLabel(access) {
-  if (access?.meio_pagamento !== 'cartao' || !access?.renovacao_automatica) return null;
-  const nextDate = access?.proxima_cobranca_em || access?.acesso_valido_ate;
-  return nextDate ? formatDate(nextDate) : 'A definir';
+    if (access?.meio_pagamento !== 'cartao' || !access?.renovacao_automatica)
+        return null;
+    const nextDate = access?.proxima_cobranca_em || access?.acesso_valido_ate;
+    return nextDate ? formatDate(nextDate) : 'A definir';
 }
-
 function setAdminLayout() {
-  const title = document.querySelector('#subscription-page-title');
-  const description = document.querySelector('#subscription-page-description');
-  const overviewTitle = document.querySelector('#subscription-overview-title');
-  const management = document.querySelector('#subscription-management-section');
-  const history = document.querySelector('#subscription-history-section');
-  const help = document.querySelector('#subscription-help-section');
-
-  if (title) title.textContent = 'Minha conta';
-  if (description) description.textContent = 'Consulte as informações do seu acesso ao FS Fit.';
-  if (overviewTitle) overviewTitle.textContent = 'Acesso administrativo';
-  if (management) management.hidden = true;
-  if (history) history.hidden = true;
-  if (help) help.hidden = true;
+    const title = document.querySelector('#subscription-page-title');
+    const description = document.querySelector('#subscription-page-description');
+    const overviewTitle = document.querySelector('#subscription-overview-title');
+    const management = document.querySelector('#subscription-management-section');
+    const history = document.querySelector('#subscription-history-section');
+    const help = document.querySelector('#subscription-help-section');
+    if (title)
+        title.textContent = 'Minha conta';
+    if (description)
+        description.textContent = 'Consulte as informações do seu acesso ao FS Fit.';
+    if (overviewTitle)
+        overviewTitle.textContent = 'Acesso administrativo';
+    if (management)
+        management.hidden = true;
+    if (history)
+        history.hidden = true;
+    if (help)
+        help.hidden = true;
 }
-
 function renderSummary(access) {
-  const host = document.querySelector('#subscription-summary-grid');
-  if (!host) return;
-
-  if (access?.admin) {
-    setAdminLayout();
-    host.innerHTML = `
+    const host = document.querySelector('#subscription-summary-grid');
+    if (!host)
+        return;
+    if (access?.admin) {
+        setAdminLayout();
+        host.innerHTML = `
       <div class="subscription-admin-card">
         <div class="subscription-admin-icon" aria-hidden="true">✓</div>
         <div>
@@ -106,18 +124,16 @@ function renderSummary(access) {
           <p>Acesso permanente ao FS Fit, sem cobrança e sem vencimento.</p>
         </div>
       </div>`;
-    return;
-  }
-
-  const status = subscriptionStatus(access);
-  const statusTone = statusClass(access);
-  const price = priceLabel(access);
-  const nextCharge = nextChargeLabel(access);
-  const cardInfo = access?.meio_pagamento === 'cartao' && access?.cartao_mascara
-    ? ` · ${access.cartao_mascara}`
-    : '';
-
-  host.innerHTML = `
+        return;
+    }
+    const status = subscriptionStatus(access);
+    const statusTone = statusClass(access);
+    const price = priceLabel(access);
+    const nextCharge = nextChargeLabel(access);
+    const cardInfo = access?.meio_pagamento === 'cartao' && access?.cartao_mascara
+        ? ` · ${access.cartao_mascara}`
+        : '';
+    host.innerHTML = `
     <div class="subscription-overview-card">
       <div class="subscription-overview-top">
         <div>
@@ -135,96 +151,93 @@ function renderSummary(access) {
       </div>
     </div>`;
 }
-
 function effectiveStatus(item) {
-  const value = String(item?.status || '').toLowerCase();
-  if (item?.method === 'pix' && ['pending', 'pendente', 'waiting', 'new', 'active'].includes(value) && item?.vence_em) {
-    const expiresAt = new Date(item.vence_em).getTime();
-    if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) return 'expirada';
-  }
-  return value;
+    const value = String(item?.status || '').toLowerCase();
+    if (item?.method === 'pix' && ['pending', 'pendente', 'waiting', 'new', 'active'].includes(value) && item?.vence_em) {
+        const expiresAt = new Date(item.vence_em).getTime();
+        if (Number.isFinite(expiresAt) && expiresAt <= Date.now())
+            return 'expirada';
+    }
+    return value;
 }
-
 function normalizeStatus(status) {
-  const value = String(status || '').toLowerCase();
-  if (['paid', 'paga', 'pago', 'approved', 'settled'].includes(value)) {
-    return { label: 'Pago', className: 'paid' };
-  }
-  if (['pending', 'pendente', 'waiting', 'new', 'active'].includes(value)) {
-    return { label: 'Pendente', className: 'pending' };
-  }
-  if (['expired', 'expirada'].includes(value)) {
-    return { label: 'Expirada', className: 'failed' };
-  }
-  if (['unpaid', 'failed', 'recusada', 'recusado', 'canceled', 'cancelada'].includes(value)) {
-    return { label: value.includes('cancel') ? 'Cancelada' : 'Não pago', className: 'failed' };
-  }
-  return { label: status || '—', className: '' };
+    const value = String(status || '').toLowerCase();
+    if (['paid', 'paga', 'pago', 'approved', 'settled'].includes(value)) {
+        return { label: 'Pago', className: 'paid' };
+    }
+    if (['pending', 'pendente', 'waiting', 'new', 'active'].includes(value)) {
+        return { label: 'Pendente', className: 'pending' };
+    }
+    if (['expired', 'expirada'].includes(value)) {
+        return { label: 'Expirada', className: 'failed' };
+    }
+    if (['unpaid', 'failed', 'recusada', 'recusado', 'canceled', 'cancelada'].includes(value)) {
+        return { label: value.includes('cancel') ? 'Cancelada' : 'Não pago', className: 'failed' };
+    }
+    return { label: status || '—', className: '' };
 }
-
 function bindHistoryActions(host) {
-  if (host.dataset.actionsBound === 'true') return;
-  host.dataset.actionsBound = 'true';
-
-  host.addEventListener('click', async event => {
-    const button = event.target.closest('[data-cancel-pix-id]');
-    if (!button) return;
-
-    const confirmed = window.confirm('Cancelar esta cobrança PIX? O QR Code deixará de aceitar pagamento.');
-    if (!confirmed) return;
-
-    const originalText = button.textContent;
-    button.disabled = true;
-    button.textContent = 'Cancelando...';
-
-    try {
-      const { data, error } = await supabase.functions.invoke('cancelar-pix-fsfit', {
-        body: { id: button.dataset.cancelPixId }
-      });
-      if (data?.erro) throw new Error(data.erro);
-      if (error) throw error;
-
-      button.closest('.subscription-history-item')?.remove();
-      if (!host.querySelector('.subscription-history-item')) {
-        host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
-      }
-    } catch (cancelError) {
-      console.error('Não foi possível cancelar a cobrança PIX:', cancelError);
-      window.alert(cancelError?.message || 'Não foi possível cancelar esta cobrança PIX agora.');
-      button.disabled = false;
-      button.textContent = originalText;
-    }
-  });
+    if (host.dataset.actionsBound === 'true')
+        return;
+    host.dataset.actionsBound = 'true';
+    host.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-cancel-pix-id]');
+        if (!button)
+            return;
+        const confirmed = window.confirm('Cancelar esta cobrança PIX? O QR Code deixará de aceitar pagamento.');
+        if (!confirmed)
+            return;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Cancelando...';
+        try {
+            const { data, error } = await supabase.functions.invoke('cancelar-pix-fsfit', {
+                body: { id: button.dataset.cancelPixId }
+            });
+            if (data?.erro)
+                throw new Error(data.erro);
+            if (error)
+                throw error;
+            button.closest('.subscription-history-item')?.remove();
+            if (!host.querySelector('.subscription-history-item')) {
+                host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
+            }
+        }
+        catch (cancelError) {
+            console.error('Não foi possível cancelar a cobrança PIX:', cancelError);
+            window.alert(cancelError?.message || 'Não foi possível cancelar esta cobrança PIX agora.');
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    });
 }
-
 function renderHistory(items) {
-  const host = document.querySelector('#subscription-history-list');
-  if (!host) return;
-
-  const visibleItems = [];
-  let pendingPixIncluded = false;
-
-  for (const item of items) {
-    const statusValue = effectiveStatus(item);
-    if (item.method === 'pix' && ['cancelada', 'canceled', 'expirada', 'expired'].includes(statusValue)) continue;
-    if (item.method === 'pix' && ['pending', 'pendente', 'waiting', 'new', 'active'].includes(statusValue)) {
-      if (pendingPixIncluded) continue;
-      pendingPixIncluded = true;
+    const host = document.querySelector('#subscription-history-list');
+    if (!host)
+        return;
+    const visibleItems = [];
+    let pendingPixIncluded = false;
+    for (const item of items) {
+        const statusValue = effectiveStatus(item);
+        if (item.method === 'pix' && ['cancelada', 'canceled', 'expirada', 'expired'].includes(statusValue))
+            continue;
+        if (item.method === 'pix' && ['pending', 'pendente', 'waiting', 'new', 'active'].includes(statusValue)) {
+            if (pendingPixIncluded)
+                continue;
+            pendingPixIncluded = true;
+        }
+        visibleItems.push({ ...item, effective_status: statusValue });
     }
-    visibleItems.push({ ...item, effective_status: statusValue });
-  }
-
-  if (!visibleItems.length) {
-    host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
-    return;
-  }
-
-  host.innerHTML = visibleItems.map(item => {
-    const status = normalizeStatus(item.effective_status || item.status);
-    const date = item.pago_em || item.created_at;
-    const method = item.method === 'cartao' ? 'Cartão de crédito' : 'PIX';
-    const canCancel = item.method === 'pix' && status.label === 'Pendente';
-    return `
+    if (!visibleItems.length) {
+        host.innerHTML = '<div class="subscription-empty"><strong>Nenhuma cobrança registrada ainda.</strong>Seu histórico aparecerá aqui após o primeiro pagamento.</div>';
+        return;
+    }
+    host.innerHTML = visibleItems.map(item => {
+        const status = normalizeStatus(item.effective_status || item.status);
+        const date = item.pago_em || item.created_at;
+        const method = item.method === 'cartao' ? 'Cartão de crédito' : 'PIX';
+        const canCancel = item.method === 'pix' && status.label === 'Pendente';
+        return `
       <article class="subscription-history-item">
         <div class="subscription-history-main"><strong>${method}</strong><span>${formatDate(date, true)}</span></div>
         <div class="subscription-history-date">${formatDate(date)}</div>
@@ -234,84 +247,78 @@ function renderHistory(items) {
           ${canCancel ? `<button class="subscription-history-cancel" type="button" data-cancel-pix-id="${item.id}">Cancelar cobrança</button>` : ''}
         </div>
       </article>`;
-  }).join('');
-
-  bindHistoryActions(host);
+    }).join('');
+    bindHistoryActions(host);
 }
-
 async function loadHistory(userId) {
-  const host = document.querySelector('#subscription-history-list');
-
-  try {
-    const [cardResult, pixResult] = await Promise.all([
-      supabase
-        .from('cobrancas_cartao')
-        .select('id,status,valor_centavos,pago_em,created_at')
-        .eq('personal_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(20),
-      supabase
-        .from('cobrancas_pix')
-        .select('id,txid,status,valor_centavos,vence_em,pago_em,created_at')
-        .eq('personal_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(20)
-    ]);
-
-    if (cardResult.error) throw cardResult.error;
-    if (pixResult.error) throw pixResult.error;
-
-    const card = (cardResult.data || []).map(item => ({ ...item, method: 'cartao' }));
-    const pix = (pixResult.data || []).map(item => ({ ...item, method: 'pix' }));
-    const items = [...card, ...pix]
-      .sort((a, b) => new Date(b.pago_em || b.created_at).getTime() - new Date(a.pago_em || a.created_at).getTime())
-      .slice(0, 30);
-
-    renderHistory(items);
-  } catch (error) {
-    console.error('Não foi possível carregar o histórico de cobranças:', error);
-    if (host) host.innerHTML = '<div class="subscription-empty">Não foi possível carregar o histórico agora.</div>';
-  }
-}
-
-function addSubscriptionMenuItem() {
-  const profileLink = document.querySelector('[data-page="perfil"]');
-  const profileItem = profileLink?.closest('li');
-  if (!profileItem || document.querySelector('[data-page="assinatura"]')) return;
-
-  const item = document.createElement('li');
-  item.innerHTML = '<a data-page="assinatura" class="active" href="assinatura.html">Minha assinatura</a>';
-  profileItem.insertAdjacentElement('beforebegin', item);
-}
-
-async function init() {
-  renderHeader('');
-  addSubscriptionMenuItem();
-
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error || !session) {
-    window.location.replace('index.html?login=1');
-    return;
-  }
-
-  try {
-    await ensurePersonalProfile(session);
-    const access = await getAccessStatus();
-
-    if (access?.tipo_acesso === 'inativo' && !access?.admin) {
-      window.location.replace('painel.html');
-      return;
+    const host = document.querySelector('#subscription-history-list');
+    try {
+        const [cardResult, pixResult] = await Promise.all([
+            supabase
+                .from('cobrancas_cartao')
+                .select('id,status,valor_centavos,pago_em,created_at')
+                .eq('personal_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(20),
+            supabase
+                .from('cobrancas_pix')
+                .select('id,txid,status,valor_centavos,vence_em,pago_em,created_at')
+                .eq('personal_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(20)
+        ]);
+        if (cardResult.error)
+            throw cardResult.error;
+        if (pixResult.error)
+            throw pixResult.error;
+        const card = (cardResult.data || []).map(item => ({ ...item, method: 'cartao' }));
+        const pix = (pixResult.data || []).map(item => ({ ...item, method: 'pix' }));
+        const items = [...card, ...pix]
+            .sort((a, b) => new Date(b.pago_em || b.created_at).getTime() - new Date(a.pago_em || a.created_at).getTime())
+            .slice(0, 30);
+        renderHistory(items);
     }
-
-    session.fsfitAccess = access;
-    await setGreeting(session);
-    renderSummary(access);
-    if (!access?.admin) await loadHistory(session.user.id);
-  } catch (loadError) {
-    console.error('Não foi possível carregar a página de assinatura:', loadError);
-    const host = document.querySelector('#subscription-summary-grid');
-    if (host) host.innerHTML = '<div class="subscription-overview-card"><strong>Não foi possível carregar os dados da assinatura. Atualize a página e tente novamente.</strong></div>';
-  }
+    catch (error) {
+        console.error('Não foi possível carregar o histórico de cobranças:', error);
+        if (host)
+            host.innerHTML = '<div class="subscription-empty">Não foi possível carregar o histórico agora.</div>';
+    }
 }
-
+function addSubscriptionMenuItem() {
+    const profileLink = document.querySelector('[data-page="perfil"]');
+    const profileItem = profileLink?.closest('li');
+    if (!profileItem || document.querySelector('[data-page="assinatura"]'))
+        return;
+    const item = document.createElement('li');
+    item.innerHTML = '<a data-page="assinatura" class="active" href="assinatura.html">Minha assinatura</a>';
+    profileItem.insertAdjacentElement('beforebegin', item);
+}
+async function init() {
+    renderHeader('');
+    addSubscriptionMenuItem();
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error || !session) {
+        window.location.replace('index.html?login=1');
+        return;
+    }
+    try {
+        await ensurePersonalProfile(session);
+        const access = await getAccessStatus();
+        if (access?.tipo_acesso === 'inativo' && !access?.admin) {
+            window.location.replace('painel.html');
+            return;
+        }
+        session.fsfitAccess = access;
+        await setGreeting(session);
+        renderSummary(access);
+        if (!access?.admin)
+            await loadHistory(session.user.id);
+    }
+    catch (loadError) {
+        console.error('Não foi possível carregar a página de assinatura:', loadError);
+        const host = document.querySelector('#subscription-summary-grid');
+        if (host)
+            host.innerHTML = '<div class="subscription-overview-card"><strong>Não foi possível carregar os dados da assinatura. Atualize a página e tente novamente.</strong></div>';
+    }
+}
 init();
