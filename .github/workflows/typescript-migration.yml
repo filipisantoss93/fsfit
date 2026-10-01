@@ -5,6 +5,10 @@ on:
     paths:
       - 'typescript/**/*.ts'
       - 'js/mobile-more-swipe.js'
+      - 'js/aulas-painel-quick-actions.js'
+      - 'js/treino-aluno-semanal.js'
+      - 'js/biblioteca-treinos.js'
+      - 'js/treino-aluno-exercicios-avulsos.js'
       - 'js/ficha-aluno.js'
       - 'js/aula-aluno.js'
       - 'js/dieta-aluno.js'
@@ -137,6 +141,10 @@ on:
     paths:
       - 'typescript/**/*.ts'
       - 'js/mobile-more-swipe.js'
+      - 'js/aulas-painel-quick-actions.js'
+      - 'js/treino-aluno-semanal.js'
+      - 'js/biblioteca-treinos.js'
+      - 'js/treino-aluno-exercicios-avulsos.js'
       - 'js/ficha-aluno.js'
       - 'js/aula-aluno.js'
       - 'js/dieta-aluno.js'
@@ -266,7 +274,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: typescript-migration-${{ github.ref }}
@@ -281,6 +289,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
       - name: Configure Node.js
         uses: actions/setup-node@v4
@@ -297,10 +307,25 @@ jobs:
       - name: Build browser JavaScript
         run: npm run build:typescript
 
+      - name: Commit generated JavaScript for migration batch
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git diff --quiet -- js/treino-aluno-exercicios-avulsos.js js/biblioteca-treinos.js js/treino-aluno-semanal.js js/aulas-painel-quick-actions.js; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add js/treino-aluno-exercicios-avulsos.js js/biblioteca-treinos.js js/treino-aluno-semanal.js js/aulas-painel-quick-actions.js
+            git commit -m "Build student workout TypeScript outputs"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+
       - name: Ensure generated JavaScript is committed
         run: |
           git diff --exit-code -- \
             js/mobile-more-swipe.js \
+            js/aulas-painel-quick-actions.js \
+            js/treino-aluno-semanal.js \
+            js/biblioteca-treinos.js \
+            js/treino-aluno-exercicios-avulsos.js \
             js/ficha-aluno.js \
             js/aula-aluno.js \
             js/dieta-aluno.js \
