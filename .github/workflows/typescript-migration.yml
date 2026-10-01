@@ -5,6 +5,7 @@ on:
     paths:
       - 'typescript/**/*.ts'
       - 'js/admin-search-clear.js'
+      - 'js/admin-tabs.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/exercise-picker-horizontal-scroll-fix.js'
       - 'js/library-row-click.js'
@@ -18,6 +19,7 @@ on:
     paths:
       - 'typescript/**/*.ts'
       - 'js/admin-search-clear.js'
+      - 'js/admin-tabs.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/exercise-picker-horizontal-scroll-fix.js'
       - 'js/library-row-click.js'
@@ -60,7 +62,13 @@ jobs:
         run: npm run build:typescript
 
       - name: Ensure generated JavaScript is committed
-        run: git diff --exit-code -- js/admin-search-clear.js
+        run: |
+          git diff --exit-code -- \
+            js/admin-search-clear.js \
+            js/admin-tabs.js \
+            js/aulas-painel-delete-layout-fix.js \
+            js/exercise-picker-horizontal-scroll-fix.js \
+            js/library-row-click.js
 
       - name: Validate page script references
         run: node scripts/audit-page-scripts.mjs
