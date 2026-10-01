@@ -1,3 +1,4 @@
+// @ts-ignore Existing browser JavaScript module with cache version.
 import './modal-focus-a11y.js?v=20260930-ts1';
 import { supabase } from './supabase.js';
 
