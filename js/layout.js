@@ -87,6 +87,14 @@ function ensureMobileMoreSheet(trigger) {
         <button class="fsfit-more-item" type="button" data-fsfit-public-page><span class="fsfit-more-item-icon" aria-hidden="true">↗</span><span class="fsfit-more-item-copy"><strong>Página pública</strong><small>Veja sua página como seus alunos veem</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></button>
         <a class="fsfit-more-item" href="assinatura.html"><span class="fsfit-more-item-icon" aria-hidden="true">AS</span><span class="fsfit-more-item-copy"><strong>Assinatura</strong><small>Plano, cobrança e renovação</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
         <a class="fsfit-more-item" href="contato.html"><span class="fsfit-more-item-icon" aria-hidden="true">?</span><span class="fsfit-more-item-copy"><strong>Contato</strong><small>Suporte e canais de atendimento</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
+        <div class="fsfit-more-theme" aria-label="Tema visual">
+          <span class="fsfit-theme-setting-label">Tema</span>
+          <div class="fsfit-theme-control" role="group" aria-label="Escolher tema">
+            <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Auto</button>
+            <button type="button" data-fsfit-theme-choice="light" aria-pressed="false">Claro</button>
+            <button type="button" data-fsfit-theme-choice="dark" aria-pressed="false">Escuro</button>
+          </div>
+        </div>
         <button class="fsfit-more-item is-danger" type="button" data-fsfit-logout><span class="fsfit-more-item-icon" aria-hidden="true">SA</span><span class="fsfit-more-item-copy"><strong>Sair</strong><small>Encerrar sua sessão no FS Fit</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></button>
       </nav>
     </section>`;
