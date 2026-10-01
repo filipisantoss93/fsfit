@@ -115,3 +115,52 @@
   --fsfit-glass: var(--fs-glass);
   --safe-area-top: var(--fs-safe-top);
 }
+
+
+/*
+ * FS Fit — tema claro semântico
+ *
+ * O tema escuro permanece como baseline em :root. O runtime global resolve
+ * Automático / Claro / Escuro e define data-fsfit-theme antes do CSS principal.
+ * As páginas devem consumir estes tokens, nunca detectar o tema por conta própria.
+ */
+html[data-fsfit-theme="light"] {
+  --fs-bg: #f5f7f8;
+  --fs-surface: #ffffff;
+  --fs-surface-raised: #eef2f4;
+  --fs-surface-soft: #e5eaed;
+  --fs-surface-overlay: rgba(255, 255, 255, .96);
+  --fs-glass: rgba(255, 255, 255, .9);
+  --fs-overlay: rgba(19, 29, 38, .42);
+
+  --fs-border: rgba(24, 39, 51, .13);
+  --fs-border-strong: rgba(24, 39, 51, .2);
+
+  --fs-text: #17212b;
+  --fs-text-muted: #53616e;
+  --fs-text-subtle: #687886;
+  --fs-text-on-primary: #ffffff;
+
+  --fs-primary: #497326;
+  --fs-primary-hover: #3f661f;
+  --fs-primary-strong: #35581a;
+  --fs-primary-soft: rgba(73, 115, 38, .09);
+  --fs-primary-border: rgba(73, 115, 38, .25);
+  --fs-info: #416f9e;
+  --fs-warning: #8d650b;
+  --fs-danger: #b44851;
+  --fs-success: #497326;
+
+  --fs-shadow-sm: 0 8px 24px rgba(28, 39, 49, .08);
+  --fs-shadow-md: 0 18px 48px rgba(28, 39, 49, .12);
+  --fs-shadow-lg: 0 24px 64px rgba(28, 39, 49, .16);
+  --fs-focus-ring: 0 0 0 3px rgba(73, 115, 38, .18);
+}
+
+html[data-fsfit-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-fsfit-theme="light"] {
+  color-scheme: light;
+}
