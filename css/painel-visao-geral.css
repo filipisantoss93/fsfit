@@ -48,7 +48,7 @@ html.dashboard-legacy-home #dashboard-overview-panel > .quick-actions { display:
       html.dashboard-legacy-home .dashboard-home-header .dashboard-user-greeting { font-size:1.18rem; }
       html.dashboard-legacy-home .dashboard-welcome-line { font-size:.75rem; }
       html.dashboard-legacy-home .dashboard-tabs { gap:2px !important; margin-bottom:10px !important; padding:3px !important; border-radius:12px !important; }
-      html.dashboard-legacy-home .dashboard-tab { min-height:36px !important; gap:3px !important; padding:7px 4px !important; border-radius:9px !important; font-size:var(--fs-font-xs,.75rem) !important; }
+      html.dashboard-legacy-home .dashboard-tab { min-height:44px !important; gap:3px !important; padding:7px 4px !important; border-radius:9px !important; font-size:var(--fs-font-xs,.75rem) !important; }
       html.dashboard-legacy-home .dashboard-tab-count { min-width:18px !important; height:18px !important; padding:0 4px !important; font-size:var(--fs-font-xs,.75rem) !important; }
       html.dashboard-legacy-home .dashboard-home-panel { gap:8px; }
       html.dashboard-legacy-home .home-ready-card { gap:10px; padding:11px 12px; }

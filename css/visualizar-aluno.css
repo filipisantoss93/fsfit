@@ -163,7 +163,7 @@ body.student-page {
 .student-detail-dialog { position: relative; width: min(680px,100%); max-height: 88vh; overflow: auto; border: 1px solid var(--student-border); border-radius: 24px 24px 0 0; background: var(--fs-surface); }
 .student-detail-header { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--fs-border); }
 .student-detail-header h2 { margin: 0; }
-.student-detail-close { width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--fs-surface-soft); color: var(--student-text); font-size: 1.6rem; }
+.student-detail-close {width:44px;height:44px; border: 0; border-radius: 50%; background: var(--fs-surface-soft); color: var(--student-text); font-size: 1.6rem; }
 .student-detail-body { padding: 22px; }
 .student-detail-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
 .student-detail-grid > div,.student-detail-block { padding: 15px; border: 1px solid var(--fs-border); border-radius: 13px; background: var(--fs-surface-tint); }

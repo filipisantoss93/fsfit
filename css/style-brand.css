@@ -362,7 +362,7 @@ body.fsfit-saas .dashboard-tabs {
 }
 
 body.fsfit-saas .dashboard-tab {
-  min-height: 38px !important;
+  min-height:44px !important;
   padding: 8px 12px !important;
   border-radius: var(--fs-radius-sm, 6px) !important;
   font-weight: 800 !important;
@@ -472,7 +472,7 @@ body.fsfit-saas .library-action-bar .btn {
   body.fsfit-saas .page-header .library-top-actions .btn,
   body.fsfit-saas .page-actions .btn,
   body.fsfit-saas .library-action-bar .btn {
-    min-height: 42px !important;
+    min-height:44px !important;
     padding: 9px 10px !important;
     font-size: .84rem !important;
   }
