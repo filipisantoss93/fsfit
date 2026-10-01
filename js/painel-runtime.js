@@ -19,7 +19,7 @@ if (hasDashboard) {
   loadRuntimeGroup([
     {
       id: 'painel-home-desktop-carousel',
-      source: './painel-home-desktop-carousel.js?v=20260724-desktop-carousel1',
+      source: './painel-home-desktop-carousel.js?v=20261001-ts4',
       errorMessage: 'Falha ao carregar as setas do carrossel de alunos:'
     },
     {
