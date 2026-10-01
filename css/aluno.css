@@ -52,7 +52,7 @@ body.student-page {
   background:var(--fs-surface-raised);color:var(--student-dashboard-text);display:grid;place-items:center;position:relative
 }
 .student-icon-button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8}
-.student-notification-badge{position:absolute;top:-6px;right:-5px;min-width:21px;height:21px;border-radius:999px;display:grid;place-items:center;background:var(--fs-primary);color:var(--student-dashboard-text);font-size:.68rem;font-weight:900}
+.student-notification-badge{position:absolute;top:-6px;right:-5px;min-width:21px;height:21px;border-radius:999px;display:grid;place-items:center;background:var(--fs-primary);color:var(--student-dashboard-text);font-size:var(--fs-font-xs);font-weight:900}
 
 .student-state{margin:20px 0;padding:22px;border:1px solid var(--student-dashboard-border);border-radius:18px;background:var(--student-dashboard-surface);text-align:center;color:var(--student-dashboard-muted)}
 #student-content{padding-top:14px}
@@ -71,7 +71,7 @@ body.student-page {
   border:1px solid var(--fs-border);border-radius:16px;background:var(--fs-surface-tint);color:var(--student-dashboard-text);text-decoration:none
 }
 .student-trainer-dashboard-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--fs-surface-soft);color:var(--student-dashboard-text);font-size:.82rem;font-weight:900}
-.student-trainer-dashboard-chip small{display:block;color:var(--student-dashboard-muted);font-size:.64rem}
+.student-trainer-dashboard-chip small{display:block;color:var(--student-dashboard-muted);font-size:var(--fs-font-xs)}
 .student-trainer-dashboard-chip strong{display:block;margin-top:1px;font-size:.88rem}
 .student-trainer-dashboard-chip b{color:var(--student-dashboard-green);font-size:1rem}
 
@@ -89,7 +89,7 @@ body.student-page {
   border:1px solid var(--fs-primary-border);border-radius:50px 50px 20px 20px;display:grid;place-items:center;text-align:center;
   color:var(--student-dashboard-green);font-size:1.25rem;font-weight:900;line-height:1.05;background:radial-gradient(circle,var(--fs-primary-soft),transparent 63%),var(--fs-surface-raised)
 }
-.student-today-hero small{color:var(--student-dashboard-green);font-size:.72rem;font-weight:900;letter-spacing:.12em}
+.student-today-hero small{color:var(--student-dashboard-green);font-size:var(--fs-font-xs);font-weight:900;letter-spacing:.12em}
 .student-today-hero h2{max-width:62%;margin:38px 0 7px;font-size:1.7rem;letter-spacing:-.045em}
 .student-today-hero p{max-width:62%;margin:0;color:var(--student-dashboard-muted);font-size:.92rem;line-height:1.45}
 
@@ -97,10 +97,10 @@ body.student-page {
 .student-today-card{
   min-height:108px;padding:15px;border:1px solid var(--student-dashboard-border);border-radius:17px;background:var(--student-dashboard-surface);color:var(--student-dashboard-text);text-align:left
 }
-.student-today-card small{display:block;color:var(--student-dashboard-green);font-size:.68rem;font-weight:900;letter-spacing:.11em}
+.student-today-card small{display:block;color:var(--student-dashboard-green);font-size:var(--fs-font-xs);font-weight:900;letter-spacing:.11em}
 .student-today-card strong{display:block;margin-top:9px;font-size:1.12rem}
 .student-today-card>span:not(.student-today-card-arrow){display:block;margin-top:3px;color:var(--student-dashboard-muted);font-size:.8rem}
-.student-today-card-arrow{display:inline-block;margin-top:9px;color:var(--student-dashboard-green);font-size:.72rem;font-weight:900}
+.student-today-card-arrow{display:inline-block;margin-top:9px;color:var(--student-dashboard-green);font-size:var(--fs-font-xs);font-weight:900}
 .student-home-primary{margin-top:10px;display:grid;grid-template-columns:1.3fr 1fr;gap:9px}
 .student-home-primary .btn{min-height:46px;justify-content:center;border-radius:13px;font-size:.86rem}
 
@@ -113,27 +113,27 @@ body.student-page {
 .student-dashboard-summary-icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:0 0 auto;background:var(--student-dashboard-green-soft);color:var(--student-dashboard-green);font-size:1rem}
 .student-dashboard-summary strong,.student-dashboard-summary small{display:block}
 .student-dashboard-summary strong{font-size:1rem}
-.student-dashboard-summary small{margin-top:2px;color:var(--student-dashboard-muted);font-size:.7rem}
+.student-dashboard-summary small{margin-top:2px;color:var(--student-dashboard-muted);font-size:var(--fs-font-xs)}
 
 .student-dashboard-section{margin-top:12px;padding:16px;border:1px solid var(--student-dashboard-border);border-radius:18px;background:linear-gradient(145deg,var(--fs-surface-raised),var(--fs-surface))}
-.student-dashboard-section>header{margin-bottom:8px;color:var(--student-dashboard-green);font-size:.72rem;font-weight:900;letter-spacing:.11em}
+.student-dashboard-section>header{margin-bottom:8px;color:var(--student-dashboard-green);font-size:var(--fs-font-xs);font-weight:900;letter-spacing:.11em}
 .student-dashboard-upcoming{display:grid}
 .student-dashboard-upcoming-row{min-height:54px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--fs-border)}
 .student-dashboard-upcoming-row:last-child{border-bottom:0}
 .student-dashboard-upcoming-row>span{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--student-dashboard-green-soft);color:var(--student-dashboard-green);font-size:.9rem}
 .student-dashboard-upcoming-row strong,.student-dashboard-upcoming-row small{display:block}
 .student-dashboard-upcoming-row strong{font-size:.88rem}
-.student-dashboard-upcoming-row small{margin-top:2px;color:var(--student-dashboard-muted);font-size:.72rem}
+.student-dashboard-upcoming-row small{margin-top:2px;color:var(--student-dashboard-muted);font-size:var(--fs-font-xs)}
 .student-dashboard-upcoming-row b{color:var(--fs-text-subtle);font-size:1.2rem}
 
 .student-home-note{margin-top:12px;border-radius:18px;background:linear-gradient(145deg,var(--fs-surface-raised),var(--fs-surface))}
 .student-home-note button{min-height:92px;padding:16px}
-.student-home-note small{color:var(--student-dashboard-green);font-size:.7rem}
+.student-home-note small{color:var(--student-dashboard-green);font-size:var(--fs-font-xs)}
 .student-home-note p{font-size:.88rem;color:var(--fs-text);line-height:1.45}
-.student-home-note span{font-size:.72rem}
+.student-home-note span{font-size:var(--fs-font-xs)}
 
 .student-dashboard-quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.student-dashboard-quick-grid button{min-height:76px;padding:10px 5px;border:1px solid var(--fs-border);border-radius:14px;background:var(--fs-surface-tint);color:var(--fs-text);font:inherit;font-size:.74rem}
+.student-dashboard-quick-grid button{min-height:76px;padding:10px 5px;border:1px solid var(--fs-border);border-radius:14px;background:var(--fs-surface-tint);color:var(--fs-text);font:inherit;font-size:var(--fs-font-xs)}
 .student-dashboard-quick-grid button span{display:block;margin-bottom:6px;font-size:1.15rem}
 
 .student-section-heading{margin:0 0 10px;padding:16px;border:1px solid var(--student-dashboard-border);border-radius:17px;background:var(--student-dashboard-surface)}
@@ -144,7 +144,7 @@ body.student-page {
   padding:5px max(14px,env(safe-area-inset-left)) calc(5px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));
   display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--fs-border);background:var(--fs-surface-overlay);backdrop-filter:blur(18px)
 }
-.student-dashboard-bottom-nav button{border:0;background:transparent;color:var(--student-dashboard-muted);font:inherit;font-size:.7rem;font-weight:800}
+.student-dashboard-bottom-nav button{border:0;background:transparent;color:var(--student-dashboard-muted);font:inherit;font-size:var(--fs-font-xs);font-weight:800}
 .student-dashboard-bottom-nav button span{display:block;margin-bottom:2px;font-size:1.15rem}
 .student-dashboard-bottom-nav button.active{color:var(--student-dashboard-green)}
 
@@ -169,7 +169,7 @@ body.student-page {
   .student-dashboard-summary>div,.student-dashboard-summary>button{padding:10px 8px;gap:7px}
   .student-dashboard-summary-icon{width:32px;height:32px}
   .student-dashboard-quick-grid{grid-template-columns:repeat(4,1fr);gap:6px}
-  .student-dashboard-quick-grid button{min-height:70px;font-size:.66rem}
+  .student-dashboard-quick-grid button{min-height:70px;font-size:var(--fs-font-xs)}
 }
 
 @media(max-width:360px){
