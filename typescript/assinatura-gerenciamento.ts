@@ -143,6 +143,8 @@ async function tokenizeCard(formRoot: HTMLElement): Promise<{ tokenResult: JsonR
 
 async function openCardForm({ access = null, plan = null, mode = 'subscribe' }: { access?: JsonRecord | null; plan?: PlanRecord | null; mode?: string } = {}): Promise<void> {
   const isReplace = mode === 'replace';
+  if (isReplace && !access) throw new Error('Assinatura atual não encontrada.');
+  if (!isReplace && !plan) throw new Error('Plano não selecionado.');
   const title = isReplace ? 'Trocar cartão' : 'Assinar com cartão';
   const description = isReplace
     ? 'O novo cartão substituirá o cartão usado nas próximas cobranças automáticas.'
@@ -348,6 +350,10 @@ async function openPlanChooser(access: JsonRecord, { only = null }: { only?: 'pi
 function renderManagement(access: JsonRecord | null | undefined): void {
   const host = document.querySelector<HTMLElement>('#subscription-management-actions');
   if (!host) return;
+  if (!access) {
+    host.innerHTML = '<div class="subscription-management-note subscription-management-note-full">Status da assinatura indisponível no momento.</div>';
+    return;
+  }
   if (access?.admin) {
     host.innerHTML = '<div class="subscription-management-note subscription-management-note-full"><strong>Conta administrativa</strong><br>Seu acesso administrativo não depende de uma assinatura paga. A central permanece disponível para consulta do histórico.</div>';
     return;
