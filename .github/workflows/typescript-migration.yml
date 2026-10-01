@@ -10,6 +10,8 @@ on:
       - 'js/admin-forecast.js'
       - 'js/exercicio-drag-order-structured-sync.js'
       - 'js/exercise-svg-extended.js'
+      - 'js/exercise-svg-complete.js'
+      - 'js/exercise-svg-icons.js'
       - 'js/exercise-svg-specific.js'
       - 'js/ficha-treinos-salvos.js'
       - 'js/painel-agenda-modal-hotfix.js'
@@ -35,6 +37,8 @@ on:
       - 'js/admin-forecast.js'
       - 'js/exercicio-drag-order-structured-sync.js'
       - 'js/exercise-svg-extended.js'
+      - 'js/exercise-svg-complete.js'
+      - 'js/exercise-svg-icons.js'
       - 'js/exercise-svg-specific.js'
       - 'js/ficha-treinos-salvos.js'
       - 'js/painel-agenda-modal-hotfix.js'
@@ -92,6 +96,8 @@ jobs:
             js/admin-forecast.js \
             js/exercicio-drag-order-structured-sync.js \
             js/exercise-svg-extended.js \
+            js/exercise-svg-complete.js \
+            js/exercise-svg-icons.js \
             js/exercise-svg-specific.js \
             js/ficha-treinos-salvos.js \
             js/painel-agenda-modal-hotfix.js \
