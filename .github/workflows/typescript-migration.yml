@@ -37,6 +37,8 @@ on:
       - 'js/painel-home-avatar.js'
       - 'js/inactive-account-guard.js'
       - 'js/config.js'
+      - 'js/alunos-dashboard.js'
+      - 'js/dieta-modelos-aluno.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -86,6 +88,8 @@ on:
       - 'js/painel-home-avatar.js'
       - 'js/inactive-account-guard.js'
       - 'js/config.js'
+      - 'js/alunos-dashboard.js'
+      - 'js/dieta-modelos-aluno.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -167,6 +171,8 @@ jobs:
             js/painel-home-avatar.js \
             js/inactive-account-guard.js \
             js/config.js \
+            js/alunos-dashboard.js \
+            js/dieta-modelos-aluno.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
