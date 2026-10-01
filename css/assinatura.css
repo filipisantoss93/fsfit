@@ -13,8 +13,8 @@
 .subscription-status-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:.7rem;font-weight:900;background:var(--surface);border:1px solid var(--border);white-space:nowrap}
 .subscription-status-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
 .subscription-status-badge.paid{color:#8ff0a4;border-color:rgba(50,215,75,.35);background:rgba(50,215,75,.08)}
-.subscription-status-badge.pending{color:#ffd66b;border-color:rgba(255,193,7,.35);background:rgba(255,193,7,.08)}
-.subscription-status-badge.failed{color:#ff9b9f;border-color:rgba(255,87,87,.35);background:rgba(255,87,87,.08)}
+.subscription-status-badge.pending{color:var(--fs-warning-text);border-color:var(--fs-warning-border);background:var(--fs-warning-soft)}
+.subscription-status-badge.failed{color:var(--fs-danger-text);border-color:var(--fs-danger-border);background:var(--fs-danger-soft)}
 .subscription-overview-rows{display:grid;margin-top:5px}
 .subscription-overview-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid var(--border)}
 .subscription-overview-row:last-child{border-bottom:0;padding-bottom:0}
@@ -29,7 +29,7 @@
 .subscription-history-main strong{display:block;font-size:.9rem}.subscription-history-main span{display:block;margin-top:3px;color:var(--muted);font-size:.76rem}
 .subscription-history-date,.subscription-history-value{font-size:.84rem}.subscription-history-value{font-weight:800;white-space:nowrap}
 .subscription-history-status{display:grid;justify-items:end;gap:7px}
-.subscription-history-cancel{padding:0;border:0;background:transparent;color:#ff9b9f;font:inherit;font-size:.74rem;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.subscription-history-cancel{padding:0;border:0;background:transparent;color:var(--fs-danger-text);font:inherit;font-size:.74rem;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .subscription-history-cancel:disabled{opacity:.55;cursor:wait}
 .subscription-empty{padding:24px 10px;text-align:center;color:var(--muted);font-size:.86rem;line-height:1.5}
 .subscription-empty strong{display:block;margin-bottom:5px;color:var(--text)}
@@ -61,11 +61,11 @@
 .subscription-page-header{align-items:flex-start;gap:12px;margin:8px 0 18px}
 .subscription-page-header h1{font-size:clamp(1.85rem,5vw,2.35rem)}
 .subscription-page-header p{max-width:620px;margin-top:6px;font-size:.86rem}
-.subscription-section{margin-bottom:12px;padding:16px;border-radius:16px;background:linear-gradient(180deg,rgba(24,29,36,.98),rgba(20,24,30,.98));box-shadow:0 12px 34px rgba(0,0,0,.2)}
+.subscription-section{margin-bottom:12px;padding:16px;border-radius:16px;background:linear-gradient(180deg,var(--fs-surface-raised),var(--fs-surface));box-shadow:0 12px 34px rgba(0,0,0,.2)}
 .subscription-section-header{align-items:center;margin-bottom:12px}
 .subscription-section-header h2{font-size:1.05rem;letter-spacing:-.02em}
 .subscription-section-header p{margin-top:3px;font-size:.76rem;line-height:1.4}
-.subscription-overview-card{padding:15px;border-radius:13px;background:rgba(255,255,255,.022)}
+.subscription-overview-card{padding:15px;border-radius:13px;background:var(--fs-surface-tint)}
 .subscription-overview-top{align-items:center;padding-bottom:12px}
 .subscription-plan-kicker{font-size:.62rem;letter-spacing:.09em}
 .subscription-plan-title{font-size:1.08rem;letter-spacing:-.02em}
@@ -75,7 +75,7 @@
 .subscription-overview-row span{font-size:.76rem}
 .subscription-overview-row strong{font-size:.82rem}
 .subscription-management-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.subscription-management-grid>.card,.subscription-management-grid>article,.subscription-management-grid>div:not(.subscription-management-note){min-width:0;padding:13px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.022);box-shadow:none}
+.subscription-management-grid>.card,.subscription-management-grid>article,.subscription-management-grid>div:not(.subscription-management-note){min-width:0;padding:13px;border:1px solid var(--border);border-radius:12px;background:var(--fs-surface-tint);box-shadow:none}
 .subscription-management-grid .btn{width:100%;min-height:42px;margin-top:10px;font-size:.76rem}
 .subscription-management-note{padding:20px 12px;border:1px dashed rgba(255,255,255,.12);border-radius:13px;color:var(--muted);text-align:center;font-size:.8rem}
 .subscription-admin-card{padding:14px;border-radius:13px}
@@ -83,7 +83,7 @@
 .subscription-admin-card h2{font-size:1rem}
 .subscription-admin-card p{font-size:.78rem;line-height:1.45}
 .subscription-history-list{display:grid;gap:7px;border-top:0}
-.subscription-history-item{grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.022)}
+.subscription-history-item{grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:var(--fs-surface-tint)}
 .subscription-history-main strong{font-size:.84rem}
 .subscription-history-main span{font-size:.7rem}
 .subscription-history-date,.subscription-history-value{font-size:.76rem}
