@@ -1,0 +1,27 @@
+name: Typography legibility scan
+
+on:
+  push:
+    branches:
+      - review/typography-legibility
+    paths:
+      - 'css/**/*.css'
+      - 'scripts/audit-typography-legibility.mjs'
+      - '.github/workflows/typography-legibility-scan.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: review/typography-legibility
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Scan functional typography
+        run: node scripts/audit-typography-legibility.mjs
