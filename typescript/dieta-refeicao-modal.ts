@@ -1,0 +1,45 @@
+const modal = document.querySelector<HTMLElement>('#meal-form-modal');
+const title = document.querySelector<HTMLElement>('#meal-form-modal-title');
+const form = document.querySelector<HTMLFormElement>('#meal-form');
+const openButton = document.querySelector<HTMLElement>('#new-meal-button');
+
+if (modal && title && form) {
+  const openModal = (editing = false): void => {
+    title.textContent = editing ? 'Editar refeição' : 'Nova refeição';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('diet-modal-open');
+    setTimeout(() => form.querySelector<HTMLInputElement>('input[name="nome"]')?.focus(), 0);
+  };
+
+  const closeModal = (): void => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (!document.querySelector('.diet-modal.open')) document.body.classList.remove('diet-modal-open');
+  };
+
+  openButton?.addEventListener('click', () => {
+    form.reset();
+    const orderField = form.elements.namedItem('ordem');
+    if (orderField instanceof HTMLInputElement) orderField.value = '1';
+    form.querySelectorAll<HTMLInputElement>('#meal-days input').forEach(input => { input.checked = false; });
+    form.querySelector('[type="submit"]')?.replaceChildren(document.createTextNode('Adicionar refeição'));
+    openModal(false);
+  });
+
+  document.addEventListener('click', event => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('[data-close-meal-form-modal]')) closeModal();
+    if (event.target.closest('#meal-modal-edit')) setTimeout(() => openModal(true), 0);
+  });
+
+  form.addEventListener('submit', () => {
+    setTimeout(() => {
+      if (!document.querySelector('#diet-message.message.error.show')) closeModal();
+    }, 500);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+}

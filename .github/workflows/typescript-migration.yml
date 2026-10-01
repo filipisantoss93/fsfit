@@ -7,8 +7,11 @@ on:
       - 'js/admin-search-clear.js'
       - 'js/admin-tabs.js'
       - 'js/aulas-painel-delete-layout-fix.js'
+      - 'js/biblioteca-treinos-layout.js'
+      - 'js/dieta-refeicao-modal.js'
       - 'js/exercise-picker-horizontal-scroll-fix.js'
       - 'js/library-row-click.js'
+      - 'js/treino-aluno-empty-state-guard.js'
       - 'tsconfig.json'
       - 'package.json'
       - 'package-lock.json'
@@ -21,8 +24,11 @@ on:
       - 'js/admin-search-clear.js'
       - 'js/admin-tabs.js'
       - 'js/aulas-painel-delete-layout-fix.js'
+      - 'js/biblioteca-treinos-layout.js'
+      - 'js/dieta-refeicao-modal.js'
       - 'js/exercise-picker-horizontal-scroll-fix.js'
       - 'js/library-row-click.js'
+      - 'js/treino-aluno-empty-state-guard.js'
       - 'tsconfig.json'
       - 'package.json'
       - 'package-lock.json'
@@ -67,8 +73,11 @@ jobs:
             js/admin-search-clear.js \
             js/admin-tabs.js \
             js/aulas-painel-delete-layout-fix.js \
+            js/biblioteca-treinos-layout.js \
+            js/dieta-refeicao-modal.js \
             js/exercise-picker-horizontal-scroll-fix.js \
-            js/library-row-click.js
+            js/library-row-click.js \
+            js/treino-aluno-empty-state-guard.js
 
       - name: Validate page script references
         run: node scripts/audit-page-scripts.mjs

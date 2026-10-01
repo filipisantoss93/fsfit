@@ -51,7 +51,7 @@ try {
   // ser carregado junto, pois ele reativa a interface antiga e duplica a
   // navegação e os estados vazios.
   await import('./treino-aluno-simplificado.js?v=20260726-simple2');
-  await import('./treino-aluno-empty-state-guard.js?v=20260725-empty-guard2');
+  await import('./treino-aluno-empty-state-guard.js?v=20260930-ts1');
   await import('./treino-aluno-exercicios-avulsos.js?v=20260725-day-exercises2');
 
   revealSimplifiedPage();
