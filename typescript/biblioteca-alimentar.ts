@@ -306,12 +306,12 @@ foodSearch.addEventListener('input', renderFoods);
 mealSearch.addEventListener('input', renderMeals);
 mealFoodSearch.addEventListener('input', renderMealFoodPicker);
 
-document.querySelector('#open-food-modal').addEventListener('click', () => { resetFoodForm(); openModal(foodModal); });
-document.querySelector('#open-food-category-modal').addEventListener('click', () => { resetFoodCategoryForm(); openModal(foodCategoryModal); });
-document.querySelector('#open-meal-builder').addEventListener('click', () => { resetMealBuilder(); openModal(mealModal); });
-document.querySelector('#cancel-food-edit').addEventListener('click', () => { closeModal(foodModal); resetFoodForm(); });
-document.querySelector('#cancel-food-category-edit').addEventListener('click', () => { closeModal(foodCategoryModal); resetFoodCategoryForm(); });
-document.querySelector('#cancel-meal-builder').addEventListener('click', () => { closeModal(mealModal); resetMealBuilder(); });
+document.querySelector<HTMLElement>('#open-food-modal')!.addEventListener('click', () => { resetFoodForm(); openModal(foodModal); });
+document.querySelector<HTMLElement>('#open-food-category-modal')!.addEventListener('click', () => { resetFoodCategoryForm(); openModal(foodCategoryModal); });
+document.querySelector<HTMLElement>('#open-meal-builder')!.addEventListener('click', () => { resetMealBuilder(); openModal(mealModal); });
+document.querySelector<HTMLElement>('#cancel-food-edit')!.addEventListener('click', () => { closeModal(foodModal); resetFoodForm(); });
+document.querySelector<HTMLElement>('#cancel-food-category-edit')!.addEventListener('click', () => { closeModal(foodCategoryModal); resetFoodCategoryForm(); });
+document.querySelector<HTMLElement>('#cancel-meal-builder')!.addEventListener('click', () => { closeModal(mealModal); resetMealBuilder(); });
 
 document.addEventListener('click', async event => {
   const target = event.target as HTMLElement;
@@ -319,19 +319,19 @@ document.addEventListener('click', async event => {
   if (target.closest('[data-close-food-category-modal]')) { closeModal(foodCategoryModal); resetFoodCategoryForm(); return; }
   if (target.closest('[data-close-meal-builder]')) { closeModal(mealModal); resetMealBuilder(); return; }
 
-  const categoryButton = target.closest('[data-food-category]');
-  if (categoryButton) { activeFoodCategoryId = categoryButton.dataset.foodCategory; foodSearch.value = ''; renderFoodCategoryNav(); renderFoods(); return; }
-  const mealCategoryButton = target.closest('[data-meal-food-category]');
-  if (mealCategoryButton) { activeMealFoodCategoryId = mealCategoryButton.dataset.mealFoodCategory; renderMealFoodCategoryNav(); renderMealFoodPicker(); return; }
+  const categoryButton = target.closest<HTMLElement>('[data-food-category]');
+  if (categoryButton) { activeFoodCategoryId = categoryButton.dataset.foodCategory || null; foodSearch.value = ''; renderFoodCategoryNav(); renderFoods(); return; }
+  const mealCategoryButton = target.closest<HTMLElement>('[data-meal-food-category]');
+  if (mealCategoryButton) { activeMealFoodCategoryId = mealCategoryButton.dataset.mealFoodCategory || null; renderMealFoodCategoryNav(); renderMealFoodPicker(); return; }
 
-  const missingFood = target.closest('[data-add-missing-food]');
-  if (missingFood) { resetFoodForm(missingFood.dataset.addMissingFood); openModal(foodModal); return; }
-  const missingMealFood = target.closest('[data-add-missing-meal-food]');
-  if (missingMealFood) { resetFoodForm(missingMealFood.dataset.addMissingMealFood); openModal(foodModal); return; }
+  const missingFood = target.closest<HTMLElement>('[data-add-missing-food]');
+  if (missingFood) { resetFoodForm(missingFood.dataset.addMissingFood || ''); openModal(foodModal); return; }
+  const missingMealFood = target.closest<HTMLElement>('[data-add-missing-meal-food]');
+  if (missingMealFood) { resetFoodForm(missingMealFood.dataset.addMissingMealFood || ''); openModal(foodModal); return; }
 
-  const editFoodButton = target.closest('[data-edit-food]');
+  const editFoodButton = target.closest<HTMLElement>('[data-edit-food]');
   if (editFoodButton) { editFood(editFoodButton.dataset.editFood); return; }
-  const deleteFoodButton = target.closest('[data-delete-food]');
+  const deleteFoodButton = target.closest<HTMLElement>('[data-delete-food]');
   if (deleteFoodButton) {
     if (!confirm(`Excluir ${deleteFoodButton.dataset.name} da biblioteca?`)) return;
     const { error } = await supabase.from('alimentos').delete().eq('id', deleteFoodButton.dataset.deleteFood).eq('personal_id', session.user.id).eq('global', false);
@@ -341,7 +341,7 @@ document.addEventListener('click', async event => {
     return;
   }
 
-  const editCategoryButton = target.closest('[data-edit-food-category]');
+  const editCategoryButton = target.closest<HTMLElement>('[data-edit-food-category]');
   if (editCategoryButton) {
     const category = foodCategoryById(editCategoryButton.dataset.editFoodCategory);
     if (!category || category.global) return;
@@ -352,7 +352,7 @@ document.addEventListener('click', async event => {
     openModal(foodCategoryModal);
     return;
   }
-  const deleteCategoryButton = target.closest('[data-delete-food-category]');
+  const deleteCategoryButton = target.closest<HTMLElement>('[data-delete-food-category]');
   if (deleteCategoryButton) {
     if (!confirm(`Excluir a categoria ${deleteCategoryButton.dataset.name}?`)) return;
     const { error } = await supabase.from('categorias_alimentos').delete().eq('id', deleteCategoryButton.dataset.deleteFoodCategory).eq('personal_id', session.user.id).eq('global', false);
@@ -363,15 +363,16 @@ document.addEventListener('click', async event => {
     return;
   }
 
-  const removeFoodButton = target.closest('[data-remove-meal-food]');
+  const removeFoodButton = target.closest<HTMLElement>('[data-remove-meal-food]');
   if (removeFoodButton) {
-    selectedMealFoods.delete(removeFoodButton.dataset.removeMealFood);
+    const removeId = removeFoodButton.dataset.removeMealFood;
+    if (removeId) selectedMealFoods.delete(removeId);
     renderMealFoodPicker();
     renderSelectedMealFoods();
     return;
   }
 
-  const deleteMealButton = target.closest('[data-delete-meal]');
+  const deleteMealButton = target.closest<HTMLElement>('[data-delete-meal]');
   if (deleteMealButton) {
     if (!confirm(`Excluir a refeição ${deleteMealButton.dataset.name}?`)) return;
     const { error } = await supabase.from('biblioteca_refeicoes').delete().eq('id', deleteMealButton.dataset.deleteMeal).eq('personal_id', session.user.id).eq('global', false);
@@ -393,11 +394,11 @@ document.addEventListener('change', event => {
     return;
   }
   const quantity = target.closest<HTMLInputElement>('[data-meal-quantity]');
-  if (quantity) { const item = selectedMealFoods.get(quantity.dataset.mealQuantity); if (item) item.quantidade = quantity.value; return; }
+  if (quantity) { const id = quantity.dataset.mealQuantity; const item = id ? selectedMealFoods.get(id) : undefined; if (item) item.quantidade = quantity.value; return; }
   const unit = target.closest<HTMLInputElement>('[data-meal-unit]');
-  if (unit) { const item = selectedMealFoods.get(unit.dataset.mealUnit); if (item) item.unidade = unit.value; return; }
+  if (unit) { const id = unit.dataset.mealUnit; const item = id ? selectedMealFoods.get(id) : undefined; if (item) item.unidade = unit.value; return; }
   const note = target.closest<HTMLInputElement>('[data-meal-note]');
-  if (note) { const item = selectedMealFoods.get(note.dataset.mealNote); if (item) item.observacoes = note.value; }
+  if (note) { const id = note.dataset.mealNote; const item = id ? selectedMealFoods.get(id) : undefined; if (item) item.observacoes = note.value; }
 });
 
 try {
