@@ -11,6 +11,7 @@ on:
       - 'scripts/audit-css-pages.mjs'
       - 'scripts/audit-css-runtime.mjs'
       - 'scripts/audit-theme-contrast.mjs'
+      - 'scripts/audit-typography-legibility.mjs'
       - '.github/workflows/auditoria-css.yml'
   push:
     branches: [main]
@@ -23,6 +24,7 @@ on:
       - 'scripts/audit-css-pages.mjs'
       - 'scripts/audit-css-runtime.mjs'
       - 'scripts/audit-theme-contrast.mjs'
+      - 'scripts/audit-typography-legibility.mjs'
       - '.github/workflows/auditoria-css.yml'
 
 permissions:
@@ -49,6 +51,9 @@ jobs:
 
       - name: Auditar contraste dos temas
         run: node scripts/audit-theme-contrast.mjs
+
+      - name: Auditar legibilidade tipográfica
+        run: node scripts/audit-typography-legibility.mjs
 
       - name: Auditar referências, duplicações e arquivos de origem
         run: node scripts/audit-css-pages.mjs
