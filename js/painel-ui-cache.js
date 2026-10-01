@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js';
-import { readUiCache, writeUiCache } from './ui-cache.js';
+import { readUiCache, writeUiCache } from './ui-cache.js?v=20261001-ts-ui-cache1';
 
 const SCOPE = 'painel-ui-snapshot';
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
