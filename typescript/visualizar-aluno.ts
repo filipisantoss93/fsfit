@@ -6,7 +6,7 @@ import { requireSession } from './layout.js';
 type JsonRecord = Record<string, any>;
 
 const $ = <T extends Element = HTMLElement>(selector: string): T => document.querySelector<T>(selector)!;
-const $ = <T extends Element = HTMLElement>(selector: string): T[] => [...document.querySelectorAll<T>(selector)];
+const queryAll = <T extends Element = HTMLElement>(selector: string): T[] => [...document.querySelectorAll<T>(selector)];
 const alunoId = new URLSearchParams(location.search).get('id');
 const loading = $('#loading-state');
 const errorState = $('#error-state');
@@ -100,8 +100,8 @@ function youtubeEmbedUrl(url: unknown): string | null {
 
 function setView(view: string): void {
   const target = document.querySelector(`[data-student-panel="${CSS.escape(view)}"]`) ? view : 'home';
-  $$('[data-student-panel]').forEach(panel => panel.classList.toggle('active', panel.dataset.studentPanel === target));
-  $$('[data-student-view]').forEach(button => {
+  queryAll('[data-student-panel]').forEach(panel => panel.classList.toggle('active', panel.dataset.studentPanel === target));
+  queryAll('[data-student-view]').forEach(button => {
     const navView = button.dataset.studentView;
     button.classList.toggle('active', navView === target || (target === 'diet' && navView === 'more'));
   });
@@ -113,7 +113,7 @@ function setupNavigation(): void {
     const trigger = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-student-view]') : null;
     if (!trigger) return;
     event.preventDefault();
-    setView(trigger.dataset.studentView);
+    setView(trigger.dataset.studentView || 'home');
   });
 
   $('#view-exercises')?.addEventListener('click', () => setView('workout'));
@@ -125,7 +125,7 @@ function setupNavigation(): void {
     setView('workout');
   });
 
-  $$('[data-dashboard-action]').forEach(button => button.addEventListener('click', () => {
+  queryAll('[data-dashboard-action]').forEach(button => button.addEventListener('click', () => {
     const action = button.dataset.dashboardAction;
     openDetail(action === 'notifications' ? 'Notificações' : 'Configurações', `<div class="student-detail-block"><p>${action === 'notifications' ? 'Nenhuma notificação pendente neste momento.' : 'As configurações do portal serão disponibilizadas conforme os recursos da conta.'}</p></div>`);
   }));
@@ -170,7 +170,7 @@ function openWorkoutItem(id: string): void {
 function openMealItem(id: string): void {
   const item = mealItems.find(row => String(row.id || row.ordem || '') === String(id));
   if (!item) return;
-  const days = (item.dias_semana || []).map(day => dayNames[Number(day)]).filter(Boolean).join(', ');
+  const days = (item.dias_semana || []).map((day: unknown) => dayNames[Number(day)]).filter(Boolean).join(', ');
   openDetail(item.nome || 'Refeição', `<div class="student-detail-grid"><div><small>Horário</small><strong>${esc(item.horario ? String(item.horario).slice(0, 5) : '—')}</strong></div><div><small>Ordem</small><strong>${esc(String(item.ordem || '—'))}</strong></div></div><div class="student-detail-block"><small>Dias da semana</small><p>${esc(days || 'Não informado')}</p></div><div class="student-detail-block"><small>Descrição</small><p>${esc(item.descricao || 'Nenhuma descrição informada.')}</p></div>${item.substituicoes ? `<div class="student-detail-block"><small>Substituições</small><p>${esc(item.substituicoes)}</p></div>` : ''}`);
 }
 
@@ -316,7 +316,7 @@ $('#diet-content').addEventListener('click', event => {
   if (itemId) openMealItem(itemId);
 });
 
-$$('[data-close-student-detail]').forEach(button => button.addEventListener('click', closeDetail));
+queryAll('[data-close-student-detail]').forEach(button => button.addEventListener('click', closeDetail));
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeDetail(); });
 
 setupNavigation();
