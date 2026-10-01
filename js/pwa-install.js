@@ -1,5 +1,5 @@
 import './modal-focus-a11y.js?v=20260930-ts1';
-import './painel-runtime.js?v=20260730-panel-runtime1';
+import './painel-runtime.js?v=20261001-ts-panel-runtime1';
 
 const DISMISS_KEY = 'fsfit_pwa_install_dismissed_until';
 const DISMISS_DAYS = 7;
