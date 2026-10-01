@@ -190,7 +190,7 @@ async function editStudent(id: string): Promise<void> {
   form.horario_aula.value = data.horario_aula ? String(data.horario_aula).slice(0, 5) : '';
   form.local_aula.value = data.local_aula || '';
   updateAge();
-  document.querySelector('#cancel-edit').classList.remove('hidden');
+  document.querySelector<HTMLButtonElement>('#cancel-edit')!.classList.remove('hidden');
   openForm();
 }
 
@@ -199,7 +199,7 @@ function resetForm(): void {
   form.reset();
   form.idade.value = '';
   formTitle.textContent = 'Cadastrar novo aluno';
-  document.querySelector('#cancel-edit').classList.add('hidden');
+  document.querySelector<HTMLButtonElement>('#cancel-edit')!.classList.add('hidden');
 }
 
 form.data_nascimento.addEventListener('input', () => {
@@ -213,7 +213,7 @@ form.data_nascimento.addEventListener('blur', () => {
   }
 });
 form.whatsapp.addEventListener('input', () => { form.whatsapp.value = phone(form.whatsapp.value); });
-document.querySelector('#cancel-edit').addEventListener('click', resetForm);
+document.querySelector<HTMLButtonElement>('#cancel-edit')!.addEventListener('click', resetForm);
 toggleStudentForm?.addEventListener('click', () => {
   resetForm();
   openForm();
