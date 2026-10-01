@@ -1,0 +1,173 @@
+/* FS Fit — contrato final de consistência UX das telas internas */
+
+main.container {
+  --fs-ux-section-gap: 16px;
+}
+
+main.container > .page-header,
+main.container > .student-record-header {
+  margin-bottom: 20px;
+}
+
+.page-header > div:first-child,
+.student-record-title > div:first-child,
+.section-heading > div:first-child {
+  min-width: 0;
+}
+
+.page-header h1,
+.student-record-title h1 {
+  text-wrap: balance;
+}
+
+.page-header p,
+.student-record-title p {
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+.page-header > .btn,
+.page-header > .actions,
+.page-header > [class$="-header-actions"] {
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
+.page-header > .hero-badge {
+  flex: 0 0 auto;
+  align-self: flex-start;
+}
+
+/* Retorno é navegação, não compete visualmente com a ação principal da página. */
+.page-header > div:first-child > a.btn.btn-outline:first-child {
+  width: fit-content;
+  margin: 0 0 8px;
+  padding-inline: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--fs-text-muted, var(--muted));
+  box-shadow: none;
+  justify-content: flex-start;
+}
+
+.page-header > div:first-child > a.btn.btn-outline:first-child:hover {
+  border-color: transparent;
+  background: transparent;
+  color: var(--fs-text);
+}
+
+.section-heading {
+  min-width: 0;
+}
+
+.section-heading > .actions,
+.section-heading > [class$="-actions"] {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+
+main.container :where(.card, .panel, .sub-card, .section-heading, .page-header) {
+  min-width: 0;
+}
+
+main.container :where(a, p, span, strong) {
+  overflow-wrap: break-word;
+}
+
+/* Barras horizontais mantêm o item ativo acessível sem quebrar o layout. */
+:where(
+  .dashboard-tabs,
+  .record-tabs,
+  .profile-tabs,
+  .admin-tabs-nav,
+  .finance-status-filter-nav,
+  .library-category-nav,
+  .student-plan-tabs
+) {
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+}
+
+:where(
+  .dashboard-tabs,
+  .record-tabs,
+  .profile-tabs,
+  .admin-tabs-nav,
+  .finance-status-filter-nav,
+  .library-category-nav,
+  .student-plan-tabs
+) > :where(button, a) {
+  scroll-snap-align: start;
+}
+
+/* Estados operacionais não devem deslocar a página quando vazios. */
+.message:not(.show):empty,
+[role="status"]:empty:not(.show) {
+  margin-block: 0;
+}
+
+/* Rodapés de modal e grupos de ação seguem a mesma ordem visual. */
+:where(.modal-actions, .modal-footer, [class$="-modal-actions"]) {
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 620px) {
+  main.container {
+    margin-top: 18px;
+  }
+
+  main.container > .page-header,
+  main.container > .student-record-header {
+    margin-bottom: 16px;
+  }
+
+  .page-header {
+    gap: 12px;
+  }
+
+  .page-header > .hero-badge {
+    order: -1;
+    margin-bottom: -2px;
+  }
+
+  .page-header > .btn,
+  .page-header > .actions,
+  .page-header > [class$="-header-actions"] {
+    width: 100%;
+  }
+
+  .page-header > .actions,
+  .page-header > [class$="-header-actions"] {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .page-header > .btn,
+  .page-header > .actions > .btn,
+  .page-header > [class$="-header-actions"] > .btn {
+    width: 100%;
+  }
+
+  .section-heading {
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .section-heading > .actions,
+  .section-heading > [class$="-actions"] {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .section-heading > .actions > .btn,
+  .section-heading > [class$="-actions"] > .btn {
+    flex: 1 1 auto;
+  }
+
+  :where(.modal-actions, .modal-footer, [class$="-modal-actions"]) > .btn {
+    flex: 1 1 100%;
+  }
+}
