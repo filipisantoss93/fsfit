@@ -6,6 +6,7 @@ on:
       - 'typescript/**/*.ts'
       - 'js/assinatura-gerenciamento.js'
       - 'js/renovacao-plano.js'
+      - 'js/financeiro.js'
       - 'js/admin.js'
       - 'js/biblioteca-alimentar.js'
       - 'js/layout-core.js'
@@ -151,6 +152,7 @@ on:
       - 'typescript/**/*.ts'
       - 'js/assinatura-gerenciamento.js'
       - 'js/renovacao-plano.js'
+      - 'js/financeiro.js'
       - 'js/admin.js'
       - 'js/biblioteca-alimentar.js'
       - 'js/layout-core.js'
@@ -325,14 +327,14 @@ jobs:
       - name: Build browser JavaScript
         run: npm run build:typescript
 
-      - name: Commit generated JavaScript for current batch
+      - name: Commit generated JavaScript for final batch
         run: |
-          if git diff --quiet -- js/renovacao-plano.js js/assinatura-gerenciamento.js; then
+          if git diff --quiet -- js/financeiro.js; then
             echo "Generated JavaScript already synchronized."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add js/renovacao-plano.js js/assinatura-gerenciamento.js
-          git commit -m "Compile TypeScript outputs for subscription flows"
+          git add js/financeiro.js
+          git commit -m "Compile final TypeScript finance output"
           git push origin HEAD:codex/typescript-migration-phase1
