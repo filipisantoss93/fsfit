@@ -15,6 +15,8 @@ on:
       - 'js/exercise-svg-specific.js'
       - 'js/ficha-treinos-salvos.js'
       - 'js/painel-agenda-modal-hotfix.js'
+      - 'js/portal-aluno-tabs.js'
+      - 'js/selecionar-personal.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -42,6 +44,8 @@ on:
       - 'js/exercise-svg-specific.js'
       - 'js/ficha-treinos-salvos.js'
       - 'js/painel-agenda-modal-hotfix.js'
+      - 'js/portal-aluno-tabs.js'
+      - 'js/selecionar-personal.js'
       - 'js/aulas-painel-delete-layout-fix.js'
       - 'js/biblioteca-treinos-layout.js'
       - 'js/dieta-refeicao-modal.js'
@@ -101,6 +105,8 @@ jobs:
             js/exercise-svg-specific.js \
             js/ficha-treinos-salvos.js \
             js/painel-agenda-modal-hotfix.js \
+            js/portal-aluno-tabs.js \
+            js/selecionar-personal.js \
             js/aulas-painel-delete-layout-fix.js \
             js/biblioteca-treinos-layout.js \
             js/dieta-refeicao-modal.js \
