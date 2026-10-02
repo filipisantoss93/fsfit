@@ -30,6 +30,32 @@
   position: relative;
 }
 
+.fsfit-header-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fs-text-muted);
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.fsfit-header-theme select {
+  min-height: 40px;
+  max-width: 102px;
+  padding: 0 25px 0 9px;
+  border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius-md);
+  background: var(--fs-surface-raised);
+  color: var(--fs-text);
+  font: inherit;
+  font-size: .76rem;
+}
+
+.fsfit-header-theme select:focus-visible {
+  outline: none;
+  box-shadow: var(--fs-focus-ring);
+}
+
 .notification-button,
 .menu-mobile-btn {
   position: relative;
@@ -744,14 +770,4 @@
   .menu-mobile-btn {
     transition: none;
   }
-}
-
-
-/* Tema no shell lateral */
-.nav-footer .fsfit-theme-setting {
-  margin-bottom: 8px;
-  padding: 10px;
-  border: 1px solid var(--fs-border);
-  border-radius: var(--fs-radius-md);
-  background: var(--fs-surface);
 }

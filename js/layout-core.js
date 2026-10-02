@@ -135,14 +135,6 @@ export function renderHeader(active = '') {
           <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html">${icon('settings')}<span>Administração</span><span class="admin-support-nav-badge hidden" data-admin-support-badge>0</span></a></li>
         </ul>
         <div class="nav-footer">
-          <div class="fsfit-theme-setting">
-            <span class="fsfit-theme-setting-label">Tema</span>
-            <div class="fsfit-theme-control" role="group" aria-label="Tema visual">
-              <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Auto</button>
-              <button type="button" data-fsfit-theme-choice="light" aria-pressed="false">Claro</button>
-              <button type="button" data-fsfit-theme-choice="dark" aria-pressed="false">Escuro</button>
-            </div>
-          </div>
           <a id="sidebar-profile" class="sidebar-profile" href="perfil.html" data-page="perfil">
             <span id="sidebar-profile-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span>
             <span class="sidebar-profile-copy"><strong id="sidebar-profile-name">Personal</strong><small>Meu perfil</small></span>
@@ -151,6 +143,14 @@ export function renderHeader(active = '') {
           <button id="logout-button" class="sidebar-logout" type="button">${icon('logout')}<span>Sair</span></button>
         </div>
         <div class="nav-header-actions">
+          <label class="fsfit-header-theme" for="fsfit-theme-select">
+            <span class="fsfit-header-theme-label">Tema</span>
+            <select id="fsfit-theme-select" aria-label="Selecionar tema visual">
+              <option value="auto">Auto</option>
+              <option value="light">Claro</option>
+              <option value="dark">Escuro</option>
+            </select>
+          </label>
           <div class="notification-shell">
             <button id="notification-button" class="notification-button" type="button" aria-label="Abrir notificações" aria-expanded="false" aria-controls="notification-panel">${icon('bell')}<span id="notification-badge" class="notification-badge hidden">0</span></button>
             <section id="notification-panel" class="notification-panel" aria-label="Notificações" hidden>
@@ -166,6 +166,14 @@ export function renderHeader(active = '') {
     const menuButton = host.querySelector('#menu-button');
     const notificationButton = host.querySelector('#notification-button');
     const notificationPanel = host.querySelector('#notification-panel');
+    const themeSelect = host.querySelector('#fsfit-theme-select');
+    const syncThemeSelect = () => {
+        if (themeSelect && globalThis.FSFitTheme)
+            themeSelect.value = globalThis.FSFitTheme.getPreference();
+    };
+    syncThemeSelect();
+    themeSelect?.addEventListener('change', () => globalThis.FSFitTheme?.setPreference(themeSelect.value));
+    window.addEventListener('fsfit:theme-change', syncThemeSelect);
     host.querySelector(`[data-page="${active}"]`)?.classList.add('active');
     const setMenuOpen = (open) => {
         menu?.classList.toggle('active', open);
