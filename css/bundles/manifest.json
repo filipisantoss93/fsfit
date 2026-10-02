@@ -7,10 +7,10 @@
     "/admin-assinaturas.html": "/css/bundles/fsfit.89605808405263cf.css",
     "/admin-contatos.html": "/css/bundles/fsfit.bb7d51810ce5d195.css",
     "/admin.html": "/css/bundles/fsfit.ce61e02bcb85e635.css",
-    "/agenda.html": "/css/bundles/fsfit.afdf751c4bf25132.css",
+    "/agenda.html": "/css/bundles/fsfit.2bf33168d95cab97.css",
     "/aluno-preview.html": "/css/bundles/fsfit.d3b87f7da0d6613d.css",
     "/aluno.html": "/css/bundles/fsfit.cfad55f9ea46ea58.css",
-    "/alunos.html": "/css/bundles/fsfit.37ae0925ec933670.css",
+    "/alunos.html": "/css/bundles/fsfit.683cbe9d02db29d0.css",
     "/assinatura.html": "/css/bundles/fsfit.e9fe3e363b0ebc53.css",
     "/biblioteca-alimentar.html": "/css/bundles/fsfit.aa0fbf503e48a351.css",
     "/biblioteca-exercicios.html": "/css/bundles/fsfit.087726bd431fc85a.css",
@@ -43,11 +43,11 @@
   ],
   "criticalBundles": [
     "/css/bundles/fsfit.13788541d1556105.css",
-    "/css/bundles/fsfit.37ae0925ec933670.css",
+    "/css/bundles/fsfit.2bf33168d95cab97.css",
+    "/css/bundles/fsfit.683cbe9d02db29d0.css",
     "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/css/bundles/fsfit.a1a482539541846d.css",
     "/css/bundles/fsfit.a68fd1b65affe4b6.css",
-    "/css/bundles/fsfit.afdf751c4bf25132.css",
     "/css/bundles/fsfit.cfad55f9ea46ea58.css"
   ],
   "bundles": {
@@ -252,9 +252,9 @@
       ]
     },
     "agenda.html": {
-      "url": "/css/bundles/fsfit.afdf751c4bf25132.css",
-      "sha256": "afdf751c4bf251320f26a58cce508c58066cbd4200f3cf28fb34028e278dc1a6",
-      "bytes": 130498,
+      "url": "/css/bundles/fsfit.2bf33168d95cab97.css",
+      "sha256": "2bf33168d95cab97d5d3a5ea8e03faf97a314200d13cd939409ae14b54aa1382",
+      "bytes": 130573,
       "sourceCount": 19,
       "duplicatesRemoved": 1,
       "sources": [
@@ -397,9 +397,9 @@
       ]
     },
     "alunos.html": {
-      "url": "/css/bundles/fsfit.37ae0925ec933670.css",
-      "sha256": "37ae0925ec93367019411a59649da7331cd349e021a8445815bbdfd0847fde21",
-      "bytes": 134146,
+      "url": "/css/bundles/fsfit.683cbe9d02db29d0.css",
+      "sha256": "683cbe9d02db29d026dff1cbcf740ae912f197cf1a30403cc14692a1e76e6dc7",
+      "bytes": 134093,
       "sourceCount": 21,
       "duplicatesRemoved": 1,
       "sources": [

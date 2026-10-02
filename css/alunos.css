@@ -1,11 +1,11 @@
 /* Página de alunos — Fase 4 · padrão FS Fit */
 .students-page { width: min(calc(100% - 32px), 1040px); max-width: 1040px; }
-.students-page-header { align-items: flex-start; gap: var(--fs-space-5, 20px); margin-bottom: var(--fs-space-4, 16px); }
-.students-page-heading { min-width: 0; }
+.students-page-header { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-bottom: var(--fs-space-4, 16px); }
 .students-eyebrow { display: block; margin-bottom: 6px; color: var(--fs-primary, var(--primary)); font-size:var(--fs-font-xs,.75rem); font-weight: 900; letter-spacing: .1em; }
+.students-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
 .students-page-header h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.35rem); letter-spacing: -.035em; }
 .students-page-header p { max-width: 620px; margin: 7px 0 0; color: var(--fs-text-muted, var(--muted)); font-size: .86rem; line-height: 1.5; }
-.students-add-button { width: auto; min-height: var(--fs-control-height, 42px); margin-left: auto; padding-inline: 15px; white-space: nowrap; align-self: flex-start; justify-self: end; }
+.students-add-button { flex: 0 0 auto; width: auto; min-height: var(--fs-control-height, 42px); margin: 0; padding-inline: 15px; white-space: nowrap; }
 .students-add-button span { margin-right: 4px; font-size: 1.05em; }
 
 .students-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--fs-space-3, 12px); margin: 0 0 var(--fs-space-4, 16px); }
@@ -70,10 +70,11 @@ body.embed-edit .student-modal-panel { width: 100%; max-height: none; min-height
 
 @media (max-width: 620px) {
   .students-page { width: 100%; padding-inline: 12px; }
-  .students-page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 10px; margin: 10px 0 14px; }
+  .students-page-header { align-items: stretch; gap: 0; margin: 10px 0 14px; }
   .students-page-header h1 { font-size: 1.65rem; }
   .students-page-header p { max-width: 300px; font-size: .8rem; }
-  .students-add-button { grid-column: 2; grid-row: 1; align-self: start; justify-self: end; min-height:44px; margin-top: 2px; padding-inline: 11px; font-size:var(--fs-font-xs,.75rem); }
+  .students-title-row { gap: 8px; }
+  .students-add-button { min-height:44px; padding-inline: 11px; font-size:var(--fs-font-xs,.75rem); }
   .students-add-button span { margin-right: 2px; }
   .students-summary { gap: 8px; margin-inline: 0; }
   .students-summary-card { min-width: 138px; padding: 12px 13px; border-radius: var(--fs-radius-md, 8px); }
