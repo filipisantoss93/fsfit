@@ -76,7 +76,7 @@
   .agenda-header { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: start; gap: 10px; }
   .agenda-header p { margin-bottom: 0; }
   .agenda-header-actions { display: flex; width: auto; margin-left: 0; justify-self: end; }
-  .agenda-schedule-button { width: auto; min-height: 44px; padding: 8px 12px; font-size:var(--fs-font-xs); text-align: center; }
+  .agenda-schedule-button { padding: 8px 12px; font-size:var(--fs-font-xs); text-align: center; }
   .agenda-toolbar { padding: 9px; }
   .agenda-day { padding: 14px; }
   .agenda-day-heading { align-items: center; }

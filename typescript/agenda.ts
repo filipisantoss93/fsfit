@@ -37,6 +37,7 @@ let cancelledStudentIds = new Set<string>();
 let liveStudentIds = new Set<string>();
 let studentRecords: JsonRecord[] = [];
 let scheduleReturnFocus: HTMLElement | null = null;
+let dateRequestId = 0;
 
 const scheduleUi = ensureScheduleUi();
 const scheduleModal = scheduleUi.modal;
@@ -53,6 +54,14 @@ function esc(value: unknown = ''): string {
   const div = document.createElement('div');
   div.textContent = String(value ?? '');
   return div.innerHTML;
+}
+
+function withLoadingTimeout<T>(request: PromiseLike<T>, timeoutMs = 12000): Promise<T> {
+  let timer = 0;
+  const timeout = new Promise<T>((_, reject) => {
+    timer = window.setTimeout(() => reject(new Error('A solicitação demorou demais.')), timeoutMs);
+  });
+  return Promise.race([Promise.resolve(request), timeout]).finally(() => window.clearTimeout(timer));
 }
 
 function formatTime(value: unknown): string {
@@ -245,9 +254,9 @@ function updateDateControls(date: Date): void {
   todayRow.hidden = isToday;
 }
 
-async function loadDateSpecificData(date: Date): Promise<void> {
+async function loadDateSpecificData(date: Date): Promise<{ appointments: AgendaEntry[]; cancelledIds: Set<string> }> {
   const value = formatDateValue(date);
-  const [appointmentsResult, cancellationsResult] = await Promise.all([
+  const [appointmentsResult, cancellationsResult] = await withLoadingTimeout(Promise.all([
     supabase
       .from('agenda_agendamentos')
       .select('id,aluno_id,treino_id,data,horario,local,titulo,alunos(id,nome),treinos(id,nome)')
@@ -259,22 +268,37 @@ async function loadDateSpecificData(date: Date): Promise<void> {
       .select('aluno_id')
       .eq('personal_id', session.user.id)
       .eq('data', value)
-  ]);
+  ]));
 
   if (appointmentsResult.error) console.error('Erro ao carregar agendamentos manuais:', appointmentsResult.error);
   if (cancellationsResult.error) console.error('Erro ao carregar cancelamentos da agenda:', cancellationsResult.error);
 
-  manualAppointments = (appointmentsResult.data || []).map(normalizeManualAppointment);
-  cancelledStudentIds = new Set((cancellationsResult.data || []).map((row: JsonRecord) => String(row.aluno_id || '')).filter(Boolean));
+  return {
+    appointments: (appointmentsResult.data || []).map(normalizeManualAppointment),
+    cancelledIds: new Set((cancellationsResult.data || []).map((row: JsonRecord) => String(row.aluno_id || '')).filter(Boolean))
+  };
 }
 
 async function selectDate(date: Date): Promise<void> {
   const value = formatDateValue(date);
+  const requestId = ++dateRequestId;
   dateInput.value = value;
   updateDateControls(date);
-  await loadDateSpecificData(date);
+  manualAppointments = [];
+  cancelledStudentIds = new Set();
   renderAgendaForDate(date);
   history.replaceState({}, '', `agenda.html?data=${encodeURIComponent(value)}`);
+
+  try {
+    const result = await loadDateSpecificData(date);
+    if (requestId !== dateRequestId || dateInput.value !== value) return;
+    manualAppointments = result.appointments;
+    cancelledStudentIds = result.cancelledIds;
+    renderAgendaForDate(date);
+  } catch (error) {
+    console.error('Erro ao carregar detalhes da data da agenda:', error);
+    if (requestId === dateRequestId) showMessage(message, 'Não foi possível carregar os agendamentos manuais. Os treinos ativos continuam visíveis.', 'error');
+  }
 }
 
 function shiftSelectedDate(days: number): void {
@@ -382,12 +406,26 @@ async function saveAppointment(event: Event): Promise<void> {
 }
 
 async function loadAgenda(): Promise<void> {
-  const { data, error } = await supabase
+  const initialDate = new URLSearchParams(location.search).get('data');
+  const selectedDate = initialDate ? parseDateValue(initialDate) : new Date();
+  dateInput.value = formatDateValue(selectedDate);
+  updateDateControls(selectedDate);
+  grid.innerHTML = '<article class="card agenda-loading-card" role="status">Carregando agenda…</article>';
+
+  let result;
+  try {
+    result = await withLoadingTimeout(supabase
     .from('treinos')
     .select('id,nome,dias_semana,status,alunos!inner(id,nome,periodo_aula,horario_aula,local_aula)')
     .eq('personal_id', session.user.id)
     .eq('status', 'ativo')
-    .order('updated_at', { ascending: false });
+    .order('updated_at', { ascending: false }));
+  } catch (error) {
+    console.error('Erro ao carregar treinos da agenda:', error);
+    grid.innerHTML = '<article class="card agenda-empty" role="alert">A agenda demorou para carregar. Atualize a página para tentar novamente.</article>';
+    return showMessage(message, 'A agenda demorou para carregar.', 'error');
+  }
+  const { data, error } = result;
 
   if (error) {
     console.error(error);
@@ -398,10 +436,10 @@ async function loadAgenda(): Promise<void> {
 
   workoutRecords = (data || []) as JsonRecord[];
   agendaEntries = normalizeEntries(workoutRecords);
-  await Promise.all([loadStudents(), loadLiveStudents()]);
+  void loadStudents();
+  void loadLiveStudents();
 
-  const requestedDate = new URLSearchParams(location.search).get('data');
-  await selectDate(requestedDate ? parseDateValue(requestedDate) : new Date());
+  await selectDate(selectedDate);
 }
 
 function ensureScheduleUi(): { modal: HTMLElement; form: HTMLFormElement } {

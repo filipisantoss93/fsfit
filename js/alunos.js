@@ -20,6 +20,13 @@ let students = [];
 function errorMessage(error, fallback) {
     return error instanceof Error && error.message ? error.message : fallback;
 }
+function withLoadingTimeout(request, timeoutMs = 12000) {
+    let timer = 0;
+    const timeout = new Promise((_, reject) => {
+        timer = window.setTimeout(() => reject(new Error('A solicitação demorou demais.')), timeoutMs);
+    });
+    return Promise.race([Promise.resolve(request), timeout]).finally(() => window.clearTimeout(timer));
+}
 function esc(value = '') {
     const div = document.createElement('div');
     div.textContent = String(value ?? '');
@@ -140,13 +147,26 @@ function filterStudents() {
     renderStudents(filtered);
 }
 async function loadStudents() {
-    const { data, error } = await supabase
+    list.innerHTML = '<tr><td colspan="4" class="student-loading-state">Carregando alunos…</td></tr>';
+    let result;
+    try {
+        result = await withLoadingTimeout(supabase
         .from('alunos')
         .select('id,nome,sexo,telefone,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,status')
         .eq('personal_id', session.user.id)
-        .order('nome');
-    if (error)
+        .order('nome'));
+    }
+    catch (error) {
+        console.error('Erro ao carregar alunos:', error);
+        list.innerHTML = '<tr><td colspan="4" class="student-loading-state" role="alert">A lista demorou para carregar. Atualize a página para tentar novamente.</td></tr>';
+        return showMessage(message, 'A lista de alunos demorou para carregar.', 'error');
+    }
+    const { data, error } = result;
+    if (error) {
+        console.error('Erro ao carregar alunos:', error);
+        list.innerHTML = '<tr><td colspan="4" class="student-loading-state" role="alert">Não foi possível carregar os alunos. Atualize a página para tentar novamente.</td></tr>';
         return showMessage(message, 'Não foi possível carregar os alunos.', 'error');
+    }
     students = (data || []);
     updateStudentCount(students.length);
     filterStudents();

@@ -349,9 +349,9 @@ main.container :where(a, p, span, strong) {
     margin-bottom: -2px;
   }
 
-  .page-header > .btn,
-  .page-header > .actions,
-  .page-header > [class$="-header-actions"] {
+  .page-header:not(.students-page-header):not(.agenda-header) > .btn,
+  .page-header:not(.students-page-header):not(.agenda-header) > .actions,
+  .page-header:not(.students-page-header):not(.agenda-header) > [class$="-header-actions"] {
     width: 100%;
   }
 
@@ -362,9 +362,9 @@ main.container :where(a, p, span, strong) {
     gap: 8px;
   }
 
-  .page-header > .btn,
-  .page-header > .actions > .btn,
-  .page-header > [class$="-header-actions"] > .btn {
+  .page-header:not(.students-page-header):not(.agenda-header) > .btn,
+  .page-header:not(.students-page-header):not(.agenda-header) > .actions > .btn,
+  .page-header:not(.students-page-header):not(.agenda-header) > [class$="-header-actions"] > .btn {
     width: 100%;
   }
 
@@ -388,4 +388,3 @@ main.container :where(a, p, span, strong) {
     flex: 1 1 100%;
   }
 }
-
