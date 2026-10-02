@@ -2,7 +2,7 @@
 .students-page { width: min(calc(100% - 32px), 1040px); max-width: 1040px; }
 .students-page-header { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-bottom: var(--fs-space-4, 16px); }
 .students-eyebrow { display: block; margin-bottom: 6px; color: var(--fs-primary, var(--primary)); font-size:var(--fs-font-xs,.75rem); font-weight: 900; letter-spacing: .1em; }
-.students-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.students-title-row { display: flex; align-self: stretch; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-width: 0; }
 .students-page-header h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.35rem); letter-spacing: -.035em; }
 .students-page-header p { max-width: 620px; margin: 7px 0 0; color: var(--fs-text-muted, var(--muted)); font-size: .86rem; line-height: 1.5; }
 .students-add-button { flex: 0 0 auto; width: auto; min-height: var(--fs-control-height, 42px); margin: 0; padding-inline: 15px; white-space: nowrap; }

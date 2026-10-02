@@ -1,6 +1,6 @@
 .agenda-page { max-width: 980px; }
 .agenda-header { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
-.agenda-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.agenda-title-row { display: flex; align-self: stretch; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-width: 0; }
 .agenda-title-row h1 { margin-bottom: 0; }
 .agenda-header p { max-width: 620px; margin-top: 7px; }
 .agenda-header-actions { display: flex; align-items: center; gap: 8px; margin-left: 0; flex: 0 0 auto; }
