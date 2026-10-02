@@ -15,6 +15,7 @@ let activeFilter = 'all';
 let studentMeta = new Map<string, StudentMeta>();
 let inClassIds = new Set<string>();
 let activeWorkoutIds = new Set<string>();
+let filterDataLoaded = false;
 
 function esc(value: unknown = ''): string {
   const div = document.createElement('div');
@@ -87,6 +88,7 @@ function closeActionMenus(except: Element | null = null): void {
 }
 
 function updateSummary(): void {
+  if (!filterDataLoaded) return;
   const total = studentMeta.size || list?.querySelectorAll('tr[data-student-id]').length || 0;
   const noWorkout = [...studentMeta.keys()].filter(id => !activeWorkoutIds.has(id)).length;
   const totalNode = document.querySelector('#student-count');
@@ -240,7 +242,10 @@ async function refreshFilterData(): Promise<void> {
     supabase.from('treinos').select('aluno_id').eq('personal_id', session.user.id).eq('status', 'ativo')
   ]);
 
-  if (!studentsResult.error) studentMeta = new Map<string, StudentMeta>(((studentsResult.data || []) as StudentMeta[]).map(item => [item.id, item]));
+  if (!studentsResult.error) {
+    studentMeta = new Map<string, StudentMeta>(((studentsResult.data || []) as StudentMeta[]).map(item => [item.id, item]));
+    filterDataLoaded = true;
+  }
   if (!sessionsResult.error) inClassIds = new Set<string>(((sessionsResult.data || []) as Array<{ status: string; aluno_id: string }>).filter(item => item.status === 'em_aula').map(item => item.aluno_id));
   if (!workoutsResult.error) activeWorkoutIds = new Set<string>(((workoutsResult.data || []) as Array<{ aluno_id?: string }>).map(item => item.aluno_id).filter((id): id is string => Boolean(id)));
 

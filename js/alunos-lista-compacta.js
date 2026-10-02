@@ -11,6 +11,7 @@ let activeFilter = 'all';
 let studentMeta = new Map();
 let inClassIds = new Set();
 let activeWorkoutIds = new Set();
+let filterDataLoaded = false;
 function esc(value = '') {
     const div = document.createElement('div');
     div.textContent = String(value ?? '');
@@ -85,6 +86,8 @@ function closeActionMenus(except = null) {
     });
 }
 function updateSummary() {
+    if (!filterDataLoaded)
+        return;
     const total = studentMeta.size || list?.querySelectorAll('tr[data-student-id]').length || 0;
     const noWorkout = [...studentMeta.keys()].filter(id => !activeWorkoutIds.has(id)).length;
     const totalNode = document.querySelector('#student-count');
@@ -242,8 +245,10 @@ async function refreshFilterData() {
         supabase.rpc('listar_sessoes_em_aula_personal'),
         supabase.from('treinos').select('aluno_id').eq('personal_id', session.user.id).eq('status', 'ativo')
     ]);
-    if (!studentsResult.error)
+    if (!studentsResult.error) {
         studentMeta = new Map((studentsResult.data || []).map(item => [item.id, item]));
+        filterDataLoaded = true;
+    }
     if (!sessionsResult.error)
         inClassIds = new Set((sessionsResult.data || []).filter(item => item.status === 'em_aula').map(item => item.aluno_id));
     if (!workoutsResult.error)
