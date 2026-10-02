@@ -269,6 +269,43 @@ html.fsfit-sheet-open body {
     line-height: 1;
   }
 
+  /* Os contadores ficam sobre o rótulo, como o badge do sino, sem criar
+     uma segunda linha que aumente ou desloque o item da navegação. */
+  .fsfit-bottom-nav .fsfit-nav-badge {
+    position: absolute;
+    z-index: 2;
+    top: 22px;
+    left: calc(50% + 34px);
+    display: inline-flex;
+    width: auto;
+    min-width: 17px;
+    min-height: 17px;
+    height: 17px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--fs-surface-overlay);
+    border-radius: 999px;
+    background: #c74751;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .fsfit-bottom-nav .fsfit-nav-badge.is-dot {
+    top: 24px;
+    left: calc(50% + 30px);
+    width: 9px;
+    min-width: 9px;
+    min-height: 9px;
+    height: 9px;
+    padding: 0;
+    border-width: 2px;
+  }
+
   .fsfit-bottom-nav a.active,
   .fsfit-bottom-nav button.active,
   .fsfit-bottom-nav button.is-open {

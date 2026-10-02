@@ -8,6 +8,8 @@ button { color: inherit; }
 .container { width: min(calc(100% - 32px), var(--container)); margin: 32px auto 60px; }
 .main-header { position: sticky; top: 0; z-index: 100; padding-top: var(--safe-area-top); background: var(--fs-surface-overlay); border-bottom: 1px solid var(--border); backdrop-filter: blur(14px); }
 .nav-container { width: min(calc(100% - 32px), var(--container)); min-height: 76px; margin-inline: auto; display: flex; align-items: center; gap: 20px; }
+#header-container [data-fsfit-shell-placeholder],
+.fsfit-bottom-nav[data-fsfit-shell-placeholder] { visibility: hidden; }
 .logo-nav, .auth-logo { display: flex; align-items: center; gap: 9px; font-size: 1.35rem; font-weight: 800; }
 .logo-nav strong, .auth-logo strong { display: grid; place-items: center; min-width: 42px; height: 42px; padding: 0 10px; border-radius: 13px; color: #101410; background: linear-gradient(135deg, var(--primary), var(--warning)); }
 .logo-nav span, .auth-logo span { font-weight: 700; }
@@ -349,9 +351,9 @@ main.container :where(a, p, span, strong) {
     margin-bottom: -2px;
   }
 
-  .page-header > .btn,
-  .page-header > .actions,
-  .page-header > [class$="-header-actions"] {
+  .page-header:not(.students-page-header):not(.agenda-header) > .btn,
+  .page-header:not(.students-page-header):not(.agenda-header) > .actions,
+  .page-header:not(.students-page-header):not(.agenda-header) > [class$="-header-actions"] {
     width: 100%;
   }
 
@@ -362,9 +364,9 @@ main.container :where(a, p, span, strong) {
     gap: 8px;
   }
 
-  .page-header > .btn,
-  .page-header > .actions > .btn,
-  .page-header > [class$="-header-actions"] > .btn {
+  .page-header:not(.students-page-header):not(.agenda-header) > .btn,
+  .page-header:not(.students-page-header):not(.agenda-header) > .actions > .btn,
+  .page-header:not(.students-page-header):not(.agenda-header) > [class$="-header-actions"] > .btn {
     width: 100%;
   }
 
@@ -388,4 +390,3 @@ main.container :where(a, p, span, strong) {
     flex: 1 1 100%;
   }
 }
-

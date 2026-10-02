@@ -132,7 +132,6 @@ body.fsfit-dashboard-modern .dashboard-public-link-compact, body.fsfit-dashboard
 
 @media (max-width: 620px) {
   body.fsfit-dashboard-modern .page-header { align-items: stretch; gap: 14px; }
-  body.fsfit-dashboard-modern #new-student-button { width: 100%; }
   body.fsfit-dashboard-modern .dashboard-summary-card { min-height: 96px; padding: 14px 12px; }
   body.fsfit-dashboard-modern .dashboard-summary-card strong { font-size: 1.18rem; }
   body.fsfit-dashboard-modern .attention-card { padding: 17px; }
