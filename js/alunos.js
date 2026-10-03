@@ -174,7 +174,7 @@ async function loadStudents() {
 }
 async function editStudent(id) {
     const { data, error } = await supabase.from('alunos')
-        .select('id,nome,sexo,telefone,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,objetivo,restricoes,observacoes,periodo_aula,horario_aula,local_aula,status')
+        .select('id,nome,sexo,telefone,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,objetivo,restricoes,observacoes,periodo_aula,horario_aula,local_aula,dias_semana,dias_aula,status')
         .eq('id', id).eq('personal_id', session.user.id).single();
     if (error)
         return showMessage(message, 'Não foi possível abrir o cadastro.', 'error');
@@ -193,6 +193,8 @@ async function editStudent(id) {
     form.periodo_aula.value = data.periodo_aula || '';
     form.horario_aula.value = data.horario_aula ? String(data.horario_aula).slice(0, 5) : '';
     form.local_aula.value = data.local_aula || '';
+    const routineDays = Array.isArray(data.dias_semana) && data.dias_semana.length ? data.dias_semana : (data.dias_aula || []);
+    form.querySelectorAll('[name="dias_semana_rotina"]').forEach(input => { input.checked = routineDays.includes(input.value); });
     updateAge();
     document.querySelector('#cancel-edit').classList.remove('hidden');
     openForm();
@@ -294,7 +296,9 @@ form.addEventListener('submit', async (event) => {
         telefone: phone(form.whatsapp.value),
         sexo: dbSexo(form.sexo.value),
         data_nascimento: birthDateIso,
-        periodo_aula: form.periodo_aula.value || null,
+        dias_semana: [...form.querySelectorAll('[name="dias_semana_rotina"]:checked')].map(input => input.value),
+    dias_aula: [...form.querySelectorAll('[name="dias_semana_rotina"]:checked')].map(input => input.value),
+    periodo_aula: form.periodo_aula.value || null,
         horario_aula: form.horario_aula.value || null,
         local_aula: form.local_aula.value.trim() || null,
         altura_cm: numberOrNull(form.altura_cm.value),
@@ -309,10 +313,16 @@ form.addEventListener('submit', async (event) => {
         return showMessage(message, 'Informe o nome do aluno.', 'error');
     if (payload.telefone.length !== 11)
         return showMessage(message, 'O WhatsApp deve ter 11 números: DDD + número.', 'error');
-    if ((payload.periodo_aula || payload.horario_aula || payload.local_aula) && !(payload.periodo_aula && payload.horario_aula && payload.local_aula)) {
-        return showMessage(message, 'Para programar a agenda, informe período, horário e local. Os dias são definidos pelo treino ativo.', 'error');
-    }
-    const button = form.querySelector('[type=submit]');
+    if (payload.dias_semana.length && !(payload.horario_aula && payload.local_aula)) {
+    return showMessage(message, 'Para criar a rotina semanal, selecione os dias e informe horário e local.', 'error');
+  }
+  if (!payload.dias_semana.length) {
+    payload.periodo_aula = null;
+    payload.horario_aula = null;
+    payload.local_aula = null;
+  }
+
+  const button = form.querySelector('[type=submit]');
     button.disabled = true;
     try {
         const query = editingId
