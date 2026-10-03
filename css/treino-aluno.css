@@ -513,7 +513,7 @@ body.day-exercise-picker-open { overflow: hidden; }
 .day-exercise-categories::-webkit-scrollbar { display: none; }
 .day-exercise-categories button {
   flex: 0 0 auto;
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 12px;
   border: 1px solid var(--fs-border, var(--border, #2b333e));
   border-radius: 999px;
@@ -648,7 +648,7 @@ body.day-exercise-picker-open { overflow: hidden; }
   .day-exercise-picker-toolbar { gap: 8px; padding: 10px 12px 8px; }
   .day-exercise-target-note { padding: 8px 9px; }
   .day-exercise-categories { gap: 6px; }
-  .day-exercise-categories button { min-height: 34px; padding-inline: 10px; font-size: .78rem; }
+  .day-exercise-categories button { min-height: 44px; padding-inline: 10px; font-size: .78rem; }
   .day-exercise-list { gap: 6px; padding: 8px 12px 10px; }
   .day-exercise-option { min-height: 54px; padding: 9px 10px; }
   .day-exercise-picker-footer { grid-template-columns: 1fr; gap: 7px; padding: 9px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }

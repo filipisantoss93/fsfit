@@ -29,7 +29,7 @@
     "/selecionar-personal.html": "/css/bundles/fsfit.96077af6bc38c593.css",
     "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/termos.html": "/css/bundles/fsfit.8defe059f370c629.css",
-    "/treino-aluno.html": "/css/bundles/fsfit.e201e00dad8aff63.css",
+    "/treino-aluno.html": "/css/bundles/fsfit.400d849391dcb22f.css",
     "/visualizar-aluno.html": "/css/bundles/fsfit.125f7c37c8e0cca6.css"
   },
   "criticalPages": [
@@ -1253,8 +1253,8 @@
       ]
     },
     "treino-aluno.html": {
-      "url": "/css/bundles/fsfit.e201e00dad8aff63.css",
-      "sha256": "e201e00dad8aff6365bf064bb9f0fed4f2ddf7fda0b894c0e6f5c1368c2aee98",
+      "url": "/css/bundles/fsfit.400d849391dcb22f.css",
+      "sha256": "400d849391dcb22fb161703f1f60ea67c6be58d0236e90c9ed856dd23be71028",
       "bytes": 171473,
       "sourceCount": 25,
       "duplicatesRemoved": 0,
