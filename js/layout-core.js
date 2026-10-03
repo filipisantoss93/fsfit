@@ -115,6 +115,7 @@ export function renderHeader(active = '') {
     const host = document.querySelector('#header-container');
     if (!host)
         return;
+    const profileSilhouette = '<svg class="profile-avatar-silhouette" style="display:block;width:58%;height:58%;fill:currentColor;color:var(--muted);pointer-events:none" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0v1h-15z"/></svg>';
     headerCleanup?.();
     headerCleanup = null;
     host.innerHTML = `
@@ -144,7 +145,7 @@ export function renderHeader(active = '') {
             </div>
           </div>
           <a id="sidebar-profile" class="sidebar-profile" href="perfil.html" data-page="perfil">
-            <span id="sidebar-profile-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span>
+            <span id="sidebar-profile-avatar" class="sidebar-profile-avatar" aria-hidden="true">${profileSilhouette}</span>
             <span class="sidebar-profile-copy"><strong id="sidebar-profile-name">Personal</strong><small>Meu perfil</small></span>
             ${icon('chevron')}
           </a>
@@ -158,7 +159,7 @@ export function renderHeader(active = '') {
               <div id="notification-list" class="notification-list"><div class="notification-empty"><strong>Nenhuma notificação nova</strong><span>As atualizações dos seus alunos aparecerão aqui.</span></div></div>
             </section>
           </div>
-          <button id="fsfit-profile-menu-button" class="fsfit-profile-menu-button" type="button" aria-label="Abrir menu da plataforma" aria-expanded="false" aria-haspopup="dialog" aria-controls="fsfit-more-dialog"><span id="fsfit-header-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span></button>
+          <button id="fsfit-profile-menu-button" class="fsfit-profile-menu-button" type="button" aria-label="Abrir menu da plataforma" aria-expanded="false" aria-haspopup="dialog" aria-controls="fsfit-more-dialog"><span id="fsfit-header-avatar" class="sidebar-profile-avatar" aria-hidden="true">${profileSilhouette}</span></button>
         </div>
       </nav>
     </header>`;
@@ -465,8 +466,6 @@ export async function setGreeting(session) {
     const headerGreeting = document.querySelector('#user-greeting');
     const dashboardGreeting = document.querySelector('#dashboard-user-greeting');
     const sidebarName = document.querySelector('#sidebar-profile-name');
-    const sidebarAvatar = document.querySelector('#sidebar-profile-avatar');
-    const headerAvatar = document.querySelector('#fsfit-header-avatar');
     if (headerGreeting)
         headerGreeting.textContent = text;
     if (dashboardGreeting) {
@@ -475,22 +474,6 @@ export async function setGreeting(session) {
     }
     if (sidebarName)
         sidebarName.textContent = resolvedName;
-    if (sidebarAvatar) {
-        const initials = String(resolvedName).split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'PF';
-        const avatarUrl = session.user?.user_metadata?.avatar_url || session.user?.user_metadata?.picture || '';
-        if (avatarUrl) {
-            sidebarAvatar.style.backgroundImage = `url("${String(avatarUrl).replace(/"/g, '%22')}")`;
-            sidebarAvatar.textContent = '';
-            sidebarAvatar.classList.add('has-image');
-        }
-        else {
-            sidebarAvatar.textContent = initials;
-        }
-    }
-    if (headerAvatar) {
-        const initials = String(resolvedName).split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'PF';
-        headerAvatar.textContent = initials;
-    }
     try {
         const { data: admin } = await supabase.from('platform_admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
         if (admin)
