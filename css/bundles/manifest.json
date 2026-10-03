@@ -29,7 +29,7 @@
     "/selecionar-personal.html": "/css/bundles/fsfit.96077af6bc38c593.css",
     "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/termos.html": "/css/bundles/fsfit.8defe059f370c629.css",
-    "/treino-aluno.html": "/css/bundles/fsfit.6f8ec83aa87b774c.css",
+    "/treino-aluno.html": "/css/bundles/fsfit.d7c8fc12a6280b50.css",
     "/visualizar-aluno.html": "/css/bundles/fsfit.125f7c37c8e0cca6.css"
   },
   "criticalPages": [
@@ -1253,10 +1253,10 @@
       ]
     },
     "treino-aluno.html": {
-      "url": "/css/bundles/fsfit.6f8ec83aa87b774c.css",
-      "sha256": "6f8ec83aa87b774cbe814124cb3759369e09f25059167bdab833899761e28022",
-      "bytes": 161570,
-      "sourceCount": 25,
+      "url": "/css/bundles/fsfit.d7c8fc12a6280b50.css",
+      "sha256": "d7c8fc12a6280b50457ec3d828ae52bd3300e4cca9cb9c10198949f68f508123",
+      "bytes": 171527,
+      "sourceCount": 26,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -1272,6 +1272,7 @@
         "css/pwa-install.css",
         "css/style.css",
         "css/treino-aluno.css",
+        "css/treino-aluno-exercicios-avulsos.css",
         "css/treino-aluno-retorno.css",
         "css/treino-sticky-exercise-save.css",
         "css/treino-exercise-picker-sheet.css",

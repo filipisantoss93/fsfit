@@ -211,7 +211,8 @@
     "treino-aluno.html": {
       "styles": [
         "css/style.css",
-        "css/treino-aluno.css"
+        "css/treino-aluno.css",
+        "css/treino-aluno-exercicios-avulsos.css"
       ]
     },
     "visualizar-aluno.html": {
