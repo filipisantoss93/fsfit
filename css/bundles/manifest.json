@@ -17,7 +17,7 @@
     "/cancelamento.html": "/css/bundles/fsfit.8defe059f370c629.css",
     "/contato.html": "/css/bundles/fsfit.5dca001f4e81f832.css",
     "/dieta-aluno.html": "/css/bundles/fsfit.f1f2acca92442fbd.css",
-    "/ficha-aluno.html": "/css/bundles/fsfit.0a86130afd51158f.css",
+    "/ficha-aluno.html": "/css/bundles/fsfit.38997d588206f058.css",
     "/financeiro.html": "/css/bundles/fsfit.05ce157e5272ca0d.css",
     "/lembretes-aluno.html": "/css/bundles/fsfit.29c54bae03b734ec.css",
     "/nova-senha.html": "/css/bundles/fsfit.be9c50c11b658af0.css",
@@ -758,9 +758,9 @@
       ]
     },
     "ficha-aluno.html": {
-      "url": "/css/bundles/fsfit.0a86130afd51158f.css",
-      "sha256": "0a86130afd51158fbebb5de9b0a28934539f715ef8b4f80b3ffa1336b56b57ec",
-      "bytes": 147951,
+      "url": "/css/bundles/fsfit.38997d588206f058.css",
+      "sha256": "38997d588206f058d113c036c3b80ce02c288971c1df1d0908ff2fb4c5584948",
+      "bytes": 146967,
       "sourceCount": 19,
       "duplicatesRemoved": 0,
       "sources": [
