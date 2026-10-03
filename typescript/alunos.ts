@@ -164,13 +164,14 @@ function filterStudents(): void {
 
 async function loadStudents(): Promise<void> {
   list.innerHTML = '<tr><td colspan="4" class="student-loading-state">Carregando alunos…</td></tr>';
-  let result;
-  try {
-    result = await withLoadingTimeout(supabase
+  const query = supabase
     .from('alunos')
     .select('id,nome,sexo,telefone,data_nascimento,altura_cm,peso_inicial_kg,percentual_gordura_inicial,status')
     .eq('personal_id', session.user.id)
-    .order('nome'));
+    .order('nome');
+  let result: Awaited<typeof query>;
+  try {
+    result = await withLoadingTimeout(query);
   } catch (error) {
     console.error('Erro ao carregar alunos:', error);
     list.innerHTML = '<tr><td colspan="4" class="student-loading-state" role="alert">A lista demorou para carregar. Atualize a página para tentar novamente.</td></tr>';

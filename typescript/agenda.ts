@@ -412,14 +412,15 @@ async function loadAgenda(): Promise<void> {
   updateDateControls(selectedDate);
   grid.innerHTML = '<article class="card agenda-loading-card" role="status">Carregando agenda…</article>';
 
-  let result;
-  try {
-    result = await withLoadingTimeout(supabase
+  const query = supabase
     .from('treinos')
     .select('id,nome,dias_semana,status,alunos!inner(id,nome,periodo_aula,horario_aula,local_aula)')
     .eq('personal_id', session.user.id)
     .eq('status', 'ativo')
-    .order('updated_at', { ascending: false }));
+    .order('updated_at', { ascending: false });
+  let result: Awaited<typeof query>;
+  try {
+    result = await withLoadingTimeout(query);
   } catch (error) {
     console.error('Erro ao carregar treinos da agenda:', error);
     grid.innerHTML = '<article class="card agenda-empty" role="alert">A agenda demorou para carregar. Atualize a página para tentar novamente.</article>';

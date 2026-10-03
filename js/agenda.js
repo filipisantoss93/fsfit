@@ -374,14 +374,15 @@ async function loadAgenda() {
     dateInput.value = formatDateValue(selectedDate);
     updateDateControls(selectedDate);
     grid.innerHTML = '<article class="card agenda-loading-card" role="status">Carregando agenda…</article>';
-    let result;
-    try {
-        result = await withLoadingTimeout(supabase
+    const query = supabase
         .from('treinos')
         .select('id,nome,dias_semana,status,alunos!inner(id,nome,periodo_aula,horario_aula,local_aula)')
         .eq('personal_id', session.user.id)
         .eq('status', 'ativo')
-        .order('updated_at', { ascending: false }));
+        .order('updated_at', { ascending: false });
+    let result;
+    try {
+        result = await withLoadingTimeout(query);
     }
     catch (error) {
         console.error('Erro ao carregar treinos da agenda:', error);
@@ -391,7 +392,7 @@ async function loadAgenda() {
     const { data, error } = result;
     if (error) {
         console.error(error);
-        grid.innerHTML = '<article class="card agenda-empty" role="alert">Não foi possível carregar os treinos da agenda.</article>';
+        grid.innerHTML = '';
         showMessage(message, 'Não foi possível carregar a agenda.', 'error');
         return;
     }
