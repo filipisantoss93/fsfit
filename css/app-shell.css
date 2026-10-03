@@ -21,9 +21,6 @@ body {
   }
 }
 
-@media (max-width: 860px) {
-}
-
 /* Sistema global de modal e bloqueio de rolagem. */
 html.fsfit-modal-open,
 body.fsfit-modal-open {

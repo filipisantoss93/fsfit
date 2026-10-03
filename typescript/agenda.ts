@@ -45,6 +45,8 @@ const scheduleForm = scheduleUi.form;
 const scheduleStudent = scheduleForm.querySelector<HTMLSelectElement>('[name="aluno_id"]')!;
 const scheduleWorkout = scheduleForm.querySelector<HTMLSelectElement>('[name="treino_id"]')!;
 const scheduleDate = scheduleForm.querySelector<HTMLInputElement>('[name="data"]')!;
+const scheduleRecurrence = scheduleForm.querySelector<HTMLElement>('[data-schedule-recurrence]')!;
+const scheduleEndDate = scheduleForm.querySelector<HTMLInputElement>('[name="data_fim"]')!;
 const scheduleTime = scheduleForm.querySelector<HTMLInputElement>('[name="horario"]')!;
 const scheduleLocation = scheduleForm.querySelector<HTMLInputElement>('[name="local"]')!;
 const scheduleTitle = scheduleForm.querySelector<HTMLInputElement>('[name="titulo"]')!;
@@ -352,6 +354,13 @@ function openScheduleModal(): void {
   const selectedDate = dateInput.value || formatDateValue(new Date());
   scheduleForm.reset();
   scheduleDate.value = selectedDate;
+  const endDate = parseDateValue(selectedDate);
+  endDate.setDate(endDate.getDate() + 84);
+  scheduleEndDate.value = formatDateValue(endDate);
+  scheduleRecurrence.hidden = true;
+  const endDateInput = scheduleForm.querySelector<HTMLInputElement>('[name="data_fim"]')!;
+  endDateInput.disabled = true;
+  endDateInput.required = false;
   scheduleWorkout.innerHTML = '<option value="">Usar treino ativo do aluno</option>';
   scheduleModal.classList.add('open');
   scheduleModal.setAttribute('aria-hidden', 'false');
@@ -377,24 +386,40 @@ async function saveAppointment(event: Event): Promise<void> {
   scheduleSubmit.textContent = 'Salvando...';
 
   try {
-    const payload = {
+    const basePayload = {
       personal_id: session.user.id,
       aluno_id: studentId,
       treino_id: scheduleWorkout.value || null,
-      data: scheduleDate.value,
       horario: scheduleTime.value || null,
       local: scheduleLocation.value.trim() || null,
       titulo: scheduleTitle.value.trim() || null
     };
+    const dates: string[] = [];
+    const schedulingMode = scheduleForm.querySelector<HTMLInputElement>('[name="modo_agendamento"]:checked')?.value;
+    if (schedulingMode === 'weekly') {
+      const weekdays = [...scheduleForm.querySelectorAll<HTMLInputElement>('[name="dias_semana"]:checked')].map(input => Number(input.value));
+      const start = parseDateValue(scheduleDate.value);
+      const end = parseDateValue(scheduleEndDate.value);
+      if (!weekdays.length) throw new Error('Selecione ao menos um dia da semana.');
+      if (end < start) throw new Error('A data final precisa ser igual ou posterior à data inicial.');
+      if (end.getTime() - start.getTime() > 183 * 86400000) throw new Error('A repetição pode durar no máximo 26 semanas.');
+      for (const cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+        if (weekdays.includes(cursor.getDay())) dates.push(formatDateValue(cursor));
+      }
+      if (dates.length > 100) throw new Error('Esse período cria mais de 100 aulas. Reduza a duração ou os dias selecionados.');
+    } else {
+      dates.push(scheduleDate.value);
+    }
 
+    const payload = dates.map(data => ({ ...basePayload, data }));
     const { error } = await supabase.from('agenda_agendamentos').insert(payload);
     if (error) throw error;
 
     closeScheduleModal();
     showMessage(message, 'Aluno agendado com sucesso.');
 
-    if (dateInput.value === payload.data) {
-      await selectDate(parseDateValue(payload.data));
+    if (dates.includes(dateInput.value)) {
+      await selectDate(parseDateValue(dateInput.value));
     }
   } catch (error) {
     console.error('Erro ao agendar aluno:', error);
@@ -481,9 +506,14 @@ function ensureScheduleUi(): { modal: HTMLElement; form: HTMLFormElement } {
         <form id="schedule-form">
           <div class="form-group"><label>Aluno *</label><select name="aluno_id" required><option value="">Selecione um aluno</option></select></div>
           <div class="form-group"><label>Treino</label><select name="treino_id"><option value="">Usar treino ativo do aluno</option></select></div>
+          <div class="form-group"><label>Tipo de agendamento</label><div class="schedule-mode-options" role="group" aria-label="Tipo de agendamento"><label><input type="radio" name="modo_agendamento" value="exact" checked> Dia exato</label><label><input type="radio" name="modo_agendamento" value="weekly"> Repetir semanalmente</label></div></div>
           <div class="grid grid-2">
             <div class="form-group"><label>Data *</label><input name="data" type="date" required></div>
             <div class="form-group"><label>Horário *</label><input name="horario" type="time" required></div>
+          </div>
+          <div data-schedule-recurrence hidden>
+            <div class="form-group"><label>Dias da semana *</label><div class="schedule-weekdays"><label><input type="checkbox" name="dias_semana" value="1"> Seg</label><label><input type="checkbox" name="dias_semana" value="2"> Ter</label><label><input type="checkbox" name="dias_semana" value="3"> Qua</label><label><input type="checkbox" name="dias_semana" value="4"> Qui</label><label><input type="checkbox" name="dias_semana" value="5"> Sex</label><label><input type="checkbox" name="dias_semana" value="6"> Sáb</label><label><input type="checkbox" name="dias_semana" value="0"> Dom</label></div></div>
+            <div class="form-group"><label>Repetir até *</label><input name="data_fim" type="date" required disabled><small class="field-help">As aulas serão criadas semanalmente até esta data (máximo de 26 semanas).</small></div>
           </div>
           <div class="form-group"><label>Local</label><input name="local" maxlength="140" placeholder="Ex.: Academia Central"></div>
           <div class="form-group"><label>Descrição</label><input name="titulo" maxlength="140" placeholder="Ex.: Avaliação, funcional, preparação 5K..."></div>
@@ -500,6 +530,15 @@ function ensureScheduleUi(): { modal: HTMLElement; form: HTMLFormElement } {
   modal.querySelector('.agenda-modal-card')?.setAttribute('data-modal-scroll', '');
 
   const form = modal.querySelector<HTMLFormElement>('#schedule-form')!;
+  form.querySelectorAll<HTMLInputElement>('[name="modo_agendamento"]').forEach(input => input.addEventListener('change', () => {
+    const recurring = input.checked && input.value === 'weekly';
+    if (!input.checked) return;
+    const group = form.querySelector<HTMLElement>('[data-schedule-recurrence]')!;
+    const endDate = form.querySelector<HTMLInputElement>('[name="data_fim"]')!;
+    group.hidden = !recurring;
+    endDate.disabled = !recurring;
+    endDate.required = recurring;
+  }));
   openButton?.addEventListener('click', openScheduleModal);
   modal.querySelectorAll('[data-close-schedule-modal]').forEach(button => button.addEventListener('click', closeScheduleModal));
   form?.addEventListener('submit', saveAppointment);
