@@ -211,7 +211,6 @@ body.fsfit-dashboard-modern .quick-action:hover {
 }
 
 .notification-button,
-.menu-mobile-btn,
 .fsfit-more-close {
   border-radius: var(--fs-radius-sm, 6px) !important;
 }
@@ -256,8 +255,7 @@ body.fsfit-dashboard-modern .quick-action:hover {
   color: var(--fs-text-muted, #929da9) !important;
 }
 
-.fsfit-more-backdrop,
-body.nav-menu-open::before {
+.fsfit-more-backdrop {
   background: rgba(4, 7, 11, .68) !important;
 }
 
@@ -314,8 +312,7 @@ body.nav-menu-open::before {
 }
 
 html.fsfit-sheet-open,
-html.fsfit-sheet-open body,
-body.nav-menu-open {
+html.fsfit-sheet-open body {
   overscroll-behavior: none;
 }
 

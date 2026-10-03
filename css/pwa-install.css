@@ -162,14 +162,6 @@
     min-height: 58px !important;
   }
 
-  body.nav-menu-open::before {
-    inset: calc(var(--safe-area-top) + 58px) 0 0 !important;
-  }
-
-  .main-header .nav-menu {
-    top: 100% !important;
-    max-height: calc(100dvh - var(--safe-area-top) - 74px) !important;
-  }
 }
 
 @media (max-width: 520px) {

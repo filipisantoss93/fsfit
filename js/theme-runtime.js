@@ -32,6 +32,14 @@
         if (appleStatus)
             appleStatus.content = resolved === 'dark' ? 'black-translucent' : 'default';
     }
+    function syncControls(preference) {
+        document.querySelectorAll('[data-fsfit-theme-choice]').forEach(control => {
+            const choice = control.dataset.fsfitThemeChoice;
+            const active = choice === preference;
+            control.classList.toggle('is-active', active);
+            control.setAttribute('aria-pressed', String(active));
+        });
+    }
     function applyTheme() {
         const preference = readPreference();
         const resolved = resolveTheme(preference);
@@ -40,6 +48,7 @@
         root.dataset.fsfitTheme = resolved;
         root.style.colorScheme = resolved;
         syncThemeColor(resolved);
+        syncControls(preference);
         window.dispatchEvent(new CustomEvent('fsfit:theme-change', {
             detail: { preference, resolved }
         }));
@@ -62,9 +71,23 @@
         apply: applyTheme
     };
     globalThis.FSFitTheme = runtime;
+    document.addEventListener('click', event => {
+        const target = event.target instanceof Element
+            ? event.target.closest('[data-fsfit-theme-choice]')
+            : null;
+        if (!target)
+            return;
+        const choice = target.dataset.fsfitThemeChoice;
+        if (!choice || !allowed.has(choice))
+            return;
+        setPreference(choice);
+    });
     media.addEventListener?.('change', () => {
         if (readPreference() === 'auto')
             applyTheme();
     });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => syncControls(readPreference()), { once: true });
+    }
     applyTheme();
 })();

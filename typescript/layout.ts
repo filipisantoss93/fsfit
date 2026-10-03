@@ -1,16 +1,16 @@
 // @ts-ignore Existing browser JavaScript module.
 import { supabase } from './supabase.js';
 // @ts-ignore Existing browser JavaScript module.
-import * as core from './layout-core.js';
+import * as core from './layout-core.js?v=20261003-platform-menu1';
 // @ts-ignore Existing browser JavaScript module.
 import './shared-components.js?v=20261001-shared-ts1';
 
 // @ts-ignore Existing browser JavaScript module.
-export * from './layout-core.js';
+export * from './layout-core.js?v=20261003-platform-menu1';
 
 const PANEL_RETURN_SCROLL_KEY = 'fsfit:panel:return-scroll';
 const PANEL_RESTORE_SCROLL_KEY = 'fsfit:panel:restore-scroll';
-const DESKTOP_SHELL_STYLESHEET = 'css/header-menu.css?v=20260729-shell-order1';
+const DESKTOP_SHELL_STYLESHEET = 'css/header-menu.css?v=20261003-platform-menu1';
 const AUTO_SHELL_ACTIVE_BY_PAGE: Record<string, string> = {
   'painel.html': 'painel',
   'alunos.html': 'alunos',
@@ -64,9 +64,13 @@ function scheduleNonCriticalEnhancements(): void {
       // @ts-ignore Existing browser JavaScript module.
       import('./checkout-endereco.js?v=20261001-ts-address1').catch(error => console.error('Não foi possível carregar o complemento de endereço:', error));
     }
-    if (document.querySelector('.fsfit-more-sheet, [data-bottom-page="mais"]')) {
+    if (document.querySelector('.fsfit-more-sheet')) {
       // @ts-ignore Existing browser JavaScript module.
-      import('./mobile-more-swipe.js?v=20260721-more-swipe1').catch(error => console.error('Não foi possível carregar os gestos do menu Mais:', error));
+      import('./mobile-more-swipe.js?v=20261003-platform-menu1').catch(error => console.error('Não foi possível carregar os recursos do menu:', error));
+    }
+    if (document.querySelector('#fsfit-profile-menu-button')) {
+      // @ts-ignore Existing browser JavaScript module.
+      import('./sidebar-profile-photo.js?v=20261003-header-avatar1').catch(error => console.error('Não foi possível carregar a foto do perfil:', error));
     }
     if (STUDENT_AVATAR_PAGES.has(page)) {
       // @ts-ignore Existing browser JavaScript module.
@@ -84,10 +88,10 @@ function ensureMobileMoreSheet(trigger: HTMLButtonElement): { openSheet: () => v
   sheet.setAttribute('aria-hidden', 'true');
   sheet.innerHTML = `
     <button class="fsfit-more-backdrop" type="button" aria-label="Fechar menu"></button>
-    <section class="fsfit-more-panel" role="dialog" aria-modal="true" aria-labelledby="fsfit-more-title">
+    <section id="fsfit-more-dialog" class="fsfit-more-panel" role="dialog" aria-modal="true" aria-labelledby="fsfit-more-title">
       <div class="fsfit-more-handle" aria-hidden="true"></div>
       <header class="fsfit-more-heading">
-        <div><small>FS FIT</small><h2 id="fsfit-more-title">Mais opções</h2></div>
+        <div><small>FS FIT</small><h2 id="fsfit-more-title">Menu da plataforma</h2></div>
         <button class="fsfit-more-close" type="button" aria-label="Fechar">×</button>
       </header>
       <nav class="fsfit-more-list" aria-label="Mais opções do FS Fit">
@@ -96,10 +100,10 @@ function ensureMobileMoreSheet(trigger: HTMLButtonElement): { openSheet: () => v
         <button class="fsfit-more-item" type="button" data-fsfit-public-page><span class="fsfit-more-item-icon" aria-hidden="true">↗</span><span class="fsfit-more-item-copy"><strong>Página pública</strong><small>Veja sua página como seus alunos veem</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></button>
         <a class="fsfit-more-item" href="assinatura.html"><span class="fsfit-more-item-icon" aria-hidden="true">AS</span><span class="fsfit-more-item-copy"><strong>Assinatura</strong><small>Plano, cobrança e renovação</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
         <a class="fsfit-more-item" href="contato.html"><span class="fsfit-more-item-icon" aria-hidden="true">?</span><span class="fsfit-more-item-copy"><strong>Contato</strong><small>Suporte e canais de atendimento</small></span><span class="fsfit-more-item-chevron" aria-hidden="true">›</span></a>
-        <div class="fsfit-more-theme" aria-label="Tema visual">
+        <div class="fsfit-more-theme fsfit-theme-setting" aria-label="Tema visual">
           <span class="fsfit-theme-setting-label">Tema</span>
           <div class="fsfit-theme-control" role="group" aria-label="Escolher tema">
-            <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Auto</button>
+            <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Sistema</button>
             <button type="button" data-fsfit-theme-choice="light" aria-pressed="false">Claro</button>
             <button type="button" data-fsfit-theme-choice="dark" aria-pressed="false">Escuro</button>
           </div>
@@ -198,7 +202,6 @@ function ensureMobileBottomNav(active = ''): void {
   document.querySelector('.fsfit-bottom-nav')?.remove();
   const page = currentPage();
   const inferredActive = active || page.replace(/\.html$/i, '');
-  const primaryPages = new Set(['painel', 'alunos', 'agenda', 'financeiro']);
   const nav = document.createElement('nav');
   nav.className = 'fsfit-bottom-nav';
   nav.setAttribute('aria-label', 'Navegação principal');
@@ -219,18 +222,9 @@ function ensureMobileBottomNav(active = ''): void {
     nav.appendChild(link);
   });
 
-  const moreButton = document.createElement('button');
-  moreButton.type = 'button';
-  moreButton.dataset.bottomPage = 'mais';
-  moreButton.innerHTML = '<span aria-hidden="true">•••</span>Mais';
-  moreButton.setAttribute('aria-label', 'Abrir mais opções');
-  moreButton.setAttribute('aria-expanded', 'false');
-  moreButton.setAttribute('aria-haspopup', 'dialog');
-  if (!primaryPages.has(inferredActive)) moreButton.classList.add('active');
-  nav.appendChild(moreButton);
-
   document.body.appendChild(nav);
-  ensureMobileMoreSheet(moreButton);
+  const profileMenuButton = document.querySelector<HTMLButtonElement>('#fsfit-profile-menu-button');
+  if (profileMenuButton) ensureMobileMoreSheet(profileMenuButton);
 }
 
 function configureStudentRecordBackLink(): void {

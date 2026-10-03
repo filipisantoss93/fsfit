@@ -9,7 +9,6 @@ if (homePanel) {
         initializeHome(session);
 }
 async function initializeHome(session) {
-    renderHomeShell();
     updateGreetingDate();
     let scheduleEntries = [];
     let selectedLiveIndex = 0;
@@ -289,67 +288,6 @@ async function initializeHome(session) {
         if (document.visibilityState === 'visible')
             reloadAgenda().catch(console.error);
     });
-}
-function renderHomeShell() {
-    if (!homePanel)
-        return;
-    homePanel.classList.add('home-redesign');
-    homePanel.innerHTML = `
-    <article id="home-now-card" class="card home-now-card" aria-live="polite">
-      <div class="home-now-content">
-        <span id="home-now-icon" class="home-now-icon" aria-hidden="true">⌁</span>
-        <div class="home-now-copy">
-          <small class="home-card-kicker">AGORA</small>
-          <h2 id="home-now-title">Carregando seu dia...</h2>
-          <p id="home-now-status" class="home-now-status">Consultando agenda e aulas em andamento.</p>
-          <div class="home-now-person"><span aria-hidden="true">♙</span><span id="home-now-person-text">FS Fit</span></div>
-          <span id="home-now-meta" class="home-now-meta">Sincronizando informações</span>
-          <div id="home-now-indicators" class="home-now-indicators" hidden></div>
-          <small id="home-now-swipe-hint" class="home-now-swipe-hint" hidden></small>
-        </div>
-      </div>
-      <button id="home-now-action" class="home-now-action" type="button">Acompanhar aula →</button>
-    </article>
-
-    <article class="card home-day-card">
-      <h2 class="home-section-title">Seu dia</h2>
-      <div class="home-day-summary">
-        <span><i class="home-day-dot done"></i><strong id="home-day-completed">0</strong> concluídos</span>
-        <span><i class="home-day-dot live"></i><strong id="home-day-live">0</strong> em andamento</span>
-        <span><i class="home-day-dot"></i><strong id="home-day-total">0</strong> atendimentos</span>
-      </div>
-      <div class="home-day-progress" aria-hidden="true">
-        <span id="home-day-progress-done" class="home-day-progress-done"></span>
-        <span id="home-day-progress-live" class="home-day-progress-live"></span>
-      </div>
-    </article>
-
-    <article class="card home-upcoming-card">
-      <h2 class="home-section-title">Próximos da agenda</h2>
-      <div id="home-upcoming-list" class="home-upcoming-list"><p class="home-upcoming-empty">Carregando próximos atendimentos...</p></div>
-    </article>
-
-    <button id="home-review-card" class="card home-review-card" type="button">
-      <span class="home-review-leading">
-        <span class="home-review-icon" aria-hidden="true">▣</span>
-        <span class="home-review-copy">
-          <strong id="home-review-title">Itens para revisar</strong>
-          <span id="home-review-detail">Carregando pendências...</span>
-        </span>
-      </span>
-      <span class="home-review-link">Ver detalhes ›</span>
-    </button>
-
-    <article class="card home-summary-strip" aria-label="Resumo rápido">
-      <div class="home-summary-item">
-        <span class="home-summary-icon" aria-hidden="true">♟♟</span>
-        <div class="home-summary-copy"><strong id="home-summary-active">—</strong><span>alunos ativos</span></div>
-      </div>
-      <div class="home-summary-item">
-        <span class="home-summary-icon" aria-hidden="true">R$</span>
-        <div class="home-summary-copy"><strong id="home-summary-received">—</strong><span>recebidos no mês</span></div>
-      </div>
-    </article>`;
 }
 async function loadUpcomingAgenda(personalId) {
     const today = startOfDay(new Date());

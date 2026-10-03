@@ -22,14 +22,6 @@ body {
 }
 
 @media (max-width: 860px) {
-  #header-container .nav-menu {
-    transform: translateY(-8px) scale(.98) !important;
-    transform-origin: top right !important;
-  }
-
-  #header-container .nav-menu.active {
-    transform: translateY(0) scale(1) !important;
-  }
 }
 
 /* Sistema global de modal e bloqueio de rolagem. */
