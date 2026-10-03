@@ -21,12 +21,12 @@ function renderPhoto(avatar, url, name) {
     avatar.style.removeProperty('background-image');
 }
 async function initializeSidebarProfilePhoto() {
-    const avatar = document.querySelector('#sidebar-profile-avatar');
+    const avatars = Array.from(document.querySelectorAll('#sidebar-profile-avatar, #fsfit-header-avatar'));
     const nameElement = document.querySelector('#sidebar-profile-name');
-    if (!avatar)
+    if (!avatars.length)
         return;
     const name = nameElement?.textContent?.trim() || 'Personal';
-    renderFallback(avatar, name);
+    avatars.forEach(avatar => renderFallback(avatar, name));
     try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id)
@@ -42,13 +42,13 @@ async function initializeSidebarProfilePhoto() {
         if (nameElement && data?.nome_publico?.trim())
             nameElement.textContent = data.nome_publico.trim();
         if (data?.foto_url?.trim())
-            renderPhoto(avatar, data.foto_url.trim(), resolvedName);
+            avatars.forEach(avatar => renderPhoto(avatar, data.foto_url.trim(), resolvedName));
         else
-            renderFallback(avatar, resolvedName);
+            avatars.forEach(avatar => renderFallback(avatar, resolvedName));
     }
     catch (error) {
         console.warn('Não foi possível carregar a foto do personal na sidebar:', error);
-        renderFallback(avatar, name);
+        avatars.forEach(avatar => renderFallback(avatar, name));
     }
 }
 if (document.readyState === 'loading') {

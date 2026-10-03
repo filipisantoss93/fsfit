@@ -140,7 +140,7 @@ function ensureMoreSheetEntries(sheet) {
         exerciseEntry?.insertAdjacentHTML('afterend', `
       <a class="fsfit-more-item" href="biblioteca-alimentar.html" data-fsfit-food-library-entry>
         <span class="fsfit-more-item-icon" aria-hidden="true">AL</span>
-        <span class="fsfit-more-item-copy"><strong>Biblioteca de alimentos</strong><small>Gerencie alimentos e informações nutricionais</small></span>
+        <span class="fsfit-more-item-copy"><strong>Alimentação</strong><small>Biblioteca alimentar e refeições</small></span>
         <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
       </a>`);
     }
@@ -149,7 +149,7 @@ function ensureMoreSheetEntries(sheet) {
         logoutEntry?.insertAdjacentHTML('beforebegin', `
       <a class="fsfit-more-item hidden" href="admin.html" data-fsfit-admin-entry hidden>
         <span class="fsfit-more-item-icon" aria-hidden="true">AD</span>
-        <span class="fsfit-more-item-copy"><strong>Painel administrativo</strong><small>Usuários, assinaturas e faturamento</small></span>
+        <span class="fsfit-more-item-copy"><strong>Administração</strong><small>Gerencie a plataforma</small></span>
         <span class="fsfit-more-item-chevron" aria-hidden="true">›</span>
       </a>`);
     }

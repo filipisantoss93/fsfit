@@ -135,6 +135,14 @@ export function renderHeader(active = '') {
           <li id="admin-nav" class="hidden nav-admin-item"><a data-page="admin" href="admin.html">${icon('settings')}<span>Administração</span><span class="admin-support-nav-badge hidden" data-admin-support-badge>0</span></a></li>
         </ul>
         <div class="nav-footer">
+          <div class="fsfit-theme-setting">
+            <span class="fsfit-theme-setting-label">Tema</span>
+            <div class="fsfit-theme-control" role="group" aria-label="Tema visual">
+              <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Sistema</button>
+              <button type="button" data-fsfit-theme-choice="light" aria-pressed="false">Claro</button>
+              <button type="button" data-fsfit-theme-choice="dark" aria-pressed="false">Escuro</button>
+            </div>
+          </div>
           <a id="sidebar-profile" class="sidebar-profile" href="perfil.html" data-page="perfil">
             <span id="sidebar-profile-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span>
             <span class="sidebar-profile-copy"><strong id="sidebar-profile-name">Personal</strong><small>Meu perfil</small></span>
@@ -143,14 +151,6 @@ export function renderHeader(active = '') {
           <button id="logout-button" class="sidebar-logout" type="button">${icon('logout')}<span>Sair</span></button>
         </div>
         <div class="nav-header-actions">
-          <label class="fsfit-header-theme" for="fsfit-theme-select">
-            <span class="fsfit-header-theme-label">Tema</span>
-            <select id="fsfit-theme-select" aria-label="Selecionar tema visual">
-              <option value="auto">Auto</option>
-              <option value="light">Claro</option>
-              <option value="dark">Escuro</option>
-            </select>
-          </label>
           <div class="notification-shell">
             <button id="notification-button" class="notification-button" type="button" aria-label="Abrir notificações" aria-expanded="false" aria-controls="notification-panel">${icon('bell')}<span id="notification-badge" class="notification-badge hidden">0</span></button>
             <section id="notification-panel" class="notification-panel" aria-label="Notificações" hidden>
@@ -158,29 +158,13 @@ export function renderHeader(active = '') {
               <div id="notification-list" class="notification-list"><div class="notification-empty"><strong>Nenhuma notificação nova</strong><span>As atualizações dos seus alunos aparecerão aqui.</span></div></div>
             </section>
           </div>
-          <button id="menu-button" class="menu-mobile-btn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">☰</button>
+          <button id="fsfit-profile-menu-button" class="fsfit-profile-menu-button" type="button" aria-label="Abrir menu da plataforma" aria-expanded="false" aria-haspopup="dialog" aria-controls="fsfit-more-dialog"><span id="fsfit-header-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span></button>
         </div>
       </nav>
     </header>`;
-    const menu = host.querySelector('#nav-menu');
-    const menuButton = host.querySelector('#menu-button');
     const notificationButton = host.querySelector('#notification-button');
     const notificationPanel = host.querySelector('#notification-panel');
-    const themeSelect = host.querySelector('#fsfit-theme-select');
-    const syncThemeSelect = () => {
-        if (themeSelect && globalThis.FSFitTheme)
-            themeSelect.value = globalThis.FSFitTheme.getPreference();
-    };
-    syncThemeSelect();
-    themeSelect?.addEventListener('change', () => globalThis.FSFitTheme?.setPreference(themeSelect.value));
-    window.addEventListener('fsfit:theme-change', syncThemeSelect);
     host.querySelector(`[data-page="${active}"]`)?.classList.add('active');
-    const setMenuOpen = (open) => {
-        menu?.classList.toggle('active', open);
-        menuButton?.setAttribute('aria-expanded', String(open));
-        menuButton?.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
-        document.body.classList.toggle('nav-menu-open', open && window.matchMedia('(max-width: 860px)').matches);
-    };
     const setNotificationsOpen = (open) => {
         if (!notificationPanel || !notificationButton)
             return;
@@ -189,40 +173,24 @@ export function renderHeader(active = '') {
     };
     const handleDocumentClick = (event) => {
         if (!(event.target instanceof Node) || !host.contains(event.target)) {
-            setMenuOpen(false);
             setNotificationsOpen(false);
         }
     };
     const handleDocumentKeydown = (event) => {
         if (event.key === 'Escape') {
-            setMenuOpen(false);
             setNotificationsOpen(false);
         }
     };
-    const handleResize = () => {
-        if (!window.matchMedia('(max-width: 860px)').matches)
-            setMenuOpen(false);
-    };
-    menuButton?.addEventListener('click', event => {
-        event.stopPropagation();
-        setNotificationsOpen(false);
-        setMenuOpen(!menu?.classList.contains('active'));
-    });
     notificationButton?.addEventListener('click', event => {
         event.stopPropagation();
-        setMenuOpen(false);
         setNotificationsOpen(Boolean(notificationPanel?.hidden ?? true));
     });
-    menu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
     document.addEventListener('click', handleDocumentClick);
     document.addEventListener('keydown', handleDocumentKeydown);
-    window.addEventListener('resize', handleResize);
     host.querySelector('#logout-button')?.addEventListener('click', signOutAndRedirect);
     headerCleanup = () => {
         document.removeEventListener('click', handleDocumentClick);
         document.removeEventListener('keydown', handleDocumentKeydown);
-        window.removeEventListener('resize', handleResize);
-        document.body.classList.remove('nav-menu-open');
     };
 }
 async function loadPersonalProfile(session) {
@@ -498,6 +466,7 @@ export async function setGreeting(session) {
     const dashboardGreeting = document.querySelector('#dashboard-user-greeting');
     const sidebarName = document.querySelector('#sidebar-profile-name');
     const sidebarAvatar = document.querySelector('#sidebar-profile-avatar');
+    const headerAvatar = document.querySelector('#fsfit-header-avatar');
     if (headerGreeting)
         headerGreeting.textContent = text;
     if (dashboardGreeting) {
@@ -517,6 +486,10 @@ export async function setGreeting(session) {
         else {
             sidebarAvatar.textContent = initials;
         }
+    }
+    if (headerAvatar) {
+        const initials = String(resolvedName).split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'PF';
+        headerAvatar.textContent = initials;
     }
     try {
         const { data: admin } = await supabase.from('platform_admins').select('user_id').eq('user_id', session.user.id).maybeSingle();

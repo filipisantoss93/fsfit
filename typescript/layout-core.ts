@@ -145,7 +145,7 @@ export function renderHeader(active: string = ''): void {
           <div class="fsfit-theme-setting">
             <span class="fsfit-theme-setting-label">Tema</span>
             <div class="fsfit-theme-control" role="group" aria-label="Tema visual">
-              <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Auto</button>
+              <button type="button" data-fsfit-theme-choice="auto" aria-pressed="false">Sistema</button>
               <button type="button" data-fsfit-theme-choice="light" aria-pressed="false">Claro</button>
               <button type="button" data-fsfit-theme-choice="dark" aria-pressed="false">Escuro</button>
             </div>
@@ -165,23 +165,14 @@ export function renderHeader(active: string = ''): void {
               <div id="notification-list" class="notification-list"><div class="notification-empty"><strong>Nenhuma notificação nova</strong><span>As atualizações dos seus alunos aparecerão aqui.</span></div></div>
             </section>
           </div>
-          <button id="menu-button" class="menu-mobile-btn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">☰</button>
+          <button id="fsfit-profile-menu-button" class="fsfit-profile-menu-button" type="button" aria-label="Abrir menu da plataforma" aria-expanded="false" aria-haspopup="dialog" aria-controls="fsfit-more-dialog"><span id="fsfit-header-avatar" class="sidebar-profile-avatar" aria-hidden="true">PF</span></button>
         </div>
       </nav>
     </header>`;
 
-  const menu = host.querySelector<HTMLElement>('#nav-menu');
-  const menuButton = host.querySelector<HTMLButtonElement>('#menu-button');
   const notificationButton = host.querySelector<HTMLButtonElement>('#notification-button');
   const notificationPanel = host.querySelector<HTMLElement>('#notification-panel');
   host.querySelector(`[data-page="${active}"]`)?.classList.add('active');
-
-  const setMenuOpen = (open: boolean): void => {
-    menu?.classList.toggle('active', open);
-    menuButton?.setAttribute('aria-expanded', String(open));
-    menuButton?.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
-    document.body.classList.toggle('nav-menu-open', open && window.matchMedia('(max-width: 860px)').matches);
-  };
 
   const setNotificationsOpen = (open: boolean): void => {
     if (!notificationPanel || !notificationButton) return;
@@ -191,45 +182,28 @@ export function renderHeader(active: string = ''): void {
 
   const handleDocumentClick = (event: MouseEvent): void => {
     if (!(event.target instanceof Node) || !host.contains(event.target)) {
-      setMenuOpen(false);
       setNotificationsOpen(false);
     }
   };
 
   const handleDocumentKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') {
-      setMenuOpen(false);
       setNotificationsOpen(false);
     }
   };
 
-  const handleResize = (): void => {
-    if (!window.matchMedia('(max-width: 860px)').matches) setMenuOpen(false);
-  };
-
-  menuButton?.addEventListener('click', event => {
-    event.stopPropagation();
-    setNotificationsOpen(false);
-    setMenuOpen(!menu?.classList.contains('active'));
-  });
-
   notificationButton?.addEventListener('click', event => {
     event.stopPropagation();
-    setMenuOpen(false);
     setNotificationsOpen(Boolean(notificationPanel?.hidden ?? true));
   });
 
-  menu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
   document.addEventListener('click', handleDocumentClick);
   document.addEventListener('keydown', handleDocumentKeydown);
-  window.addEventListener('resize', handleResize);
   host.querySelector('#logout-button')?.addEventListener('click', signOutAndRedirect);
 
   headerCleanup = () => {
     document.removeEventListener('click', handleDocumentClick);
     document.removeEventListener('keydown', handleDocumentKeydown);
-    window.removeEventListener('resize', handleResize);
-    document.body.classList.remove('nav-menu-open');
   };
 }
 
@@ -496,6 +470,7 @@ export async function setGreeting(session: SessionRecord | null): Promise<void> 
   const dashboardGreeting = document.querySelector<HTMLElement>('#dashboard-user-greeting');
   const sidebarName = document.querySelector<HTMLElement>('#sidebar-profile-name');
   const sidebarAvatar = document.querySelector<HTMLElement>('#sidebar-profile-avatar');
+  const headerAvatar = document.querySelector<HTMLElement>('#fsfit-header-avatar');
   if (headerGreeting) headerGreeting.textContent = text;
   if (dashboardGreeting) {
     dashboardGreeting.textContent = text;
@@ -512,6 +487,10 @@ export async function setGreeting(session: SessionRecord | null): Promise<void> 
     } else {
       sidebarAvatar.textContent = initials;
     }
+  }
+  if (headerAvatar) {
+    const initials = String(resolvedName).split(/\s+/).filter(Boolean).slice(0, 2).map((part: string) => part[0]?.toUpperCase()).join('') || 'PF';
+    headerAvatar.textContent = initials;
   }
 
   try {

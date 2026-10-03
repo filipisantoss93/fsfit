@@ -25,12 +25,12 @@ function renderPhoto(avatar: HTMLElement, url: string, name: string) {
 }
 
 async function initializeSidebarProfilePhoto() {
-  const avatar = document.querySelector<HTMLElement>('#sidebar-profile-avatar');
+  const avatars = Array.from(document.querySelectorAll<HTMLElement>('#sidebar-profile-avatar, #fsfit-header-avatar'));
   const nameElement = document.querySelector<HTMLElement>('#sidebar-profile-name');
-  if (!avatar) return;
+  if (!avatars.length) return;
 
   const name = nameElement?.textContent?.trim() || 'Personal';
-  renderFallback(avatar, name);
+  avatars.forEach(avatar => renderFallback(avatar, name));
 
   try {
     const { data: { session } } = await supabase.auth.getSession();
@@ -45,11 +45,11 @@ async function initializeSidebarProfilePhoto() {
     if (error) throw error;
     const resolvedName = data?.nome_publico?.trim() || name;
     if (nameElement && data?.nome_publico?.trim()) nameElement.textContent = data.nome_publico.trim();
-    if (data?.foto_url?.trim()) renderPhoto(avatar, data.foto_url.trim(), resolvedName);
-    else renderFallback(avatar, resolvedName);
+    if (data?.foto_url?.trim()) avatars.forEach(avatar => renderPhoto(avatar, data.foto_url.trim(), resolvedName));
+    else avatars.forEach(avatar => renderFallback(avatar, resolvedName));
   } catch (error) {
     console.warn('Não foi possível carregar a foto do personal na sidebar:', error);
-    renderFallback(avatar, name);
+    avatars.forEach(avatar => renderFallback(avatar, name));
   }
 }
 

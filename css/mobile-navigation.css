@@ -4,6 +4,10 @@
   display: none;
 }
 
+.fsfit-profile-menu-button {
+  display: none;
+}
+
 .fsfit-more-sheet {
   position: fixed;
   inset: 0;
@@ -206,9 +210,73 @@ html.fsfit-sheet-open body {
     padding-bottom: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px) + 16px) !important;
   }
 
-  #header-container .menu-mobile-btn,
-  .menu-mobile-btn {
-    display: none !important;
+  #header-container .fsfit-profile-menu-button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--fs-border-strong);
+    border-radius: 50%;
+    background: var(--fs-surface-raised);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  #header-container .fsfit-profile-menu-button .sidebar-profile-avatar {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    font-size: .78rem;
+    font-weight: 900;
+  }
+
+  #header-container .fsfit-profile-menu-button .sidebar-profile-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .fsfit-more-theme {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--fs-border);
+    border-radius: 14px;
+    background: var(--fs-surface-raised);
+  }
+
+  .fsfit-theme-setting-label { color: var(--text); font-size: .9rem; font-weight: 850; }
+
+  .fsfit-theme-control {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .fsfit-theme-control button {
+    min-height: 42px;
+    border: 1px solid var(--fs-border);
+    border-radius: 10px;
+    background: var(--fs-surface);
+    color: var(--fs-text-muted);
+    font: inherit;
+    font-size: .84rem;
+    font-weight: 800;
+  }
+
+  .fsfit-theme-control button.is-active {
+    border-color: var(--fs-primary-border);
+    background: var(--fs-primary-soft);
+    color: var(--primary);
   }
 
   .fsfit-bottom-nav {
@@ -219,7 +287,7 @@ html.fsfit-sheet-open body {
     bottom: 0 !important;
     z-index: 140 !important;
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     min-height: calc(var(--fsfit-nav-height) + env(safe-area-inset-bottom, 0px));
     margin: 0 !important;
     padding: 7px 7px calc(7px + env(safe-area-inset-bottom, 0px));
