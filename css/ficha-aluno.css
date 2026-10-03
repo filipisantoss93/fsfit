@@ -1058,3 +1058,27 @@ body.student-record-page:not(.student-edit-open) {
   }
 }
 
+@media (max-width: 700px) {
+  .student-record-page .student-record-header-enhanced {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'back menu' 'identity identity';
+    gap: 8px 10px;
+    min-height: 0;
+    padding: 12px 14px;
+    padding-bottom: 12px !important;
+  }
+  .student-record-page .student-record-header-actions {
+    position: relative;
+    grid-area: menu;
+    inset: auto;
+    z-index: 130;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0;
+  }
+  .student-record-page .student-record-title { grid-area: identity; padding: 2px 0 0; }
+  .student-record-page .student-record-menu { position: relative; z-index: 130; }
+  .student-record-page .student-record-menu-popover { z-index: 131; max-height: min(60dvh, 360px); }
+  .student-record-page .record-tabs { z-index: 20 !important; }
+}

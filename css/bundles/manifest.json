@@ -7,7 +7,7 @@
     "/admin-assinaturas.html": "/css/bundles/fsfit.989772816763218c.css",
     "/admin-contatos.html": "/css/bundles/fsfit.c3a8d2f1cc18ca22.css",
     "/admin.html": "/css/bundles/fsfit.77eda9ce2614e660.css",
-    "/agenda.html": "/css/bundles/fsfit.154afaf0ef65d8bf.css",
+    "/agenda.html": "/css/bundles/fsfit.f53b65d6e918e3c4.css",
     "/aluno-preview.html": "/css/bundles/fsfit.ef4ceb55c907fc59.css",
     "/aluno.html": "/css/bundles/fsfit.bf184f49c6cd5e90.css",
     "/alunos.html": "/css/bundles/fsfit.b48ae161fd4eda36.css",
@@ -17,7 +17,7 @@
     "/cancelamento.html": "/css/bundles/fsfit.bc421ba25d889d08.css",
     "/contato.html": "/css/bundles/fsfit.7752c9a21cc4c4cb.css",
     "/dieta-aluno.html": "/css/bundles/fsfit.6ee0785d8e2c0335.css",
-    "/ficha-aluno.html": "/css/bundles/fsfit.ee616c7307b8573f.css",
+    "/ficha-aluno.html": "/css/bundles/fsfit.657fec6c39e76f12.css",
     "/financeiro.html": "/css/bundles/fsfit.2ccad29c16552caa.css",
     "/lembretes-aluno.html": "/css/bundles/fsfit.2c51b097d6e1c3d3.css",
     "/nova-senha.html": "/css/bundles/fsfit.06a87a67f1ecf35a.css",
@@ -29,7 +29,7 @@
     "/selecionar-personal.html": "/css/bundles/fsfit.36896d52d69d0487.css",
     "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/termos.html": "/css/bundles/fsfit.bc421ba25d889d08.css",
-    "/treino-aluno.html": "/css/bundles/fsfit.6a9ff23061b769ed.css",
+    "/treino-aluno.html": "/css/bundles/fsfit.1de9b917b9116784.css",
     "/visualizar-aluno.html": "/css/bundles/fsfit.fa9636c2c0f0ab1f.css"
   },
   "criticalPages": [
@@ -42,13 +42,13 @@
     "/painel.html"
   ],
   "criticalBundles": [
-    "/css/bundles/fsfit.154afaf0ef65d8bf.css",
     "/css/bundles/fsfit.2ccad29c16552caa.css",
     "/css/bundles/fsfit.2ee54881504d9c2a.css",
     "/css/bundles/fsfit.7151448c6711e4cb.css",
     "/css/bundles/fsfit.b48ae161fd4eda36.css",
     "/css/bundles/fsfit.bf184f49c6cd5e90.css",
-    "/css/bundles/fsfit.dd19ffa3c367a435.css"
+    "/css/bundles/fsfit.dd19ffa3c367a435.css",
+    "/css/bundles/fsfit.f53b65d6e918e3c4.css"
   ],
   "bundles": {
     "abrir-whatsapp-lembrete.html": {
@@ -252,9 +252,9 @@
       ]
     },
     "agenda.html": {
-      "url": "/css/bundles/fsfit.154afaf0ef65d8bf.css",
-      "sha256": "154afaf0ef65d8bfafe0e699bb0bb35bc9b08aa56504e241a91f8e7ca3164976",
-      "bytes": 127543,
+      "url": "/css/bundles/fsfit.f53b65d6e918e3c4.css",
+      "sha256": "f53b65d6e918e3c4a340a363a232c1e813d56117f26324afb28dd87877299ee5",
+      "bytes": 128304,
       "sourceCount": 19,
       "duplicatesRemoved": 1,
       "sources": [
@@ -758,9 +758,9 @@
       ]
     },
     "ficha-aluno.html": {
-      "url": "/css/bundles/fsfit.ee616c7307b8573f.css",
-      "sha256": "ee616c7307b8573ff12f1507b0d5f03f5d7e9408c9a6a517b6b0af06ac906e66",
-      "bytes": 147119,
+      "url": "/css/bundles/fsfit.657fec6c39e76f12.css",
+      "sha256": "657fec6c39e76f125b983d85dc18307c77d1997352317f3b5d2b5eee73af7165",
+      "bytes": 147982,
       "sourceCount": 19,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1253,10 +1253,10 @@
       ]
     },
     "treino-aluno.html": {
-      "url": "/css/bundles/fsfit.6a9ff23061b769ed.css",
-      "sha256": "6a9ff23061b769edb5c057e6c052444e867832b6b63cea57880d678c0782f4d3",
-      "bytes": 151336,
-      "sourceCount": 25,
+      "url": "/css/bundles/fsfit.1de9b917b9116784.css",
+      "sha256": "1de9b917b9116784e6012b55c3afb98438c44b2d0c850a1e3d2a4df400c0e3c6",
+      "bytes": 161640,
+      "sourceCount": 26,
       "duplicatesRemoved": 0,
       "sources": [
         "css/fsfit-design-system-components.css",
@@ -1275,6 +1275,7 @@
         "css/treino-aluno-retorno.css",
         "css/treino-sticky-exercise-save.css",
         "css/treino-exercise-picker-sheet.css",
+        "css/treino-aluno-app.css",
         "css/treino-multidias.css",
         "css/treino-busca-exercicios.css",
         "css/exercicio-drag-order.css",

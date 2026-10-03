@@ -20,6 +20,8 @@ function hideLegacyInterface() {
 function revealSimplifiedPage() {
     hideLegacyInterface();
     loading?.remove();
+    document.querySelector('#workout-message')?.remove();
+    document.querySelectorAll('.workout-page > .workout-plans-card, .workout-page > #active-workout-workspace, .workout-page > .workout-active-card, .workout-page > #workout-editor-view-nav, .workout-page > #workout-week-card').forEach(element => element.remove());
     document.documentElement.classList.remove('workout-simple-preload');
     document.body.classList.add('workout-simple-enabled');
     document.body.classList.add('workout-simple-ready');
