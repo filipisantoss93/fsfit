@@ -167,11 +167,41 @@ function validateImage(file) {
 function extFor(file) {
     return ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' })[file.type] || 'jpg';
 }
+async function optimizeAvatar(file) {
+    const sourceUrl = URL.createObjectURL(file);
+    try {
+        const image = new Image();
+        image.decoding = 'async';
+        image.src = sourceUrl;
+        await image.decode();
+        const maxEdge = 512;
+        const scale = Math.min(1, maxEdge / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext('2d');
+        if (!context)
+            throw new Error('Não foi possível preparar a foto do perfil.');
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const toBlob = (quality) => new Promise((resolve, reject) => {
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Não foi possível converter a foto do perfil.')), 'image/jpeg', quality);
+        });
+        let optimized = await toBlob(.84);
+        if (optimized.size > 300 * 1024)
+            optimized = await toBlob(.68);
+        const filename = file.name.replace(/\.[^.]+$/, '') || 'avatar';
+        return new File([optimized], `${filename}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+    }
+    finally {
+        URL.revokeObjectURL(sourceUrl);
+    }
+}
 async function uploadImage(file, kind) {
     validateImage(file);
-    const path = `${session.user.id}/${kind}/${Date.now()}-${crypto.randomUUID()}.${extFor(file)}`;
-    const { data, error } = await supabase.storage.from(BUCKET).upload(path, file, {
-        contentType: file.type,
+    const uploadFile = kind === 'avatar' ? await optimizeAvatar(file) : file;
+    const path = `${session.user.id}/${kind}/${Date.now()}-${crypto.randomUUID()}.${extFor(uploadFile)}`;
+    const { data, error } = await supabase.storage.from(BUCKET).upload(path, uploadFile, {
+        contentType: uploadFile.type,
         cacheControl: '3600',
         upsert: false
     });
