@@ -263,7 +263,7 @@ html.fsfit-sheet-open body {
   }
 
   .fsfit-theme-control button {
-    min-height: 42px;
+    min-height: 44px;
     border: 1px solid var(--fs-border);
     border-radius: 10px;
     background: var(--fs-surface);
