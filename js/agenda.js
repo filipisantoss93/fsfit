@@ -36,10 +36,7 @@ const scheduleUi = ensureScheduleUi();
 const scheduleModal = scheduleUi.modal;
 const scheduleForm = scheduleUi.form;
 const scheduleStudent = scheduleForm.querySelector('[name="aluno_id"]');
-
 const scheduleDate = scheduleForm.querySelector('[name="data"]');
-
-
 const scheduleTime = scheduleForm.querySelector('[name="horario"]');
 const scheduleLocation = scheduleForm.querySelector('[name="local"]');
 const scheduleTitle = scheduleForm.querySelector('[name="titulo"]');
@@ -434,7 +431,7 @@ function ensureScheduleUi() {
         <button class="agenda-modal-close" type="button" data-close-schedule-modal aria-label="Fechar">×</button>
         <div class="agenda-modal-kicker">AGENDA</div>
         <h2 id="schedule-modal-title">Agendar aluno</h2>
-                <form id="schedule-form">
+        <form id="schedule-form">
           <p class="form-hint">Este agendamento vale somente nesta data. Para mudar a rotina semanal, edite o cadastro do aluno.</p>
           <div class="form-group"><label>Aluno *</label><select name="aluno_id" required><option value="">Selecione um aluno</option></select></div>
           <div class="grid grid-2">
