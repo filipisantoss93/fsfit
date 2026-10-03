@@ -36,10 +36,10 @@ const scheduleUi = ensureScheduleUi();
 const scheduleModal = scheduleUi.modal;
 const scheduleForm = scheduleUi.form;
 const scheduleStudent = scheduleForm.querySelector('[name="aluno_id"]');
-const scheduleWorkout = scheduleForm.querySelector('[name="treino_id"]');
+
 const scheduleDate = scheduleForm.querySelector('[name="data"]');
-const scheduleRecurrence = scheduleForm.querySelector('[data-schedule-recurrence]');
-const scheduleEndDate = scheduleForm.querySelector('[name="data_fim"]');
+
+
 const scheduleTime = scheduleForm.querySelector('[name="horario"]');
 const scheduleLocation = scheduleForm.querySelector('[name="local"]');
 const scheduleTitle = scheduleForm.querySelector('[name="titulo"]');
@@ -99,36 +99,41 @@ function formatDateDisplay(date) {
 function formatDayHeading(date) {
     return `${dayLabels[date.getDay()]}, ${date.getDate()} de ${monthName(date)}`;
 }
-function normalizeEntries(workouts = []) {
+function normalizeWeekday(value, legacyTrainingDay = false) {
+    if (typeof value === 'number' || /^\d+$/.test(String(value ?? ''))) {
+        const number = Number(value);
+        if (legacyTrainingDay)
+            return number === 7 ? 0 : number >= 1 && number <= 6 ? number : number === 0 ? 0 : null;
+        return number >= 0 && number <= 6 ? number : null;
+    }
+    const day = String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const aliases = { domingo: 0, dom: 0, segunda: 1, seg: 1, terca: 2, ter: 2, quarta: 3, qua: 3, quinta: 4, qui: 4, sexta: 5, sex: 5, sabado: 6, sab: 6 };
+    return aliases[day] ?? null;
+}
+function normalizeEntries(workouts = [], students = []) {
+    const byId = new Map();
+    students.forEach(student => { if (student?.id) byId.set(String(student.id), student); });
+    workouts.forEach(workout => { const s = workout.alunos; if (s?.id && !byId.has(String(s.id))) byId.set(String(s.id), s); });
+    const workoutByStudent = new Map();
+    workouts.forEach(workout => { const id = String(workout.alunos?.id || ''); if (id && !workoutByStudent.has(id)) workoutByStudent.set(id, workout); });
     const entries = [];
     const seen = new Set();
-    workouts.forEach(workout => {
-        const student = workout.alunos;
-        if (!student?.id || !Array.isArray(workout.dias_semana))
-            return;
-        workout.dias_semana.forEach(day => {
-            const dayNumber = Number(day);
-            if (!Number.isInteger(dayNumber) || dayNumber < 0 || dayNumber > 6)
-                return;
-            const key = `${student.id}:${dayNumber}`;
+    byId.forEach((student, id) => {
+        const days = Array.isArray(student.dias_semana) && student.dias_semana.length ? student.dias_semana : Array.isArray(student.dias_aula) && student.dias_aula.length ? student.dias_aula : [];
+        const workout = workoutByStudent.get(id);
+        const fallback = !days.length && Array.isArray(workout?.dias_semana) ? workout.dias_semana : [];
+        const normalized = days.length ? days.map(day => normalizeWeekday(day)).filter(day => day !== null) : fallback.map(day => normalizeWeekday(day, true)).filter(day => day !== null);
+        normalized.forEach(day => {
+            const key = `${id}:${day}`;
             if (seen.has(key))
                 return;
             seen.add(key);
-            entries.push({
-                day: dayNumber,
-                id: student.id,
-                nome: student.nome,
-                periodo_aula: student.periodo_aula,
-                horario_aula: student.horario_aula,
-                local_aula: student.local_aula,
-                treino_id: workout.id,
-                treino_nome: workout.nome,
-                manual: false
-            });
+            entries.push({ day, id: student.id, nome: student.nome, periodo_aula: student.periodo_aula, horario_aula: student.horario_aula, local_aula: student.local_aula, treino_id: workout?.id || null, treino_nome: days.length ? 'Rotina semanal' : (workout?.nome || 'Rotina semanal'), manual: false });
         });
     });
     return entries;
 }
+
 function normalizeManualAppointment(row) {
     return {
         day: parseDateValue(row.data).getDay(),
@@ -298,8 +303,9 @@ async function loadLiveStudents() {
 async function loadStudents() {
     const { data, error } = await supabase
         .from('alunos')
-        .select('id,nome,horario_aula,local_aula')
+        .select('id,nome,periodo_aula,horario_aula,local_aula,dias_semana,dias_aula,status')
         .eq('personal_id', session.user.id)
+        .eq('status', 'ativo')
         .order('nome');
     if (error) {
         console.error('Erro ao carregar alunos para agendamento:', error);
@@ -310,25 +316,11 @@ async function loadStudents() {
         .map(student => `<option value="${esc(student.id)}">${esc(student.nome)}</option>`)
         .join('');
 }
-function updateWorkoutOptions(studentId) {
-    const workouts = workoutRecords.filter(workout => String(workout.alunos?.id || '') === String(studentId));
-    scheduleWorkout.innerHTML = '<option value="">Usar treino ativo do aluno</option>' + workouts
-        .map(workout => `<option value="${esc(workout.id)}">${esc(workout.nome || 'Treino ativo')}</option>`)
-        .join('');
-}
 function openScheduleModal() {
     scheduleReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const selectedDate = dateInput.value || formatDateValue(new Date());
     scheduleForm.reset();
     scheduleDate.value = selectedDate;
-    const endDate = parseDateValue(selectedDate);
-    endDate.setDate(endDate.getDate() + 84);
-    scheduleEndDate.value = formatDateValue(endDate);
-    scheduleRecurrence.hidden = true;
-    const endDateInput = scheduleForm.querySelector('[name="data_fim"]');
-    endDateInput.disabled = true;
-    endDateInput.required = false;
-    scheduleWorkout.innerHTML = '<option value="">Usar treino ativo do aluno</option>';
     scheduleModal.classList.add('open');
     scheduleModal.setAttribute('aria-hidden', 'false');
     window.FSFitModalManager?.sync();
@@ -350,45 +342,22 @@ async function saveAppointment(event) {
     const originalText = scheduleSubmit.textContent;
     scheduleSubmit.textContent = 'Salvando...';
     try {
-        const basePayload = {
+        const payload = {
             personal_id: session.user.id,
             aluno_id: studentId,
-            treino_id: scheduleWorkout.value || null,
+            treino_id: null,
+            data: scheduleDate.value,
             horario: scheduleTime.value || null,
             local: scheduleLocation.value.trim() || null,
             titulo: scheduleTitle.value.trim() || null
         };
-        const dates = [];
-        const schedulingMode = scheduleForm.querySelector('[name="modo_agendamento"]:checked')?.value;
-        if (schedulingMode === 'weekly') {
-            const weekdays = [...scheduleForm.querySelectorAll('[name="dias_semana"]:checked')].map(input => Number(input.value));
-            const start = parseDateValue(scheduleDate.value);
-            const end = parseDateValue(scheduleEndDate.value);
-            if (!weekdays.length)
-                throw new Error('Selecione ao menos um dia da semana.');
-            if (end < start)
-                throw new Error('A data final precisa ser igual ou posterior à data inicial.');
-            if (end.getTime() - start.getTime() > 183 * 86400000)
-                throw new Error('A repetição pode durar no máximo 26 semanas.');
-            for (const cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
-                if (weekdays.includes(cursor.getDay()))
-                    dates.push(formatDateValue(cursor));
-            }
-            if (dates.length > 100)
-                throw new Error('Esse período cria mais de 100 aulas. Reduza a duração ou os dias selecionados.');
-        }
-        else {
-            dates.push(scheduleDate.value);
-        }
-        const payload = dates.map(data => ({ ...basePayload, data }));
         const { error } = await supabase.from('agenda_agendamentos').insert(payload);
         if (error)
             throw error;
         closeScheduleModal();
-        showMessage(message, 'Aluno agendado com sucesso.');
-        if (dates.includes(dateInput.value)) {
+        showMessage(message, 'Agendamento válido somente nesta data salvo.');
+        if (scheduleDate.value === dateInput.value)
             await selectDate(parseDateValue(dateInput.value));
-        }
     }
     catch (error) {
         console.error('Erro ao agendar aluno:', error);
@@ -407,7 +376,7 @@ async function loadAgenda() {
     grid.innerHTML = '<article class="card agenda-loading-card" role="status">Carregando agenda…</article>';
     const query = supabase
         .from('treinos')
-        .select('id,nome,dias_semana,status,alunos!inner(id,nome,periodo_aula,horario_aula,local_aula)')
+        .select('id,nome,dias_semana,status,alunos!inner(id,nome,periodo_aula,horario_aula,local_aula,dias_semana,dias_aula)')
         .eq('personal_id', session.user.id)
         .eq('status', 'ativo')
         .order('updated_at', { ascending: false });
@@ -428,8 +397,8 @@ async function loadAgenda() {
         return;
     }
     workoutRecords = (data || []);
-    agendaEntries = normalizeEntries(workoutRecords);
-    void loadStudents();
+    await loadStudents();
+    agendaEntries = normalizeEntries(workoutRecords, studentRecords);
     void loadLiveStudents();
     await selectDate(selectedDate);
 }
@@ -465,23 +434,18 @@ function ensureScheduleUi() {
         <button class="agenda-modal-close" type="button" data-close-schedule-modal aria-label="Fechar">×</button>
         <div class="agenda-modal-kicker">AGENDA</div>
         <h2 id="schedule-modal-title">Agendar aluno</h2>
-        <form id="schedule-form">
+                <form id="schedule-form">
+          <p class="form-hint">Este agendamento vale somente nesta data. Para mudar a rotina semanal, edite o cadastro do aluno.</p>
           <div class="form-group"><label>Aluno *</label><select name="aluno_id" required><option value="">Selecione um aluno</option></select></div>
-          <div class="form-group"><label>Treino</label><select name="treino_id"><option value="">Usar treino ativo do aluno</option></select></div>
-          <div class="form-group"><label>Tipo de agendamento</label><div class="schedule-mode-options" role="group" aria-label="Tipo de agendamento"><label><input type="radio" name="modo_agendamento" value="exact" checked> Dia exato</label><label><input type="radio" name="modo_agendamento" value="weekly"> Repetir semanalmente</label></div></div>
           <div class="grid grid-2">
             <div class="form-group"><label>Data *</label><input name="data" type="date" required></div>
             <div class="form-group"><label>Horário *</label><input name="horario" type="time" required></div>
           </div>
-          <div data-schedule-recurrence hidden>
-            <div class="form-group"><label>Dias da semana *</label><div class="schedule-weekdays"><label><input type="checkbox" name="dias_semana" value="1"> Seg</label><label><input type="checkbox" name="dias_semana" value="2"> Ter</label><label><input type="checkbox" name="dias_semana" value="3"> Qua</label><label><input type="checkbox" name="dias_semana" value="4"> Qui</label><label><input type="checkbox" name="dias_semana" value="5"> Sex</label><label><input type="checkbox" name="dias_semana" value="6"> Sáb</label><label><input type="checkbox" name="dias_semana" value="0"> Dom</label></div></div>
-            <div class="form-group"><label>Repetir até *</label><input name="data_fim" type="date" required disabled><small class="field-help">As aulas serão criadas semanalmente até esta data (máximo de 26 semanas).</small></div>
-          </div>
           <div class="form-group"><label>Local</label><input name="local" maxlength="140" placeholder="Ex.: Academia Central"></div>
-          <div class="form-group"><label>Descrição</label><input name="titulo" maxlength="140" placeholder="Ex.: Avaliação, funcional, preparação 5K..."></div>
+          <div class="form-group"><label>Descrição</label><input name="titulo" maxlength="140" placeholder="Ex.: Avaliação, aula extra..."></div>
           <div class="agenda-modal-actions">
             <button class="btn btn-neutral" type="button" data-close-schedule-modal>Cancelar</button>
-            <button id="schedule-submit" class="btn btn-primary" type="submit">Salvar agendamento</button>
+            <button id="schedule-submit" class="btn btn-primary" type="submit">Salvar nesta data</button>
           </div>
         </form>
       </section>`;
@@ -490,16 +454,6 @@ function ensureScheduleUi() {
     modal.dataset.modalRoot = 'true';
     modal.querySelector('.agenda-modal-card')?.setAttribute('data-modal-scroll', '');
     const form = modal.querySelector('#schedule-form');
-    form.querySelectorAll('[name="modo_agendamento"]').forEach(input => input.addEventListener('change', () => {
-        const recurring = input.checked && input.value === 'weekly';
-        if (!input.checked)
-            return;
-        const group = form.querySelector('[data-schedule-recurrence]');
-        const endDate = form.querySelector('[name="data_fim"]');
-        group.hidden = !recurring;
-        endDate.disabled = !recurring;
-        endDate.required = recurring;
-    }));
     openButton?.addEventListener('click', openScheduleModal);
     modal.querySelectorAll('[data-close-schedule-modal]').forEach(button => button.addEventListener('click', closeScheduleModal));
     form?.addEventListener('submit', saveAppointment);
@@ -507,14 +461,14 @@ function ensureScheduleUi() {
 }
 scheduleStudent.addEventListener('change', () => {
     const student = studentRecords.find(item => String(item.id) === String(scheduleStudent.value));
-    updateWorkoutOptions(scheduleStudent.value);
-    if (student) {
-        if (!scheduleTime.value && student.horario_aula)
-            scheduleTime.value = formatTime(student.horario_aula);
-        if (!scheduleLocation.value && student.local_aula)
-            scheduleLocation.value = student.local_aula;
-    }
+    if (!student)
+        return;
+    if (!scheduleTime.value && student.horario_aula)
+        scheduleTime.value = formatTime(student.horario_aula);
+    if (!scheduleLocation.value && student.local_aula)
+        scheduleLocation.value = student.local_aula;
 });
+
 dateDisplayButton.addEventListener('click', () => {
     try {
         if (typeof dateInput.showPicker === 'function')
