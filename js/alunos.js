@@ -193,8 +193,8 @@ async function editStudent(id) {
     form.periodo_aula.value = data.periodo_aula || '';
     form.horario_aula.value = data.horario_aula ? String(data.horario_aula).slice(0, 5) : '';
     form.local_aula.value = data.local_aula || '';
-  const routineDays = Array.isArray(data.dias_semana) && data.dias_semana.length ? data.dias_semana : (data.dias_aula || []);
-  form.querySelectorAll('[name="dias_semana_rotina"]').forEach(input => { input.checked = routineDays.includes(input.value); });
+    const routineDays = Array.isArray(data.dias_semana) && data.dias_semana.length ? data.dias_semana : (data.dias_aula || []);
+    form.querySelectorAll('[name="dias_semana_rotina"]').forEach(input => { input.checked = routineDays.includes(input.value); });
     updateAge();
     document.querySelector('#cancel-edit').classList.remove('hidden');
     openForm();
