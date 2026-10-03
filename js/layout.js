@@ -63,7 +63,7 @@ function scheduleNonCriticalEnhancements() {
         }
         if (document.querySelector('#fsfit-profile-menu-button')) {
             // @ts-ignore Existing browser JavaScript module.
-            import('./sidebar-profile-photo.js?v=20261003-header-avatar1').catch(error => console.error('Não foi possível carregar a foto do perfil:', error));
+            import('./sidebar-profile-photo.js?v=20261003-header-avatar2').catch(error => console.error('Não foi possível carregar a foto do perfil:', error));
         }
         if (STUDENT_AVATAR_PAGES.has(page)) {
             // @ts-ignore Existing browser JavaScript module.
