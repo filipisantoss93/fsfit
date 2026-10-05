@@ -22,17 +22,20 @@ set status = 'cancelada',
     updated_at = now()
 where status in ('criando', 'pendente');
 
--- Interrompe a reconciliação periódica de cobranças Efí de mensalidade.
-do $$
+-- Remove a reconciliação periódica de cobranças Efí de mensalidade.
+do $
+declare
+  v_job_id bigint;
 begin
   if to_regclass('cron.job') is not null then
-    execute $command$
-      update cron.job
-         set active = false
-       where jobname = 'fsfit-reconciliar-pix-mensalidades'
-    $command$;
+    execute 'select jobid from cron.job where jobname = $1 limit 1'
+      into v_job_id
+      using 'fsfit-reconciliar-pix-mensalidades';
+    if v_job_id is not null then
+      execute 'select cron.unschedule($1)' using v_job_id;
+    end if;
   end if;
 end
-$$;
+$;
 
 commit;
