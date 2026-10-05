@@ -201,7 +201,7 @@ function renderPixModal(): void {
   }
 }
 
-function copyPixCode(): Promise<void> {
+async function copyPixCode(): Promise<void> {
   if (!pixPayload) return;
   const original = copyButton.textContent;
   try {
