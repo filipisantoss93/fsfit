@@ -1054,3 +1054,7 @@ html[data-fsfit-theme="light"] body.ads-landing .lp-live-exercise {
   border-color: rgba(23, 33, 43, .12);
   background: #f5f7f8;
 }
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-price-value strong {
+  color: var(--lp-text);
+}
