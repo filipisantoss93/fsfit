@@ -449,6 +449,7 @@ async function load() {
     await fetchPayments();
     await generateCurrentCharges();
     fillPixForm();
+    ensureDesktopDashboard();
     renderSummary();
     renderConfirmations();
     renderStudents();
