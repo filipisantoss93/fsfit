@@ -121,7 +121,8 @@ function renderPayment() {
         alertText.textContent = 'Seu personal recebeu seu aviso e fará a confirmação após conferir o Pix na conta.';
         paidButton.classList.add('hidden');
         modalPaidButton?.classList.add('hidden');
-    } else {
+    }
+    else {
         paidButton.classList.remove('hidden');
         modalPaidButton?.classList.remove('hidden');
         if (remainingDays < 0) {
@@ -129,10 +130,12 @@ function renderPayment() {
             const days = Math.abs(remainingDays);
             alertTitle.textContent = 'Mensalidade vencida';
             alertText.textContent = `Vencimento em ${formatDate(payment.vencimento)} · ${days} ${days === 1 ? 'dia' : 'dias'} em atraso.`;
-        } else if (remainingDays === 0) {
+        }
+        else if (remainingDays === 0) {
             alertTitle.textContent = 'Sua mensalidade vence hoje';
             alertText.textContent = `Vencimento em ${formatDate(payment.vencimento)}. Gere o Pix para pagar diretamente ao seu personal.`;
-        } else {
+        }
+        else {
             alertTitle.textContent = 'Próximo vencimento';
             alertText.textContent = `Sua mensalidade vence em ${remainingDays} ${remainingDays === 1 ? 'dia' : 'dias'}, em ${formatDate(payment.vencimento)}.`;
         }
@@ -146,7 +149,8 @@ function renderPayment() {
 }
 function renderPixModal() {
     pixPayload = buildPixPayload(payment);
-    if (!pixPayload) return;
+    if (!pixPayload)
+        return;
     pixAmount.textContent = formatCurrency(payment.valor);
     pixDueDate.textContent = formatDate(payment.vencimento);
     pixCodeField.value = pixPayload;
@@ -158,16 +162,22 @@ function renderPixModal() {
     }
     try {
         if (window.QRCode) {
-            new window.QRCode(qrHost, { text: pixPayload, width: 230, height: 230, correctLevel: window.QRCode.CorrectLevel?.M });
-        } else {
+            new window.QRCode(qrHost, {
+                text: pixPayload,
+                width: 230,
+                height: 230,
+                correctLevel: window.QRCode.CorrectLevel?.M
+            });
+        }
+        else {
             qrHost.innerHTML = '<p style="color:#111;text-align:center">QR Code indisponível. Use o Pix Copia e Cola abaixo.</p>';
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Não foi possível renderizar o QR Code:', error);
         qrHost.innerHTML = '<p style="color:#111;text-align:center">QR Code indisponível. Use o Pix Copia e Cola abaixo.</p>';
     }
 }
-
 async function copyPixCode() {
     if (!pixPayload)
         return;
@@ -215,7 +225,8 @@ async function informPaid(button) {
     }
 }
 openPixButton?.addEventListener('click', () => {
-    if (!canGeneratePix(payment)) return;
+    if (!canGeneratePix(payment))
+        return;
     renderPixModal();
     setModalOpen(true);
 });
