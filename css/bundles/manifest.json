@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pages": {
-    "/": "/css/bundles/fsfit.2b1e9e1a7ccc83de.css",
+    "/": "/css/bundles/fsfit.8fdb286356c108ae.css",
     "/abrir-whatsapp-lembrete.html": "/css/bundles/fsfit.f29d33544a1c9049.css",
     "/acesso-aluno.html": "/css/bundles/fsfit.db713dca13e6932c.css",
     "/admin-assinaturas.html": "/css/bundles/fsfit.fe11a8c9a7cd87d1.css",
@@ -27,7 +27,7 @@
     "/privacidade.html": "/css/bundles/fsfit.8140f2c5c754cf7c.css",
     "/recuperar-senha.html": "/css/bundles/fsfit.13ad9fd6eeaf4bc1.css",
     "/selecionar-personal.html": "/css/bundles/fsfit.96077af6bc38c593.css",
-    "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.2b1e9e1a7ccc83de.css",
+    "/sistema-para-personal-trainer.html": "/css/bundles/fsfit.8fdb286356c108ae.css",
     "/termos.html": "/css/bundles/fsfit.8defe059f370c629.css",
     "/treino-aluno.html": "/css/bundles/fsfit.400d849391dcb22f.css",
     "/visualizar-aluno.html": "/css/bundles/fsfit.125f7c37c8e0cca6.css"
@@ -42,7 +42,7 @@
     "/painel.html"
   ],
   "criticalBundles": [
-    "/css/bundles/fsfit.2b1e9e1a7ccc83de.css",
+    "/css/bundles/fsfit.8fdb286356c108ae.css",
     "/css/bundles/fsfit.db713dca13e6932c.css",
     "/css/bundles/fsfit.78ffd29afaff93ca.css",
     "/css/bundles/fsfit.cac95221c313f26b.css",
@@ -859,9 +859,9 @@
       ]
     },
     "index.html": {
-      "url": "/css/bundles/fsfit.2b1e9e1a7ccc83de.css",
-      "sha256": "2b1e9e1a7ccc83deee528bcda6aaa02422d14dfbd9365a9f30748db6840adc53",
-      "bytes": 51233,
+      "url": "/css/bundles/fsfit.8fdb286356c108ae.css",
+      "sha256": "8fdb286356c108ae8c017d7b1f1efc79b18e27b51af5ba5ec26a1329e848aa03",
+      "bytes": 52338,
       "sourceCount": 3,
       "duplicatesRemoved": 0,
       "sources": [
@@ -1206,9 +1206,9 @@
       ]
     },
     "sistema-para-personal-trainer.html": {
-      "url": "/css/bundles/fsfit.2b1e9e1a7ccc83de.css",
-      "sha256": "2b1e9e1a7ccc83deee528bcda6aaa02422d14dfbd9365a9f30748db6840adc53",
-      "bytes": 51233,
+      "url": "/css/bundles/fsfit.8fdb286356c108ae.css",
+      "sha256": "8fdb286356c108ae8c017d7b1f1efc79b18e27b51af5ba5ec26a1329e848aa03",
+      "bytes": 52338,
       "sourceCount": 3,
       "duplicatesRemoved": 0,
       "sources": [

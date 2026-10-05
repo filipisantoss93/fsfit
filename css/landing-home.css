@@ -1016,3 +1016,41 @@ html[data-fsfit-theme="light"] body.ads-landing .auth-price-note {
     justify-content: center;
   }
 }
+
+/* A seção de aula ao vivo permanece legível quando o tema claro está ativo. */
+html[data-fsfit-theme="light"] body.ads-landing .lp-live {
+  border-color: rgba(23, 33, 43, .14);
+  background: linear-gradient(125deg, #ffffff, #f1f5f2 55%, #f7f9fa);
+  color: #17212b;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-live h2 {
+  color: #17212b;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-live > div:first-child > p {
+  color: #4d5a65;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-tags span {
+  border-color: rgba(23, 33, 43, .16);
+  background: #ffffff;
+  color: #34424e;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-card {
+  border-color: rgba(23, 33, 43, .14);
+  background: #ffffff;
+  color: #17212b;
+  box-shadow: 0 16px 36px rgba(28, 39, 49, .1);
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-progress-copy,
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-exercise small {
+  color: #5f6d79;
+}
+
+html[data-fsfit-theme="light"] body.ads-landing .lp-live-exercise {
+  border-color: rgba(23, 33, 43, .12);
+  background: #f5f7f8;
+}
